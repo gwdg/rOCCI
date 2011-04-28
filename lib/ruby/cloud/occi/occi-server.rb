@@ -382,9 +382,7 @@ begin
                 attributes[key] = value
               end
               if kind != nil
-#                target = $categoryRegistry.get_entities_by_location(target_location)[0]
                 target = $locationRegistry.get_object_by_location(target_location)
-#                source = $categoryRegistry.get_entities_by_location(source_location)[0]
                 source = $locationRegistry.get_object_by_location(source_location)
                 attributes["occi.core.target"] = target_location
                 attributes["occi.core.source"] = source_location
@@ -497,7 +495,6 @@ begin
           break
         end
       else # operation on resource
-#        mixin = $categoryRegistry.get_mixin_by_location(location)
         mixin = $locationRegistry.get_object_by_location(location)
         if mixin != nil && mixin.kind_of?(OCCI::Core::Mixin)
           request.env["HTTP_X_OCCI_LOCATION"].split(",").each do |entity_location|
@@ -550,7 +547,6 @@ begin
                     attributes[key] = value
                   end
                   if kind != nil
-#                    target = $categoryRegistry.get_entities_by_location(target_location)[0]
                     target = $locationRegistry.get_object_by_location(target_location)
                     attributes["occi.core.target"] = target_location
                     attributes["occi.core.source"] = source_location
@@ -615,7 +611,6 @@ begin
       $log.debug("exact resource match: #{exact_resource_match}")
 
       # location is a mixin, unassociate all resources from it
-#      mixin = $categoryRegistry.get_mixin_by_location(location)
       mixin = $locationRegistry.get_object_by_location(location)
       if mixin != nil && mixin.kind_of?(OCCI::Core::Mixin) then
         $log.debug("Mixin to delete")
@@ -683,11 +678,8 @@ def get_entities_by_location_from_categories(location,categories)
     if category.get_location() == location then
       entities.concat(category.entities)
     else
-#      loc_with_namespace = $config["server"] + ':' + $config["port"] + location
       category.entities.each do |entity|
-#        exact_resource_match = true if  entity.get_location() == loc_with_namespace
-#        entities << entity if entity.get_location().start_with?(loc_with_namespace)
-        exact_resource_match = true if  entity.get_location() == location
+        exact_resource_match = true if entity.get_location() == location
         entities << entity if entity.get_location().start_with?(location)
 
       end
