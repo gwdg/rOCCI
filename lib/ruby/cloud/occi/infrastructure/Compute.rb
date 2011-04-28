@@ -22,6 +22,7 @@
 require 'occi/core/Action'
 require 'occi/core/Kind'
 require 'occi/core/Resource'
+require 'occi/core/StateMachine'
 
 module OCCI
   module Infrastructure
@@ -30,18 +31,33 @@ module OCCI
       # Define appropriate kind
       begin
           # Define actions
-          actions = []
-          actions << OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "restart",
-                      title = "Compute Action Restart",   attributes = ["graceful", "warm", "cold"])
+          action_restart = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "restart",
+                            title = "Compute Action Restart",   attributes = ["graceful", "warm", "cold"])
 
-          actions << OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "start",
-                      title = "Compute Action Start",     attributes = [])
+          action_start   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "start",
+                            title = "Compute Action Start",     attributes = [])
 
-          actions << OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "stop",      
-                     title = "Compute Action Stop",      attributes = ["graceful", "acpioff", "poweroff"])
+          action_stop    = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "stop",      
+                            title = "Compute Action Stop",      attributes = ["graceful", "acpioff", "poweroff"])
 
-          actions << OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "suspend",#
-                     title = "Compute Action Suspend",   attributes = ["hibernate", "suspend"])
+          action_suspend = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "suspend",
+                            title = "Compute Action Suspend",   attributes = ["hibernate", "suspend"])
+
+          actions = [action_restart, action_start, action_stop, action_suspend]
+          
+          # Define state-machine
+          state_inactive  = OCCI::Core::StateMachine::State.new("inactive")
+          state_active    = OCCI::Core::StateMachine::State.new("active")
+          state_suspended = OCCI::Core::StateMachine::State.new("suspended")
+          
+          state_inactive.add_transition(action_start, state_active)
+
+          state_active.add_transition(action_stop, state_inactive)
+          state_active.add_transition(action_suspend, state_suspended)
+
+          state_suspended.add_transition(action_start, state_active)
+
+          compute_state_machine = OCCI::Core::StateMachine.new(state_inactive, [state_inactive, state_active, state_suspended])
 
           related = [OCCI::Core::Resource::KIND]
           entity_type = self
