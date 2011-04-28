@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<loadpath>
+	<pathentry excluding="lib/ruby/cloud/" path="" type="src"/>
+	<pathentry path="lib/ruby/cloud" type="src"/>
+	<pathentry path="/one" type="project"/>
+</loadpath>
