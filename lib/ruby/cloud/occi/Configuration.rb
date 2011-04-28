@@ -15,7 +15,7 @@
 ##############################################################################
 
 ##############################################################################
-# Description: OCCI RESTful Web Service
+# Description: Configuration of OCCI Webservice
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 

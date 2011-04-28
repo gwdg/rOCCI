@@ -152,11 +152,6 @@ begin
 
       $locationRegistry.dump_contexts
 
-      # Handle root request
-#      if location == "/"
-#        break
-#      end
-
       # Query interface: return all supported kinds + mixins
       if location == "/-/"
   
@@ -304,7 +299,6 @@ begin
 
         if action_params != ""
           $log.debug("Action from query string: #{action_params}")
-#          entities = $categoryRegistry.get_entities_by_location(location)
           entities = $locationRegistry.get_resources_below_location(location)
           $log.debug("Entities found at location #{entities}")
           method = request.env["HTTP_X_OCCI_ATTRIBUTE"]
@@ -321,7 +315,6 @@ begin
           response.status  = HTTP_STATUS_CODE["Bad Request"]
         end
 
-#      elsif kind.related == OCCI::Core::Link.getKind() # if kind is a link and no actions specified then create link
       elsif kind.related.include?(OCCI::Core::Link::KIND) # if kind is a link and no actions specified then create link
         attributes = {}
 
@@ -332,11 +325,9 @@ begin
 
         $log.debug("Attributes from Link: #{attributes}")
 
-#        target = $categoryRegistry.get_entities_by_location(attributes["occi.core.target"])[0]
         target_uri = URI.parse(attributes["occi.core.target"])
         target = $locationRegistry.get_object_by_location(target_uri.path)
         $log.debug("target entity of Link: #{target}")
-#        source = $categoryRegistry.get_entities_by_location(attributes["occi.core.source"])[0]
         source_uri = URI.parse(attributes["occi.core.source"])
         source = $locationRegistry.get_object_by_location(source_uri.path)
         $log.debug("source entity of Link: #{source}")
@@ -416,7 +407,7 @@ begin
           end
         end if request.env['HTTP_LINK'] != nil
 
-#        resource.deploy()
+        resource.deploy()
         headers['Location'] = $locationRegistry.get_absolute_location_of_object(resource)
 
       end
