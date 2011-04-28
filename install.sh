@@ -18,22 +18,40 @@ else
     BIN_LOCATION=$ONE_LOCATION/bin
 fi
 
+
 echo -n "Installing OCCI server."
 
-cp bin/occi $ONE_LOCATION/bin
+if [ -f $ONE_LOCATION/bin/occi-server ]; then
+    mv $ONE_LOCATION/bin/occi-server $ONE_LOCATION/bin/occi-server.old
+fi
+
+cp bin/occi-server $ONE_LOCATION/bin
 
 echo -n "."
 
-cp $ONE_LOCATION/etc/occi-server.conf $ONE_LOCATION/etc/occi-server.conf.bck
+if [ -f $ONE_LOCATION/etc/occi-server.conf ]; then
+  cp $ONE_LOCATION/etc/occi-server.conf $ONE_LOCATION/etc/occi-server.conf.bak
+fi
 cp etc/occi-one.conf $ONE_LOCATION/etc
-cp $ONE_LOCATION/etc/occi-one.conf $ONE_LOCATION/etc/occi-one.conf.bck
+
+echo -n "."
+
+if [ -f $ONE_LOCATION/etc/occi-one.conf ]; then
+    cp $ONE_LOCATION/etc/occi-one.conf $ONE_LOCATION/etc/occi-one.conf.bak
+fi
 cp etc/occi-server.conf $ONE_LOCATION/etc
+
+if [ -d $ONE_LOCATION/etc/occi_one_templates ]; then
+    mv $ONE_LOCATION/etc/occi_one_templates $ONE_LOCATION/etc/occi_one_templates.bak
+fi
 cp -r etc/occi_one_templates $ONE_LOCATION/etc
 
 echo -n "."
 
 mv -f $ONE_LOCATION/lib/ruby/cloud/occi $ONE_LOCATION/lib/ruby/cloud/occi.old
-rm -rf $ONE_LOCATION/lib/ruby/cloud/occi
+
+echo -n "."
+
 cp -R lib/ruby/cloud/occi/* $ONE_LOCATION/lib/ruby/cloud/occi
 
 chmod +x $ONE_LOCATION/lib/ruby/cloud/occi/occi-server.rb
@@ -42,5 +60,6 @@ echo "."
 
 echo "done"
 
-echo "Your current occi-one.conf has been moved to $ONE_LOCATION/etc/occi-one.conf.bck"
-echo "Your current occi-server.conf has been moved to $ONE_LOCATION/etc/occi-server.conf.bck"
+echo "Your current occi-one.conf has been moved to $ONE_LOCATION/etc/occi-one.conf.bak"
+echo "Your current occi-server.conf has been moved to $ONE_LOCATION/etc/occi-server.conf.bak"
+echo "Your current occi templates have been moved to $ONE_LOCATION/etc/occi_one_templates.bak"
