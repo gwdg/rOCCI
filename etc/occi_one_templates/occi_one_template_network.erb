@@ -1,0 +1,17 @@
+<% if attributes["id"]%>
+NAME = "<%= attributes["id"] if attributes["id"]%>"
+<%else%>
+"<%o =  [('a'..'z'),('A'..'Z'),(0..9)].map{|i| i.to_a}.flatten%>" 
+NAME  =  "<%=(0..7).map{ o[rand(o.length)]}.join%>"
+<% end %>
+
+TYPE = RANGED
+
+BRIDGE = virbr0
+
+NETWORK_ADDRESS = 192.168.2.125 
+NETWORK_SIZE    = 126
+NETMASK         = 255.255.255.0
+GATEWAY         = 192.168.2.1
+
+ 

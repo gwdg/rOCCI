@@ -1,0 +1,8 @@
+<% if attributes["id"]%>
+NAME          = "<%= attributes["id"] if attributes["id"]%>"
+<% end %>
+PATH          = /srv/cloud/images/ttylinux/ttylinux.img
+PUBLIC        = YES
+DESCRIPTION   = "<%= attributes["summary"] if attributes["summary"]%>"
+TYPE		  = "OS"
+SIZE          = "<%= attributes["occi.storage.size"] if attributes["occi.storage.size"]%>"
