@@ -38,6 +38,7 @@ module OCCI
   module Backend
     class OpenNebulaBackend < CloudServer
 
+      ########################################################################
       # Vorlage für die Response einer Virtuellen Maschine
       @@occi_vmm = %q{
                  <COMPUTE href="<%= $URL %>/compute/<%= self.id.to_s  %>">
@@ -113,10 +114,12 @@ module OCCI
         </STORAGE>
     }
 
-      TEMPLATECOMPUTERAWFILE = 'template_compute_raw.erb'
-      TEMPLATENETWORKRAWFILE = 'template_network_raw.erb'
-      TEMPLATESTORAGERAWFILE = 'template_storage_raw.erb'
+      TEMPLATECOMPUTERAWFILE = 'occi_one_template_compute.erb'
+      TEMPLATENETWORKRAWFILE = 'occi_one_template_network.erb'
+      TEMPLATESTORAGERAWFILE = 'occi_one_template_storage.erb'
 
+      ########################################################################
+      # Virtual Machine methods
 
       # CREATE a VM
       def create_compute_instance(computeObject)
@@ -137,9 +140,12 @@ module OCCI
           end
         end
         xmlLoc = VirtualMachine.build_xml
+        $log.debug("XMLLoc #{xmlLoc}")
         vm=VirtualMachine.new(xmlLoc, @one_client)
+        $log.debug("ONE VM handler #{vm}")
         @templateRaw = @config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
         template = ERB.new(File.read(@templateRaw)).result(binding)
+        $log.debug("Parsed template #{template}")
         rc = vm.allocate(template)
         $log.debug(vm.info)
       end
@@ -253,23 +259,6 @@ module OCCI
         return ids
       end
 
-      #    # GET ALL VMs - A POOL INSTANCE
-      #    def get_all_vm_instances()
-      #      vm_pool = VirtualMachinePool.new(@one_client, -1)
-      #      rc = vm_pool.info
-      #      if OpenNebula.is_error?(rc)
-      #        raise OCCI::Errors::BackEndError, rc.message
-      #      else
-      #        vm_pool.each do |vm|
-      #          locations << "#{$url}compute/#{vm.id.to_s},"
-      #          locations_plain << "X-OCCI-LOCATION: "
-      #          locations_plain << "#{$url}compute/#{vm.id.to_s}\n"
-      #        end
-      #
-      #      end
-      #      return rc, locations_occi, locations_plain
-      #    end
-
       # Trigger an action on VM
       def trigger_action_on_vm_instance(iD, actiontype, method=nil)
         vM=VmOcci.new(VmOcci.build_xml(iD), @one_client)
@@ -298,31 +287,20 @@ module OCCI
         end
       end
 
+      ########################################################################
+      # Network methods
+      
       # CREATE a VNET
-      def createNetworkInstance(networkObject)
-        o = []
+      def create_network_instance(networkObject)
         attributes = networkObject.attributes
 
-        xmlLoc = VNetOcci.build_xml
-        vNET=VNetOcci.new(xmlLoc, @one_client)
-        @templateRaw = TEMPLATENETWORKRAWFILE
+        xmlLoc = VirtualNetwork.build_xml
+        network=VirtualNetwork.new(xmlLoc, @one_client)
+        @templateRaw = @config["TEMPLATE_LOCATION"] + TEMPLATENETWORKRAWFILE
         template = ERB.new(File.read(@templateRaw)).result(binding)
-        rc = vNET.allocate(template)
-        vNETInfo = vNET.info
-
-        if rc == nil
-
-          # Formatierte Ausgabe mit ausgewählten Informationen über die Virtuelle-Maschine (da "ausgewählte" Informationen vorhanden)
-          # recht übersichtliche Ausgabe -
-          begin
-            adinfo = vNET.to_occi(@@occi_vnet)
-            doc = REXML::Document.new(adinfo)
-            networkObject.attributes["id"] = REXML::XPath.first(doc, "//NAME").text
-          end
-        else
-          raise OCCI::Errors::BackEndError, "#{rc.inspect} - VirtualNetworkName already exists?}"
-          error = OpenNebula::Error.new(rc)
-        end
+        $log.debug("Parsed template #{template}")
+        rc = network.allocate(template)
+        $log.debug(network.info)
       end
 
       # TODO: genau wie bei get VM Fehlerbehandlung einführen
@@ -383,27 +361,6 @@ module OCCI
         end
       end
 
-      #    # GET ALL VNET'S - A POOL INSTANCE
-      #    def get_all_vnet_instances()
-      #      locations_occi = []
-      #      locations_plain = []
-      #      vnet_pool = VirtualNetworkPool.new(@one_client, -1)
-      #      rc = vnet_pool.info
-      #      if OpenNebula.is_error?(rc)
-      #        raise OCCI::Errors::BackEndError, rc.message
-      #      else
-      #        vnet_pool.each do |vnet|
-      #          locations_occi << "#{$url}network/#{vnet.id.to_s},"
-      #          locations_occi_for_entity = "#{$url}network/#{vnet.id.to_s}"
-      #          OCCI::Infrastructure::Network::get_network_kind.addEntity(OCCI::Infrastructure::Network::reverse_initialize(locations_occi_for_entity))
-      #          locations_plain << "X-OCCI-LOCATION: "
-      #          locations_plain << "#{$url}network/#{vnet.id.to_s}\n"
-      #        end
-      #        #pp OCCI::Infrastructure::Network::get_network_kind.entities
-      #      end
-      #      return rc, locations_occi, locations_plain
-      #    end
-
       # GET ALL VNET'S - A POOL INSTANCE
       def get_all_vnet_ids()
         ids = []
@@ -434,6 +391,9 @@ module OCCI
           return vnet_info
         end
       end
+      
+      ########################################################################
+      # Storage methods
 
       # CREATE a STORAGE / IMAGE
       def createStorageInstance(storageObject)
@@ -491,25 +451,6 @@ module OCCI
           return vimage_size, vimage_state
         end
       end
-
-      #    # GET ALL Images - A POOL INSTANCE
-      #    def get_all_image_instances()
-      #      locations_occi = []
-      #      locations_plain = []
-      #      image_pool = ImagePool.new(@one_client, -1)
-      #      rc = image_pool.info
-      #      if OpenNebula.is_error?(rc)
-      #        raise OCCI::Errors::BackEndError, rc.message
-      #      else
-      #        image_pool.each do |image|
-      #          locations_occi << "#{$url}image/#{image.id.to_s},"
-      #          locations_plain << "X-OCCI-LOCATION: "
-      #          locations_plain << "#{$url}image/#{image.id.to_s}\n"
-      #        end
-      #
-      #      end
-      #      return rc, locations_occi, locations_plain
-      #    end
 
       # GET ALL Images - A POOL INSTANCE
       def get_all_image_ids()

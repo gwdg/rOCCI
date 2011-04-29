@@ -62,6 +62,7 @@ require 'occi/rendering/http/LocationRegistry'
 ##############################################################################
 # Initialize logger
 
+$stdout.sync = true
 $log = Logger.new(STDOUT)
 
 ##############################################################################
