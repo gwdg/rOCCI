@@ -35,12 +35,6 @@ module OCCI
         @entities = (entities != nil ? entities : [])
       end
 
-      def addEntity(entity)
-        @entities =[] if @entities == nil
-        @entities << entity
-        @entities
-      end
-
     end
   end
 end

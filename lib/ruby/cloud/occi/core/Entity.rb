@@ -101,38 +101,9 @@ module OCCI
         self.class.getKind.get_short_category_string()
       end
 
-#      def associate_mixin(mixin)
-#        raise "Can not associate 'nil'-mixin with entity: #{self}"
-#        @mixin = mixin
-#        attributes = self.add_mixin_attributes
-#        mix_entities = @mixin.addEntity(self)
-#        @mixins << @mixin
-#      end
-
-      #TODO: also the actions has to be merged
-#      def add_mixin_attributes
-#        @attributes.merge!(@mixin.get_attributes())
-#        mixin_orig = @mixin
-#        while @mixin.related != nil
-#          @mixin = @mixin.related
-#          @attributes.merge!(@mixin.get_attributes())
-#        end
-#        @mixin = mixin_orig
-#        @attributes
-#      end
-
-#      def get_own_attributes()
-#        attr = []
-#        self.class.getKind().attributes.keys.each do |key|    
-#          attr << key + '=' + @attributes[key] if @attributes[key] != nil
-#        end
-#        return attr
-#      end
-
       def kind()
         return $categoryRegistry.getKind(@kind_type)
       end
-
 
     end
   end

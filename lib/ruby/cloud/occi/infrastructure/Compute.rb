@@ -52,12 +52,12 @@ module OCCI
           
           state_inactive.add_transition(action_start, state_active)
 
-          state_active.add_transition(action_stop, state_inactive)
+          state_active.add_transition(action_stop,    state_inactive)
           state_active.add_transition(action_suspend, state_suspended)
 
           state_suspended.add_transition(action_start, state_active)
 
-          compute_state_machine = OCCI::Core::StateMachine.new(state_inactive, [state_inactive, state_active, state_suspended])
+          STATE_MACHINE = OCCI::Core::StateMachine.new(state_inactive, [state_inactive, state_active, state_suspended])
 
           related = [OCCI::Core::Resource::KIND]
           entity_type = self
@@ -81,7 +81,8 @@ module OCCI
  
       def initialize(attributes)
         super(attributes)
-        @kind_type = "http://schemas.ogf.org/occi/infrastructure#compute"
+        @kind_type      = "http://schemas.ogf.org/occi/infrastructure#compute"
+        @state_machine  = STATE_MACHINE
       end
 
       def deploy()

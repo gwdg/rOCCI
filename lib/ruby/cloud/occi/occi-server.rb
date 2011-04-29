@@ -661,7 +661,7 @@ def add_instances_from_backend_to_service
       ids.each do |id|
         attributes = kind.entity_type.getInstance_id(id)
         resource = kind.entity_type.new(attributes, nil, false)
-        kind.addEntity(resource)
+        kind.entities << resource
       end
     end
   end
