@@ -307,7 +307,7 @@ begin
             # TODO trigger action!
 #            action.trigger(entities,method)
             $log.debug("Action triggered")
-            delegator = OCCI::Core::ActionDelegator.instance
+            delegator = OCCI::ActionDelegator.instance
             entities.each do |entity|
               delegator.delegate_action(action, method, entity)
             end

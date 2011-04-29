@@ -20,6 +20,7 @@
 ##############################################################################
 
 require 'occi/core/Kind'
+require 'occi/StateMachine'
 
 module OCCI
   module Infrastructure
@@ -34,14 +35,14 @@ module OCCI
         actions = [ACTION_DOWN, ACTION_UP]
 
         # Define state-machine
-        STATE_INACTIVE  = OCCI::Core::StateMachine::State.new("inactive")
-        STATE_ACTIVE    = OCCI::Core::StateMachine::State.new("active")
+        STATE_INACTIVE  = OCCI::StateMachine::State.new("inactive")
+        STATE_ACTIVE    = OCCI::StateMachine::State.new("active")
         
         STATE_INACTIVE.add_transition(ACTION_UP, STATE_ACTIVE)
 
         STATE_ACTIVE.add_transition(ACTION_DOWN, STATE_INACTIVE)
 
-        STATE_MACHINE = OCCI::Core::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE])
+        STATE_MACHINE = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE])
 
         related     = [OCCI::Core::Resource::KIND]
         entity_type = self

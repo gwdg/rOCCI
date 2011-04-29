@@ -21,6 +21,7 @@
 
 require 'occi/core/Kind'
 require 'occi/core/Resource'
+require 'occi/StateMachine'
 
 module OCCI
   module Infrastructure
@@ -41,11 +42,11 @@ module OCCI
         actions = [ACTION_BACKUP, ACTION_OFFLINE, ACTION_ONLINE, ACTION_RESIZE, ACTION_SNAPSHOT]
 
         # Define state-machine
-        STATE_OFFLINE   = OCCI::Core::StateMachine::State.new("offline")
-        STATE_ONLINE    = OCCI::Core::StateMachine::State.new("online")
-        STATE_BACKUP    = OCCI::Core::StateMachine::State.new("backup")
-        STATE_SNAPSHOT  = OCCI::Core::StateMachine::State.new("snapshot")
-        STATE_RESIZE    = OCCI::Core::StateMachine::State.new("resize")
+        STATE_OFFLINE   = OCCI::StateMachine::State.new("offline")
+        STATE_ONLINE    = OCCI::StateMachine::State.new("online")
+        STATE_BACKUP    = OCCI::StateMachine::State.new("backup")
+        STATE_SNAPSHOT  = OCCI::StateMachine::State.new("snapshot")
+        STATE_RESIZE    = OCCI::StateMachine::State.new("resize")
         
         STATE_OFFLINE.add_transition(ACTION_ONLINE, STATE_ONLINE)
         
@@ -60,7 +61,7 @@ module OCCI
         
         STATE_RESIZE.add_transition(ACTION_COMPLETE,  STATE_ONLINE)
 
-        STATE_MACHINE = OCCI::Core::StateMachine.new(STATE_OFFLINE, [STATE_OFFLINE, STATE_ONLINE, STATE_BACKUP, STATE_SNAPSHOT, STATE_RESIZE])
+        STATE_MACHINE = OCCI::StateMachine.new(STATE_OFFLINE, [STATE_OFFLINE, STATE_ONLINE, STATE_BACKUP, STATE_SNAPSHOT, STATE_RESIZE])
 
         related     = [OCCI::Core::Resource::KIND]
         entity_type = self
