@@ -31,33 +31,33 @@ module OCCI
       # Define appropriate kind
       begin
           # Define actions
-          action_restart = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "restart",
+          ACTION_RESTART = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "restart",
                             title = "Compute Action Restart",   attributes = ["graceful", "warm", "cold"])
 
-          action_start   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "start",
+          ACTION_START   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "start",
                             title = "Compute Action Start",     attributes = [])
 
-          action_stop    = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "stop",      
+          ACTION_STOP    = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "stop",      
                             title = "Compute Action Stop",      attributes = ["graceful", "acpioff", "poweroff"])
 
-          action_suspend = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "suspend",
+          ACTION_SUSPEND = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "suspend",
                             title = "Compute Action Suspend",   attributes = ["hibernate", "suspend"])
 
-          actions = [action_restart, action_start, action_stop, action_suspend]
+          actions = [ACTION_RESTART, ACTION_START, ACTION_STOP, ACTION_SUSPEND]
           
           # Define state-machine
-          state_inactive  = OCCI::Core::StateMachine::State.new("inactive")
-          state_active    = OCCI::Core::StateMachine::State.new("active")
-          state_suspended = OCCI::Core::StateMachine::State.new("suspended")
+          STATE_INACTIVE  = OCCI::Core::StateMachine::State.new("inactive")
+          STATE_ACTIVE    = OCCI::Core::StateMachine::State.new("active")
+          STATE_SUSPENDED = OCCI::Core::StateMachine::State.new("suspended")
           
-          state_inactive.add_transition(action_start, state_active)
+          STATE_INACTIVE.add_transition(ACTION_RESTART, STATE_ACTIVE)
 
-          state_active.add_transition(action_stop,    state_inactive)
-          state_active.add_transition(action_suspend, state_suspended)
+          STATE_ACTIVE.add_transition(ACTION_STOP,    STATE_INACTIVE)
+          STATE_ACTIVE.add_transition(ACTION_SUSPEND, STATE_SUSPENDED)
 
-          state_suspended.add_transition(action_start, state_active)
+          STATE_SUSPENDED.add_transition(ACTION_START, STATE_ACTIVE)
 
-          STATE_MACHINE = OCCI::Core::StateMachine.new(state_inactive, [state_inactive, state_active, state_suspended])
+          STATE_MACHINE = OCCI::Core::StateMachine.new(STATE_ACTIVE, [STATE_INACTIVE, STATE_ACTIVE, STATE_SUSPENDED])
 
           related = [OCCI::Core::Resource::KIND]
           entity_type = self
@@ -82,7 +82,7 @@ module OCCI
       def initialize(attributes)
         super(attributes)
         @kind_type      = "http://schemas.ogf.org/occi/infrastructure#compute"
-        @state_machine  = STATE_MACHINE
+        @state_machine  = STATE_MACHINE.clone
       end
 
       def deploy()

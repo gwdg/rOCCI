@@ -291,7 +291,7 @@ begin
       end
 
       $log.debug("Kind found: #{kind.term}") if kind != nil
-      $log.debug("Action found: #{action.getCategory.title}") if action != nil
+      $log.debug("Action found: #{action.category.title}") if action != nil
 
       if request.query_string() != ""
         regexp = Regexp.new(/action=([^&]*)/)
@@ -306,6 +306,10 @@ begin
             # TODO trigger action!
 #            action.trigger(entities,method)
             $log.debug("Action triggered")
+            delegator = OCCI::Core::ActionDelegator.instance
+            entities.each do |entity|
+              delegator.delegate_action(action, method, entity)
+            end
           else
             $log.error("Entities corresponding to location couldn't be found")
             response.status  = HTTP_STATUS_CODE["Bad Request"]

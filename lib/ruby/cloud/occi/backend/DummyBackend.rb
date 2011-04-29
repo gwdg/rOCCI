@@ -19,6 +19,9 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'occi/core/ActionDelegator'
+require 'occi/infrastructure/Compute'
+
 module OCCI
   module Backend
     class DummyBackend
@@ -27,7 +30,20 @@ module OCCI
         @computeObjects = []
         @networkObjects = []
         @storageObjects = []
+        
+        # Register methods for actions
+        delegator = OCCI::Core::ActionDelegator.instance
+        delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_START, self, :compute_start)
+        delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_STOP,  self, :compute_stop)
       end     
+      
+      def compute_start(action, parameters, resource)
+        $log.debug("compute_start: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+      end
+      
+      def compute_stop(action, parameters, resource)
+        $log.debug("compute_stop: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+      end
       
       def create_compute_instance(computeObject)
         @computeObjects << computeObject

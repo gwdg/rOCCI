@@ -147,8 +147,11 @@ module OCCI
               next
             end
             # Only resources must be returned
-            resources << context_element if context_element.kind_of?(OCCI::Core::Resource)
+            resources << context_element if context_element.kind_of?(OCCI::Core::Entity)
           end until context_elements_list.empty?
+          # Test if there is an object directly under the requested location
+          entity = get_object_by_location(location)
+          resources << entity if entity != nil && entity.kind_of?(OCCI::Core::Entity)
           return resources
         end
         
