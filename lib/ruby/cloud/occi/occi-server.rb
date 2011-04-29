@@ -113,7 +113,7 @@ begin
   $backend = case $config["backend"]
   when "opennebula"
     require 'occi/backend/OpenNebulaBackend'
-    OCCI::Backend::OpenNebulaInterface.new(CONFIGURATION_FILE)
+    OCCI::Backend::OpenNebulaBackend.new($config['OPENNEBULA_CONFIG'])
   when "dummy" then 
     require 'occi/backend/DummyBackend'
     OCCI::Backend::DummyBackend.new()
