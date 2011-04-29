@@ -20,40 +20,67 @@
 ##############################################################################
 
 require 'occi/core/Kind'
-#require 'OCCI/Core/Resource'
+require 'occi/core/Resource'
 
 module OCCI
   module Infrastructure
     class Storage < OCCI::Core::Resource
 
-      # Define appropriate kind
+      # Define associated kind
       begin
-          # Define actions
-          actions = []
-          actions << OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "backup",    title = "Storage Action Backup",    attributes = [])
-          actions << OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "offline",   title = "Storage Action Offline",   attributes = [])
-          actions << OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "online",    title = "Storage Action Online",    attributes = [])
-          actions << OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "resize",    title = "Storage Action Resize",    attributes = ["size"])
-          actions << OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "snapshot",  title = "Storage Action Snapshot",  attributes = [])
+        # Define actions
+        ACTION_BACKUP   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "backup",    title = "Storage Action Backup",    attributes = [])
+        ACTION_OFFLINE  = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "offline",   title = "Storage Action Offline",   attributes = [])
+        ACTION_ONLINE   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "online",    title = "Storage Action Online",    attributes = [])
+        ACTION_RESIZE   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "resize",    title = "Storage Action Resize",    attributes = ["size"])
+        ACTION_SNAPSHOT = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "snapshot",  title = "Storage Action Snapshot",  attributes = [])
 
-          related     = [OCCI::Core::Resource::KIND]
-          entity_type = self
-          entities    = []
+        # TODO: determine how to model "complete" action (can not be called by occi-client but may be called by backend?)
+        ACTION_COMPLETE = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "complete",  title = "Storage Action Complete",  attributes = [])
 
-          term    = "storage"
-          scheme  = "http://schemas.ogf.org/occi/infrastructure#"
-          title   = "Storage Resource"
+        actions = [ACTION_BACKUP, ACTION_OFFLINE, ACTION_ONLINE, ACTION_RESIZE, ACTION_SNAPSHOT]
 
-          attributes = OCCI::Core::Attributes.new()
-          attributes << OCCI::Core::Attribute.new(name = 'occi.storage.size',   mutable = true,   mandatory = true, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'occi.storage.state',  mutable = false,  mandatory = true, unique = true)
+        # Define state-machine
+        STATE_OFFLINE   = OCCI::Core::StateMachine::State.new("offline")
+        STATE_ONLINE    = OCCI::Core::StateMachine::State.new("online")
+        STATE_BACKUP    = OCCI::Core::StateMachine::State.new("backup")
+        STATE_SNAPSHOT  = OCCI::Core::StateMachine::State.new("snapshot")
+        STATE_RESIZE    = OCCI::Core::StateMachine::State.new("resize")
+        
+        STATE_OFFLINE.add_transition(ACTION_ONLINE, STATE_ONLINE)
+        
+        STATE_ONLINE.add_transition(ACTION_OFFLINE,   STATE_OFFLINE)
+        STATE_ONLINE.add_transition(ACTION_BACKUP,    STATE_BACKUP)
+        STATE_ONLINE.add_transition(ACTION_SNAPSHOT,  STATE_SNAPSHOT)
+        STATE_ONLINE.add_transition(ACTION_RESIZE,    STATE_RESIZE)
+
+        STATE_BACKUP.add_transition(ACTION_COMPLETE,  STATE_ONLINE)
+
+        STATE_SNAPSHOT.add_transition(ACTION_COMPLETE,STATE_ONLINE)
+        
+        STATE_RESIZE.add_transition(ACTION_COMPLETE,  STATE_ONLINE)
+
+        STATE_MACHINE = OCCI::Core::StateMachine.new(STATE_OFFLINE, [STATE_OFFLINE, STATE_ONLINE, STATE_BACKUP, STATE_SNAPSHOT, STATE_RESIZE])
+
+        related     = [OCCI::Core::Resource::KIND]
+        entity_type = self
+        entities    = []
+
+        term    = "storage"
+        scheme  = "http://schemas.ogf.org/occi/infrastructure#"
+        title   = "Storage Resource"
+
+        attributes = OCCI::Core::Attributes.new()
+        attributes << OCCI::Core::Attribute.new(name = 'occi.storage.size',   mutable = true,   mandatory = true, unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.storage.state',  mutable = false,  mandatory = true, unique = true)
           
-          KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
+        KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
       end
 
       def initialize(attributes)
         super(attributes)
-        @kind_type = "http://schemas.ogf.org/occi/infrastructure#storage"
+        @kind_type      = "http://schemas.ogf.org/occi/infrastructure#storage"
+        @state_machine  = STATE_MACHINE.clone
       end
       
       def deploy()

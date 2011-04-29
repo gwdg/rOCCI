@@ -25,12 +25,23 @@ module OCCI
   module Infrastructure
     class Network < OCCI::Core::Resource
 
-      # Define appropriate kind
+      # Define associated kind
       begin
-        # Register && define actions
-        actions = []
-        actions << OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/network/action#", term = "down",      title = "Network Action Down", attributes = [])
-        actions << OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/network/action#", term = "up",        title = "Network Action Up", attributes = [])
+        # Define actions
+        ACTION_DOWN = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/network/action#", term = "down",      title = "Network Action Down", attributes = [])
+        ACTION_UP   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/network/action#", term = "up",        title = "Network Action Up", attributes = [])
+
+        actions = [ACTION_DOWN, ACTION_UP]
+
+        # Define state-machine
+        STATE_INACTIVE  = OCCI::Core::StateMachine::State.new("inactive")
+        STATE_ACTIVE    = OCCI::Core::StateMachine::State.new("active")
+        
+        STATE_INACTIVE.add_transition(ACTION_UP, STATE_ACTIVE)
+
+        STATE_ACTIVE.add_transition(ACTION_DOWN, STATE_INACTIVE)
+
+        STATE_MACHINE = OCCI::Core::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE])
 
         related     = [OCCI::Core::Resource::KIND]
         entity_type = self
@@ -51,6 +62,7 @@ module OCCI
       def initialize(attributes)
         super(attributes)
         @kind_type = "http://schemas.ogf.org/occi/infrastructure#network"
+        @state_machine  = STATE_MACHINE.clone
       end
       
       def deploy()

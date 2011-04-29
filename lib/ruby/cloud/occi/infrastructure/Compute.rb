@@ -28,55 +28,57 @@ module OCCI
   module Infrastructure
     class Compute < OCCI::Core::Resource
  
-      # Define appropriate kind
+      # Define associated kind
       begin
-          # Define actions
-          ACTION_RESTART = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "restart",
-                            title = "Compute Action Restart",   attributes = ["graceful", "warm", "cold"])
+        # Define actions
+        ACTION_RESTART = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "restart",
+                          title = "Compute Action Restart",   attributes = ["graceful", "warm", "cold"])
 
-          ACTION_START   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "start",
-                            title = "Compute Action Start",     attributes = [])
+        ACTION_START   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "start",
+                          title = "Compute Action Start",     attributes = [])
 
-          ACTION_STOP    = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "stop",      
-                            title = "Compute Action Stop",      attributes = ["graceful", "acpioff", "poweroff"])
+        ACTION_STOP    = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "stop",      
+                          title = "Compute Action Stop",      attributes = ["graceful", "acpioff", "poweroff"])
 
-          ACTION_SUSPEND = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "suspend",
-                            title = "Compute Action Suspend",   attributes = ["hibernate", "suspend"])
+        ACTION_SUSPEND = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "suspend",
+                          title = "Compute Action Suspend",   attributes = ["hibernate", "suspend"])
 
-          actions = [ACTION_RESTART, ACTION_START, ACTION_STOP, ACTION_SUSPEND]
+        actions = [ACTION_RESTART, ACTION_START, ACTION_STOP, ACTION_SUSPEND]
           
-          # Define state-machine
-          STATE_INACTIVE  = OCCI::Core::StateMachine::State.new("inactive")
-          STATE_ACTIVE    = OCCI::Core::StateMachine::State.new("active")
-          STATE_SUSPENDED = OCCI::Core::StateMachine::State.new("suspended")
+        # Define state-machine
+        STATE_INACTIVE  = OCCI::Core::StateMachine::State.new("inactive")
+        STATE_ACTIVE    = OCCI::Core::StateMachine::State.new("active")
+        STATE_SUSPENDED = OCCI::Core::StateMachine::State.new("suspended")
           
-          STATE_INACTIVE.add_transition(ACTION_RESTART, STATE_ACTIVE)
+        STATE_INACTIVE.add_transition(ACTION_RESTART, STATE_ACTIVE)
 
-          STATE_ACTIVE.add_transition(ACTION_STOP,    STATE_INACTIVE)
-          STATE_ACTIVE.add_transition(ACTION_SUSPEND, STATE_SUSPENDED)
+        STATE_ACTIVE.add_transition(ACTION_STOP,    STATE_INACTIVE)
+        STATE_ACTIVE.add_transition(ACTION_SUSPEND, STATE_SUSPENDED)
+        # TODO: determine if the following modelling of the restart action is approriate
+        STATE_ACTIVE.add_transition(ACTION_RESTART, STATE_ACTIVE)
 
-          STATE_SUSPENDED.add_transition(ACTION_START, STATE_ACTIVE)
+        STATE_SUSPENDED.add_transition(ACTION_START, STATE_ACTIVE)
 
-          STATE_MACHINE = OCCI::Core::StateMachine.new(STATE_ACTIVE, [STATE_INACTIVE, STATE_ACTIVE, STATE_SUSPENDED])
+        STATE_MACHINE = OCCI::Core::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE, STATE_SUSPENDED])
 
-          related = [OCCI::Core::Resource::KIND]
-          entity_type = self
-          entities = []
+        related = [OCCI::Core::Resource::KIND]
+        entity_type = self
+        entities = []
 
-          term    = "compute"
-          scheme  = "http://schemas.ogf.org/occi/infrastructure#"
-          title   = "Compute Resource"
+        term    = "compute"
+        scheme  = "http://schemas.ogf.org/occi/infrastructure#"
+        title   = "Compute Resource"
 
-          attributes = OCCI::Core::Attributes.new()
-          attributes << OCCI::Core::Attribute.new(name = 'occi.compute.cores',        mutable = true,   mandatory = false,  unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'occi.compute.architecture', mutable = true,   mandatory = false,  unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'occi.compute.state',        mutable = false,  mandatory = true,   unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'occi.compute.hostname',     mutable = true,   mandatory = false,  unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'occi.compute.memory',       mutable = true,   mandatory = false,  unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'occi.compute.speed',        mutable = true,   mandatory = false,  unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'occi.compute.id',           mutable = true,   mandatory = false,  unique = true)
+        attributes = OCCI::Core::Attributes.new()
+        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.cores',        mutable = true,   mandatory = false,  unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.architecture', mutable = true,   mandatory = false,  unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.state',        mutable = false,  mandatory = true,   unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.hostname',     mutable = true,   mandatory = false,  unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.memory',       mutable = true,   mandatory = false,  unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.speed',        mutable = true,   mandatory = false,  unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.id',           mutable = true,   mandatory = false,  unique = true)
           
-          KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
+        KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
       end
  
       def initialize(attributes)
