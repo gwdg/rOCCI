@@ -277,18 +277,11 @@ begin
 
       if request.env['HTTP_CATEGORY'] != nil
         # Get first kind from supplied category string
-        kind = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="kinds")[0]
-        action = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="actions")[0]
-
-        if kind == nil && action == nil
-          $log.error("Kind/Action not found in category")
-          response.status  = HTTP_STATUS_CODE["Bad Request"]
-          break
-        end
+        kind    = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="kinds")[0]
+        action  = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="actions")[0]
+        raise "Kind/Action not found in category!" if kind == nil && action == nil
       else
-        $log.error("No Category provided in request")
-        response.status  = HTTP_STATUS_CODE["Bad Request"]
-        break
+        raise "No Category provided in request!"
       end
 
       $log.debug("Kind found: #{kind.term}") if kind != nil
@@ -306,18 +299,16 @@ begin
           if entities != nil
             # TODO trigger action!
 #            action.trigger(entities,method)
-            $log.debug("Action triggered")
+            $log.debug("Action [#{action}] to be triggered on [#{entities.length}] entities:")
             delegator = OCCI::ActionDelegator.instance
             entities.each do |entity|
               delegator.delegate_action(action, method, entity)
             end
           else
-            $log.error("Entities corresponding to location couldn't be found")
-            response.status  = HTTP_STATUS_CODE["Bad Request"]
+            raise "No entities corresponding to location [#{location}] could be found!"
           end
         else
-          $log.error("Action matching failed")
-          response.status  = HTTP_STATUS_CODE["Bad Request"]
+          raise "Action matching failed!"
         end
 
       elsif kind.related.include?(OCCI::Core::Link::KIND) # if kind is a link and no actions specified then create link
@@ -395,18 +386,15 @@ begin
                 source.attributes["links"] << link
                 target.attributes["links"] << link
                 $locationRegistry.register_location(link.get_location(), link)
-                $log.debug("Link succesfully created")
+                $log.debug("Link successfully created")
               else
-                $log.error("Kind not found in category")
-                response.status  = HTTP_STATUS_CODE["Bad Request"]
+                raise "Kind not found in category!"
               end
             else
-              $log.error("Could not extract parameters from request")
-              response.status  = HTTP_STATUS_CODE["Bad Request"]
+              raise "Could not extract parameters from request!"
             end
           else
-            $log.error("Extracting information from Link failed")
-            response.status  = HTTP_STATUS_CODE["Bad Request"]
+            raise "Extracting information from Link failed!"
           end
         end if request.env['HTTP_LINK'] != nil
 

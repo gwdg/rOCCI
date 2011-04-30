@@ -32,6 +32,10 @@ module OCCI
         @category = OCCI::Core::Category.new(term, scheme, title, attributes)
       end
       
+      def to_s
+        @category.scheme + @category.term
+      end
+      
     end
   end
 end

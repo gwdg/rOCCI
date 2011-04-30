@@ -52,6 +52,10 @@ module OCCI
         @kind_type = "http://schemas.ogf.org/occi/core#resource"
       end
 
+      def to_s
+        @kind_type
+      end
+
     end
   end
 end

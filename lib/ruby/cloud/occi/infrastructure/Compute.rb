@@ -50,7 +50,7 @@ module OCCI
         STATE_ACTIVE    = OCCI::StateMachine::State.new("active")
         STATE_SUSPENDED = OCCI::StateMachine::State.new("suspended")
           
-        STATE_INACTIVE.add_transition(ACTION_RESTART, STATE_ACTIVE)
+        STATE_INACTIVE.add_transition(ACTION_START, STATE_ACTIVE)
 
         STATE_ACTIVE.add_transition(ACTION_STOP,    STATE_INACTIVE)
         STATE_ACTIVE.add_transition(ACTION_SUSPEND, STATE_SUSPENDED)

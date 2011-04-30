@@ -61,7 +61,7 @@ module OCCI
               dump_context(context[key], padding + "   ")
               next
             end
-            $log.debug("#{padding} location: #{key} : object: #{value}]")
+            $log.debug("#{padding} location: #{key} : object: #{value}")
           }
         end
 

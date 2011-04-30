@@ -23,10 +23,13 @@ module OCCI
 
   class StateMachine
 
+    attr_reader :current_state
+
     # ---------------------------------------------------------------------------------------------------------------------
     class State
+
       attr_reader :name
-      attr_reader :transitions
+      attr_reader :transitions      
 
       # ---------------------------------------------------------------------------------------------------------------------                
       def initialize(name)
@@ -41,15 +44,13 @@ module OCCI
         
       # ---------------------------------------------------------------------------------------------------------------------
       def to_s()
-        string = "state: [" + @name + "]; transitions => "
+        string = "[" + @name + "]: transitions: "
         @transitions.each do |key, value|
-          string += " [#{key} -> #{value}]"
+          string += " [#{key} -> #{value.name}]"
         end
         return string
       end
     end
-      
-    attr_reader :current_state
       
     # ---------------------------------------------------------------------------------------------------------------------
     def initialize(start_state, states)
@@ -68,6 +69,11 @@ module OCCI
     # ---------------------------------------------------------------------------------------------------------------------
     def check_transition(action)
       return @current_state.transitions.has_key?(action)
+    end
+
+    # ---------------------------------------------------------------------------------------------------------------------
+    def get_valid_transitions()
+      return @current_state.transitions
     end
 
     # ---------------------------------------------------------------------------------------------------------------------

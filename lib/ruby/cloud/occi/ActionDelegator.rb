@@ -31,7 +31,6 @@ module OCCI
     # ---------------------------------------------------------------------------------------------------------------------
     private
     # ---------------------------------------------------------------------------------------------------------------------
-      
 
     # ---------------------------------------------------------------------------------------------------------------------
     def get_target_object(object, method)
@@ -56,10 +55,13 @@ module OCCI
 
     # ---------------------------------------------------------------------------------------------------------------------
     def register_method_for_action(action, object, method, index = -1)
+
       $log.debug("Registering method [#{method}] of object [#{object}] for action [#{action}] (at index: #{index})...")
+
       raise "Method not defined for this object!" unless object.respond_to?(method)
       target    = get_target_object(object, method)
       target_id = get_target_id(target)
+
       @targets[target_id] = target
       @actions.store(action, []) unless @actions.has_key?(action)
       @actions[action].insert(index, target_id)
@@ -67,28 +69,43 @@ module OCCI
 
     # ---------------------------------------------------------------------------------------------------------------------
     def unregister_method_for_action(action, object, method)
+
       $log.debug("Unregistering method [#{method}] of object [#{object}] from action [#{action}]")
+
       target    = get_target_object(object, method)
       target_id = get_target_id(target)
+
       raise "No methods registered for action!" unless @actions.has_key?(action)
       raise "Method not registered for action!" unless @actions[action].include?(target_id)
+
       @actions[action].delete(target_id)
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
     def delegate_action(action, parameters, resource)
-      $log.debug("Delegating invocation of action [#{action}] on resource [#{resource}] with parameters [#{parameters}] to backend methods...") 
+
+      $log.debug("Delegating invocation of action [#{action}] on resource [#{resource}] with parameters [#{parameters}] to backend methods...")
+
+      # Verify
+      state_machine = resource.state_machine
+      raise "Action [#{action}] not valid for current state [#{state_machine.current_state}] of resource [#{resource}]!" if !resource.state_machine.check_transition(action)
       if !@actions.has_key?(action)
-        $log.warn("No methods registered for action [#{action}] on resource [#{resource}]")
+        $log.warn("No backend methods registered for action [#{action}] on resource [#{resource}]")
+        # Adapt resource state
+        state_machine.transition(action)
         return
       end
+
       # Invoke registered backend methods
       @actions[action].each do |target_id|
         target = @targets[target_id]
         $log.debug("Invoking method [#{target[:method]}] of object [#{target[:object]}]...")
-        result = target[:object].send(target[:method], action, parameters, resource)
         # TODO: define some convention for result handling!
+        result = target[:object].send(target[:method], action, parameters, resource)
       end
+
+      # Adapt resource state
+      state_machine.transition(action)
     end
   end
 end
