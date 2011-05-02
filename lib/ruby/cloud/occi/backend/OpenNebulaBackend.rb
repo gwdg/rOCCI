@@ -22,11 +22,16 @@
 # add OpenNebula Ruby lib to load path
 $: << ENV['ONE_LOCATION'] + '/lib/ruby'
 
+require 'rubygems'
+require 'uuidtools'
 require 'OpenNebula'
 require 'CloudServer'
 require 'CloudClient'
 require 'Configuration'
 require 'rexml/document'
+require 'occi/backend/opennebula/Image'
+require 'occi/backend/opennebula/Network'
+require 'occi/backend/opennebula/VirtualMachine'
 
 ##############################################################################
 # Include OpenNebula Constants
@@ -113,6 +118,14 @@ module OCCI
             <% end %>
         </STORAGE>
     }
+    
+    
+    def initialize(configfile)
+      $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::Image::MIXIN)
+      $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::Network::MIXIN)
+      $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::VirtualMachine::MIXIN)
+      super(configfile)
+    end
 
       TEMPLATECOMPUTERAWFILE = 'occi_one_template_compute.erb'
       TEMPLATENETWORKRAWFILE = 'occi_one_template_network.erb'
@@ -121,396 +134,398 @@ module OCCI
       ########################################################################
       # Virtual Machine methods
 
-      # CREATE a VM
+      # CREATE VM
       def create_compute_instance(computeObject)
-        attr = []
         storageLinks = []
         networkLinks = []
-        attributes = computeObject.attributes
+        attributes = computeObject.attributes.clone
+        computeObject.mixins.each do |mixin|
+          attributes.merge!(mixin.attributes)
+        end
         links = attributes["links"]
         if links != nil
           links.each do
             |link|
-            case link.getKind().term
-            when "storagelink"
-              storageLinks << link
-            when "networkinterace"
-              networkLinks << link
+            case link.target.getKind.term
+            when "storage"
+              storage_ids << UUIDTools::UUID.parse(link.target.attributes['occi.core.id']).to_i
+            when "storage"
+              network_ids << UUIDTools::UUID.parse(link.target.attributes['occi.core.id']).to_i
             end
           end
         end
-        xmlLoc = VirtualMachine.build_xml
-        $log.debug("XMLLoc #{xmlLoc}")
-        vm=VirtualMachine.new(xmlLoc, @one_client)
-        $log.debug("ONE VM handler #{vm}")
+        vm=VirtualMachine.new(VirtualMachine.build_xml, @one_client)
         @templateRaw = @config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
         template = ERB.new(File.read(@templateRaw)).result(binding)
         $log.debug("Parsed template #{template}")
         rc = vm.allocate(template)
-        $log.debug(vm.info)
+        $log.debug("Return code from OpenNebula #{rc}") if rc != nil
+        computeObject.attributes['occi.core.id'] = UUIDTools::UUID.parse_int(vm.id).to_s
+        $log.debug("ID of resource: #{computeObject.attributes['occi.core.id']}")
       end
 
-      # GET a VM
-      def getVmInstance_by_id_ret_name(iD)
-        vM=VmOcci.new(VmOcci.build_xml(iD), @one_client)
-        vMInfo = vM.info
-        begin
-          doc = REXML::Document.new(vMInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
-          xmlDoc = doc.root
-          str = ""
-          REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
-          # puts "\n" + str + "\n "
-          vMName = REXML::XPath.first(doc, "//NAME")
-        end
-      end
-
-      # GET a VM
-      def getVmInstance_by_id_ret_attributes(iD)
-        attributes = {}
-        vM=VmOcci.new(VmOcci.build_xml(iD), @one_client)
-        vMInfo = vM.info
-        if vMInfo.instance_of?(OpenNebula::Error)
-          error_bool = true
-        else error_bool = false
-        end
-
-        if error_bool == false
-          vMInfo = vM.info_xml()
-          begin
-            doc = REXML::Document.new(vMInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
-            xmlDoc = doc.root
-            str = ""
-            REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
-            #puts "\n" + str + "\n "
-            vm_state = vM.state_str
-            vm_id = REXML::XPath.first(doc, "//ID")
-            vm_hostname = REXML::XPath.first(doc, "//NAME")
-            vm_architecture = REXML::XPath.first(doc, "//TEMPLATE/ARCHITECTURE")
-            vm_cores = REXML::XPath.first(doc, "//TEMPLATE/CORES")
-            vm_memory = REXML::XPath.first(doc, "//TEMPLATE/MEMORY")
-            vm_speed = REXML::XPath.first(doc, "//TEMPLATE/SPEED")
-            attributes.merge!('occi.compute.cores'        => vm_cores.text) if vm_cores != nil
-            attributes.merge!('occi.compute.architecture' => vm_architecture.text) if vm_architecture != nil
-            attributes.merge!('occi.compute.state'        => vm_state) if vm_state != nil
-            attributes.merge!('occi.compute.hostname'     => vm_hostname.text) if vm_hostname != nil
-            attributes.merge!('occi.compute.memory'       => vm_memory.text) if vm_memory != nil
-            attributes.merge!('occi.compute.speed'        => vm_speed.text) if vm_speed != nil
-            attributes.merge!('id'                        => vm_id.text) if vm_id != nil
-            return attributes
-          end
-        else
-          return vMInfo
-        end
-      end
-
-      # GET a VM by id ret state
-      def getVmInstance_by_id_ret_state(iD)
-        vM=VmOcci.new(VmOcci.build_xml(iD), @one_client)
-        vMInfo = vM.info
-        if vMInfo.instance_of?(OpenNebula::Error)
-          error_bool = true
-        else error_bool = false
-        end
-
-        if error_bool == false
-          vMInfo = vM.info_xml()
-          begin
-            doc = REXML::Document.new(vMInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
-            xmlDoc = doc.root
-            str = ""
-            REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
-            #puts "\n" + str + "\n "
-            vm_state = vM.state_str
-            return vm_state
-          end
-        else
-          return vMInfo
-        end
-      end
-
-      # DELETE / FINALIZE a VM
-      def delete_compute_instance(iD)
-        vM=VmOcci.new(VmOcci.build_xml(iD), @one_client)
-        vMInfo = vM.info
-        if vMInfo.instance_of?(OpenNebula::Error)
-          error_bool = true
-        else error_bool = false
-        end
-        if error_bool == false
-          vM.finalize
-          return true
-        else
-          return vMInfo
-        end
-      end
-
-      # GET ALL VMs - A POOL INSTANCE
-      def get_all_vm_ids()
-        vm_pool = VirtualMachinePool.new(@one_client, -1)
-        rc = vm_pool.info
-        if OpenNebula.is_error?(rc)
-          raise OCCI::Errors::BackEndError, rc.message
-        else
-          ids = []
-          vm_pool.each do |vm|
-            ids << vm.id.to_s
-          end
-        end
-        return ids
-      end
-
-      # Trigger an action on VM
-      def trigger_action_on_vm_instance(iD, actiontype, method=nil)
-        vM=VmOcci.new(VmOcci.build_xml(iD), @one_client)
-        vMInfo = vM.info
-        if vMInfo.instance_of?(OpenNebula::Error)
-          error_bool = true
-        else error_bool = false
-        end
-        if error_bool == false
-          if actiontype == "start" then
-            rc = vM.send("resume")
-          elsif actiontype == "restart"
-            rc = vM.send("stop")
-            vMInfo = vM.info
-            thread2 = Thread.new{
-              while vM.state_str != "PENDING" do
-                vMInfo = vM.info
-                rc=vM.send("resume")
-                vMInfo = vM.info
-              end
-            }
-          else rc = vM.send(actiontype)
-          end
-        else
-          raise OCCI::Errors::BackEndError, "#{rc.inspect} - ActionType not defined?}"
-        end
+      # DELETE VM
+      def delete_compute_instance(computeObject)
+        id = UUIDTools::UUID.parse(computeObject.attributes['occi.core.id']).to_i
+        vm=VirtualMachine.new(VirtualMachine.build_xml(id), @one_client)
+        rc = vm.delete
+        $log.debug("Return code from OpenNebula #{rc}") if rc != nil
       end
 
       ########################################################################
       # Network methods
       
-      # CREATE a VNET
+      # CREATE VNET
       def create_network_instance(networkObject)
-        attributes = networkObject.attributes
-
-        xmlLoc = VirtualNetwork.build_xml
-        network=VirtualNetwork.new(xmlLoc, @one_client)
+        attributes = networkObject.attributes.clone
+        networkObject.mixins.each do |mixin|
+          attributes.merge!(mixin.attributes)
+        end
+        network=VirtualNetwork.new(VirtualNetwork.build_xml(), @one_client)
         @templateRaw = @config["TEMPLATE_LOCATION"] + TEMPLATENETWORKRAWFILE
         template = ERB.new(File.read(@templateRaw)).result(binding)
         $log.debug("Parsed template #{template}")
         rc = network.allocate(template)
-        $log.debug(network.info)
+        $log.debug("Return code from OpenNebula #{rc}") if rc != nil
+        $log.debug("ID of network #{network.id}")
+        networkObject.attributes['occi.core.id'] = UUIDTools::UUID.parse_int(network.id).to_s
+        $log.debug("ID of resource: #{networkObject.attributes['occi.core.id']}")
       end
 
-      # TODO: genau wie bei get VM Fehlerbehandlung einführen
-      # GET a VNET RET NAME
-      def getNetworkInstance_by_id_ret_name(iD)
-        vNET=VNetOcci.new(VNetOcci.build_xml(iD), @one_client)
-        vNetInfo = vNET.info
-        begin
-          doc = REXML::Document.new(vNetInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
-          xmlDoc = doc.root
-          str = ""
-          REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
-          # puts "\n" + str + "\n "
-          vNetName = REXML::XPath.first(doc, "//NAME")
-        end
-      end
-
-      # TODO: genau wie bei get VM Fehlerbehandlung einführen
-      # GET a VNET RET ID
-      def getNetworkInstance_by_id_ret_attributes(iD)
-        attributes = {}
-        vNET=VNetOcci.new(VNetOcci.build_xml(iD), @one_client)
-        vNetInfo = vNET.info
-        begin
-          doc = REXML::Document.new(vNetInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
-          xmlDoc = doc.root
-          str = ""
-          REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
-          # puts "\n" + str + "\n "
-
-          vnet_state = REXML::XPath.first(doc, "//NETSTATE")
-          vnet_vlan = REXML::XPath.first(doc, "//VLAN")
-          vnet_label = REXML::XPath.first(doc, "//LABEL")
-          vnet_id = REXML::XPath.first(doc, "//ID")
-
-          attributes.merge!('occi.network.state'    => vnet_state.text) if vnet_state != nil
-          attributes.merge!('occi.network.vlan'     => vnet_vlan.text) if vnet_vlan != nil
-          attributes.merge!('occi.network.label'    => vnet_label.text) if vnet_label != nil
-          attributes.merge!('id'                    => vnet_id.text) if vnet_id != nil
-
-          return attributes
-        end
-      end
-
-      # TODO: genau wie bei get VM Fehlerbehandlung einführen
-      # GET a VNET RET STATE
-      def getNetworkInstance_by_id_ret_state(iD)
-        vNET=VNetOcci.new(VNetOcci.build_xml(iD), @one_client)
-        vNetInfo = vNET.info
-        begin
-          doc = REXML::Document.new(vNetInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
-          xmlDoc = doc.root
-          str = ""
-          REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
-          # puts "\n" + str + "\n "
-          vnet_state = REXML::XPath.first(doc, "//NETSTATE")
-          return vnet_state
-        end
-      end
-
-      # GET ALL VNET'S - A POOL INSTANCE
-      def get_all_vnet_ids()
-        ids = []
-        vnet_pool = VirtualNetworkPool.new(@one_client, -1)
-        rc = vnet_pool.info
-        if OpenNebula.is_error?(rc)
-          raise OCCI::Errors::BackEndError, rc.message
-        else
-          vnet_pool.each do |vnet|
-            ids << vnet.id.to_s
-          end
-        end
-        return ids
-      end
-
-      # DELETE / FINALIZE a VNET
-      def delete_vnet_instance(iD)
-        vnet=VNetOcci.new(VNetOcci.build_xml(iD), @one_client)
-        vnet_info = vnet.info
-        if vnet_info.instance_of?(OpenNebula::Error)
-          error_bool = true
-        else error_bool = false
-        end
-        if error_bool == false
-          vnet.delete
-          return true
-        else
-          return vnet_info
-        end
+      # DELETE VNET
+      def delete_network_instance(networkObject)
+        id = UUIDTools::UUID.parse(networkObject.attributes['occi.core.id']).to_i
+        network=VirtualNetwork.new(VirtualNetwork.build_xml(id), @one_client)
+        rc = network.delete
+        $log.debug("Return code from OpenNebula #{rc}") if rc != nil
       end
       
       ########################################################################
       # Storage methods
 
-      # CREATE a STORAGE / IMAGE
-      def createStorageInstance(storageObject)
-        attributes = storageObject.attributes
-        xmlLoc = VImageOcci.build_xml
-        vImage=VImageOcci.new(xmlLoc, @one_client)
-        @templateRaw = TEMPLATESTORAGERAWFILE
+      # CREATE STORAGE
+      def create_storage_instance(storageObject)
+        attributes = storageObject.attributes.clone
+        storageObject.mixins.each do |mixin|
+          attributes.merge!(mixin.attributes)
+        end
+        storage=Image.new(Image.build_xml, @one_client)
+        @templateRaw = @config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
         template = ERB.new(File.read(@templateRaw)).result(binding)
-        rc = vImage.allocate(template)
-        rc_enable = vImage.enable
-        vImageInfo = vImage.info
-        if rc == nil
-          # Formatierte Ausgabe mit ausgewählten Informationen über die Virtuelle-Maschine (da "ausgewählte" Informationen vorhanden)
-          # recht übersichtliche Ausgabe -
-          begin
-            adinfo = vImage.to_occi(@@occi_vimage)
-            doc = REXML::Document.new(adinfo)
-            xmlLoc = doc.root
-            storageObject.attributes["id"] = REXML::XPath.first(doc, "//NAME").text
-          end
-        else
-          raise OCCI::Errors::BackEndError, "#{rc.inspect} - ImageName already exists?}"
-          error = OpenNebula::Error.new(rc)
-        end
+        $log.debug("Parsed template #{template}")
+        rc = storage.allocate(template)
+        $log.debug("Return code from OpenNebula #{rc}") if rc != nil
+        # does storage need to be enabled?
+        #storage.enable
+        storageObject.attributes['occi.core.id'] = UUIDTools::UUID.parse_int(vm.id).to_s
+        $log.debug("ID of resource: #{storageObject.attributes['occi.core.id']}")
       end
-
-      # TODO: genau wie bei get VM Fehlerbehandlung einführen
-      # GET an IMAGE
-      def getStorageInstance_by_id_ret_name(iD)
-        vIMAGE=VImageOcci.new(Image.build_xml(iD), @one_client)
-        vImageInfo = vIMAGE.info
-        begin
-          doc = REXML::Document.new(vImageInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
-          xmlDoc = doc.root
-          str = ""
-          REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
-          #puts "\n" + str + "\n "
-          vImageName = REXML::XPath.first(doc, "//NAME")
-        end
+      
+      # DELETE STORAGE / IMAGE
+      def delete_storage_instance(storageObject)
+        id = UUIDTools::UUID.parse(storageObject.attributes['occi.core.id']).to_i
+        storage=Image.new(Image.build_xml(id), @one_client)
+        rc = storage.delete
+        $log.debug("Return code from OpenNebula #{rc}") if rc != nil
       end
-
-      # TODO: genau wie bei get VM Fehlerbehandlung einführen
-      # GET an IMAGE
-      def getStorageInstance_by_id_ret_id(iD)
-        vIMAGE=VImageOcci.new(Image.build_xml(iD), @one_client)
-        vImageInfo = vIMAGE.info
-        begin
-          doc = REXML::Document.new(vImageInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
-          xmlDoc = doc.root
-          str = ""
-          REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
-          #puts "\n" + str + "\n "
-          vimage_size = REXML::XPath.first(doc, "//SIZE")
-          vimage_state = REXML::XPath.first(doc, "//TEMPLATE/STATE")
-          return vimage_size, vimage_state
-        end
-      end
-
-      # GET ALL Images - A POOL INSTANCE
-      def get_all_image_ids()
-        ids = []
-        image_pool = ImagePool.new(@one_client, -1)
-        rc = image_pool.info
-        if OpenNebula.is_error?(rc)
-          raise OCCI::Errors::BackEndError, rc.message
-        else
-          image_pool.each do |image|
-            ids << image.id.to_s
-          end
-        end
-        return ids
-      end
-
-      # TODO: genau wie bei get VM Fehlerbehandlung einführen
-      # return: attributes
-      def getImageInstance_by_id_ret_attributes(iD)
-        attributes = {}
-        vImage=VImageOcci.new(VImageOcci.build_xml(iD), @one_client)
-        vNetInfo = vImage.info
-        begin
-          doc = REXML::Document.new(vNetInfo.to_s)
-          xmlDoc = doc.root
-          str = ""
-          REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
-          # puts "\n" + str + "\n "
-
-          vimage_size = REXML::XPath.first(doc, "//SIZE")
-          vimage_state = REXML::XPath.first(doc, "//TEMPLATE/STATE")
-          vimage_id = REXML::XPath.first(doc, "//ID")
-
-          attributes.merge!('occi.storage.size'    => vimage_size.text) if vimage_size != nil
-          attributes.merge!('occi.storage.state'   => vimage_state.text) if vimage_state != nil
-          attributes.merge!('id'                   => vimage_id.text) if vimage_id != nil
-
-          return attributes
-        end
-      end
-
-      # TODO: to be implement, but OpenNebula does not yet support linking of two resource instances at runtime
-      # CREATE a NETWORKINTERFACE
-      def createNetworkInterfaceInstance(network_interface_object)
-        puts "DUMMY METHOD createNetworkInterfaceInstance called"
-        link_loc = "http://localhost:4567/link/network/link_stor0001"
-        #  return nil, "456"
-
-      end
-
-      # DELETE a NETWORKINTERFACE
-      def delete_networkinterface_instance(iD)
-        puts "NETWORKINTERFACE INSTANCE DELETED"
-        true
-      end
-
-      # CREATE a StorageLink
-      def createStorageLinkInstance(attributes, kind)
-        puts "DUMMY METHODE createStorageLinkInstance wurde aufgerufen"
-      end
+      
     end
   end
 end
+
+##############################################################################
+# ATTIC
+
+######################
+# network
+
+## TODO: genau wie bei get VM Fehlerbehandlung einführen
+## GET a VNET RET NAME
+#def getNetworkInstance_by_id_ret_name(iD)
+#  vNET=VNetOcci.new(VNetOcci.build_xml(iD), @one_client)
+#  vNetInfo = vNET.info
+#  begin
+#    doc = REXML::Document.new(vNetInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
+#    xmlDoc = doc.root
+#    str = ""
+#    REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
+#    # puts "\n" + str + "\n "
+#    vNetName = REXML::XPath.first(doc, "//NAME")
+#  end
+#end
+#
+## TODO: genau wie bei get VM Fehlerbehandlung einführen
+## GET a VNET RET ID
+#def getNetworkInstance_by_id_ret_attributes(iD)
+#  attributes = {}
+#  vNET=VNetOcci.new(VNetOcci.build_xml(iD), @one_client)
+#  vNetInfo = vNET.info
+#  begin
+#    doc = REXML::Document.new(vNetInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
+#    xmlDoc = doc.root
+#    str = ""
+#    REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
+#    # puts "\n" + str + "\n "
+#
+#    vnet_state = REXML::XPath.first(doc, "//NETSTATE")
+#    vnet_vlan = REXML::XPath.first(doc, "//VLAN")
+#    vnet_label = REXML::XPath.first(doc, "//LABEL")
+#    vnet_id = REXML::XPath.first(doc, "//ID")
+#
+#    attributes.merge!('occi.network.state'    => vnet_state.text) if vnet_state != nil
+#    attributes.merge!('occi.network.vlan'     => vnet_vlan.text) if vnet_vlan != nil
+#    attributes.merge!('occi.network.label'    => vnet_label.text) if vnet_label != nil
+#    attributes.merge!('id'                    => vnet_id.text) if vnet_id != nil
+#
+#    return attributes
+#  end
+#end
+#
+## TODO: genau wie bei get VM Fehlerbehandlung einführen
+## GET a VNET RET STATE
+#def getNetworkInstance_by_id_ret_state(iD)
+#  vNET=VNetOcci.new(VNetOcci.build_xml(iD), @one_client)
+#  vNetInfo = vNET.info
+#  begin
+#    doc = REXML::Document.new(vNetInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
+#    xmlDoc = doc.root
+#    str = ""
+#    REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
+#    # puts "\n" + str + "\n "
+#    vnet_state = REXML::XPath.first(doc, "//NETSTATE")
+#    return vnet_state
+#  end
+#end
+#
+## GET ALL VNET'S - A POOL INSTANCE
+#def get_all_vnet_ids()
+#  ids = []
+#  vnet_pool = VirtualNetworkPool.new(@one_client, -1)
+#  rc = vnet_pool.info
+#  if OpenNebula.is_error?(rc)
+#    raise OCCI::Errors::BackEndError, rc.message
+#  else
+#    vnet_pool.each do |vnet|
+#      ids << vnet.id.to_s
+#    end
+#  end
+#  return ids
+#end
+
+############################
+# VMs
+# GET ALL VMs - A POOL INSTANCE
+#def get_all_vm_ids()
+#  vm_pool = VirtualMachinePool.new(@one_client, -1)
+#  rc = vm_pool.info
+#  if OpenNebula.is_error?(rc)
+#    raise OCCI::Errors::BackEndError, rc.message
+#  else
+#    ids = []
+#    vm_pool.each do |vm|
+#      ids << vm.id.to_s
+#    end
+#  end
+#  return ids
+#end
+#
+## Trigger an action on VM
+#def trigger_action_on_vm_instance(iD, actiontype, method=nil)
+#  vM=VmOcci.new(VmOcci.build_xml(iD), @one_client)
+#  vMInfo = vM.info
+#  if vMInfo.instance_of?(OpenNebula::Error)
+#    error_bool = true
+#  else error_bool = false
+#  end
+#  if error_bool == false
+#    if actiontype == "start" then
+#      rc = vM.send("resume")
+#    elsif actiontype == "restart"
+#      rc = vM.send("stop")
+#      vMInfo = vM.info
+#      thread2 = Thread.new{
+#        while vM.state_str != "PENDING" do
+#          vMInfo = vM.info
+#          rc=vM.send("resume")
+#          vMInfo = vM.info
+#        end
+#      }
+#    else rc = vM.send(actiontype)
+#    end
+#  else
+#    raise OCCI::Errors::BackEndError, "#{rc.inspect} - ActionType not defined?}"
+#  end
+#end
+#
+## GET a VM
+#def getVmInstance_by_id_ret_name(iD)
+#  vM=VmOcci.new(VmOcci.build_xml(iD), @one_client)
+#  vMInfo = vM.info
+#  begin
+#    doc = REXML::Document.new(vMInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
+#    xmlDoc = doc.root
+#    str = ""
+#    REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
+#    # puts "\n" + str + "\n "
+#    vMName = REXML::XPath.first(doc, "//NAME")
+#  end
+#end
+#
+## GET a VM
+#def getVmInstance_by_id_ret_attributes(iD)
+#  attributes = {}
+#  vM=VmOcci.new(VmOcci.build_xml(iD), @one_client)
+#  vMInfo = vM.info
+#  if vMInfo.instance_of?(OpenNebula::Error)
+#    error_bool = true
+#  else error_bool = false
+#  end
+#
+#  if error_bool == false
+#    vMInfo = vM.info_xml()
+#    begin
+#      doc = REXML::Document.new(vMInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
+#      xmlDoc = doc.root
+#      str = ""
+#      REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
+#      #puts "\n" + str + "\n "
+#      vm_state = vM.state_str
+#      vm_id = REXML::XPath.first(doc, "//ID")
+#      vm_hostname = REXML::XPath.first(doc, "//NAME")
+#      vm_architecture = REXML::XPath.first(doc, "//TEMPLATE/ARCHITECTURE")
+#      vm_cores = REXML::XPath.first(doc, "//TEMPLATE/CORES")
+#      vm_memory = REXML::XPath.first(doc, "//TEMPLATE/MEMORY")
+#      vm_speed = REXML::XPath.first(doc, "//TEMPLATE/SPEED")
+#      attributes.merge!('occi.compute.cores'        => vm_cores.text) if vm_cores != nil
+#      attributes.merge!('occi.compute.architecture' => vm_architecture.text) if vm_architecture != nil
+#      attributes.merge!('occi.compute.state'        => vm_state) if vm_state != nil
+#      attributes.merge!('occi.compute.hostname'     => vm_hostname.text) if vm_hostname != nil
+#      attributes.merge!('occi.compute.memory'       => vm_memory.text) if vm_memory != nil
+#      attributes.merge!('occi.compute.speed'        => vm_speed.text) if vm_speed != nil
+#      attributes.merge!('id'                        => vm_id.text) if vm_id != nil
+#      return attributes
+#    end
+#  else
+#    return vMInfo
+#  end
+#end
+#
+## GET a VM by id ret state
+#def getVmInstance_by_id_ret_state(iD)
+#  vM=VmOcci.new(VmOcci.build_xml(iD), @one_client)
+#  vMInfo = vM.info
+#  if vMInfo.instance_of?(OpenNebula::Error)
+#    error_bool = true
+#  else error_bool = false
+#  end
+#
+#  if error_bool == false
+#    vMInfo = vM.info_xml()
+#    begin
+#      doc = REXML::Document.new(vMInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
+#      xmlDoc = doc.root
+#      str = ""
+#      REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
+#      #puts "\n" + str + "\n "
+#      vm_state = vM.state_str
+#      return vm_state
+#    end
+#  else
+#    return vMInfo
+#  end
+#end
+
+#########################
+# Storage
+#
+## TODO: genau wie bei get VM Fehlerbehandlung einführen
+## GET an IMAGE
+#def getStorageInstance_by_id_ret_name(iD)
+#  vIMAGE=VImageOcci.new(Image.build_xml(iD), @one_client)
+#  vImageInfo = vIMAGE.info
+#  begin
+#    doc = REXML::Document.new(vImageInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
+#    xmlDoc = doc.root
+#    str = ""
+#    REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
+#    #puts "\n" + str + "\n "
+#    vImageName = REXML::XPath.first(doc, "//NAME")
+#  end
+#end
+#
+## TODO: genau wie bei get VM Fehlerbehandlung einführen
+## GET an IMAGE
+#def getStorageInstance_by_id_ret_id(iD)
+#  vIMAGE=VImageOcci.new(Image.build_xml(iD), @one_client)
+#  vImageInfo = vIMAGE.info
+#  begin
+#    doc = REXML::Document.new(vImageInfo.to_s) #  to_s wichtig... kann aus array ansonsten kein string erstellen
+#    xmlDoc = doc.root
+#    str = ""
+#    REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
+#    #puts "\n" + str + "\n "
+#    vimage_size = REXML::XPath.first(doc, "//SIZE")
+#    vimage_state = REXML::XPath.first(doc, "//TEMPLATE/STATE")
+#    return vimage_size, vimage_state
+#  end
+#end
+#
+## GET ALL Images - A POOL INSTANCE
+#def get_all_image_ids()
+#  ids = []
+#  image_pool = ImagePool.new(@one_client, -1)
+#  rc = image_pool.info
+#  if OpenNebula.is_error?(rc)
+#    raise OCCI::Errors::BackEndError, rc.message
+#  else
+#    image_pool.each do |image|
+#      ids << image.id.to_s
+#    end
+#  end
+#  return ids
+#end
+#
+## TODO: genau wie bei get VM Fehlerbehandlung einführen
+## return: attributes
+#def getImageInstance_by_id_ret_attributes(iD)
+#  attributes = {}
+#  vImage=VImageOcci.new(VImageOcci.build_xml(iD), @one_client)
+#  vNetInfo = vImage.info
+#  begin
+#    doc = REXML::Document.new(vNetInfo.to_s)
+#    xmlDoc = doc.root
+#    str = ""
+#    REXML::Formatters::Pretty.new(4).write(xmlDoc,str)
+#    # puts "\n" + str + "\n "
+#
+#    vimage_size = REXML::XPath.first(doc, "//SIZE")
+#    vimage_state = REXML::XPath.first(doc, "//TEMPLATE/STATE")
+#    vimage_id = REXML::XPath.first(doc, "//ID")
+#
+#    attributes.merge!('occi.storage.size'    => vimage_size.text) if vimage_size != nil
+#    attributes.merge!('occi.storage.state'   => vimage_state.text) if vimage_state != nil
+#    attributes.merge!('id'                   => vimage_id.text) if vimage_id != nil
+#
+#    return attributes
+#  end
+#end
+#
+## TODO: to be implement, but OpenNebula does not yet support linking of two resource instances at runtime
+## CREATE a NETWORKINTERFACE
+#def createNetworkInterfaceInstance(network_interface_object)
+#  puts "DUMMY METHOD createNetworkInterfaceInstance called"
+#  link_loc = "http://localhost:4567/link/network/link_stor0001"
+#  #  return nil, "456"
+#
+#end
+#
+## DELETE a NETWORKINTERFACE
+#def delete_networkinterface_instance(iD)
+#  puts "NETWORKINTERFACE INSTANCE DELETED"
+#  true
+#end
+#
+## CREATE a StorageLink
+#def createStorageLinkInstance(attributes, kind)
+#  puts "DUMMY METHODE createStorageLinkInstance wurde aufgerufen"
+#end

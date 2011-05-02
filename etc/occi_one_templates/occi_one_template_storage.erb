@@ -1,8 +1,17 @@
-<% if attributes["id"]%>
-NAME          = "<%= attributes["id"] if attributes["id"]%>"
+NAME          = "<%= attributes['occi.core.title'] %>"
+DESCRIPTION   = "<%= attributes['occi.core.summary'] if attributes['occi.core.summary'] %>"
+
+TYPE          = <%= attributes['opennebula.image.type'] %>
+PUBLIC        = <%= attributes['opennebula.image.public'].upcase if attributes['opennebula.image.public'] %>
+PERSISTENT    = <%= attributes['opennebula.image.persistent'].upcase if attributes['opennebula.image.persistent'] %>
+DEV_PREFIX    = <%= attributes['opennebula.image.dev_prefix'].upcase if attributes['opennebula.image.dev_prefix'] %>
+BUS           = <%= attributes['opennebula.image.bus'].upcase if attributes['opennebula.image.bus'] %>
+PATH          = <%= attributes['opennebula.image.path'].upcase if attributes['opennebula.image.path'] %>
+SOURCE        = <%= attributes['opennebula.image.source'].upcase if attributes['opennebula.image.source'] %>
+
+SIZE          = <%= attributes['occi.storage.size'] if attributes['occi.storage.size']%>
+<% if attributes['opennebula.image.fstype'] %>
+FSTYPE        = "<%= attributes['occi.storage.fstype'] %>"
+<% else %>
+FSTYPE        = "ext3"
 <% end %>
-PATH          = /srv/cloud/images/ttylinux/ttylinux.img
-PUBLIC        = YES
-DESCRIPTION   = "<%= attributes["summary"] if attributes["summary"]%>"
-TYPE		  = "OS"
-SIZE          = "<%= attributes["occi.storage.size"] if attributes["occi.storage.size"]%>"

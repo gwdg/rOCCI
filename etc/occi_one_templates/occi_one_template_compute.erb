@@ -1,26 +1,24 @@
-<% if attributes["occi.core.title"] %>
-NAME = "<%= attributes["occi.core.title"]%>"
-<%end%>
-MEMORY = "<%= attributes["occi.compute.memory"] if attributes["occi.compute.memory"]%>"
-ARCHITECTURE = "<%= attributes["occi.compute.architecture"] if attributes["occi.compute.architecture"]%>"
-SPEED = "<%= attributes["occi.compute.speed"] if attributes["occi.compute.speed"]%>"
-CORES = "<%= attributes["occi.compute.cores"] if attributes["occi.compute.cores"]%>"
-CPU = "<%= attributes["occi.compute.cores"] if attributes["occi.compute.cores"]%>"
+NAME          = "<%= attributes["occi.core.title"]%>"
+DESCRIPTION   = "<%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>"
+MEMORY        = "<%= attributes["occi.compute.memory"] if attributes["occi.compute.memory"]%>"
+ARCHITECTURE  = "<%= attributes["occi.compute.architecture"] if attributes["occi.compute.architecture"]%>"
+CPU           = "<%= attributes["occi.compute.cores"] if attributes["occi.compute.cores"]%>"
+VCPU          = "<%= attributes["opennebula.vm.vcpu"] if attributes["opennebula.vm.vcpu"]%>"
 
-# for testing purposes
-DISK = [ IMAGE = "Ubuntu Desktop"]
-NIC  = [ NETWORK = "VMLAN"]
+<% if attributes["opennebula.vm.boot"] %>
+BOOT          = "<%= attributes["opennebula.vm.boot"] if attributes["opennebula.vm.boot"]%>"
+<% else %>
+BOOT          = hd
+<% end %>
   
-<% storageLinks.each do |storageLink| %>
-DISK = [ IMAGE = "<%= storageLink.attributes["id"] if links != nil %>"]
+<% storage_ids.each do |storage_id| %>
+DISK          = [ IMAGE_ID = "<%= storage_id %>"]
 <%end%>
    
-<% networkLinks.each do |networkLink| %>
-NIC = [ NETWORK = "<%= networkLink.attributes["id"] if links != nil%>"]
+<% network_ids.each do |network_id| %>
+NIC           = [ NETWORK_ID = "<%= network_id %>"]
 <%end%>
 
-GRAPHICS = [type="vnc"]
-  
-RANK = FREECPU
-  
-FEATURES=[ acpi="no" ]
+GRAPHICS      = [type="vnc"]
+RANK          = FREECPU
+FEATURES      = [ acpi="no" ]

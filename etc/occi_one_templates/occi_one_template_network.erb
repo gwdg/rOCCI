@@ -1,12 +1,13 @@
-<% if attributes["occi.core.title"]%>
-NAME = "<%= attributes["occi.core.title"]%>"
-<% end %>
+NAME            = "<%= attributes["occi.core.title"]%>"
+DESCRIPTION     = "<%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>"
+BRIDGE          = <%= attributes['opennebula.network.bridge'] %>
+PUBLIC          = <%= attributes['opennebula.network.public'].upcase if attributes['opennebula.network.public']%>
 
-TYPE = RANGED
+TYPE            = <%= attributes['opennebula.network.type'].upcase %>
 
-BRIDGE = virbr0
+NETWORK_ADDRESS = <%= attributes['opennebula.network.address'].upcase if attributes['opennebula.network.address']%>
+NETWORK_SIZE    = <%= attributes['opennebula.network.size'].upcase if attributes['opennebula.network.size']%>
 
-NETWORK_ADDRESS = 192.168.2.125 
-NETWORK_SIZE    = 126
-NETMASK         = 255.255.255.0
-GATEWAY         = 192.168.2.1
+<% attributes['opennebula.network.leases'].each do |lease| %>
+LEASES          = [ <%= lease %> ]
+<% end if attributes['opennebula.network.leases'] %>

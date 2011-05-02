@@ -358,7 +358,6 @@ begin
         end
 
         resource = kind.entity_type.new(attributes)
-        $locationRegistry.register_location(resource.get_location, resource)
 
         # Add links
         request.env['HTTP_LINK'].split(',').each do |link_string|
@@ -399,6 +398,9 @@ begin
         end if request.env['HTTP_LINK'] != nil
 
         resource.deploy()
+        
+        $locationRegistry.register_location(resource.get_location, resource)
+        
         headers['Location'] = $locationRegistry.get_absolute_location_of_object(resource)
 
       end
