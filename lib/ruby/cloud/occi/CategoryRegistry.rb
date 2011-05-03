@@ -142,7 +142,7 @@ module OCCI
       # there may be multiple categories
       categoryString.split(",").each do |category|
         # match category string to corresponding parameters
-        match = regexp.match(categoryString)
+        match = regexp.match(category)
         $log.debug("Matched parameters from category: #{match}")
         if match != nil then
           term, scheme = match.captures

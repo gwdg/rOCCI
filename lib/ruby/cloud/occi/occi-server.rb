@@ -340,6 +340,10 @@ begin
 
         $log.warn("Provided location does not match location of category: #{kind.get_location} vs. #{location}") if kind.get_location != location
 
+        # add mixins
+        mixins = []
+        mixins = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins") if request.env['HTTP_CATEGORY'] != nil
+        
         attributes = {}
         if request.env["HTTP_X_OCCI_ATTRIBUTE"] != nil
 
@@ -357,7 +361,7 @@ begin
           #kind.attributes.check(attributes)
         end
 
-        resource = kind.entity_type.new(attributes)
+        resource = kind.entity_type.new(attributes,mixins)
 
         # Add links
         request.env['HTTP_LINK'].split(',').each do |link_string|
@@ -445,7 +449,7 @@ begin
         end
       end
 
-      if location == "/-/"
+      if location == "/-/" # create user defined mixin
         if mixin == nil
           term, scheme, kind, params = Regexp.new(/(\w+);\s*scheme="([^"]+)";\s*class="([^"]+)";(.*)/).match(request.env['HTTP_CATEGORY']).captures
           $log.debug(term + scheme + kind + params)

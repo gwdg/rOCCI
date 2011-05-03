@@ -78,14 +78,14 @@ module OCCI
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
       end
 
-      def initialize(attributes)
-        super(attributes)
+      def initialize(attributes, mixins=[])
+        super(attributes, mixins)
         @kind_type      = "http://schemas.ogf.org/occi/infrastructure#storage"
         @state_machine  = STATE_MACHINE.clone
       end
       
       def deploy()
-        $backend.create_storage_Instance(self)
+        $backend.create_storage_instance(self)
       end
       
       def delete()

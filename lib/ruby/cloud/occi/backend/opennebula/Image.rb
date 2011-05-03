@@ -36,7 +36,7 @@ module OCCI
           entities = []
 
           term    = "image"
-          scheme  = "http://schemas.opennebula.org/occi/infrastructure/#"
+          scheme  = "http://schemas.opennebula.org/occi/infrastructure#"
           title   = "OpenNebula Image Mixin"
 
           attributes = OCCI::Core::Attributes.new()

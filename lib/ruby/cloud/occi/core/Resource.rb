@@ -45,7 +45,7 @@ module OCCI
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)        
       end
 
-      def initialize(attributes)
+      def initialize(attributes, mixins = [])
         attributes['occi.core.summary'] = "" if attributes['occi.core.summary'] == nil
         attributes['links']             = []
         super(attributes)
