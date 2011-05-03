@@ -59,8 +59,6 @@ module OCCI
 
         STATE_SUSPENDED.add_transition(ACTION_START, STATE_ACTIVE)
 
-        STATE_MACHINE = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE, STATE_SUSPENDED])
-
         related = [OCCI::Core::Resource::KIND]
         entity_type = self
         entities = []
@@ -84,16 +82,20 @@ module OCCI
       def initialize(attributes)
         super(attributes)
         @kind_type      = "http://schemas.ogf.org/occi/infrastructure#compute"
-        @state_machine  = STATE_MACHINE.clone
+        @state_machine  = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE, STATE_SUSPENDED], :on_transition => self.method(:update_state))
       end
 
-      def deploy()
+      def deploy
         $backend.create_compute_instance(self)
       end
       
-      def delete()
+      def delete
         $backend.delete_compute_instance(self)
         delete_entity()
+      end
+
+      def update_state
+        @attributes['occi.compute.state'] = state_machine.current_state.name
       end
 
     end

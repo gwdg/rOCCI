@@ -31,9 +31,9 @@ module OCCI
       def initialize(scheme, term, title, attributes)
         @category = OCCI::Core::Category.new(term, scheme, title, attributes)
       end
-      
+
       def to_s
-        @category.scheme + @category.term
+        category.scheme + category.term
       end
       
     end

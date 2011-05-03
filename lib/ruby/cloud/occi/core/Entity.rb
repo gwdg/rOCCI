@@ -29,7 +29,12 @@ module OCCI
   module Core
     class Entity
 
-      attr_reader :kind_type
+      # Attributes are hashes and contain key - value pairs as defined by the corresponding kind
+      attr_reader   :attributes
+      attr_reader   :mixins
+
+      attr_reader   :kind_type
+      attr_reader   :state_machine
 
       # Define appropriate kind
       begin
@@ -49,15 +54,10 @@ module OCCI
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
       end
 
-      # attributes are hashes and contain key - value pairs as defined by the corresponding kind
-      attr_accessor :attributes
-      attr_reader   :mixins
 
       def initialize(attributes)
-        # create UUID from namespace using SHA-1
-#        attributes['occi.core.id'] = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE, $config['server']).to_s
         # Make sure UUID is UNIQUE for every entity
-        attributes['occi.core.id'] = UUIDTools::UUID.timestamp_create.to_s
+        attributes['occi.core.id']    = UUIDTools::UUID.timestamp_create.to_s
         attributes['occi.core.title'] = "" if attributes['occi.core.title'] == nil
         @attributes = attributes
         @mixins = []

@@ -26,8 +26,6 @@ module OCCI
   module Core
     class Resource < Entity
 
-      attr_reader :state_machine
-
       begin
         actions     = []
         related     = [OCCI::Core::Entity::KIND]

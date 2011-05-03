@@ -29,17 +29,19 @@ module OCCI
 
       # Define associated kind
       begin
-        # Define actions
+        # Define client initiated actions
         ACTION_BACKUP   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "backup",    title = "Storage Action Backup",    attributes = [])
         ACTION_OFFLINE  = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "offline",   title = "Storage Action Offline",   attributes = [])
         ACTION_ONLINE   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "online",    title = "Storage Action Online",    attributes = [])
         ACTION_RESIZE   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "resize",    title = "Storage Action Resize",    attributes = ["size"])
         ACTION_SNAPSHOT = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "snapshot",  title = "Storage Action Snapshot",  attributes = [])
 
-        # TODO: determine how to model "complete" action (can not be called by occi-client but may be called by backend?)
-        ACTION_COMPLETE = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "complete",  title = "Storage Action Complete",  attributes = [])
-
         actions = [ACTION_BACKUP, ACTION_OFFLINE, ACTION_ONLINE, ACTION_RESIZE, ACTION_SNAPSHOT]
+
+        # Define backend initiated actions
+
+        ACTION_BACKEND_COMPLETE = "complete"
+        ACTION_BACKEND_DEGRADED = "degraded"
 
         # Define state-machine
         STATE_OFFLINE   = OCCI::StateMachine::State.new("offline")
@@ -48,20 +50,26 @@ module OCCI
         STATE_SNAPSHOT  = OCCI::StateMachine::State.new("snapshot")
         STATE_RESIZE    = OCCI::StateMachine::State.new("resize")
         
-        STATE_OFFLINE.add_transition(ACTION_ONLINE, STATE_ONLINE)
+        # Degraded state can only be reached by backend initiated state transitions
+        STATE_DEGRADED  = OCCI::StateMachine::State.new("degraded")
         
-        STATE_ONLINE.add_transition(ACTION_OFFLINE,   STATE_OFFLINE)
-        STATE_ONLINE.add_transition(ACTION_BACKUP,    STATE_BACKUP)
-        STATE_ONLINE.add_transition(ACTION_SNAPSHOT,  STATE_SNAPSHOT)
-        STATE_ONLINE.add_transition(ACTION_RESIZE,    STATE_RESIZE)
-
-        STATE_BACKUP.add_transition(ACTION_COMPLETE,  STATE_ONLINE)
-
-        STATE_SNAPSHOT.add_transition(ACTION_COMPLETE,STATE_ONLINE)
+        STATE_OFFLINE.add_transition(ACTION_ONLINE,             STATE_ONLINE)
+        STATE_OFFLINE.add_transition(ACTION_BACKEND_DEGRADED,   STATE_DEGRADED)
         
-        STATE_RESIZE.add_transition(ACTION_COMPLETE,  STATE_ONLINE)
+        STATE_ONLINE.add_transition(ACTION_OFFLINE,             STATE_OFFLINE)
+        STATE_ONLINE.add_transition(ACTION_BACKUP,              STATE_BACKUP)
+        STATE_ONLINE.add_transition(ACTION_SNAPSHOT,            STATE_SNAPSHOT)
+        STATE_ONLINE.add_transition(ACTION_RESIZE,              STATE_RESIZE)
+        STATE_ONLINE.add_transition(ACTION_BACKEND_DEGRADED,    STATE_DEGRADED)
 
-        STATE_MACHINE = OCCI::StateMachine.new(STATE_OFFLINE, [STATE_OFFLINE, STATE_ONLINE, STATE_BACKUP, STATE_SNAPSHOT, STATE_RESIZE])
+        STATE_BACKUP.add_transition(ACTION_BACKEND_COMPLETE,    STATE_ONLINE)
+        STATE_BACKUP.add_transition(ACTION_BACKEND_DEGRADED,    STATE_DEGRADED)
+
+        STATE_SNAPSHOT.add_transition(ACTION_BACKEND_COMPLETE,  STATE_ONLINE)
+        STATE_SNAPSHOT.add_transition(ACTION_BACKEND_DEGRADED,  STATE_DEGRADED)
+        
+        STATE_RESIZE.add_transition(ACTION_BACKEND_COMPLETE,    STATE_ONLINE)
+        STATE_RESIZE.add_transition(ACTION_BACKEND_DEGRADED,    STATE_DEGRADED)
 
         related     = [OCCI::Core::Resource::KIND]
         entity_type = self
@@ -81,7 +89,7 @@ module OCCI
       def initialize(attributes)
         super(attributes)
         @kind_type      = "http://schemas.ogf.org/occi/infrastructure#storage"
-        @state_machine  = STATE_MACHINE.clone
+        @state_machine  = OCCI::StateMachine.new(STATE_OFFLINE, [STATE_OFFLINE, STATE_ONLINE, STATE_BACKUP, STATE_SNAPSHOT, STATE_RESIZE], :on_transition => self.method(:update_state))
       end
       
       def deploy()
@@ -91,6 +99,10 @@ module OCCI
       def delete()
         $backend.delete_storage_instance(self)
         delete_entity()
+      end
+
+      def update_state 
+        @attributes['occi.storage.state'] = state_machine.current_state.name if [STATE_ONLINE.name, STATE_OFFLINE.name, STATE_DEGRADED.name].include?(state_machine.current_state.name)
       end
 
     end

@@ -28,6 +28,21 @@ module OCCI
 
       # Define appropriate kind
       begin
+        
+        # Define backend initiated actions
+
+        ACTION_BACKEND_START  = "start"
+        ACTION_BACKEND_STOP   = "stop"
+
+        # Define state-machine
+
+        STATE_INACTIVE  = OCCI::StateMachine::State.new("inactive")
+        STATE_ACTIVE    = OCCI::StateMachine::State.new("active")
+
+        STATE_INACTIVE.add_transition(ACTION_BACKEND_START, STATE_ACTIVE)
+
+        STATE_ACTIVE.add_transition(ACTION_BACKEND_STOP,    STATE_INACTIVE)
+        
         actions = []
         related = [OCCI::Core::Link::KIND]
         entity_type = self
@@ -47,7 +62,12 @@ module OCCI
 
       def initialize(attributes)
         super(attributes)
-        @kind_type = "http://schemas.ogf.org/occi/infrastructure#networkinterface"
+        @kind_type      = "http://schemas.ogf.org/occi/infrastructure#networkinterface"
+        @state_machine  = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE], :on_transition => self.method(:update_state))
+      end
+
+      def update_state
+        @attributes['occi.networkinterface.state'] = state_machine.current_state.name
       end
 
     end

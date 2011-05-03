@@ -19,6 +19,8 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'occi/core/Action'
+
 module OCCI
 
   class StateMachine
@@ -31,6 +33,19 @@ module OCCI
       attr_reader :name
       attr_reader :transitions      
 
+      # ---------------------------------------------------------------------------------------------------------------------
+      private
+      # ---------------------------------------------------------------------------------------------------------------------
+      
+      def get_action_name(action)
+        return action.category.term if action.kind_of?(OCCI::Core::Action)           
+        return action.to_s
+      end
+      
+      # ---------------------------------------------------------------------------------------------------------------------
+      public
+      # ---------------------------------------------------------------------------------------------------------------------
+
       # ---------------------------------------------------------------------------------------------------------------------                
       def initialize(name)
         @name         = name
@@ -39,7 +54,7 @@ module OCCI
                 
       # ---------------------------------------------------------------------------------------------------------------------
       def add_transition(action, target_state)
-        @transitions[action] = target_state
+        @transitions[get_action_name(action)]  = target_state 
       end
         
       # ---------------------------------------------------------------------------------------------------------------------
@@ -53,22 +68,25 @@ module OCCI
     end
       
     # ---------------------------------------------------------------------------------------------------------------------
-    def initialize(start_state, states)
-      @start_state = start_state
-      @current_state = start_state
-      @states = states
+    def initialize(start_state, states, options = {})
+      @start_state    = start_state
+      @current_state  = start_state
+      @states         = states
+      @options        = options
       raise "Start state [#{start_state}] not part of provided states" if !states.include?(start_state)
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
     def transition(action)
       raise "Transition for action [#{action}] not supported in current state: #{@current_state}" if !check_transition(action)
-      @current_state = @current_state.transitions[action]
+      @current_state = @current_state.transitions[get_action_name(action)]
+      # Invoke event callback if defined
+      @options[:on_transition].call if @options.has_key?(:on_transition)
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
     def check_transition(action)
-      return @current_state.transitions.has_key?(action)
+      return @current_state.transitions.has_key?(get_action_name(action))
     end
 
     # ---------------------------------------------------------------------------------------------------------------------

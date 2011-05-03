@@ -42,7 +42,7 @@ module OCCI
 
         STATE_ACTIVE.add_transition(ACTION_DOWN, STATE_INACTIVE)
 
-        STATE_MACHINE = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE])
+        STATE_MACHINE = 
 
         related     = [OCCI::Core::Resource::KIND]
         entity_type = self
@@ -62,17 +62,21 @@ module OCCI
 
       def initialize(attributes)
         super(attributes)
-        @kind_type = "http://schemas.ogf.org/occi/infrastructure#network"
-        @state_machine  = STATE_MACHINE.clone
+        @kind_type      = "http://schemas.ogf.org/occi/infrastructure#network"
+        @state_machine  = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE], :on_transition => self.method(:update_state))
       end
       
-      def deploy()
+      def deploy
         $backend.create_network_instance(self)
       end
       
-      def delete()
+      def delete
         $backend.delete_network_instance(self)
         delete_entity()
+      end
+
+      def update_state
+        @attributes['occi.network.state'] = state_machine.current_state.name
       end
 
     end
