@@ -48,17 +48,17 @@ require 'occi/Configuration'
 
 # OCCI Infrastructure classes
 require 'occi/infrastructure/Compute'
-#require 'occi/infrastructure/Storage'
-#require 'occi/infrastructure/Network'
-#require 'occi/infrastructure/Networkinterface'
-#require 'occi/infrastructure/StorageLink'
-#require 'occi/infrastructure/Ipnetworking'
-#require 'occi/infrastructure/Ipnet6'
-#require 'occi/infrastructure/Reservation'
+require 'occi/infrastructure/Storage'
+require 'occi/infrastructure/Network'
+require 'occi/infrastructure/Networkinterface'
+require 'occi/infrastructure/StorageLink'
+require 'occi/infrastructure/Ipnetworking'
+require 'occi/infrastructure/Ipnet6'
+require 'occi/infrastructure/Reservation'
 
 # OCCI HTTP rendering
 require 'occi/rendering/http/Renderer'
-#require 'occi/rendering/http/LocationRegistry'
+require 'occi/rendering/http/LocationRegistry'
 
 ##############################################################################
 # Initialize logger
@@ -94,19 +94,22 @@ end
 # registry for the locations of all OCCI objects
 $locationRegistry = OCCI::Rendering::HTTP::LocationRegistry.new
 
+$objects = []
+
 REQUEST_DEFAULTS  = { :method        => :get,
                       :headers       => {:Accept => "text/occi"},
                       :timeout       => 1000,   # milliseconds
                       :cache_timeout => 0       # seconds
                     } 
 
-
+# ---------------------------------------------------------------------------------------------------------------------
 def get_default_request(params = {})
   url       = $config["server"] + ":" + $config["port"] + (params[:location] || "/")
   request   = Typhoeus::Request.new(url, REQUEST_DEFAULTS.merge(params))
   return request  
 end
 
+# ---------------------------------------------------------------------------------------------------------------------
 def get_version
   request = get_default_request
   request.on_complete do |response|
@@ -115,6 +118,7 @@ def get_version
   $hydra.queue(request)
 end 
 
+# ---------------------------------------------------------------------------------------------------------------------
 def get_categories
   request = get_default_request(:location => "/-/")
   request.on_complete do |response|
@@ -125,24 +129,40 @@ def get_categories
   $hydra.queue(request)
 end
 
+# ---------------------------------------------------------------------------------------------------------------------
 def create_resource(kind)
   request = get_default_request(:method => :post)
   header = OCCI::Rendering::HTTP::Renderer.render_category_type(kind)
-#  $log.debug("* Category-string: " + category_string)
   request.headers.merge!(header)
   request.on_complete do |response|
-    $log.debug("Resource of kind [#{kind}] created: ")
-    response.headers_hash.each do |key, value|
-      $log.debug("#{key} = #{value}")
-    end
+#    response.headers_hash.each do |key, value|
+#      $log.debug("#{key} = #{value}")
+#    end
+    $log.debug("Resource of kind [#{kind}] created under location: #{response.headers_hash["Location"]}")
+    $objects << response.headers_hash["Location"]
+    
+    delete_resource(response.headers_hash["Location"])
+    
   end
   $hydra.queue(request)
 end
 
+# ---------------------------------------------------------------------------------------------------------------------
+def delete_resource(location)
+  request = get_default_request(:method => :delete)
+  request.on_complete do |response|
+    $log.debug("Resource under location [#{location}] has been deleted!")
+    $objects.delete(location)
+  end
+  $hydra.queue(request)
+end
+
+# ---------------------------------------------------------------------------------------------------------------------
 begin
 
-  # Run the request via Hydra ()
+  # Run the request via Hydra
   $hydra = Typhoeus::Hydra.new(:max_concurrency => 1)
+
   # No memoization
   $hydra.disable_memoization
  
@@ -150,10 +170,6 @@ begin
   get_categories
   create_resource(OCCI::Infrastructure::Compute::KIND)
   
-#  request = get_version()
-#  $log.debug(request)
-  
-#  $hydra.queue(request)
   $hydra.run
 
   # the response object will be set after the request is run
