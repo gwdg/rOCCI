@@ -46,7 +46,7 @@ module OCCI
       def initialize(attributes, mixins = [])
         attributes['occi.core.summary'] = "" if attributes['occi.core.summary'] == nil
         attributes['links']             = []
-        super(attributes)
+        super(attributes,mixins)
         @kind_type = "http://schemas.ogf.org/occi/core#resource"
       end
 
