@@ -55,11 +55,12 @@ module OCCI
       end
 
 
-      def initialize(attributes,mixins = [])
+      def initialize(attributes,mixins)
         # Make sure UUID is UNIQUE for every entity
         attributes['occi.core.id']    = UUIDTools::UUID.timestamp_create.to_s
         attributes['occi.core.title'] = "" if attributes['occi.core.title'] == nil
         @mixins = mixins
+        $log.debug("Mixins in entity #{@mixins}")
         @attributes = attributes
         @kind_type = "http://schemas.ogf.org/occi/core#entity"
         kind.entities << self
@@ -91,16 +92,6 @@ module OCCI
         end if links != nil
         kind.entities.delete(self)
         $locationRegistry.unregister_location(get_location())
-      end
-
-      # attributes are hashes and contain key - value pairs as defined by the corresponding kind and mixins
-      def attributes
-        attributes = {}
-        attributes.merge!(@attributes)
-        @mixins.each do |mixin|
-          attributes.merge!(mixin.attributes)
-        end
-        return attributes
       end
 
       def get_location()
