@@ -36,7 +36,7 @@ module OCCI
           entities = []
 
           term    = "virtualnetwork"
-          scheme  = "http://schemas.opennebula.org/occi/infrastructure/#"
+          scheme  = "http://schemas.opennebula.org/occi/infrastructure#"
           title   = "OpenNebula Virtual Network Mixin"
 
           attributes = OCCI::Core::Attributes.new()

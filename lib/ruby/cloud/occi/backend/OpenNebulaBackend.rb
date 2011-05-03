@@ -136,12 +136,9 @@ module OCCI
 
       # CREATE VM
       def create_compute_instance(computeObject)
-        storageLinks = []
-        networkLinks = []
-        attributes = computeObject.attributes.clone
-        computeObject.mixins.each do |mixin|
-          attributes.merge!(mixin.attributes)
-        end
+        storage_ids = []
+        network_ids = []
+        attributes = computeObject.attributes
         links = attributes["links"]
         if links != nil
           links.each do
@@ -160,8 +157,8 @@ module OCCI
         $log.debug("Parsed template #{template}")
         rc = vm.allocate(template)
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
-        computeObject.attributes['occi.core.id'] = UUIDTools::UUID.parse_int(vm.id).to_s
-        $log.debug("ID of resource: #{computeObject.attributes['occi.core.id']}")
+        attributes['occi.core.id'] = UUIDTools::UUID.parse_int(vm.id).to_s
+        $log.debug("ID of resource: #{attributes['occi.core.id']}")
       end
 
       # DELETE VM
@@ -177,10 +174,7 @@ module OCCI
       
       # CREATE VNET
       def create_network_instance(networkObject)
-        attributes = networkObject.attributes.clone
-        networkObject.mixins.each do |mixin|
-          attributes.merge!(mixin.attributes)
-        end
+        attributes = networkObject.attributes
         network=VirtualNetwork.new(VirtualNetwork.build_xml(), @one_client)
         @templateRaw = @config["TEMPLATE_LOCATION"] + TEMPLATENETWORKRAWFILE
         template = ERB.new(File.read(@templateRaw)).result(binding)
@@ -188,8 +182,8 @@ module OCCI
         rc = network.allocate(template)
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
         $log.debug("ID of network #{network.id}")
-        networkObject.attributes['occi.core.id'] = UUIDTools::UUID.parse_int(network.id).to_s
-        $log.debug("ID of resource: #{networkObject.attributes['occi.core.id']}")
+        attributes['occi.core.id'] = UUIDTools::UUID.parse_int(network.id).to_s
+        $log.debug("ID of resource: #{attributes['occi.core.id']}")
       end
 
       # DELETE VNET
@@ -205,10 +199,7 @@ module OCCI
 
       # CREATE STORAGE
       def create_storage_instance(storageObject)
-        attributes = storageObject.attributes.clone
-        storageObject.mixins.each do |mixin|
-          attributes.merge!(mixin.attributes)
-        end
+        attributes = storageObject.attributes
         storage=Image.new(Image.build_xml, @one_client)
         @templateRaw = @config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
         template = ERB.new(File.read(@templateRaw)).result(binding)
@@ -217,8 +208,8 @@ module OCCI
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
         # does storage need to be enabled?
         #storage.enable
-        storageObject.attributes['occi.core.id'] = UUIDTools::UUID.parse_int(vm.id).to_s
-        $log.debug("ID of resource: #{storageObject.attributes['occi.core.id']}")
+        attributes['occi.core.id'] = UUIDTools::UUID.parse_int(storage.id).to_s
+        $log.debug("ID of resource: #{attributes['occi.core.id']}")
       end
       
       # DELETE STORAGE / IMAGE

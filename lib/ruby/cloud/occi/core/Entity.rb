@@ -1,12 +1,12 @@
 ##############################################################################
 #  Copyright 2011 Service Computing group, TU Dortmund
-#  
+#
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
-#  
+#
 #      http://www.apache.org/licenses/LICENSE-2.0
-#  
+#
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,26 +50,26 @@ module OCCI
         attributes = OCCI::Core::Attributes.new()
         attributes << OCCI::Core::Attribute.new(name = 'occi.core.id',    mutable = false,  mandatory = true,   unique = true)
         attributes << OCCI::Core::Attribute.new(name = 'occi.core.title', mutable = true,   mandatory = false,  unique = true)
-          
+
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
       end
 
 
-      def initialize(attributes)
+      def initialize(attributes,mixins = [])
         # Make sure UUID is UNIQUE for every entity
         attributes['occi.core.id']    = UUIDTools::UUID.timestamp_create.to_s
         attributes['occi.core.title'] = "" if attributes['occi.core.title'] == nil
+        @mixins = mixins
         @attributes = attributes
-        @mixins = []
         @kind_type = "http://schemas.ogf.org/occi/core#entity"
         kind.entities << self
       end
-      
+
       def delete()
         $log.debug("Deleting entity with location #{get_location}")
         delete_entity()
       end
-      
+
       def delete_entity()
         self.mixins.each do |mixin|
           mixin.entities.delete(self)
@@ -79,24 +79,34 @@ module OCCI
         links.each do |link|
           $log.debug("occi.core.target #{link.attributes["occi.core.target"]}")
           target_uri = URI.parse(link.attributes["occi.core.target"])
-          target = $locationRegistry.get_object_by_location(target_uri.path) 
+          target = $locationRegistry.get_object_by_location(target_uri.path)
           $log.debug("Target #{target}")
           target.attributes['links'].delete(link)
 
           $log.debug("occi.core.source #{link.attributes["occi.core.source"]}")
           source_uri = URI.parse(link.attributes["occi.core.source"])
-          source = $locationRegistry.get_object_by_location(source_uri.path) 
+          source = $locationRegistry.get_object_by_location(source_uri.path)
           $log.debug("Source #{source}")
           source.attributes['links'].delete(link)
         end if links != nil
         kind.entities.delete(self)
         $locationRegistry.unregister_location(get_location())
       end
-      
+
+      # attributes are hashes and contain key - value pairs as defined by the corresponding kind and mixins
+      def attributes
+        attributes = {}
+        attributes.merge!(@attributes)
+        @mixins.each do |mixin|
+          attributes.merge!(mixin.attributes)
+        end
+        return attributes
+      end
+
       def get_location()
         location = $locationRegistry.get_location_of_object(kind) + attributes['occi.core.id']
       end
-      
+
       def get_category_string()
         self.class.getKind.get_short_category_string()
       end

@@ -60,8 +60,8 @@ module OCCI
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
       end
 
-      def initialize(attributes)
-        super(attributes)
+      def initialize(attributes, mixins=[])
+        super(attributes, mixins)
         @kind_type      = "http://schemas.ogf.org/occi/infrastructure#network"
         @state_machine  = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE], :on_transition => self.method(:update_state))
       end

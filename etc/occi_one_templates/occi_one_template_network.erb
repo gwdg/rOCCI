@@ -1,5 +1,5 @@
-NAME            = "<%= attributes["occi.core.title"]%>"
-DESCRIPTION     = "<%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>"
+NAME            = <%= attributes["occi.core.title"]%>
+DESCRIPTION     = <%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>
 BRIDGE          = <%= attributes['opennebula.network.bridge'] %>
 PUBLIC          = <%= attributes['opennebula.network.public'].upcase if attributes['opennebula.network.public']%>
 
