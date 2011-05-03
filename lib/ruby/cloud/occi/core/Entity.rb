@@ -115,6 +115,10 @@ module OCCI
         return $categoryRegistry.getKind(@kind_type)
       end
 
+      def to_s
+        return kind_type
+      end
+
     end
   end
 end

@@ -24,7 +24,6 @@ require 'occi/core/Kind'
 require 'occi/core/Mixin'
 require 'occi/rendering/http/LocationRegistry'
 
-
 ##############################################################################
 # HTTP Status Codes
 

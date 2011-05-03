@@ -98,9 +98,31 @@ $objects = []
 
 REQUEST_DEFAULTS  = { :method        => :get,
                       :headers       => {:Accept => "text/occi"},
-                      :timeout       => 1000,   # milliseconds
+                      :timeout       => 10000,   # milliseconds
                       :cache_timeout => 0       # seconds
                     } 
+
+# ---------------------------------------------------------------------------------------------------------------------
+def check_response(response)
+
+  return true if response.success?
+
+  if response.timed_out?
+    # Response timed out
+    $log.error("Response timed out: #{response.time} seconds!")
+    return
+  end
+
+  if response.code == 0
+    # Could not get an http response, something's wrong.
+    $log.error("No http response received: #{response.curl_error_message}")
+    return
+  end
+
+  # Received a non-successful http response.
+  $log.error("HTTP request failed: " + response.code.to_s)
+
+end
 
 # ---------------------------------------------------------------------------------------------------------------------
 def get_default_request(params = {})
@@ -113,6 +135,7 @@ end
 def get_version
   request = get_default_request
   request.on_complete do |response|
+    check_response(response)
     $log.debug("Server version: " + response.headers_hash["Server"])
   end
   $hydra.queue(request)
@@ -122,6 +145,7 @@ end
 def get_categories
   request = get_default_request(:location => "/-/")
   request.on_complete do |response|
+    check_response(response)
     response.headers_hash.each do |key, value|
       $log.debug("#{key} = #{value}")
     end
@@ -135,13 +159,15 @@ def create_resource(kind)
   header = OCCI::Rendering::HTTP::Renderer.render_category_type(kind)
   request.headers.merge!(header)
   request.on_complete do |response|
+    check_response(response)
 #    response.headers_hash.each do |key, value|
 #      $log.debug("#{key} = #{value}")
 #    end
     $log.debug("Resource of kind [#{kind}] created under location: #{response.headers_hash["Location"]}")
-    $objects << response.headers_hash["Location"]
+    resource_uri = URI.parse(response.headers_hash["Location"])
+    $objects << resource_uri.path
     
-    delete_resource(response.headers_hash["Location"])
+#    delete_resource(response.headers_hash["Location"])
     
   end
   $hydra.queue(request)
@@ -149,12 +175,25 @@ end
 
 # ---------------------------------------------------------------------------------------------------------------------
 def delete_resource(location)
-  request = get_default_request(:method => :delete)
+  request = get_default_request(  :method   => :delete,
+                                  :location => location)
   request.on_complete do |response|
-    $log.debug("Resource under location [#{location}] has been deleted!")
-    $objects.delete(location)
+    check_response(response)
+    if response.body == "OK"
+      $log.debug("Resource under location [#{location}] has been deleted!")
+      $objects.delete(location)
+    else
+      $log.error("Could not delete resource under location [#{location}]!")
+    end
   end
   $hydra.queue(request)
+end
+
+# ---------------------------------------------------------------------------------------------------------------------
+def clean_up
+  $objects.each do |location|
+    delete_resource(location)
+  end
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -168,21 +207,17 @@ begin
  
   get_version
   get_categories
-  create_resource(OCCI::Infrastructure::Compute::KIND)
+  
+  20.times do
+    create_resource(OCCI::Infrastructure::Compute::KIND)
+  end
   
   $hydra.run
 
-  # the response object will be set after the request is run
-#  response = request.response
-#  response.code    # http status code
-#  response.time    # time in seconds the request took
-#  response.headers # the http headers
-#  response.headers_hash # http headers put into a hash
-#  response.body    # the response body
-#  $log.debug(response)
+  clean_up
+
+  sleep 1.0
   
-#  response.headers_hash.each do |key, value|
-#    $log.debug("#{key} = #{value}")
-#  end
+  $hydra.run
   
 end

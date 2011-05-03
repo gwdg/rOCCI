@@ -294,7 +294,7 @@ begin
         if action_params != ""
           $log.debug("Action from query string: #{action_params}")
           entities = $locationRegistry.get_resources_below_location(location)
-          $log.debug("Entities found at location #{entities}")
+#          $log.debug("Entities found at location #{entities}")
           method = request.env["HTTP_X_OCCI_ATTRIBUTE"]
           if entities != nil
             # TODO trigger action!
@@ -606,7 +606,7 @@ begin
 
       entities, exact_resource_match = get_entities_by_location_from_categories(location,categories)
 
-      $log.debug(entities)
+#      $log.debug(entities)
       $log.debug("exact resource match: #{exact_resource_match}")
 
       # location is a mixin, unassociate all resources from it
@@ -627,7 +627,7 @@ begin
 
       else # delete all entities at and below the location
         $log.debug("Entities to delete")
-        $log.debug(entities)
+#        $log.debug(entities)
         entities.each do |entity|
           entity.delete()
         end
@@ -685,7 +685,7 @@ def get_entities_by_location_from_categories(location,categories)
     end
   end
 
-  $log.debug("Entities corresponding to location")
-  $log.debug(entities)
+  $log.debug("Entities corresponding to location: #{entities.length}")
+#  $log.debug(entities)
   return [entities, exact_resource_match]
 end
