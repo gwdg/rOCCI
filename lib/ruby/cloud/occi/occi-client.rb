@@ -125,6 +125,13 @@ def check_response(response)
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
+def dump_headers(response)
+    response.headers_hash.each do |key, value|
+      $log.debug("#{key} = #{value}")
+    end
+end
+
+# ---------------------------------------------------------------------------------------------------------------------
 def get_default_request(params = {})
   url       = $config["server"] + ":" + $config["port"] + (params[:location] || "/")
   request   = Typhoeus::Request.new(url, REQUEST_DEFAULTS.merge(params))
@@ -155,28 +162,46 @@ end
 
 # ---------------------------------------------------------------------------------------------------------------------
 def create_resource(kind)
+
   request = get_default_request(:method => :post)
-  header = OCCI::Rendering::HTTP::Renderer.render_category_type(kind)
-  request.headers.merge!(header)
+  headers = OCCI::Rendering::HTTP::Renderer.render_category_type(kind)
+  request.headers.merge!(headers)
+
   request.on_complete do |response|
     check_response(response)
-#    response.headers_hash.each do |key, value|
-#      $log.debug("#{key} = #{value}")
-#    end
     $log.debug("Resource of kind [#{kind}] created under location: #{response.headers_hash["Location"]}")
     resource_uri = URI.parse(response.headers_hash["Location"])
     $objects << resource_uri.path
-    
-#    delete_resource(response.headers_hash["Location"])
-    
   end
+
+  $hydra.queue(request)
+end
+
+# ---------------------------------------------------------------------------------------------------------------------
+def retrieve_resource(location)
+
+  request = get_default_request(  :method   => :get,
+                                  :location => location)
+
+  request.on_complete do |response|
+    check_response(response)
+    if response.body == "OK"
+      $log.debug("Retrieved resource under location [#{location}]!")
+      dump_headers(response)
+    else
+      $log.error("Could not retrieve resource under location [#{location}]!")
+    end
+  end
+
   $hydra.queue(request)
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
 def delete_resource(location)
+
   request = get_default_request(  :method   => :delete,
                                   :location => location)
+
   request.on_complete do |response|
     check_response(response)
     if response.body == "OK"
@@ -186,7 +211,30 @@ def delete_resource(location)
       $log.error("Could not delete resource under location [#{location}]!")
     end
   end
+
   $hydra.queue(request)
+end
+
+# ---------------------------------------------------------------------------------------------------------------------
+def trigger_action(location, action, parameters = {})
+
+  request = get_default_request(  :method   => :post,
+                                  :location => "#{location}?action=#{action.category.term}")
+  headers = {}
+  headers = OCCI::Rendering::HTTP::Renderer.merge_headers(headers, OCCI::Rendering::HTTP::Renderer.render_category_type(action))
+  headers = OCCI::Rendering::HTTP::Renderer.merge_headers(headers, OCCI::Rendering::HTTP::Renderer.render_attributes(parameters))
+  request.headers.merge!(headers)
+
+  request.on_complete do |response|
+    check_response(response)
+    if response.body == "OK"
+      $log.debug("Triggered action [#{action}] on resource under location [#{location}] with parameters [#{parameters}]!")
+    else
+      $log.error("Could not trigger action [#{action}] on resource under location [#{location}] with parameters [#{parameters}]!")
+    end
+  end
+
+  $hydra.queue(request)  
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -208,15 +256,27 @@ begin
   get_version
   get_categories
   
-  2.times do
-    create_resource(OCCI::Infrastructure::Compute::KIND)
-  end
-  
+#  20.times do
+#    create_resource(OCCI::Infrastructure::Compute::KIND)
+#  end
+ 
+  create_resource(OCCI::Infrastructure::Compute::KIND)
   $hydra.run
+
+  retrieve_resource($objects[0])
+  $hydra.run
+  
+  trigger_action($objects[0], OCCI::Infrastructure::Compute::ACTION_START)
+  $hydra.run
+
+  retrieve_resource($objects[0])
+  $hydra.run
+  
+#  $hydra.run
 
   clean_up
 
-  sleep 1.0
+#  sleep 1.0
   
   $hydra.run
   

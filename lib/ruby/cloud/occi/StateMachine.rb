@@ -54,9 +54,20 @@ module OCCI
                 
       # ---------------------------------------------------------------------------------------------------------------------
       def add_transition(action, target_state)
-        @transitions[get_action_name(action)]  = target_state 
+        @transitions[get_action_name(action)] = target_state 
       end
-        
+      
+      # ---------------------------------------------------------------------------------------------------------------------
+      def has_transition(action)
+        return @transitions.has_key?(get_action_name(action))
+      end
+      
+      # ---------------------------------------------------------------------------------------------------------------------
+      def get_target_state(action)
+        raise "Unsupport transition [#{action}] for this state: #{self}" unless has_transition(action)
+        return @transitions[get_action_name(action)]
+      end
+      
       # ---------------------------------------------------------------------------------------------------------------------
       def to_s()
         string = "[" + @name + "]: transitions: "
@@ -79,14 +90,14 @@ module OCCI
     # ---------------------------------------------------------------------------------------------------------------------
     def transition(action)
       raise "Transition for action [#{action}] not supported in current state: #{@current_state}" if !check_transition(action)
-      @current_state = @current_state.transitions[get_action_name(action)]
+      @current_state = @current_state.get_target_state(action)
       # Invoke event callback if defined
       @options[:on_transition].call if @options.has_key?(:on_transition)
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
     def check_transition(action)
-      return @current_state.transitions.has_key?(get_action_name(action))
+      return @current_state.has_transition(action)
     end
 
     # ---------------------------------------------------------------------------------------------------------------------

@@ -179,19 +179,19 @@ module OCCI
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_entity_attributes(entity)
+        def self.render_attributes(attributes)
           
-          return {} if entity.attributes.empty?
+          return {} if attributes.empty?
 
           attributes_values = []
-          entity.attributes.each do |name, value|
+          attributes.each do |name, value|
             attributes_values << %Q{#{name}="#{value}"}
           end
           
           header = {}
           header[HEADER_ATTRIBUTE] = attributes_values
         
-          $log.debug("Rendered attributes: #{entity.attributes}:")
+          $log.debug("Rendered attributes: #{attributes}:")
           $log.debug(header)
 
           return header
@@ -245,7 +245,7 @@ module OCCI
           end
           
           # Render attributes
-          merge_headers(headers, render_entity_attributes(entity))
+          merge_headers(headers, render_attributes(entity.attributes))
           
           # Render link references
           entity.attributes["links"].each do |link|
