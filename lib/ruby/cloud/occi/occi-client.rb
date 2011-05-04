@@ -208,7 +208,7 @@ begin
   get_version
   get_categories
   
-  20.times do
+  2.times do
     create_resource(OCCI::Infrastructure::Compute::KIND)
   end
   
