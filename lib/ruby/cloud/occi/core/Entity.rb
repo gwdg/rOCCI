@@ -54,8 +54,7 @@ module OCCI
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
       end
 
-
-      def initialize(attributes,mixins)
+      def initialize(attributes, mixins)
         # Make sure UUID is UNIQUE for every entity
         attributes['occi.core.id']    = UUIDTools::UUID.timestamp_create.to_s
         attributes['occi.core.title'] = "" if attributes['occi.core.title'] == nil
@@ -64,6 +63,47 @@ module OCCI
         @attributes = attributes
         @kind_type = "http://schemas.ogf.org/occi/core#entity"
         kind.entities << self
+      end
+
+      def check_attributes(attributes)
+
+        # Construct set of all attribute definitions to check against (derived from kind + mixins)
+        
+        # Attribute name -> attribute def
+        attribute_definitions = {}
+        
+        # Attribute name -> category
+        attribute_categories  = {}
+
+        # Attribute definitions from kind
+        kind.attributes.each do |attribute_def|
+          attribute_definitions[attribute_def.name] = attribute_def
+          attribute_catgeories[attribute_def.name]  = kind
+        end
+
+        # Attribute definitions from all mixins
+        mixins.each do |mixin|
+          mixin.attributes.each do |attribute_def|
+            raise "Attribute [#{attribute_def.name}] already defined in category [#{attribute_categories[attribute_def.name]}], redefinition from category [#{mixin}]!" if attribute_definitions.has_key?(attribute_def.name)
+            attribute_definitions[attribute_def.name] = attribute_def
+            attribute_catgeories[attribute_def.name]  = mixin            
+          end
+        end
+        
+        # Check given attributes against set of definitions
+
+        attributes.each do |name, value|
+
+          # Check for unknown attribute
+          raise "Attribute [#{name}] with value [#{value}] unknown!" unless attribute_definitions.hash_key?(name)
+
+          # Check for uniqueness 
+          if value.respond_to?(:each) && value.length > 1
+            raise "Attribute [#{name}] not unique: value: [#{value}], definition in: [#{attribute_categories[name]}]!" if attribute_definitions[name].unique
+          end
+          
+          
+        end
       end
 
       def delete()
