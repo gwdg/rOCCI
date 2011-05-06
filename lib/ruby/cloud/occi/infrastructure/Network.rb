@@ -61,9 +61,10 @@ module OCCI
       end
 
       def initialize(attributes, mixins=[])
-        super(attributes, mixins)
-        @kind_type      = "http://schemas.ogf.org/occi/infrastructure#network"
         @state_machine  = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE], :on_transition => self.method(:update_state))
+        # Initialize resource state
+        attributes['occi.network.state'] = state_machine.current_state.name
+        super(attributes, OCCI::Infrastructure::Network::KIND, mixins)
       end
       
       def deploy

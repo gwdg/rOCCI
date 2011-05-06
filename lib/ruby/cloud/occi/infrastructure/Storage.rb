@@ -87,9 +87,10 @@ module OCCI
       end
 
       def initialize(attributes, mixins=[])
-        super(attributes, mixins)
-        @kind_type      = "http://schemas.ogf.org/occi/infrastructure#storage"
         @state_machine  = OCCI::StateMachine.new(STATE_OFFLINE, [STATE_OFFLINE, STATE_ONLINE, STATE_BACKUP, STATE_SNAPSHOT, STATE_RESIZE], :on_transition => self.method(:update_state))
+        # Initialize resource state
+        attributes['occi.storage.state'] = state_machine.current_state.name
+        super(attributes, OCCI::Infrastructure::Storage::KIND, mixins)
       end
       
       def deploy()

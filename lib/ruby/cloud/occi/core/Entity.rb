@@ -27,13 +27,15 @@ require 'occi/core/Kind'
 
 module OCCI
   module Core
+    
+    # ---------------------------------------------------------------------------------------------------------------------
     class Entity
 
       # Attributes are hashes and contain key - value pairs as defined by the corresponding kind
       attr_reader   :attributes
       attr_reader   :mixins
 
-      attr_reader   :kind_type
+      attr_reader   :kind
       attr_reader   :state_machine
 
       # Define appropriate kind
@@ -54,18 +56,12 @@ module OCCI
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
       end
 
-      def initialize(attributes, mixins)
-        # Make sure UUID is UNIQUE for every entity
-        attributes['occi.core.id']    = UUIDTools::UUID.timestamp_create.to_s
-        attributes['occi.core.title'] = "" if attributes['occi.core.title'] == nil
-        @mixins = mixins
-        $log.debug("Mixins in entity #{@mixins}")
-        @attributes = attributes
-        @kind_type = "http://schemas.ogf.org/occi/core#entity"
-        kind.entities << self
-      end
-
-      def check_attributes(attributes)
+      # ---------------------------------------------------------------------------------------------------------------------
+      private
+      # ---------------------------------------------------------------------------------------------------------------------
+      
+      # ---------------------------------------------------------------------------------------------------------------------
+      def check_attributes(new_attributes, old_attributes = nil)
 
         # Construct set of all attribute definitions to check against (derived from kind + mixins)
         
@@ -75,42 +71,79 @@ module OCCI
         # Attribute name -> category
         attribute_categories  = {}
 
-        # Attribute definitions from kind
-        kind.attributes.each do |attribute_def|
-          attribute_definitions[attribute_def.name] = attribute_def
-          attribute_catgeories[attribute_def.name]  = kind
-        end
+        # Attribute definitions from kind + mixins
+        categories = Category::Related::get_all_related([kind]) + Category::Related::get_all_related(mixins)
 
         # Attribute definitions from all mixins
-        mixins.each do |mixin|
-          mixin.attributes.each do |attribute_def|
-            raise "Attribute [#{attribute_def.name}] already defined in category [#{attribute_categories[attribute_def.name]}], redefinition from category [#{mixin}]!" if attribute_definitions.has_key?(attribute_def.name)
-            attribute_definitions[attribute_def.name] = attribute_def
-            attribute_catgeories[attribute_def.name]  = mixin            
+        categories.each do |category|
+          category.attributes.each do |name, attribute_def|
+            raise "Attribute [#{name}] already defined in category [#{attribute_categories[name]}], redefinition from category [#{category}]!" if attribute_definitions.has_key?(name)
+            attribute_definitions[name] = attribute_def
+            attribute_categories[name]  = category            
           end
         end
         
+        $log.debug("Attributes definitions to check against: #{attribute_definitions.keys}") 
+        
         # Check given attributes against set of definitions
 
-        attributes.each do |name, value|
+        new_attributes.each do |name, value|
 
-          # Check for unknown attribute
-          raise "Attribute [#{name}] with value [#{value}] unknown!" unless attribute_definitions.hash_key?(name)
+          # Check for undefined attribute
+          raise "Attribute [#{name}] with value [#{value}] unknown!" unless attribute_definitions.has_key?(name)
 
-          # Check for uniqueness 
-          if value.respond_to?(:each) && value.length > 1
+          # Check for uniqueness
+          # TODO: Multi-valued attributes are currently not supported but also not needed (can easily be added as arrays in the attributes-map later on)
+          if value.kind_of?(Array) && value.length > 1
             raise "Attribute [#{name}] not unique: value: [#{value}], definition in: [#{attribute_categories[name]}]!" if attribute_definitions[name].unique
           end
           
-          
+          # Check for mutability by client
+          if !attribute_definitions[name].mutable && old_attributes != nil && old_attributes.has_key?(name)
+            raise "Attribute [#{name}] is not mutable: old value: [#{old_attributes[name]}], new value: [#{value}]" unless old_attributes[name] == value
+          end
+        end
+        
+        # Make sure all mandatory attributes are set
+        attribute_definitions.each do |name, attribute|
+          if attribute.mandatory
+            raise "Mandatory attribute [#{name}] not set!" unless new_attributes.has_key?(name) && new_attributes[name] != nil
+          end
         end
       end
 
+      # ---------------------------------------------------------------------------------------------------------------------
+      public
+      # ---------------------------------------------------------------------------------------------------------------------
+
+      # ---------------------------------------------------------------------------------------------------------------------
+      def initialize(attributes, kind, mixins)
+
+        # Make sure UUID is UNIQUE for every entity
+        attributes['occi.core.id']    = UUIDTools::UUID.timestamp_create.to_s
+        attributes['occi.core.title'] = "" if attributes['occi.core.title'] == nil
+
+        @mixins     = mixins
+        @kind       = kind
+#        @kind_type  = "http://schemas.ogf.org/occi/core#entity"
+
+        # Must be called AFTER kind + mixins are set
+        check_attributes(attributes)
+
+        @attributes = attributes
+
+        kind.entities << self
+        
+        $log.debug("Mixins in entity #{@mixins}")
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------
       def delete()
         $log.debug("Deleting entity with location #{get_location}")
         delete_entity()
       end
 
+      # ---------------------------------------------------------------------------------------------------------------------
       def delete_entity()
         self.mixins.each do |mixin|
           mixin.entities.delete(self)
@@ -134,20 +167,14 @@ module OCCI
         $locationRegistry.unregister_location(get_location())
       end
 
+      # ---------------------------------------------------------------------------------------------------------------------
       def get_location()
         location = $locationRegistry.get_location_of_object(kind) + attributes['occi.core.id']
       end
 
+      # ---------------------------------------------------------------------------------------------------------------------
       def get_category_string()
         self.class.getKind.get_short_category_string()
-      end
-
-      def kind()
-        return $categoryRegistry.getKind(@kind_type)
-      end
-
-      def to_s
-        return kind_type
       end
 
     end

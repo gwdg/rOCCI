@@ -43,15 +43,10 @@ module OCCI
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)        
       end
 
-      def initialize(attributes, mixins = [])
+      def initialize(attributes, kind, mixins = [])
         attributes['occi.core.summary'] = "" if attributes['occi.core.summary'] == nil
         attributes['links']             = []
-        super(attributes,mixins)
-        @kind_type = "http://schemas.ogf.org/occi/core#resource"
-      end
-
-      def to_s
-        @kind_type
+        super(attributes, kind, mixins)
       end
 
     end

@@ -25,6 +25,19 @@ module OCCI
   module Core
     class Category
 
+      module Related
+        def self.get_all_related(categories)
+          related     = []
+          to_process  = categories.clone
+          while !to_process.empty? do
+            element = to_process.shift
+            related << element unless related.include?(element)
+            to_process.concat(element.related)
+          end
+          return related
+        end
+      end
+
       attr_reader   :scheme
       attr_reader   :term
       attr_reader   :title
@@ -40,6 +53,11 @@ module OCCI
       def get_location()
         location = '/' + @term + '/'
       end
+      
+      def id
+        return @scheme + @term
+      end
+      
     end
   end
 end

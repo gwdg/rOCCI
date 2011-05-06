@@ -226,7 +226,7 @@ begin
           end
           
           resources.each do |resource|
-            locations << $locationRegistry.get_location_of_object(resource) if filter.has_key?(resource.kind_type)
+            locations << $locationRegistry.get_location_of_object(resource) if filter.has_key?(resource.kind.id)
           end
 
         else

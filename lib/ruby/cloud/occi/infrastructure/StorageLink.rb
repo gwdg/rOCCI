@@ -61,10 +61,11 @@ module OCCI
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
       end
 
-      def initialize(attributes, mixins=[])
-        super(attributes, mixins)
-        @kind_type      = "http://schemas.ogf.org/occi/infrastructure#storagelink"
-        @state_machine  = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE], :on_transition => self.method(:update_state))
+      def initialize(attributes, mixins = [])
+        @state_machine = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE], :on_transition => self.method(:update_state))
+        # Initialize resource state
+        attributes['occi.storagelink.state'] = state_machine.current_state.name
+        super(attributes, OCCI::Infrastructure::StorageLink::KIND, mixins)
         $backend.createStorageLinkInstance(self)
       end
 

@@ -79,10 +79,11 @@ module OCCI
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
       end
  
-      def initialize(attributes, mixins=[])
-        super(attributes, mixins)
-        @kind_type      = "http://schemas.ogf.org/occi/infrastructure#compute"
+      def initialize(attributes, mixins = [])
         @state_machine  = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE, STATE_SUSPENDED], :on_transition => self.method(:update_state))
+        # Initialize resource state
+        attributes['occi.compute.state'] = state_machine.current_state.name
+        super(attributes, OCCI::Infrastructure::Compute::KIND ,mixins)
       end
 
       def deploy

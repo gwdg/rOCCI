@@ -80,11 +80,11 @@ module OCCI
       
     # ---------------------------------------------------------------------------------------------------------------------
     def initialize(start_state, states, options = {})
+      raise "Start state [#{start_state}] not part of provided states" if !states.include?(start_state)
       @start_state    = start_state
       @current_state  = start_state
       @states         = states
       @options        = options
-      raise "Start state [#{start_state}] not part of provided states" if !states.include?(start_state)
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
