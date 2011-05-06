@@ -19,15 +19,18 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'occi/core/Attributes'
+
 module OCCI
   module Core
     class Category
-      attr_accessor :scheme
-      attr_accessor :term
-      attr_accessor :title
-      attr_accessor :attributes
+
+      attr_reader   :scheme
+      attr_reader   :term
+      attr_reader   :title
+      attr_reader   :attributes
       
-      def initialize(term,scheme,title,attributes)
+      def initialize(term, scheme, title, attributes)
         @term   = term
         @scheme = scheme
         @title  = title
