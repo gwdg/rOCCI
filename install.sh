@@ -20,53 +20,61 @@ fi
 
 echo -n "Stopping OCCI server"
 
+$BIN_LOCATION/occi-server stop
 
 echo -n "Installing OCCI server."
 
 backup_information=""
 
-if [ -f $ONE_LOCATION/bin/occi-server ]; then
-    mv $ONE_LOCATION/bin/occi-server $ONE_LOCATION/bin/occi-server.old
+if [[ -f $BIN_LOCATION/occi-server ] -a [ ! -f $BIN_LOCATION/occi-server.orig ]]; then
+    mv $BIN_LOCATION/occi-server $BIN_LOCATION/occi-server.orig
 fi
-cp bin/occi-server $ONE_LOCATION/bin
+cp bin/occi-server $BIN_LOCATION
 
 echo -n "."
 
-if [ -f $ONE_LOCATION/etc/occi-server.conf ]; then
-  rm -f $ONE_LOCATION/etc/occi-server.conf.old
-  mv $ONE_LOCATION/etc/occi-server.conf $ONE_LOCATION/etc/occi-server.conf.old
-  backup_information=$backup_information"Your current occi-server.conf has been moved to occi-server.conf.old\n" 
+if [ -f $ETC_LOCATION/occi-server.conf ]; then
+  if [ ! -f $ETC_LOCATION/occi-server.conf.orig ]; then
+    mv $ETC_LOCATION/occi-server.conf $ETC_LOCATION/occi-server.conf.orig
+    backup_information=$backup_information"Your current occi-server.conf has been moved to occi-server.conf.orig\n" 
+  else
+    mv $ETC_LOCATION/occi-server.conf $ETC_LOCATION/occi-server.conf.old
+    backup_information=$backup_information"Your current occi-server.conf has been moved to occi-server.conf.old\n"
+  fi
 fi
-cp etc/occi-server.conf $ONE_LOCATION/etc
+cp etc/occi-server.conf $ETC_LOCATION
 
 echo -n "."
 
-if [ -f $ONE_LOCATION/etc/occi-one.conf ]; then
-    rm -f $ONE_LOCATION/etc/occi-one.conf.old
-    mv $ONE_LOCATION/etc/occi-one.conf $ONE_LOCATION/etc/occi-one.conf.old
+if [ -f $ETC_LOCATION/occi-one.conf ]; then
+    mv $ETC_LOCATION/occi-one.con$ETC_LOCATION/occi-one.conf.old
     backup_information=$backup_information"Your current occi-one.conf has been moved to occi-one.conf.old\n"   
 fi
-cp etc/occi-one.conf $ONE_LOCATION/etc
+cp etc/occi-one.conf $ETC_LOCATION
 
-if [ -d $ONE_LOCATION/etc/occi_one_templates ]; then
-    rm -rf $ONE_LOCATION/etc/occi_one_templates.old
-    mv -f $ONE_LOCATION/etc/occi_one_templates $ONE_LOCATION/etc/occi_one_templates.old
+if [ -d $ETC_LOCATION/occi_one_templates ]; then
+    rm -rf $ETC_LOCATION/occi_one_templates.old
+    mv -f $ETC_LOCATION/occi_one_templates $ETC_LOCATION/occi_one_templates.old
     backup_information=$backup_information"Your current occi templates directory has been moved to occi_one_templates.old"
 fi
-cp -r etc/occi_one_templates $ONE_LOCATION/etc
+cp -r etc/occi_one_templates $ETC_LOCATION
 
 echo -n "."
 
-if [ -d $ONE_LOCATION/lib/ruby/cloud/occi ]; then
-  rm -rf $ONE_LOCATION/lib/ruby/cloud/occi.old
-  mv -f $ONE_LOCATION/lib/ruby/cloud/occi $ONE_LOCATION/lib/ruby/cloud/occi.old
+if [ -d $RUBY_LOCATION/cloud/occi ]; then
+  if [ ! -d $RUBY_LOCATION/cloud/occi.orig ]; then
+     mv -f $RUBY_LOCATION/ruby/cloud/occi $RUBY_LOCATION/ruby/cloud/occi.orig
+     backup_information=$backup_information"Your current occi lib folder has been moved to occi.old"
+  else
+    rm -rf $RUBY_LOCATION/cloud/occi
+  fi
 fi
-cp -r lib/ruby/cloud/occi/ $ONE_LOCATION/lib/ruby/cloud/occi
+cp -r lib/ruby/cloud/occi/ $RUBY_LOCATION/cloud/occi
 
 echo -n "."
 
-chmod +x $ONE_LOCATION/bin/occi-server
-chmod +x $ONE_LOCATION/lib/ruby/cloud/occi/occi-server.rb
+chmod +x $BIN_LOCATION/occi-server
+chmod +x $RUBY_LOCATION/cloud/occi/occi-server.rb
 
 echo -n "."
 
