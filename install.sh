@@ -18,7 +18,7 @@ else
     BIN_LOCATION=$ONE_LOCATION/bin
 fi
 
-echo -n "Stopping OCCI server"
+echo "Stopping OCCI server"
 
 $BIN_LOCATION/occi-server stop
 
@@ -26,7 +26,7 @@ echo -n "Installing OCCI server."
 
 backup_information=""
 
-if [[ -f $BIN_LOCATION/occi-server ] -a [ ! -f $BIN_LOCATION/occi-server.orig ]]; then
+if [ -f $BIN_LOCATION/occi-server ] && [ ! -f $BIN_LOCATION/occi-server.orig ]; then
     mv $BIN_LOCATION/occi-server $BIN_LOCATION/occi-server.orig
 fi
 cp bin/occi-server $BIN_LOCATION
@@ -47,7 +47,7 @@ cp etc/occi-server.conf $ETC_LOCATION
 echo -n "."
 
 if [ -f $ETC_LOCATION/occi-one.conf ]; then
-    mv $ETC_LOCATION/occi-one.con$ETC_LOCATION/occi-one.conf.old
+    mv $ETC_LOCATION/occi-one.conf $ETC_LOCATION/occi-one.conf.old
     backup_information=$backup_information"Your current occi-one.conf has been moved to occi-one.conf.old\n"   
 fi
 cp etc/occi-one.conf $ETC_LOCATION
