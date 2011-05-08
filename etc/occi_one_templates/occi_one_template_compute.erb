@@ -1,24 +1,34 @@
+<%# Mandatory settings %>
+OCCI_ID       = <%= attributes["occi.core.id"]%>
 NAME          = "<%= attributes["occi.core.title"]%>"
 DESCRIPTION   = "<%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>"
-MEMORY        = "<%= attributes["occi.compute.memory"] if attributes["occi.compute.memory"]%>"
-ARCHITECTURE  = "<%= attributes["occi.compute.architecture"] if attributes["occi.compute.architecture"]%>"
+MEMORY        = <%= attributes["occi.compute.memory"]*1024 if attributes["occi.compute.memory"]%>
+<% if attributes["occi.compute.architecture"] == "x64" %>
+ARCHITECTURE  = "x86_64"
+<% else %>
+ARCHITECTURE  = "i686"
+<% end %>
 CPU           = "<%= attributes["occi.compute.cores"] if attributes["occi.compute.cores"]%>"
 VCPU          = "<%= attributes["opennebula.vm.vcpu"] if attributes["opennebula.vm.vcpu"]%>"
 
+<%# KVM specific settings %>
 <% if attributes["opennebula.vm.boot"] %>
 BOOT          = "<%= attributes["opennebula.vm.boot"] if attributes["opennebula.vm.boot"]%>"
 <% else %>
 BOOT          = hd
 <% end %>
-  
+
+<%# Links to images %>
 <% storage_ids.each do |storage_id| %>
 DISK          = [ IMAGE_ID = "<%= storage_id %>"]
 <%end%>
    
+<%# Links to networks %>
 <% network_ids.each do |network_id| %>
 NIC           = [ NETWORK_ID = "<%= network_id %>"]
 <%end%>
 
+<%# Custom settings %>
 GRAPHICS      = [type="vnc"]
 RANK          = FREECPU
 FEATURES      = [ acpi="no" ]

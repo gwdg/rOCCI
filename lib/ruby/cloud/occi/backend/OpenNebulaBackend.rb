@@ -145,9 +145,9 @@ module OCCI
             |link|
             case link.target.getKind.term
             when "storage"
-              storage_ids << UUIDTools::UUID.parse(link.target.attributes['occi.core.id']).to_i
+              storage_ids << link.target.backend_id
             when "storage"
-              network_ids << UUIDTools::UUID.parse(link.target.attributes['occi.core.id']).to_i
+              network_ids << link.target.backend_id
             end
           end
         end
@@ -157,14 +157,13 @@ module OCCI
         $log.debug("Parsed template #{template}")
         rc = vm.allocate(template)
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
-        attributes['occi.core.id'] = UUIDTools::UUID.parse_int(vm.id).to_s
-        $log.debug("ID of resource: #{attributes['occi.core.id']}")
+        computeObject.backend_id = vm.id
+        $log.debug("OpenNebula ID of virtual machine: #{computeObject.backend_id}")
       end
 
       # DELETE VM
       def delete_compute_instance(computeObject)
-        id = UUIDTools::UUID.parse(computeObject.attributes['occi.core.id']).to_i
-        vm=VirtualMachine.new(VirtualMachine.build_xml(id), @one_client)
+        vm=VirtualMachine.new(VirtualMachine.build_xml(computeObject.backend_id), @one_client)
         rc = vm.delete
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
       end
@@ -181,15 +180,13 @@ module OCCI
         $log.debug("Parsed template #{template}")
         rc = network.allocate(template)
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
-        $log.debug("ID of network #{network.id}")
-        attributes['occi.core.id'] = UUIDTools::UUID.parse_int(network.id).to_s
-        $log.debug("ID of resource: #{attributes['occi.core.id']}")
+        networkObject.backend_id = network.id
+        $log.debug("OpenNebula ID of virtual network: #{networkObject.backend_id}")
       end
 
       # DELETE VNET
       def delete_network_instance(networkObject)
-        id = UUIDTools::UUID.parse(networkObject.attributes['occi.core.id']).to_i
-        network=VirtualNetwork.new(VirtualNetwork.build_xml(id), @one_client)
+        network=VirtualNetwork.new(VirtualNetwork.build_xml(networkObject.backend_id), @one_client)
         rc = network.delete
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
       end
@@ -208,14 +205,13 @@ module OCCI
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
         # does storage need to be enabled?
         #storage.enable
-        attributes['occi.core.id'] = UUIDTools::UUID.parse_int(storage.id).to_s
-        $log.debug("ID of resource: #{attributes['occi.core.id']}")
+        storageObject.backend_id = storage.id
+        $log.debug("OpenNebula ID of image: #{storageObject.backend_id}")
       end
       
       # DELETE STORAGE / IMAGE
       def delete_storage_instance(storageObject)
-        id = UUIDTools::UUID.parse(storageObject.attributes['occi.core.id']).to_i
-        storage=Image.new(Image.build_xml(id), @one_client)
+        storage=Image.new(Image.build_xml(storageObject.backend_id), @one_client)
         rc = storage.delete
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
       end

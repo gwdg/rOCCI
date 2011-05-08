@@ -143,7 +143,6 @@ module OCCI
       categoryString.split(",").each do |category_string|
         # match category string to corresponding parameters
         match = regexp.match(category_string)
-        $log.debug("Matched parameters from category: #{match}")
         if match != nil then
           term, scheme = match.captures
           key = scheme + term
@@ -157,6 +156,9 @@ module OCCI
           # Do not add nil values to categories array
           categories << category if category != nil
         end
+      end
+      categories.each do |category|
+        $log.debug("Category found: #{category.scheme}#{category.term}")
       end
       return categories
     end

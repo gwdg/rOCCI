@@ -181,7 +181,7 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         def self.render_attributes(attributes)
           
-          return {} if attributes.empty?
+          return {} if attributes == nil || attributes.empty?
 
           attributes_values = []
           attributes.each do |name, value|

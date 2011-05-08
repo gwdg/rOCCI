@@ -37,6 +37,8 @@ module OCCI
 
       attr_reader   :kind
       attr_reader   :state_machine
+      
+      attr_accessor :backend_id
 
       # Define appropriate kind
       begin

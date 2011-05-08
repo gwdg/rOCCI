@@ -310,7 +310,7 @@ begin
           raise "Action matching failed!"
         end
 
-      elsif kind.related.include?(OCCI::Core::Link::KIND) # if kind is a link and no actions specified then create link
+      elsif kind == OCCI::Core::Link::KIND or kind.related.include?(OCCI::Core::Link::KIND) # if kind is a link and no actions specified then create link
         attributes = {}
 
         request.env["HTTP_X_OCCI_ATTRIBUTE"].split(%r{,\s*}).each do |attribute_string|
@@ -338,10 +338,10 @@ begin
       else # if kind is not link and no actions specified, then create resource
 
         $log.warn("Provided location does not match location of category: #{kind.get_location} vs. #{location}") if kind.get_location != location
-
+        
         # Add mixins
         mixins = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins") if request.env['HTTP_CATEGORY'] != nil
-        
+          
         attributes = {}
         if request.env["HTTP_X_OCCI_ATTRIBUTE"] != nil
 
@@ -365,10 +365,11 @@ begin
         request.env['HTTP_LINK'].split(',').each do |link_string|
           $log.debug("Requested link: #{link_string}")
           attributes = {}
-          regexp = Regexp.new(/<([^>]*)>;\s*rel="([^"]*)";\s*self="([^"]*)";\s*category="([^"]*)";\s*([^$]*)/)
+          # TODO: find a way to use \s*self="([^"]*)";
+          regexp = Regexp.new(/<([^>]*)>;\s*rel="([^"]*)";\s*category="([^"]*)";\s*([^$]*)/)
           match_link = regexp.match(link_string)
           if match_link != nil
-            target_location, related, source_location, category_string, params = match_link.captures
+            target_location, related, category_string, params = match_link.captures
             kind = $categoryRegistry.get_categories_by_category_string(category_string, filter="kind")[0]
 
             regexp = Regexp.new(/([^;]*;\s*)/)
