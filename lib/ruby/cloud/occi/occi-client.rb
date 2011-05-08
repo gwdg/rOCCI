@@ -573,7 +573,7 @@ begin
     # No command provided / command not recognized => use default
     general_argv = ARGV
   else
-    general_options_argv  = ARGV[0..command_position - 1]
+    general_options_argv  = command_position > 1 ? ARGV[0..command_position - 1] : []
     command               = ARGV[command_position].upcase
     command_options_argv  = ARGV[command_position + 1..-1]
 
