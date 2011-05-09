@@ -1,12 +1,12 @@
 ##############################################################################
 #  Copyright 2011 Service Computing group, TU Dortmund
-#  
+#
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
-#  
+#
 #      http://www.apache.org/licenses/LICENSE-2.0
-#  
+#
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -69,7 +69,7 @@ $log = Logger.new(STDOUT)
 # Read configuration file and set loglevel
 
 if ARGV[0] != nil
-CONFIGURATION_FILE = ARGV[0]
+  CONFIGURATION_FILE = ARGV[0]
 else
   $log.error("A configuration file needs to be provided in the arguments for occi-server")
   break
@@ -89,7 +89,7 @@ if $config['LOG_LEVEL'] != nil
     Logger::INFO
   end
 end
-  
+
 ##############################################################################
 # registry for all categories (e.g. kinds, mixins, actions)
 $categoryRegistry = OCCI::CategoryRegistry.new
@@ -98,9 +98,12 @@ $categoryRegistry = OCCI::CategoryRegistry.new
 # registry for the locations of all OCCI objects
 $locationRegistry = OCCI::Rendering::HTTP::LocationRegistry.new
 
+$locationRegistry.register_location("/link/",             OCCI::Core::Link::KIND)
+
 $locationRegistry.register_location("/compute/",          OCCI::Infrastructure::Compute::KIND)
 $locationRegistry.register_location("/storage/",          OCCI::Infrastructure::Storage::KIND)
 $locationRegistry.register_location("/network/",          OCCI::Infrastructure::Network::KIND)
+
 $locationRegistry.register_location("/networkinterface/", OCCI::Infrastructure::Networkinterface::KIND)
 $locationRegistry.register_location("/storagelink/",      OCCI::Infrastructure::StorageLink::KIND)
 
@@ -115,7 +118,7 @@ begin
   when "opennebula"
     require 'occi/backend/OpenNebulaBackend'
     OCCI::Backend::OpenNebulaBackend.new($config['OPENNEBULA_CONFIG'])
-  when "dummy" then 
+  when "dummy" then
     require 'occi/backend/DummyBackend'
     OCCI::Backend::DummyBackend.new()
   else raise "Backend '" + $config["backend"] + "' not found"
@@ -139,10 +142,10 @@ set :run, true
 # Sinatra methods for handling HTTP requests
 
 begin
-  
+
   ############################################################################
   # GET request
-  
+
   get '*' do
     begin
 
@@ -155,10 +158,10 @@ begin
 
       # Query interface: return all supported kinds + mixins
       if location == "/-/"
-  
+
         actions     = []
         categories  = []
-  
+
         if request.env['HTTP_CATEGORY'] != nil && request.env['HTTP_CATEGORY'] != ""
           # Find categories corresponding to supplied category string
           categories = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'])
@@ -170,7 +173,7 @@ begin
         categories.each do |category|
           OCCI::Rendering::HTTP::Renderer.merge_headers(headers, OCCI::Rendering::HTTP::Renderer.render_category_type(category))
         end
- 
+
         # Also render actions, which should not be necessary according to the spec, but makes the "test_occy.py" happy
         actions.each do |action|
           OCCI::Rendering::HTTP::Renderer.merge_headers(headers, OCCI::Rendering::HTTP::Renderer.render_category_type(action))
@@ -178,43 +181,43 @@ begin
 
         break
       end
-    
+
       # Render exact matches referring to kinds / mixins
       if $locationRegistry.get_object_by_location(location) != nil && $locationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Category)
 
         category = $locationRegistry.get_object_by_location(location)
         raise "Only mixins / kinds are supported for exact match rendering: location: #{location}; object: #{category}" if !category.instance_variable_defined?(:@entities)
-        
+
         $log.debug("Kind / mixin exact match for location [#{location}]: #{category}")
-        
+
         locations = []
         category.entities.each do |entity|
           locations << $locationRegistry.get_location_of_object(entity)
         end
- 
+
         OCCI::Rendering::HTTP::Renderer.merge_headers(headers, OCCI::Rendering::HTTP::Renderer.render_locations(locations))
         break
       end
 
       # Render exact matches referring to resources
       if $locationRegistry.get_object_by_location(location) != nil && $locationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Resource)
-        
+
         entity = $locationRegistry.get_object_by_location(location)
-        
+
         $log.debug("Resource exact match for location [#{location}]: #{entity}")
-        
+
         OCCI::Rendering::HTTP::Renderer.merge_headers(headers, OCCI::Rendering::HTTP::Renderer.render_resource(entity))
         break
       end
 
       # Render locations ending with "/", which are not exact matches
       if location.end_with?("/")
-        
+
         $log.debug("Listing all resource instances below location: #{location}")
 
         resources = $locationRegistry.get_resources_below_location(location)
         locations = []
-        
+
         if request.env['HTTP_CATEGORY'] != nil && request.env['HTTP_CATEGORY'] != ""
 
           # Filtered version
@@ -224,7 +227,7 @@ begin
           categories.each do |category|
             filter[category.scheme + category.term] = 1;
           end
-          
+
           resources.each do |resource|
             locations << $locationRegistry.get_location_of_object(resource) if filter.has_key?(resource.kind.id)
           end
@@ -235,7 +238,7 @@ begin
             locations << $locationRegistry.get_location_of_object(resource)
           end
         end
-        
+
         OCCI::Rendering::HTTP::Renderer.merge_headers(headers, OCCI::Rendering::HTTP::Renderer.render_locations(locations))
         break
       end
@@ -244,12 +247,12 @@ begin
       $log.error("Invalid request url: #{location}")
       response.status = HTTP_STATUS_CODE["Bad Request"]
 
-      # This must be the last statement in this block, so that sinatra does not try to respond with random body content 
+      # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
 
     rescue Exception => e
-  
+
       $log.error(e)
       response.status = HTTP_STATUS_CODE["Bad Request"]
 
@@ -260,7 +263,7 @@ begin
 
   ############################################################################
   # POST request
-  
+
   # Create an instance appropriate to category field and optinally link an instance to another one
   post '*' do
     begin
@@ -297,7 +300,7 @@ begin
           method = request.env["HTTP_X_OCCI_ATTRIBUTE"]
           if entities != nil
             # TODO trigger action!
-#            action.trigger(entities,method)
+            #            action.trigger(entities,method)
             $log.debug("Action [#{action}] to be triggered on [#{entities.length}] entities:")
             delegator = OCCI::ActionDelegator.instance
             entities.each do |entity|
@@ -338,10 +341,10 @@ begin
       else # if kind is not link and no actions specified, then create resource
 
         $log.warn("Provided location does not match location of category: #{kind.get_location} vs. #{location}") if kind.get_location != location
-        
+
         # Add mixins
         mixins = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins") if request.env['HTTP_CATEGORY'] != nil
-          
+
         attributes = {}
         if request.env["HTTP_X_OCCI_ATTRIBUTE"] != nil
 
@@ -365,55 +368,55 @@ begin
         request.env['HTTP_LINK'].split(',').each do |link_string|
           $log.debug("Requested link: #{link_string}")
           attributes = {}
-          # TODO: find a way to use \s*self="([^"]*)";
-          regexp = Regexp.new(/<([^>]*)>;\s*rel="([^"]*)";\s*category="([^"]*)";\s*([^$]*)/)
-          match_link = regexp.match(link_string)
-          if match_link != nil
-            target_location, related, category_string, params = match_link.captures
-            kind = $categoryRegistry.get_categories_by_category_string(category_string, filter="kind")[0]
+          target_location = link_string.scan(/<([^>]*)>;/).transpose.to_s
+          related = link_string.scan(/rel="([^"]*)";/).transpose.to_s
+          self_string = link_string.scan(/self="([^"]*)";/).transpose.to_s
+          category_string = link_string.scan(/category="([^"]*)";/).transpose.to_s
+          link_attributes = link_string.scan(/category="[^"]*";\s*([^$]*)/).transpose.to_s
+          link_attributes.split(';').each do |attribute_string|
+            key, value = attribute_string.split('=')
+            attributes[key] = value
+          end if link_attributes != ""
+          $log.debug("target: #{target_location}")
+          $log.debug("category: #{category_string}")
+          if target_location != "" && category_string != ""
+            kind = $categoryRegistry.getKind(category_string)
+            $log.debug("Link kind found: #{kind.scheme}#{kind.term}") if kind != nil
 
-            regexp = Regexp.new(/([^;]*;\s*)/)
-            match_params = regexp.match(params)
-            if match_params != nil
-              match.each do |attribute_string|
-                key, value = attribute_string.split('=')
-                attributes[key] = value
-              end
-              if kind != nil
-                target = $locationRegistry.get_object_by_location(target_location)
-                source = $locationRegistry.get_object_by_location(source_location)
-                attributes["occi.core.target"] = target_location
-                attributes["occi.core.source"] = source_location
-                link = kind.entity_type.new(attributes)
-                source.attributes["links"] << link
-                target.attributes["links"] << link
-                $locationRegistry.register_location(link.get_location(), link)
-                $log.debug("Link successfully created")
-              else
-                raise "Kind not found in category!"
-              end
+            if kind != nil
+              target = $locationRegistry.get_object_by_location(target_location)
+              raise "Target not found" if target == nil
+              source = resource
+              attributes["occi.core.target"] = target_location
+              attributes["occi.core.source"] = source.get_location()
+              link = kind.entity_type.new(attributes)
+              source.attributes["links"] << link
+              target.attributes["links"] << link
+              $locationRegistry.register_location(link.get_location(), link)
+              $log.debug("Link successfully created")
             else
-              raise "Could not extract parameters from request!"
+              raise "Kind not found in category!"
             end
+
           else
             raise "Extracting information from Link failed!"
           end
         end if request.env['HTTP_LINK'] != nil
 
         resource.deploy()
-        
+
         $locationRegistry.register_location(resource.get_location, resource)
-        
+
         headers['Location'] = $locationRegistry.get_absolute_location_of_object(resource)
 
       end
 
-      # This must be the last statement in this block, so that sinatra does not try to respond with random body content 
+      # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
 
     rescue Exception => e
-  
+
       $log.error(e)
       response.status  = HTTP_STATUS_CODE["Bad Request"]
 
@@ -424,7 +427,7 @@ begin
 
   ############################################################################
   # PUT request
-  
+
   put '*' do
     begin
       location = request.path_info
@@ -496,12 +499,12 @@ begin
         mixin = $locationRegistry.get_object_by_location(location)
         if mixin != nil && mixin.kind_of?(OCCI::Core::Mixin)
           request.env["HTTP_X_OCCI_LOCATION"].split(",").each do |entity_location|
-            
+
             entity_uri = URI.parse(entity_location)
             entity = $locationRegistry.get_object_by_location(entity_uri.path)
 
             raise "No entity found at location: #{entity_location}"                                       if entity == nil
-            raise "Object referenced by uri [#{entity_location}] is not a OCCI::Core::Resource instance!" if !entity.kind_of?(OCCI::Core::Resource) 
+            raise "Object referenced by uri [#{entity_location}] is not a OCCI::Core::Resource instance!" if !entity.kind_of?(OCCI::Core::Resource)
 
             $log.debug("Associating entity [#{entity}] at location #{entity_location} with mixin #{mixin}")
 
@@ -571,12 +574,12 @@ begin
         end
       end
 
-      # This must be the last statement in this block, so that sinatra does not try to respond with random body content 
+      # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
 
     rescue Exception => e
-  
+
       $log.error(e)
       response.status = HTTP_STATUS_CODE["Bad Request"]
 
@@ -584,7 +587,7 @@ begin
       OCCI::Rendering::HTTP::Renderer.render_response(headers, response, request)
     end
   end
-  
+
   ############################################################################
   # DELETE request
 
@@ -614,7 +617,7 @@ begin
           mixin.entities.delete(entity) if occi_locations.include?(entity.get_location)
         end
       end
-      
+
       if location == "/-/" # delete mixins
         mixin = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins")[0]
         $log.debug("Deleting Mixin #{mixin.term}")
@@ -628,12 +631,12 @@ begin
         end
       end
 
-      # This must be the last statement in this block, so that sinatra does not try to respond with random body content 
+      # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
 
     rescue Exception => e
-  
+
       $log.error(e)
       response.status = HTTP_STATUS_CODE["Bad Request"]
 
@@ -664,7 +667,6 @@ end
 # get all Instances of Backend and store it in kind Objects in occi-service
 add_instances_from_backend_to_service
 
-
 def get_entities_by_location_from_categories(location,categories)
   exact_resource_match = false
   entities = []
@@ -681,6 +683,6 @@ def get_entities_by_location_from_categories(location,categories)
   end
 
   $log.debug("Entities corresponding to location: #{entities.length}")
-#  $log.debug(entities)
+  #  $log.debug(entities)
   return [entities, exact_resource_match]
 end

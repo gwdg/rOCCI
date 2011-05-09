@@ -171,6 +171,9 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------
       def get_location()
+        $log.debug("Kind: #{kind}")
+        $log.debug("Kind location #{$locationRegistry.get_location_of_object(kind)}")
+        $log.debug("ID #{attributes['occi.core.id']}")
         location = $locationRegistry.get_location_of_object(kind) + attributes['occi.core.id']
       end
 

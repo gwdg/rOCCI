@@ -143,11 +143,12 @@ module OCCI
         if links != nil
           links.each do
             |link|
-            case link.target.getKind.term
+            target = $locationRegistry.get_object_by_location(link.attributes['occi.core.target'])
+            case target.kind.term
             when "storage"
-              storage_ids << link.target.backend_id
-            when "storage"
-              network_ids << link.target.backend_id
+              storage_ids << target.backend_id
+            when "network"
+              network_ids << target.backend_id
             end
           end
         end
@@ -204,7 +205,7 @@ module OCCI
         rc = storage.allocate(template)
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
         # does storage need to be enabled?
-        #storage.enable
+        storage.enable
         storageObject.backend_id = storage.id
         $log.debug("OpenNebula ID of image: #{storageObject.backend_id}")
       end

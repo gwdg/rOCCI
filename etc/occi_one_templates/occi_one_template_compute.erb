@@ -1,19 +1,19 @@
 <%# Mandatory settings %>
 OCCI_ID       = <%= attributes["occi.core.id"]%>
-NAME          = "<%= attributes["occi.core.title"]%>"
-DESCRIPTION   = "<%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>"
-MEMORY        = <%= attributes["occi.compute.memory"]*1024 if attributes["occi.compute.memory"]%>
+NAME          = <%= attributes["occi.core.title"]%>
+DESCRIPTION   = <%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>
+MEMORY        = <%= attributes["occi.compute.memory"].to_i * 1024 if attributes["occi.compute.memory"]%>
 <% if attributes["occi.compute.architecture"] == "x64" %>
-ARCHITECTURE  = "x86_64"
+ARCHITECTURE  = x86_64
 <% else %>
-ARCHITECTURE  = "i686"
+ARCHITECTURE  = i686
 <% end %>
-CPU           = "<%= attributes["occi.compute.cores"] if attributes["occi.compute.cores"]%>"
-VCPU          = "<%= attributes["opennebula.vm.vcpu"] if attributes["opennebula.vm.vcpu"]%>"
+CPU           = <%= attributes["occi.compute.cores"] if attributes["occi.compute.cores"]%>
+VCPU          = <%= attributes["opennebula.vm.vcpu"] if attributes["opennebula.vm.vcpu"]%>
 
 <%# KVM specific settings %>
 <% if attributes["opennebula.vm.boot"] %>
-BOOT          = "<%= attributes["opennebula.vm.boot"] if attributes["opennebula.vm.boot"]%>"
+BOOT          = <%= attributes["opennebula.vm.boot"] if attributes["opennebula.vm.boot"]%>
 <% else %>
 BOOT          = hd
 <% end %>
