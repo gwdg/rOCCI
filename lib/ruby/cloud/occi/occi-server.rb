@@ -75,6 +75,9 @@ else
   break
 end
 
+## initialize temporary image path
+$image_path = ""
+
 $config = OCCI::Configuration.new(CONFIGURATION_FILE)
 
 if $config['LOG_LEVEL'] != nil
@@ -270,7 +273,12 @@ begin
       # TODO: mixins
 
       location = request.path_info
-      $log.debug("Requested location: #{location}")
+      $log.debug("Requested location: #{location}")   
+      
+      if params['file'] != nil
+        $log.debug("Location of Image #{params['file'][:tempfile].path}")
+        $image_path = params['file'][:tempfile].path
+      end
 
       headers = {}
 
@@ -422,6 +430,10 @@ begin
 
     ensure
       OCCI::Rendering::HTTP::Renderer.render_response(headers, response, request)
+      if $image_path != ""
+        File.delete($image_path)
+      end
+      $image_path = ""
     end
   end
 

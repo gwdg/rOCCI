@@ -198,15 +198,14 @@ module OCCI
       # CREATE STORAGE
       def create_storage_instance(storageObject)
         attributes = storageObject.attributes
-        storage=Image.new(Image.build_xml, @one_client)
+        image=Image.new(Image.build_xml, @one_client)
+        raise "No image provided" if $image_path == ""
         @templateRaw = @config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
         template = ERB.new(File.read(@templateRaw)).result(binding)
         $log.debug("Parsed template #{template}")
-        rc = storage.allocate(template)
+        rc = ImageRepository.new.create(image,template)
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
-        # does storage need to be enabled?
-        storage.enable
-        storageObject.backend_id = storage.id
+        storageObject.backend_id = image.id
         $log.debug("OpenNebula ID of image: #{storageObject.backend_id}")
       end
       
