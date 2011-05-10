@@ -418,6 +418,25 @@ def process_retrieve_command(options)
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
+def process_delete_command(options)
+  hydra = get_hydra
+  queue_requests(hydra, [delete_resource(options[:location])])
+  hydra.run
+end
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+def process_call_command(options)
+
+  action = OCCI::Infrastructure::Compute::ACTION_START
+
+  hydra = get_hydra
+  queue_requests(hydra, [trigger_action(options[:location], action, options[:attributes])])
+  hydra.run
+end
+
+
+# ---------------------------------------------------------------------------------------------------------------------
 begin
   
   # Options defaults
@@ -556,6 +575,44 @@ begin
     opts.on( '-l', '--location location', 'Location where the resourse should be created' ) do |location|
       RETRIEVE_OPTIONS[:location] = location
     end    
+  end
+
+  # ---------------------------------------------------------------------------------------------------------------------
+  # Parse "delete" command specific options!
+  
+  DELETE_COMMAND_PARSER = OptionParser.new do |opts|
+
+    opts.on( '-l', '--location location', 'Location of the resourse to be deleted' ) do |location|
+      DELETE_OPTIONS[:location] = location
+    end    
+  end
+
+#  CALL_OPTIONS    =   { :location         => nil,                 # Resource on which to trigger the action
+#                        :action           => nil,                 # Term / name of the action
+#                        :attributes       => {}                   # Parameters of the action
+#                      }
+
+  # ---------------------------------------------------------------------------------------------------------------------
+  # Parse "call" command specific options!
+  
+  CALL_COMMAND_PARSER = OptionParser.new do |opts|
+
+    opts.on( '-l', '--location STRING', 'Location of the resource on which the action should be called' ) do |location|
+      CALL_OPTIONS[:location] = location
+    end
+    
+    opts.on( '-a', '--action STRING', 'OCCI Category string (scheme + term) specifying the action' ) do |action|
+      CALL_OPTIONS[:action] = action
+    end
+
+    opts.on( '-a', '--attributes attr=val1, attr2=val2, attr3=val3', Array, 'OCCI action attributes' ) do |attributes_array|
+      attributes = {}
+      attributes_array.each do |key_value_pair|
+        key_value_pair.match(%q{/^(.+)=['|"]?(.+)['|"]?$/}) {|match| attributes[match[0]] = match[1]}
+      end
+      $log.debug("Attributes for create resource command: #{attributes}")
+      CALL_OPTIONS[:attributes] = attributes
+    end
   end
 
   # ---------------------------------------------------------------------------------------------------------------------
