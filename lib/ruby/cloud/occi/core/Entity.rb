@@ -122,7 +122,8 @@ module OCCI
       def initialize(attributes, kind, mixins)
 
         # Make sure UUID is UNIQUE for every entity
-        attributes['occi.core.id']    = UUIDTools::UUID.timestamp_create.to_s
+        # TODO: occi.core.id should not be set by user but may be set by backend during startup
+        attributes['occi.core.id']    = UUIDTools::UUID.timestamp_create.to_s if attributes['occi.core.id'] == nil || attributes['occi.core.id'] == ""
         attributes['occi.core.title'] = "" if attributes['occi.core.title'] == nil
 
         @mixins     = mixins
