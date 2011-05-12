@@ -34,7 +34,6 @@ module OCCI
       # Attributes are hashes and contain key - value pairs as defined by the corresponding kind
       attr_reader   :attributes
       attr_reader   :mixins
-
       attr_reader   :kind
       attr_reader   :state_machine
       
@@ -123,6 +122,7 @@ module OCCI
 
         # Make sure UUID is UNIQUE for every entity
         # TODO: occi.core.id should not be set by user but may be set by backend during startup
+        $log.debug(attributes['occi.core.id'])
         attributes['occi.core.id']    = UUIDTools::UUID.timestamp_create.to_s if attributes['occi.core.id'] == nil || attributes['occi.core.id'] == ""
         attributes['occi.core.title'] = "" if attributes['occi.core.title'] == nil
 
@@ -152,19 +152,19 @@ module OCCI
           mixin.entities.delete(self)
         end
         # remove all links from this entity and from all linked entities
-        links = @attributes['links'].clone() if @attributes['links'] != nil
+        links = @links.clone() if @links != []
         links.each do |link|
           $log.debug("occi.core.target #{link.attributes["occi.core.target"]}")
           target_uri = URI.parse(link.attributes["occi.core.target"])
           target = $locationRegistry.get_object_by_location(target_uri.path)
           $log.debug("Target #{target}")
-          target.attributes['links'].delete(link)
+          target.links.delete(link)
 
           $log.debug("occi.core.source #{link.attributes["occi.core.source"]}")
           source_uri = URI.parse(link.attributes["occi.core.source"])
           source = $locationRegistry.get_object_by_location(source_uri.path)
           $log.debug("Source #{source}")
-          source.attributes['links'].delete(link)
+          source.links.delete(link)
         end if links != nil
         kind.entities.delete(self)
         $locationRegistry.unregister_location(get_location())
@@ -180,7 +180,7 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------
       def get_category_string()
-        self.class.getKind.get_short_category_string()
+        self.kind.get_short_category_string()
       end
 
     end

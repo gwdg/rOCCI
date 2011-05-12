@@ -42,90 +42,15 @@ include OpenNebula
 module OCCI
   module Backend
     class OpenNebulaBackend < CloudServer
-
-      ########################################################################
-      # Vorlage für die Response einer Virtuellen Maschine
-      @@occi_vmm = %q{
-                 <COMPUTE href="<%= $URL %>/compute/<%= self.id.to_s  %>">
-                     <ID><%= self.id.to_s%></ID>
-                     <NAME><%= self.name%></NAME>
-                     <MEMORY><%=self['TEMPLATE/MEMORY']%></MEMORY>
-                     <ARCHITECTURE><%=self['TEMPLATE/ARCHITECTURE']%></ARCHITECTURE>
-                     <CORES><%=self['TEMPLATE/CORES']%></CORES>
-                     <% if self['TEMPLATE/INSTANCE_TYPE'] %>
-                     <INSTANCE_TYPE><%= self['TEMPLATE/INSTANCE_TYPE'] %></INSTANCE_TYPE>
-                     <% end %>
-                     <STATE><%= self.state_str %></STATE>
-                     <% self.each('TEMPLATE/DISK') do |disk| %>
-                     <DISK>
-                         <STORAGE href="<http://localhost:4567/storage/<%= disk['IMAGE_ID'] %>" name="<%= disk['IMAGE'] %>" al_name="<%= disk['NAME'] %>" disk="<%= disk['DISK_ID'] %>"/>
-                         <TYPE><%= disk['TYPE'] %></TYPE>
-                         <TARGET><%= disk['TARGET'] %></TARGET>
-                     </DISK>
-                     <% end %>
-                     <% self.each('TEMPLATE/NIC') do |nic| %>
-                     <NIC>
-                         <NETWORK href="<http://localhost:4567/network/<%= nic['NETWORK_ID'] %>" name="<%= nic['NETWORK'] %>"/>
-                         <% if nic['IP'] %>
-                         <IP><%= nic['IP'] %></IP>
-                         <% end %>
-                         <% if nic['MAC'] %>
-                         <MAC><%= nic['MAC'] %></MAC>
-                         <% end %>
-                     </NIC>
-                     <% end %>
-                     <% if self['TEMPLATE/CONTEXT'] %>
-                     <CONTEXT>
-                     <% self.each('TEMPLATE/CONTEXT/*') do |cont| %>
-                         <% if cont.text %>
-                         <<%= cont.name %>><%= cont.text %></<%= cont.name %>>
-                         <% end %>
-                     <% end %>
-                     </CONTEXT>
-                     <% end %>
-                 </COMPUTE>
-             }
-
-      @@occi_vnet = %q{
-<NETWORK href="<%= $URL %>/network/<%= self.id.to_s  %>">
-    <ID><%= self.id.to_s %></ID>
-    <NAME><%= self.name %></NAME>
-    <ADDRESS><%= self['TEMPLATE/NETWORK_ADDRESS'] %></ADDRESS>
-    <% if self['TEMPLATE/NETWORK_SIZE'] %>
-    <SIZE><%= self['TEMPLATE/NETWORK_SIZE'] %></SIZE>
-    <% end %>
-</NETWORK>
-}
-
-      @@occi_vimage = %q{
-        <STORAGE href="<%= $URL %>/storage/<%= self.id.to_s  %>">
-            <ID><%= self.id.to_s %></ID>
-            <NAME><%= self.name %></NAME>
-            <% if self['TEMPLATE/TYPE'] != nil %>
-            <TYPE><%= self['TEMPLATE/TYPE'] %></TYPE>
-            <% end %>
-            <% if self['TEMPLATE/DESCRIPTION'] != nil %>
-            <DESCRIPTION><%= self['TEMPLATE/DESCRIPTION'] %></DESCRIPTION>
-            <% end %>
-            <% if self['TEMPLATE/SIZE'] != nil %>
-            <SIZE><%= self['TEMPLATE/SIZE'] %></SIZE>
-            <% end %>
-            <% if self['TEMPLATE/DEV_PREFIX'] != nil %>
-            <DEVICE><%= self['TEMPLATE/DEV_PREFIX'] %></DEVICE>
-            <% end %>
-            <% if self['SOURCE'] != nil %>
-            <SOURCE><%= self['SOURCE'] %></SOURCE>
-            <% end %>
-        </STORAGE>
-    }
-    
-    
-    def initialize(configfile)
-      $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::Image::MIXIN)
-      $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::Network::MIXIN)
-      $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::VirtualMachine::MIXIN)
-      super(configfile)
-    end
+      def initialize(configfile)
+        $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::Image::MIXIN)
+        $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::Network::MIXIN)
+        $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::VirtualMachine::MIXIN)
+        super(configfile)
+        network_get_all()
+        storage_get_all()
+        compute_get_all()
+      end
 
       TEMPLATECOMPUTERAWFILE = 'occi_one_template_compute.erb'
       TEMPLATENETWORKRAWFILE = 'occi_one_template_network.erb'
@@ -139,7 +64,7 @@ module OCCI
         storage_ids = []
         network_ids = []
         attributes = computeObject.attributes
-        links = attributes["links"]
+        links = computeObject.links
         if links != nil
           links.each do
             |link|
@@ -169,9 +94,83 @@ module OCCI
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
       end
 
+      # GET ALL VMs
+      def compute_get_all()
+        vmpool=VirtualMachinePool.new(@one_client)
+        vmpool.info
+        vmpool.each do |vm|
+          attributes = {}
+          # parse all parameters from OpenNebula to OCCI
+          attributes['occi.core.id'] = vm['TEMPLATE/OCCI_ID']
+          attributes['occi.core.title'] = vm['NAME']
+          attributes['occi.core.summary'] = vm['TEMPLATE/DESCRIPTION']
+          attributes['occi.compute.cores'] = vm['TEMPLATE/CPU']
+          if vm['TEMPLATE/ARCHITECTURE'] == "x86_64"
+            attributes['occi.compute.architecture'] = "x64"
+          else
+            attributes['occi.compute.architecture'] = "x86"
+          end
+          attributes['occi.compute.memory'] = vm['TEMPLATE/MEMORY']
+          attributes["opennebula.vm.vcpu"] = vm['TEMPLATE/VCPU']
+          attributes["opennebula.vm.boot"] = vm['TEMPLATE/BOOT']
+
+          mixins = [OCCI::Backend::OpenNebula::VirtualMachine::MIXIN]
+
+          resource = OCCI::Infrastructure::Compute.new(attributes,mixins)
+          resource.backend_id = vm.id
+          $log.debug("Backend ID: #{resource.backend_id}")
+          $locationRegistry.register_location(resource.get_location, resource)
+
+          # create links for all images
+          vm['TEMPLATE/DISK/IMAGE_ID'].each do |image_id|
+            attributes = {}
+            target = nil
+            $log.debug("Image ID: #{image_id}")
+            OCCI::Infrastructure::Storage::KIND.entities.each do |storage|
+              $log.debug("Storage Backend ID: #{storage.backend_id}")
+              $log.debug(storage.backend_id.to_i == image_id.to_i)
+              target = storage if storage.backend_id.to_i == image_id.to_i
+            end
+            break if target == nil
+            source = resource
+            attributes["occi.core.target"] = target.get_location
+            attributes["occi.core.source"] = source.get_location
+            link = OCCI::Core::Link.new(attributes)
+            source.links << link
+            target.links << link
+            $locationRegistry.register_location(link.get_location, link)
+            $log.debug("Link successfully created")
+          end if vm['TEMPLATE/DISK/IMAGE_ID']
+
+          #create links for all networks
+          $log.debug("NETWORK_ID #{vm['TEMPLATE/NIC/NETWORK_ID']}")
+          vm.retrieve_elements('TEMPLATE/NIC/NETWORK_ID').each do |network_id|
+            attributes = {}
+            $log.debug("Network ID: #{network_id}")
+            target = nil
+            OCCI::Infrastructure::Network::KIND.entities.each do |network|
+              $log.debug("Network Backend ID: #{network.backend_id}")
+              $log.debug(network.backend_id.to_i == network_id.to_i)
+              target = network if network.backend_id.to_i == network_id.to_i
+              $log.debug(target.kind.term) if target != nil
+            end
+            break if target == nil
+            source = resource
+            attributes["occi.core.target"] = target.get_location
+            attributes["occi.core.source"] = source.get_location
+            link = OCCI::Core::Link.new(attributes)
+            source.links << link
+            target.links << link
+            $locationRegistry.register_location(link.get_location, link)
+            $log.debug("Link successfully created")
+          end if vm['TEMPLATE/NIC/NETWORK_ID']
+
+        end
+      end
+
       ########################################################################
       # Network methods
-      
+
       # CREATE VNET
       def create_network_instance(networkObject)
         attributes = networkObject.attributes
@@ -191,7 +190,34 @@ module OCCI
         rc = network.delete
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
       end
-      
+
+      # GET ALL VNETs
+      def network_get_all()
+        vnetpool=VirtualNetworkPool.new(@one_client)
+        vnetpool.info
+        vnetpool.each do |vnet|
+          attributes = {}
+          # parse all parameters from OpenNebula to OCCI
+          attributes['occi.core.id'] = vnet['TEMPLATE/OCCI_ID']
+          attributes['occi.core.title'] = vnet['NAME']
+          attributes['occi.core.summary'] = vnet['TEMPLATE/DESCRIPTION']
+          attributes['opennebula.network.bridge'] = vnet['TEMPLATE/BRIDGE']
+          attributes['opennebula.network.public'] = vnet['TEMPLATE/PUBLIC']
+          attributes['opennebula.network.type'] = vnet['TEMPLATE/TYPE']
+          attributes['opennebula.network.address'] = vnet['TEMPLATE/NETWORK_ADDRESS']
+          attributes['opennebula.network.size'] = vnet['TEMPLATE/NETWORK_SIZE']
+          attributes['opennebula.network.leases'] = vnet['TEMPLATE/LEASES']
+
+          mixins = [OCCI::Backend::OpenNebula::Network::MIXIN]
+
+          resource = OCCI::Infrastructure::Network.new(attributes,mixins)
+          resource.backend_id = vnet.id
+          $log.debug("Backend ID: #{resource.backend_id}")
+          $locationRegistry.register_location(resource.get_location, resource)
+
+        end
+      end
+
       ########################################################################
       # Storage methods
 
@@ -208,14 +234,45 @@ module OCCI
         storageObject.backend_id = image.id
         $log.debug("OpenNebula ID of image: #{storageObject.backend_id}")
       end
-      
+
       # DELETE STORAGE / IMAGE
       def delete_storage_instance(storageObject)
         storage=Image.new(Image.build_xml(storageObject.backend_id), @one_client)
         rc = storage.delete
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
       end
-      
+
+      # GET ALL IMAGEs
+      def storage_get_all()
+        imagepool=ImagePool.new(@one_client)
+        imagepool.info
+        imagepool.each do |image|
+          attributes = {}
+          # parse all parameters from OpenNebula to OCCI
+          attributes['occi.core.id'] = image['TEMPLATE/OCCI_ID']
+          attributes['occi.core.title'] = image['NAME']
+          attributes['occi.core.summary'] = image['TEMPLATE/DESCRIPTION']
+          attributes['opennebula.image.type'] = image['TEMPLATE/TYPE']
+          attributes['opennebula.image.public'] = image['TEMPLATE/PUBLIC']
+          attributes['opennebula.image.persistent'] = image['TEMPLATE/PERSISTENT']
+          attributes['opennebula.image.dev_prefix'] = image['TEMPLATE/DEV_PREFIX']
+          attributes['opennebula.image.bus'] = image['TEMPLATE/BUS']
+          if image['TEMPLATE/SIZE'] != nil
+            attributes['occi.storage.size'] = image['TEMPLATE/SIZE']
+          end
+          if image['TEMPLATE/FSTYPE'] != nil
+            attributes['occi.storage.fstype']
+          end
+
+          mixins = [OCCI::Backend::OpenNebula::Image::MIXIN]
+
+          resource = OCCI::Infrastructure::Storage.new(attributes,mixins)
+          resource.backend_id = image.id
+          $log.debug("Backend ID: #{resource.backend_id}")
+          $locationRegistry.register_location(resource.get_location, resource)
+        end
+      end
+
     end
   end
 end

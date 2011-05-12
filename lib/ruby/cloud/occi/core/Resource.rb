@@ -25,6 +25,8 @@ require 'occi/core/Kind'
 module OCCI
   module Core
     class Resource < Entity
+      
+      attr_reader   :links
 
       begin
         actions     = []
@@ -45,7 +47,7 @@ module OCCI
 
       def initialize(attributes, kind, mixins = [])
         attributes['occi.core.summary'] = "" if attributes['occi.core.summary'] == nil
-        attributes['links']             = []
+        @links = []
         super(attributes, kind, mixins)
       end
 

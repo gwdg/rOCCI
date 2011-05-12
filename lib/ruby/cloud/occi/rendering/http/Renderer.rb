@@ -137,12 +137,12 @@ module OCCI
           location        = $locationRegistry.get_location_of_object(link)
           target_location = link.attributes["occi.core.target"]
           target_resource = $locationRegistry.get_object_by_location(target_location)
-          target_resource_type = target_resource.class.getKind.scheme + target_resource.class.getKind.term 
+          target_resource_type = target_resource.kind.scheme + target_resource.kind.term 
  
           link_value = %Q{<#{target_location}>;rel="#{target_resource_type}";self="#{location}"}
           
           # Link params
-          category = link.class.getKind
+          category = link.kind
           link_params = %Q{;category="#{category.scheme + category.term}"}
           
           if !link.attributes.empty?
@@ -248,7 +248,7 @@ module OCCI
           merge_headers(headers, render_attributes(entity.attributes))
           
           # Render link references
-          entity.attributes["links"].each do |link|
+          entity.links.each do |link|
             merge_headers(headers, render_link_reference(link))
           end
           

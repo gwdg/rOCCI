@@ -338,8 +338,8 @@ begin
         source = $locationRegistry.get_object_by_location(source_uri.path)
         $log.debug("source entity of Link: #{source}")
         link = kind.entity_type.new(attributes)
-        source.attributes["links"] << link.get_location()
-        target.attributes["links"] << link.get_location()
+        source.links << link
+        target.links << link
 
         link_location = link.get_location()
         $locationRegistry.register_location(link_location, link)
@@ -398,8 +398,8 @@ begin
               attributes["occi.core.target"] = target_location
               attributes["occi.core.source"] = source.get_location()
               link = kind.entity_type.new(attributes)
-              source.attributes["links"] << link.get_location()
-              target.attributes["links"] << link.get_location()
+              source.links << link
+              target.links << link
               $locationRegistry.register_location(link.get_location(), link)
               $log.debug("Link successfully created")
             else
@@ -566,9 +566,9 @@ begin
                     link = kind.entity_type.new(attributes)
                     $locationRegistry.register_location(link.get_location(), link)
                     entities.each do |entity|
-                      entity.attributes["links"] << link.get_location()
+                      entity.links << link
                     end
-                    target.attributes["links"] << link.get_location()
+                    target.links << link
                     $log.debug("Link successfully created!")
                   else
                     raise "Kind not found in category!"
