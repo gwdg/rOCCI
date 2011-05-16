@@ -142,6 +142,15 @@ set :server, %w[mongrel]
 set :run, true
 
 ##############################################################################
+# Configuration of HTTP Authentication
+
+if $config['username'] != nil and $config['password'] != nil
+  use Rack::Auth::Basic, "Restricted Area" do |username, password|
+    [username, password] == [$config['username'], $config['password']]
+  end
+end
+
+##############################################################################
 # Sinatra methods for handling HTTP requests
 
 begin
@@ -273,8 +282,8 @@ begin
       # TODO: mixins
 
       location = request.path_info
-      $log.debug("Requested location: #{location}")   
-      
+      $log.debug("Requested location: #{location}")
+
       if params['file'] != nil
         $log.debug("Location of Image #{params['file'][:tempfile].path}")
         $image_path = params['file'][:tempfile].path
