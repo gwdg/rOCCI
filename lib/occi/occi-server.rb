@@ -119,10 +119,10 @@ $locationRegistry.register_location("/ipnetworking/",     OCCI::Infrastructure::
 begin
   $backend = case $config["backend"]
   when "opennebula"
-    require 'occi/backend/OpenNebulaBackend'
+    require 'backend/OpenNebulaBackend'
     OCCI::Backend::OpenNebulaBackend.new($config['OPENNEBULA_CONFIG'])
   when "dummy" then
-    require 'occi/backend/DummyBackend'
+    require 'backend/DummyBackend'
     OCCI::Backend::DummyBackend.new()
   else raise "Backend '" + $config["backend"] + "' not found"
   end

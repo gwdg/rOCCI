@@ -29,6 +29,7 @@ require 'CloudServer'
 require 'CloudClient'
 require 'Configuration'
 require 'rexml/document'
+require 'occi/ActionDelegator'
 require 'occi/backend/opennebula/Image'
 require 'occi/backend/opennebula/Network'
 require 'occi/backend/opennebula/VirtualMachine'
@@ -50,6 +51,26 @@ module OCCI
         network_get_all()
         storage_get_all()
         compute_get_all()
+        
+        # create action delegator
+        delegator = OCCI::ActionDelegator.instance
+
+        # register methods for compute actions
+        delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_START, self, :compute_start)
+        delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_STOP,  self, :compute_stop)
+        delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_RESTART, self, :compute_restart)
+        delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_SUSPEND, self, :compute_suspend)
+        
+        # register methods for network actions
+        delegator.register_method_for_action(OCCI::Infrastructure::Network::ACTION_UP, self, :network_up)
+        delegator.register_method_for_action(OCCI::Infrastructure::Network::ACTION_DOWN, self, :network_down)
+        
+        # register methods for storage actions
+        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_ONLINE, self, :storage_online)
+        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_OFFLINE, self, :storage_offline)
+        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_BACKUP, self, :storage_backup)
+        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_SNAPSHOT, self, :storage_snapshot)
+        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_RESIZE, self, :storage_resize)
       end
 
       TEMPLATECOMPUTERAWFILE = 'occi_one_template_compute.erb'
@@ -164,8 +185,55 @@ module OCCI
             $locationRegistry.register_location(link.get_location, link)
             $log.debug("Link successfully created")
           end if vm['TEMPLATE/NIC/NETWORK_ID']
-
         end
+
+        # Action start
+        def compute_start(action, parameters, resource)
+          $log.debug("compute_start: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+          vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
+          vm.resume
+          $log.debug("VM Info: #{vm.info}")
+        end
+
+        # Action stop
+        def compute_start(action, parameters, resource)
+          $log.debug("compute_stop: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+          vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
+          case parameters
+          when "graceful"
+            vm.shutdown
+          when "acpioff"
+            vm.shutdown
+          when "poweroff"
+            vm.cancel
+          end
+          $log.debug("VM Info: #{vm.info}")
+        end
+
+        # Action restart
+        def compute_start(action, parameters, resource)
+          $log.debug("compute_restart: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+          vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
+          case parameters
+          when "graceful"
+            vm.restart
+          when "warm"
+            vm.restart
+          when "cold"
+            vm.cancel
+            vm.resubmit
+          end
+          $log.debug("VM Info: #{vm.info}")
+        end
+
+        # Action suspend
+        def compute_start(action, parameters, resource)
+          $log.debug("compute_suspend: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+          vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
+          vm.suspend
+          $log.debug("VM Info: #{vm.info}")
+        end
+
       end
 
       ########################################################################
@@ -216,6 +284,22 @@ module OCCI
           $locationRegistry.register_location(resource.get_location, resource)
 
         end
+      end
+
+      # Action up
+      def network_up(action, parameters, resource)
+        $log.debug("network_up: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        network=VirtualNetwork.new(VirtualNetwork.build_xml(networkObject.backend_id), @one_client)
+        network.publish
+        $log.debug("VM Info: #{network.info}")
+      end
+
+      # Action down
+      def network_up(action, parameters, resource)
+        $log.debug("network_down: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        network=VirtualNetwork.new(VirtualNetwork.build_xml(networkObject.backend_id), @one_client)
+        network.unpublish
+        $log.debug("VM Info: #{network.info}")
       end
 
       ########################################################################
@@ -271,6 +355,40 @@ module OCCI
           $log.debug("Backend ID: #{resource.backend_id}")
           $locationRegistry.register_location(resource.get_location, resource)
         end
+      end
+
+      # Action online
+      def storage_online(action, parameters, resource)
+        $log.debug("storage_online: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        storage=Image.new(Image.build_xml(storageObject.backend_id), @one_client)
+        storage.enable
+        $log.debug("VM Info: #{network.info}")
+      end
+
+      # Action offline
+      def storage_offline(action, parameters, resource)
+        $log.debug("storage_offline: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        storage=Image.new(Image.build_xml(storageObject.backend_id), @one_client)
+        storage.disable
+        $log.debug("VM Info: #{network.info}")
+      end
+
+      # Action backup
+      def storage_backup(action, parameters, resource)
+        $log.debug("storage_backup: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        $log.debug("not yet implemented")
+      end
+
+      # Action snapshot
+      def storage_snapshot(action, parameters, resource)
+        $log.debug("storage_snapshot: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        $log.debug("not yet implemented")
+      end
+
+      # Action resize
+      def storage_resize(action, parameters, resource)
+        $log.debug("storage_resize: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        $log.debug("not yet implemented")
       end
 
     end

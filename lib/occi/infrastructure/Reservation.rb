@@ -19,8 +19,9 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/core/Mixin'
 require 'singleton'
+
+require 'occi/core/Mixin'
 
 module OCCI
   module Infrastructure

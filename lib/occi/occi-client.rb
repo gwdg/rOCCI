@@ -37,16 +37,16 @@ require 'benchmark'
 require 'occi/Configuration'
 
 # Registry for all OCCI Categories
-#require 'occi/CategoryRegistry'
+#require 'CategoryRegistry'
 
 # OCCI Core classes
-#require 'occi/core/Action'
-#require 'occi/core/Category'
-#require 'occi/core/Entity'
-#require 'occi/core/Kind'
-#require 'occi/core/Link'
-#require 'occi/core/Mixin'
-#require 'occi/core/Resource'
+#require 'core/Action'
+#require 'core/Category'
+#require 'core/Entity'
+#require 'core/Kind'
+#require 'core/Link'
+#require 'core/Mixin'
+#require 'core/Resource'
 
 # OCCI Infrastructure classes
 require 'occi/infrastructure/Compute'
