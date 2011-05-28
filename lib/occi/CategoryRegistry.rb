@@ -27,7 +27,6 @@ require 'occi/infrastructure/Network'
 require 'occi/infrastructure/Networkinterface'
 require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
-require 'occi/infrastructure/Ipnet6'
 require 'occi/infrastructure/Reservation'
 
 
@@ -62,8 +61,7 @@ module OCCI
       register_kind(OCCI::Infrastructure::StorageLink::KIND)
 
       # register all mixins provided by this implementation
-    
-      register_mixin(OCCI::Infrastructure::Ipnet6::MIXIN)
+
       register_mixin(OCCI::Infrastructure::Ipnetworking::MIXIN)
     end
 

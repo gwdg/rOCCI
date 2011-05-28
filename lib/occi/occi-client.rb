@@ -55,7 +55,6 @@ require 'occi/infrastructure/Network'
 require 'occi/infrastructure/Networkinterface'
 require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
-require 'occi/infrastructure/Ipnet6'
 require 'occi/infrastructure/Reservation'
 
 # OCCI HTTP rendering

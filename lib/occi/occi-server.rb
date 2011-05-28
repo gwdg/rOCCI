@@ -52,7 +52,6 @@ require 'occi/infrastructure/Network'
 require 'occi/infrastructure/Networkinterface'
 require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
-require 'occi/infrastructure/Ipnet6'
 require 'occi/infrastructure/Reservation'
 
 # OCCI HTTP rendering
@@ -110,7 +109,6 @@ $locationRegistry.register_location("/network/",          OCCI::Infrastructure::
 $locationRegistry.register_location("/networkinterface/", OCCI::Infrastructure::Networkinterface::KIND)
 $locationRegistry.register_location("/storagelink/",      OCCI::Infrastructure::StorageLink::KIND)
 
-$locationRegistry.register_location("/ipnet6/",           OCCI::Infrastructure::Ipnet6::MIXIN)
 $locationRegistry.register_location("/ipnetworking/",     OCCI::Infrastructure::Ipnetworking::MIXIN)
 
 ##############################################################################
@@ -119,10 +117,10 @@ $locationRegistry.register_location("/ipnetworking/",     OCCI::Infrastructure::
 begin
   $backend = case $config["backend"]
   when "opennebula"
-    require 'backend/OpenNebulaBackend'
+    require 'occi/backend/OpenNebulaBackend'
     OCCI::Backend::OpenNebulaBackend.new($config['OPENNEBULA_CONFIG'])
   when "dummy" then
-    require 'backend/DummyBackend'
+    require 'occi/backend/DummyBackend'
     OCCI::Backend::DummyBackend.new()
   else raise "Backend '" + $config["backend"] + "' not found"
   end
