@@ -52,7 +52,7 @@ require 'occi/infrastructure/Network'
 require 'occi/infrastructure/Networkinterface'
 require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
-require 'occi/infrastructure/Reservation'
+require 'occi/mixins/Reservation'
 
 # OCCI HTTP rendering
 require 'occi/rendering/http/Renderer'

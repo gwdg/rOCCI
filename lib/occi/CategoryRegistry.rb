@@ -27,7 +27,7 @@ require 'occi/infrastructure/Network'
 require 'occi/infrastructure/Networkinterface'
 require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
-require 'occi/infrastructure/Reservation'
+require 'occi/mixins/Reservation'
 
 
 # OCCI Core classes
