@@ -46,11 +46,21 @@ cp etc/occi-server.conf $ETC_LOCATION
 
 echo -n "."
 
+if [ -f $ETC_LOCATION/occi-config.ru ]; then
+    mv $ETC_LOCATION/occi-config.ru $ETC_LOCATION/occi-config.ru.old
+    backup_information=$backup_information"Your current occi-config.ru has been moved to occi-config.ru.old\n"   
+fi
+cp etc/config.ru $ETC_LOCATION/occi-config.ru
+
+echo -n "."
+
 if [ -f $ETC_LOCATION/occi-one.conf ]; then
     mv $ETC_LOCATION/occi-one.conf $ETC_LOCATION/occi-one.conf.old
     backup_information=$backup_information"Your current occi-one.conf has been moved to occi-one.conf.old\n"   
 fi
 cp etc/occi-one.conf $ETC_LOCATION
+
+echo -n "."
 
 if [ -d $ETC_LOCATION/occi_one_templates ]; then
     rm -rf $ETC_LOCATION/occi_one_templates.old
@@ -69,7 +79,7 @@ if [ -d $RUBY_LOCATION/cloud/occi ]; then
     rm -rf $RUBY_LOCATION/cloud/occi
   fi
 fi
-cp -r lib/ruby/cloud/occi/ $RUBY_LOCATION/cloud/occi
+cp -r lib/occi/ $RUBY_LOCATION/cloud/occi
 
 echo -n "."
 
