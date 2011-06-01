@@ -47,6 +47,7 @@ module OCCI
         $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::Image::MIXIN)
         $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::Network::MIXIN)
         $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::VirtualMachine::MIXIN)
+        $categoryRegistry.register_mixin(OCCI::Mixins::Reservation::MIXIN)
         super(configfile)
         network_get_all()
         storage_get_all()

@@ -24,7 +24,7 @@ require 'singleton'
 require 'occi/core/Mixin'
 
 module OCCI
-  module Infrastructure
+  module Mixins
     class Reservation < OCCI::Core::Mixin
 
       include Singleton
@@ -42,15 +42,13 @@ module OCCI
         entities = []
 
         term = "reservation"
-        scheme = "http://schemas.ogf.org/occi/infrastructure/compute#"
+        scheme = "http://schemas.ogf.org/occi/reservation#"
         title = "Reservation"
 
         attributes = OCCI::Core::Attributes.new()
         attributes << OCCI::Core::Attribute.new(name = 'occi.reservation.start',        mutable = false, mandatory = true,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.reservation.leastype',     mutable = false, mandatory = false, unique = true)
         attributes << OCCI::Core::Attribute.new(name = 'occi.reservation.duration',     mutable = false, mandatory = true,  unique = true)
         attributes << OCCI::Core::Attribute.new(name = 'occi.reservation.preemptible',  mutable = false, mandatory = true,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.reservation.strategy',     mutable = false, mandatory = false, unique = true)
 
         return term, scheme, title, attributes, actions, related, entities
       end

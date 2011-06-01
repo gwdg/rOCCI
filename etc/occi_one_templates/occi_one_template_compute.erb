@@ -28,6 +28,13 @@ DISK          = [ IMAGE_ID = "<%= storage_id %>"]
 NIC           = [ NETWORK_ID = "<%= network_id %>"]
 <%end%>
 
+<%# Haizea Reservation parameters %>
+HAIZEA=	[	start 		=	"<%= attributes["occi.reservation.start"] if attributes["occi.reservation.start"]%>",
+			duration 	= 	"<%= attributes["occi.reservation.duration"] if attributes["occi.reservation.duration"]%>",
+			preemptible	= 	"<%= attributes["occi.reservation.preemptible"] if attributes["occi.reservation.preemptible"]%>"
+]
+<%end%>
+
 <%# Custom settings %>
 GRAPHICS      = [type="vnc"]
 RANK          = FREECPU
