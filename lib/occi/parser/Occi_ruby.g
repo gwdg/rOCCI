@@ -61,23 +61,22 @@ headers : (category | link | attribute | location)* ;
 
 category returns [categories]:
 
-  'Category' ':' category_values  { $categories = $category_values.categories };
+  'Category' ':' category_values  { $categories = $category_values.category_list };
 
   category_values returns [category_list]
-  
-    scope { categories  }
-    @init { $category_values::categories = Array.new; }
 
-    :   category_value (',' category_value)*
-        { $category_list = $category_values::categories };
+    @init { $category_list = Array.new; }
 
-	category_value
+    :   cv1 = category_value      { $category_list << $cv1.data }
+        (',' cv2 = category_value { $category_list << $cv2.data })*;
+
+	category_value returns [data]
 
     scope { category }
     @init { $category_value::category = Hash.new; }
 
 	  :  term_attr scheme_attr klass_attr title_attr? rel_attr? location_attr? c_attributes_attr? actions_attr?
-	     { $category_values::categories << OpenStruct.new($category_value::category) };
+	     { $data = OpenStruct.new($category_value::category) };
 
 	term_attr:          TERM_VALUE
 	                    { $category_value::category['term'] = $TERM_VALUE.text };
@@ -87,14 +86,14 @@ category returns [categories]:
 	                    { $category_value::category['scheme'] = remove_quotes $QUOTED_VALUE.text };
 	
 	klass_attr:         ';' 'class'      '=' QUOTED_VALUE
-                      { $category_value::category['class'] = remove_quotes $QUOTED_VALUE.text };
+                      { $category_value::category['clazz'] = remove_quotes $QUOTED_VALUE.text };
                     
 	title_attr:         ';' 'title'      '=' QUOTED_VALUE
                       { $category_value::category['title'] = remove_quotes $QUOTED_VALUE.text };
                     
   /* this value can be passed on to the uri rule in Location for validation */
 	rel_attr:           ';' 'rel'        '=' QUOTED_VALUE
-                      { $category_value::category['rel'] = remove_quotes $QUOTED_VALUE.text };
+                      { $category_value::category['related'] = remove_quotes $QUOTED_VALUE.text };
 
 	/* this value can be passed on to the uri rule in Location for validation */
 	location_attr:      ';' 'location'   '=' TARGET_VALUE

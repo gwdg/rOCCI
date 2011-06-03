@@ -478,39 +478,23 @@ begin
       # Create user defined mixin
       if location == "/-/"
         
+        $log.info("Creating user defined mixin...")
+
         raise OCCI::MixinAlreadyExistsError, "Mixin [#{mixin}] already exists!" unless mixin == nil
 
-        term, scheme, kind, params = Regexp.new(/(\w+);\s*scheme="([^"]+)";\s*class="([^"]+)";(.*)/).match(request.env['HTTP_CATEGORY']).captures
-        $log.debug(term + scheme + kind + params)
-        title_match = Regexp.new(/title="([^"]*)"/).match(params)
-        title = title_match.captures[0] if title_match != nil
-        related_match = Regexp.new(/rel="([^"]*)"/).match(params)
-        related = related_match.captures[0] if related_match != nil
-        loc_match = Regexp.new(/location=([^;]*)/).match(params)
-        loc = loc_match.captures[0] if loc_match != nil
-        attributes_match = Regexp.new(/attributes="([^"]*)"/).match(params)
-        attributes = attributes_match.captures[0] if attributes_match != nil
-        actions_match = Regexp.new(/actions="([^"]*)"/).match(params)
-        actions = actions_match.captures[0] if actions_match != nil
-        entities = []
+        mixin_category_data = OCCI::Parser.new(request.env['HTTP_CATEGORY']).category_value
+        $log.debug("Category data for mixin: #{mixin_category_data}")
 
-        $log.debug("Params matched from category:")
-        $log.debug("Title: #{title}")
-        $log.debug("Related: #{related}")
-        $log.debug("Location: #{loc}")
-        $log.debug("Attributes: #{attributes}")
-        $log.debug("Actions: #{actions}")
+        raise "Mandatory information missing (term | scheme | location)!" unless mixin_category_data.term != nil && mixin_category_data.scheme != nil && mixin_category_data.location != nil
+        raise "Category class must be set to 'mixin'!"                    unless mixin_category_data.clazz == "mixin"
 
-        rel = $categoryRegistry.get_categories_by_category_string(related, filter="mixins")[0] if related != nil
-#        raise "Related mixin could not be found!" if rel == nil
-
-        if term != nil && scheme != nil && kind != nil && loc != nil
-          mixin = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, rel, entities)
-          $categoryRegistry.register_mixin(mixin)
-          $locationRegistry.register_location(mixin.get_location(), mixin)
-        else
-          raise "Mixin definition contains errors"
-        end
+        raise "Location #{mixin_category_data.location} already used for another object: " + 
+              $locationRegistry.get_object_by_location(mixin_category_data.location) unless $locationRegistry.get_object_by_location(mixin_category_data.location) == nil
+                                                                          
+        related_mixin = $categoryRegistry.get_categories_by_category_string(related, filter="mixins")[0] if mixin_category_data.related != nil
+        mixin = OCCI::Core::Mixin.new(mixin_category_data.term, mixin_category_data.scheme, mixin_category_data.title, nil, [], related_mixin, [])
+        $categoryRegistry.register_mixin(mixin)
+        $locationRegistry.register_location(mixin_category_data.location, mixin)
 
       # operation on resource
       else
