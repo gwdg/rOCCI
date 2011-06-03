@@ -117,18 +117,58 @@ category returns [categories]:
         com.example.drive0.interface="ide0", com.example.drive1.interface="ide1"
 */
 
-link: 'Link' ':' link_values;
+link returns [links]:
 
-	link_values:           link_value (',' link_value)*;
-	link_value:            target_attr rel_attr self_attr? category_attr? attribute_attr? ;
-	target_attr:           '<' (TARGET_VALUE) ('?action=' TERM_VALUE)? '>' ;                 //this value can be passed on to the rel uri rule in Location for validation with the '<' and '>' stripped
-	self_attr:             ';' 'self' '=' QUOTED_VALUE ;                                     //this value can be passed on to the uri rule in Location for validation
-	category_attr:         ';' 'category' '=' QUOTED_VALUE ;                                 //this value can be passed on to the uri rule in Location for validation
-	attribute_attr:        ';' attributes_attr ;                                             /* e.g. com.example.drive0.interface="ide0", com.example.drive1.interface="ide1" */
-  attributes_attr:        attribute_kv_attr (',' attribute_kv_attr)* ;                     /* e.g. com.example.drive0.interface="ide0", com.example.drive1.interface="ide1" */
-  attribute_kv_attr:      attribute_name_attr '=' attribute_value_attr;                    /* e.g. com.example.drive0.interface="ide0" */
-  attribute_name_attr:    TERM_VALUE;                                                      // ('.' TERM_VALUE)* ; /* e.g. com.example.drive0.interface */
-  attribute_value_attr:   QUOTED_VALUE | DIGITS | FLOAT ;                                  /* e.g. "ide0" or 12 or 12.232 */
+  'Link' ':' link_values  { $links = $link_values.link_list };
+
+	link_values returns [link_list]
+	
+	 @init { $link_list = Array.new; }
+
+	 :   lv1 = link_value      { $link_list << $lv1.data }
+	     (',' lv2 = link_value { $link_list << $lv2.data })*;
+
+	link_value returns [data]
+	
+	 scope { link }
+	 @init { 
+	   $link_value::link = Hash.new;
+	   $link_value::link['attributes'] = Hash.new;
+	 }
+	
+	 :  target_attr rel_attr self_attr? category_attr? attribute_attr?
+	    { $data = OpenStruct.new($link_value::link) } ;
+
+	/* this value can be passed on to the rel uri rule in Location for validation with the '<' and '>' stripped */
+	target_attr:           '<' (TARGET_VALUE) ('?action=' TERM_VALUE)? '>'
+                         {
+                           $link_value::link['target'] = $TARGET_VALUE.text;
+                           $link_value::link['action'] = $TERM_VALUE.text;
+                         };
+
+	/* this value can be passed on to the uri rule in Location for validation */
+	self_attr:             ';' 'self' '=' QUOTED_VALUE
+	                       { $link_value::link['self'] = remove_quotes $QUOTED_VALUE.text; };
+
+	/* this value can be passed on to the uri rule in Location for validation */
+	category_attr:         ';' 'category' '=' QUOTED_VALUE
+                         { $link_value::link['category'] = remove_quotes $QUOTED_VALUE.text; };
+
+	/* e.g. com.example.drive0.interface="ide0", com.example.drive1.interface="ide1" */
+	attribute_attr:        ';' attributes_attr ;
+
+	/* e.g. com.example.drive0.interface="ide0", com.example.drive1.interface="ide1" */
+  attributes_attr:        attribute_kv_attr (',' attribute_kv_attr)* ;
+
+  /* e.g. com.example.drive0.interface="ide0" */
+  attribute_kv_attr:      attribute_name_attr '=' attribute_value_attr
+                         { $link_value::link['attributes'][$attribute_name_attr.text] = $attribute_value_attr.text; };
+
+  /* ('.' TERM_VALUE)* ; /* e.g. com.example.drive0.interface */
+  attribute_name_attr:    TERM_VALUE;
+
+  /* e.g. "ide0" or 12 or 12.232 */
+  attribute_value_attr:   QUOTED_VALUE | DIGITS | FLOAT ;
 
 // --------------------------------------------------------------------------------------------------------------------
 /*
