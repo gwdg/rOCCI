@@ -43,8 +43,8 @@ module OCCI
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
       end
       
-      def initialize(attributes, mixins = [])
-        super(attributes, OCCI::Core::Link::KIND, mixins)
+      def initialize(attributes, kind = OCCI::Core::Link::KIND, mixins = [])
+        super(attributes, kind, mixins)
       end
       
     end
