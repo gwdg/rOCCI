@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: Occi_ruby.g
-# Generated at: 2011-06-02 16:45:34
+# Generated at: 2011-06-03 09:35:01
 # 
 
 # ~~~> start load path setup
@@ -57,7 +57,7 @@ end
 # <~~~ end load path setup
 
 
-module Occi
+module OCCI
   # TokenData defines all of the token type integer values
   # as constants, which will be included in all 
   # ANTLR-generated recognizers.
@@ -79,7 +79,7 @@ module Occi
 
 
   class Lexer < ANTLR3::Lexer
-    @grammar_home = Occi
+    @grammar_home = OCCI
     include TokenData
 
     
@@ -119,7 +119,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 3:9: 'Category'
+      # at line 7:9: 'Category'
       match( "Category" )
 
       
@@ -143,7 +143,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 4:9: ':'
+      # at line 8:9: ':'
       match( 0x3a )
 
       
@@ -167,7 +167,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 5:9: ','
+      # at line 9:9: ','
       match( 0x2c )
 
       
@@ -191,7 +191,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 6:9: ';'
+      # at line 10:9: ';'
       match( 0x3b )
 
       
@@ -215,7 +215,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 7:9: 'scheme'
+      # at line 11:9: 'scheme'
       match( "scheme" )
 
       
@@ -239,7 +239,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 8:9: '='
+      # at line 12:9: '='
       match( 0x3d )
 
       
@@ -263,7 +263,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 9:9: 'class'
+      # at line 13:9: 'class'
       match( "class" )
 
       
@@ -287,7 +287,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 10:9: 'title'
+      # at line 14:9: 'title'
       match( "title" )
 
       
@@ -311,7 +311,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 11:9: 'rel'
+      # at line 15:9: 'rel'
       match( "rel" )
 
       
@@ -335,7 +335,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 12:9: 'location'
+      # at line 16:9: 'location'
       match( "location" )
 
       
@@ -359,7 +359,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 13:9: 'attributes'
+      # at line 17:9: 'attributes'
       match( "attributes" )
 
       
@@ -383,7 +383,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 14:9: 'actions'
+      # at line 18:9: 'actions'
       match( "actions" )
 
       
@@ -407,7 +407,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 15:9: 'Link'
+      # at line 19:9: 'Link'
       match( "Link" )
 
       
@@ -431,7 +431,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 16:9: '<'
+      # at line 20:9: '<'
       match( 0x3c )
 
       
@@ -455,7 +455,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 17:9: '?action='
+      # at line 21:9: '?action='
       match( "?action=" )
 
       
@@ -479,7 +479,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 18:9: '>'
+      # at line 22:9: '>'
       match( 0x3e )
 
       
@@ -503,7 +503,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 19:9: 'self'
+      # at line 23:9: 'self'
       match( "self" )
 
       
@@ -527,7 +527,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 20:9: 'category'
+      # at line 24:9: 'category'
       match( "category" )
 
       
@@ -551,7 +551,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 21:9: 'X-OCCI-Attribute'
+      # at line 25:9: 'X-OCCI-Attribute'
       match( "X-OCCI-Attribute" )
 
       
@@ -575,7 +575,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 22:9: 'X-OCCI-Location'
+      # at line 26:9: 'X-OCCI-Location'
       match( "X-OCCI-Location" )
 
       
@@ -599,8 +599,8 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 100:17: ( 'http://' | 'https://' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' )*
-      # at line 100:17: ( 'http://' | 'https://' )
+      # at line 160:15: ( 'http://' | 'https://' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' )*
+      # at line 160:15: ( 'http://' | 'https://' )
       alt_1 = 2
       look_1_0 = @input.peek( 1 )
 
@@ -637,15 +637,15 @@ module Occi
       end
       case alt_1
       when 1
-        # at line 100:19: 'http://'
+        # at line 160:17: 'http://'
         match( "http://" )
 
       when 2
-        # at line 100:31: 'https://'
+        # at line 160:29: 'https://'
         match( "https://" )
 
       end
-      # at line 100:43: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' )*
+      # at line 160:41: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' )*
       while true # decision 2
         alt_2 = 2
         look_2_0 = @input.peek( 1 )
@@ -693,8 +693,8 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 101:17: ( '0' .. '9' )*
-      # at line 101:17: ( '0' .. '9' )*
+      # at line 161:15: ( '0' .. '9' )*
+      # at line 161:15: ( '0' .. '9' )*
       while true # decision 3
         alt_3 = 2
         look_3_0 = @input.peek( 1 )
@@ -705,7 +705,7 @@ module Occi
         end
         case alt_3
         when 1
-          # at line 101:18: '0' .. '9'
+          # at line 161:16: '0' .. '9'
           match_range( 0x30, 0x39 )
 
         else
@@ -734,8 +734,8 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 102:17: ( '0' .. '9' | '.' )*
-      # at line 102:17: ( '0' .. '9' | '.' )*
+      # at line 162:15: ( '0' .. '9' | '.' )*
+      # at line 162:15: ( '0' .. '9' | '.' )*
       while true # decision 4
         alt_4 = 2
         look_4_0 = @input.peek( 1 )
@@ -815,8 +815,8 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 104:17: ( 'a' .. 'z' | 'A..Z' | '0' .. '9' | '-' | '_' | '.' )*
-      # at line 104:17: ( 'a' .. 'z' | 'A..Z' | '0' .. '9' | '-' | '_' | '.' )*
+      # at line 164:15: ( 'a' .. 'z' | 'A..Z' | '0' .. '9' | '-' | '_' | '.' )*
+      # at line 164:15: ( 'a' .. 'z' | 'A..Z' | '0' .. '9' | '-' | '_' | '.' )*
       while true # decision 5
         alt_5 = 7
         case look_5 = @input.peek( 1 )
@@ -829,27 +829,27 @@ module Occi
         end
         case alt_5
         when 1
-          # at line 104:18: 'a' .. 'z'
+          # at line 164:16: 'a' .. 'z'
           match_range( 0x61, 0x7a )
 
         when 2
-          # at line 104:29: 'A..Z'
+          # at line 164:27: 'A..Z'
           match( "A..Z" )
 
         when 3
-          # at line 104:38: '0' .. '9'
+          # at line 164:36: '0' .. '9'
           match_range( 0x30, 0x39 )
 
         when 4
-          # at line 104:49: '-'
+          # at line 164:47: '-'
           match( 0x2d )
 
         when 5
-          # at line 104:55: '_'
+          # at line 164:53: '_'
           match( 0x5f )
 
         when 6
-          # at line 104:61: '.'
+          # at line 164:59: '.'
           match( 0x2e )
 
         else
@@ -878,8 +878,8 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 105:17: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '/' | '-' | '_' )*
-      # at line 105:17: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '/' | '-' | '_' )*
+      # at line 165:15: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '/' | '-' | '_' )*
+      # at line 165:15: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '/' | '-' | '_' )*
       while true # decision 6
         alt_6 = 2
         look_6_0 = @input.peek( 1 )
@@ -927,9 +927,9 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 106:17: QUOTE ( options {greedy=false; } : . )* QUOTE
+      # at line 166:15: QUOTE ( options {greedy=false; } : . )* QUOTE
       quote!
-      # at line 106:23: ( options {greedy=false; } : . )*
+      # at line 166:21: ( options {greedy=false; } : . )*
       while true # decision 7
         alt_7 = 2
         look_7_0 = @input.peek( 1 )
@@ -942,7 +942,7 @@ module Occi
         end
         case alt_7
         when 1
-          # at line 106:51: .
+          # at line 166:49: .
           match_any
 
         else
@@ -972,7 +972,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 108:9: ( ' ' | '\\t' | '\\r' | '\\n' )
+      # at line 167:15: ( ' ' | '\\t' | '\\r' | '\\n' )
       if @input.peek( 1 ).between?( 0x9, 0xa ) || @input.peek(1) == 0xd || @input.peek(1) == 0x20
         @input.consume
       else

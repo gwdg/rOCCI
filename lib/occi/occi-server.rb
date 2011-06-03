@@ -58,6 +58,10 @@ require 'occi/mixins/Reservation'
 require 'occi/rendering/http/Renderer'
 require 'occi/rendering/http/LocationRegistry'
 
+# OCCI HTTP parsing
+require 'occi/parser/OCCIParser'
+
+
 ##############################################################################
 # Initialize logger
 
@@ -294,6 +298,11 @@ begin
       $log.debug("Request query string #{request.query_string()}")
 
       if request.env['HTTP_CATEGORY'] != nil
+        
+        # Test grammer based parsing
+        category = OCCI::Parser.new(request.env['HTTP_CATEGORY']).category_values
+        $log.debug("*** Parsed category: " + category.to_s)
+        
         # Get first kind from supplied category string
         kind    = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="kinds")[0]
         action  = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="actions")[0]

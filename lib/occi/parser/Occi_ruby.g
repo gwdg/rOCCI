@@ -25,12 +25,17 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-grammar Occi;
+grammar OCCI;
 
 options { language = Ruby; }
 
+@header {
+  require 'ostruct';
+}
+
 headers : (category | link | attribute | location)* ;
 
+// --------------------------------------------------------------------------------------------------------------------
 /*
   e.g.
   Category: storage; \
@@ -43,19 +48,66 @@ headers : (category | link | attribute | location)* ;
     actions="http://schemas.ogf.org/occi/infrastructure/storage/action#resize"
 */
 
-category: 'Category' ':' category_values;
+category returns [categories]:
 
-  category_values:    category_value (',' category_value)*;
-	category_value:     term_attr scheme_attr klass_attr title_attr? rel_attr? location_attr? c_attributes_attr? actions_attr?;
-	term_attr:          TERM_VALUE;
-	scheme_attr:        ';' 'scheme'     '=' QUOTED_VALUE;     //this value can be passed on to the uri rule in Location for validation
-	klass_attr:         ';' 'class'      '=' QUOTED_VALUE;
-	title_attr:         ';' 'title'      '=' QUOTED_VALUE;
-	rel_attr:           ';' 'rel'        '=' QUOTED_VALUE;     //this value can be passed on to the uri rule in Location for validation
-	location_attr:      ';' 'location'   '=' TARGET_VALUE;     //this value can be passed on to the uri rule in Location for validation
-	c_attributes_attr:  ';' 'attributes' '=' QUOTED_VALUE;     //these value once extracted can be passed on to the attributes_attr rule
-	actions_attr:       ';' 'actions'    '=' QUOTED_VALUE;     //this value can be passed on to the uri rule in Location for validation
+  'Category' ':' category_values  { $categories = $category_values.categories };
 
+  category_values returns [category_list]
+  
+  scope {
+    categories
+  }
+
+  @init {
+    $category_values::categories = Array.new;
+  }
+
+  :                   category_value (',' category_value)*
+                      { $category_list = $category_values::categories };
+
+	category_value
+
+  scope {
+    category
+  }
+
+  @init {
+    $category_value::category = Hash.new;
+  }
+
+	:     term_attr scheme_attr klass_attr title_attr? rel_attr? location_attr? c_attributes_attr? actions_attr?
+	      { $category_values::categories << OpenStruct.new($category_value::category) };
+
+	term_attr:          TERM_VALUE
+	                    { $category_value::category['term'] = $TERM_VALUE.text };
+	
+	/* this value can be passed on to the uri rule in Location for validation */
+	scheme_attr:        ';' 'scheme'     '=' QUOTED_VALUE
+	                    { $category_value::category['scheme'] = $QUOTED_VALUE.text };
+	
+	klass_attr:         ';' 'class'      '=' QUOTED_VALUE
+                      { $category_value::category['class'] = $QUOTED_VALUE.text };
+                    
+	title_attr:         ';' 'title'      '=' QUOTED_VALUE
+                      { $category_value::category['title'] = $QUOTED_VALUE.text };
+                    
+  /* this value can be passed on to the uri rule in Location for validation */
+	rel_attr:           ';' 'rel'        '=' QUOTED_VALUE
+                      { $category_value::category['rel'] = $QUOTED_VALUE.text };
+
+	/* this value can be passed on to the uri rule in Location for validation */
+	location_attr:      ';' 'location'   '=' TARGET_VALUE
+                      { $category_value::category['location'] = $TARGET_VALUE.text };
+	
+	/* these value once extracted can be passed on to the attributes_attr rule */
+	c_attributes_attr:  ';' 'attributes' '=' QUOTED_VALUE
+                      { $category_value::category['attributes'] = $QUOTED_VALUE.text };
+	
+	/* this value can be passed on to the uri rule in Location for validation */
+	actions_attr:       ';' 'actions'    '=' QUOTED_VALUE
+	                    { $category_value::category['actions'] = $QUOTED_VALUE.text };
+
+// --------------------------------------------------------------------------------------------------------------------
 /* e.g.
         Link:
         </storage/disk03>;
@@ -78,6 +130,7 @@ link: 'Link' ':' link_values;
   attribute_name_attr:    TERM_VALUE;                                                      // ('.' TERM_VALUE)* ; /* e.g. com.example.drive0.interface */
   attribute_value_attr:   QUOTED_VALUE | DIGITS | FLOAT ;                                  /* e.g. "ide0" or 12 or 12.232 */
 
+// --------------------------------------------------------------------------------------------------------------------
 /*
 e.g.
   X-OCCI-Attribute: \
@@ -91,6 +144,7 @@ e.g.
 
 attribute: 'X-OCCI-Attribute' ':' attributes_attr ;
 
+// --------------------------------------------------------------------------------------------------------------------
 /*
 e.g.
   X-OCCI-Location: \
@@ -100,6 +154,8 @@ e.g.
 
 location: 'X-OCCI-Location' ':' location_values;
 location_values : URL (',' URL)*;
+
+// --------------------------------------------------------------------------------------------------------------------
 
 URL:          ( 'http://' | 'https://' )( 'a'..'z' | 'A'..'Z' | '0'..'9' | '@' | ':' | '%' | '_' | '\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' )*;
 DIGITS:       ('0'..'9')* ;
