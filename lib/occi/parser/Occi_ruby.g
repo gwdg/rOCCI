@@ -33,6 +33,17 @@ options { language = Ruby; }
   require 'ostruct';
 }
 
+@members {
+
+  def emit_error_message(message)
+    \$log.warn(message)
+  end
+
+  def remove_quotes(s)
+    s.gsub!(/^["|'](.*?)['|"]$/,'\1')
+  end
+}
+
 headers : (category | link | attribute | location)* ;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -54,46 +65,36 @@ category returns [categories]:
 
   category_values returns [category_list]
   
-  scope {
-    categories
-  }
+    scope { categories  }
+    @init { $category_values::categories = Array.new; }
 
-  @init {
-    $category_values::categories = Array.new;
-  }
-
-  :                   category_value (',' category_value)*
-                      { $category_list = $category_values::categories };
+    :   category_value (',' category_value)*
+        { $category_list = $category_values::categories };
 
 	category_value
 
-  scope {
-    category
-  }
+    scope { category }
+    @init { $category_value::category = Hash.new; }
 
-  @init {
-    $category_value::category = Hash.new;
-  }
-
-	:     term_attr scheme_attr klass_attr title_attr? rel_attr? location_attr? c_attributes_attr? actions_attr?
-	      { $category_values::categories << OpenStruct.new($category_value::category) };
+	  :  term_attr scheme_attr klass_attr title_attr? rel_attr? location_attr? c_attributes_attr? actions_attr?
+	     { $category_values::categories << OpenStruct.new($category_value::category) };
 
 	term_attr:          TERM_VALUE
 	                    { $category_value::category['term'] = $TERM_VALUE.text };
 	
 	/* this value can be passed on to the uri rule in Location for validation */
 	scheme_attr:        ';' 'scheme'     '=' QUOTED_VALUE
-	                    { $category_value::category['scheme'] = $QUOTED_VALUE.text };
+	                    { $category_value::category['scheme'] = remove_quotes $QUOTED_VALUE.text };
 	
 	klass_attr:         ';' 'class'      '=' QUOTED_VALUE
-                      { $category_value::category['class'] = $QUOTED_VALUE.text };
+                      { $category_value::category['class'] = remove_quotes $QUOTED_VALUE.text };
                     
 	title_attr:         ';' 'title'      '=' QUOTED_VALUE
-                      { $category_value::category['title'] = $QUOTED_VALUE.text };
+                      { $category_value::category['title'] = remove_quotes $QUOTED_VALUE.text };
                     
   /* this value can be passed on to the uri rule in Location for validation */
 	rel_attr:           ';' 'rel'        '=' QUOTED_VALUE
-                      { $category_value::category['rel'] = $QUOTED_VALUE.text };
+                      { $category_value::category['rel'] = remove_quotes $QUOTED_VALUE.text };
 
 	/* this value can be passed on to the uri rule in Location for validation */
 	location_attr:      ';' 'location'   '=' TARGET_VALUE
@@ -101,11 +102,11 @@ category returns [categories]:
 	
 	/* these value once extracted can be passed on to the attributes_attr rule */
 	c_attributes_attr:  ';' 'attributes' '=' QUOTED_VALUE
-                      { $category_value::category['attributes'] = $QUOTED_VALUE.text };
+                      { $category_value::category['attributes'] = remove_quotes $QUOTED_VALUE.text };
 	
 	/* this value can be passed on to the uri rule in Location for validation */
 	actions_attr:       ';' 'actions'    '=' QUOTED_VALUE
-	                    { $category_value::category['actions'] = $QUOTED_VALUE.text };
+	                    { $category_value::category['actions'] = remove_quotes $QUOTED_VALUE.text };
 
 // --------------------------------------------------------------------------------------------------------------------
 /* e.g.
