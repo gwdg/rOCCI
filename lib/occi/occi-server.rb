@@ -548,41 +548,30 @@ begin
 
         # Update / add links
         if request.env['HTTP_LINK'] != nil
-          request.env['HTTP_LINK'].split(',').each do |link_string|
-            $log.debug("Requested link: #{link_string}")
-            attributes = {}
-            regexp = Regexp.new(/<([^>]*)>;\s*rel="([^"]*)";\s*category="([^"]*)";\s*([^$]*)/)
-            match_link = regexp.match(link_string)
-            if match_link != nil
-              target_location, related, source_location, category_string, params = match_link.captures
-              kind = $categoryRegistry.get_categories_by_category_string(category_string, filter="kinds")[0]
 
-              regexp = Regexp.new(/([^;]*;\s*)/)
-              match_params = regexp.match(params)
-              if match_params != nil
-                match.each do |attribute_string|
-                  key, value = attribute_string.split('=')
-                  attributes[key] = value
-                end
-                if kind != nil
-                  target = $locationRegistry.get_object_by_location(target_location)
-                  attributes["occi.core.target"] = target_location
-                  attributes["occi.core.source"] = source_location
-                  link = kind.entity_type.new(attributes)
-                  $locationRegistry.register_location(link.get_location(), link)
-                  entities.each do |entity|
-                    entity.links << link
-                  end
-                  target.links << link
-                  $log.debug("Link successfully created!")
-                else
-                  raise "Kind not found in category!"
-                end
-              else
-                raise "Could not extract parameters from request!"
-              end
-            else
-              raise "Extracting information from Link failed"
+          links = OCCI::Parser.new(request.env['HTTP_LINK']).link_values
+          
+          links.each do |link_data|
+            $log.debug("Extracted link data: #{link_data}")
+            raise "Mandatory information missing (related | target | category)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil
+
+            kind = $categoryRegistry.get_categories_by_category_string(link_data.category, filter="kinds")[0]
+            raise "No kind for category string: #{link_data.category}" unless kind != nil
+
+            entities.each do |entity|
+                    
+              target          = $locationRegistry.get_object_by_location(target_location)
+              source_location = $locationRegistry.get_location_of_object(entity)
+
+              attributes = link_data.attributes.clone
+              attributes["occi.core.target"] = target_location
+              attributes["occi.core.source"] = source_location
+
+              link = kind.entity_type.new(attributes)
+              $locationRegistry.register_location(link.get_location(), link)
+
+              target.links << link
+              entity.links << link
             end
           end
         end
@@ -590,7 +579,7 @@ begin
       end
 
       # Create resource instance at the given location
-      raise "Putting resources is currently not allowed"
+      raise "Creating resources with method 'put' is currently not possible!"
 
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
