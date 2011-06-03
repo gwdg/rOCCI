@@ -499,9 +499,9 @@ begin
         break
       end
 
-      # operation on resource
+      # Add an resource instance to a mixin
       mixin = $locationRegistry.get_object_by_location(location)
-      if mixin != nil && mixin.kind_of?(OCCI::Core::Mixin)
+      if mixin != nil && mixin.kind_of?(OCCI::Core::Mixin) && request.env["HTTP_X_OCCI_LOCATION"] != nil
         request.env["HTTP_X_OCCI_LOCATION"].split(",").each do |entity_location|
 
           entity_uri = URI.parse(entity_location)
@@ -513,28 +513,41 @@ begin
           $log.debug("Associating entity [#{entity}] at location #{entity_location} with mixin #{mixin}")
 
           entity.mixins << mixin
-        end if request.env["HTTP_X_OCCI_LOCATION"] != nil
-      else
-        entities, exact_match = get_entities_by_location_from_categories(location,$categoryRegistry.getKinds)
-        $log.debug("Put Attributes/Links/Mixins to entities")
-        $log.debug(entities)
-        if entities != []
-          # update/add mixins
-          mixins = []
-          mixins = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins") if request.env['HTTP_CATEGORY'] != nil
+        end
+        break
+      end
+
+      # Update resource instance(s) at the given location
+      if $locationRegistry.get_object_by_location(location) != nil
+
+        # Determine set of resources to be updated
+        if $locationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Resource)
+          entities = [$locationRegistry.get_object_by_location(location)]
+        else
+          entities = $locationRegistry.get_resources_below_location(location)
+        end          
+        $log.info("Updating [#{entities.size}] entities...")
+
+        # Update / add mixins
+        if request.env['HTTP_CATEGORY'] != nil
+          mixins = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins") 
           entities.each do |entity|
-            entity.mixins << mixins if mixins != []
+            entity.mixins = mixins
           end
-          # update/add attributes
-          attributes = request.env['HTTP_X_OCCI_ATTRIBUTE'].split(',') if request.env['HTTP_X_OCCI_ATTRIBUTE'] != nil
-          attributes.each do |attribute|
+        end
+
+        # Update / add attributes
+        if request.env['HTTP_X_OCCI_ATTRIBUTE'] != nil
+          request.env['HTTP_X_OCCI_ATTRIBUTE'].split(',').each do |attribute|
             key, value = attribute.split('=')
             entities.each do |entity|
-              $log.debug("Entity #{entity}")
               entity.attributes[key] = value
             end
           end
-          # update/add links
+        end
+
+        # Update / add links
+        if request.env['HTTP_LINK'] != nil
           request.env['HTTP_LINK'].split(',').each do |link_string|
             $log.debug("Requested link: #{link_string}")
             attributes = {}
@@ -571,11 +584,13 @@ begin
             else
               raise "Extracting information from Link failed"
             end
-          end if request.env['HTTP_LINK'] != nil
-        else
-          raise "Putting resources is currently not allowed"
+          end
         end
+        break
       end
+
+      # Create resource instance at the given location
+      raise "Putting resources is currently not allowed"
 
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
