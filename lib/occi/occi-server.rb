@@ -496,83 +496,84 @@ begin
         $categoryRegistry.register_mixin(mixin)
         $locationRegistry.register_location(mixin_category_data.location, mixin)
 
+        break
+      end
+
       # operation on resource
+      mixin = $locationRegistry.get_object_by_location(location)
+      if mixin != nil && mixin.kind_of?(OCCI::Core::Mixin)
+        request.env["HTTP_X_OCCI_LOCATION"].split(",").each do |entity_location|
+
+          entity_uri = URI.parse(entity_location)
+          entity = $locationRegistry.get_object_by_location(entity_uri.path)
+
+          raise "No entity found at location: #{entity_location}"                                       if entity == nil
+          raise "Object referenced by uri [#{entity_location}] is not a OCCI::Core::Resource instance!" if !entity.kind_of?(OCCI::Core::Resource)
+
+          $log.debug("Associating entity [#{entity}] at location #{entity_location} with mixin #{mixin}")
+
+          entity.mixins << mixin
+        end if request.env["HTTP_X_OCCI_LOCATION"] != nil
       else
-        mixin = $locationRegistry.get_object_by_location(location)
-        if mixin != nil && mixin.kind_of?(OCCI::Core::Mixin)
-          request.env["HTTP_X_OCCI_LOCATION"].split(",").each do |entity_location|
-
-            entity_uri = URI.parse(entity_location)
-            entity = $locationRegistry.get_object_by_location(entity_uri.path)
-
-            raise "No entity found at location: #{entity_location}"                                       if entity == nil
-            raise "Object referenced by uri [#{entity_location}] is not a OCCI::Core::Resource instance!" if !entity.kind_of?(OCCI::Core::Resource)
-
-            $log.debug("Associating entity [#{entity}] at location #{entity_location} with mixin #{mixin}")
-
-            entity.mixins << mixin
-          end if request.env["HTTP_X_OCCI_LOCATION"] != nil
-        else
-          entities, exact_match = get_entities_by_location_from_categories(location,$categoryRegistry.getKinds)
-          $log.debug("Put Attributes/Links/Mixins to entities")
-          $log.debug(entities)
-          if entities != []
-            # update/add mixins
-            mixins = []
-            mixins = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins") if request.env['HTTP_CATEGORY'] != nil
+        entities, exact_match = get_entities_by_location_from_categories(location,$categoryRegistry.getKinds)
+        $log.debug("Put Attributes/Links/Mixins to entities")
+        $log.debug(entities)
+        if entities != []
+          # update/add mixins
+          mixins = []
+          mixins = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins") if request.env['HTTP_CATEGORY'] != nil
+          entities.each do |entity|
+            entity.mixins << mixins if mixins != []
+          end
+          # update/add attributes
+          attributes = request.env['HTTP_X_OCCI_ATTRIBUTE'].split(',') if request.env['HTTP_X_OCCI_ATTRIBUTE'] != nil
+          attributes.each do |attribute|
+            key, value = attribute.split('=')
             entities.each do |entity|
-              entity.mixins << mixins if mixins != []
+              $log.debug("Entity #{entity}")
+              entity.attributes[key] = value
             end
-            # update/add attributes
-            attributes = request.env['HTTP_X_OCCI_ATTRIBUTE'].split(',') if request.env['HTTP_X_OCCI_ATTRIBUTE'] != nil
-            attributes.each do |attribute|
-              key, value = attribute.split('=')
-              entities.each do |entity|
-                $log.debug("Entity #{entity}")
-                entity.attributes[key] = value
-              end
-            end
-            # update/add links
-            request.env['HTTP_LINK'].split(',').each do |link_string|
-              $log.debug("Requested link: #{link_string}")
-              attributes = {}
-              regexp = Regexp.new(/<([^>]*)>;\s*rel="([^"]*)";\s*category="([^"]*)";\s*([^$]*)/)
-              match_link = regexp.match(link_string)
-              if match_link != nil
-                target_location, related, source_location, category_string, params = match_link.captures
-                kind = $categoryRegistry.get_categories_by_category_string(category_string, filter="kinds")[0]
+          end
+          # update/add links
+          request.env['HTTP_LINK'].split(',').each do |link_string|
+            $log.debug("Requested link: #{link_string}")
+            attributes = {}
+            regexp = Regexp.new(/<([^>]*)>;\s*rel="([^"]*)";\s*category="([^"]*)";\s*([^$]*)/)
+            match_link = regexp.match(link_string)
+            if match_link != nil
+              target_location, related, source_location, category_string, params = match_link.captures
+              kind = $categoryRegistry.get_categories_by_category_string(category_string, filter="kinds")[0]
 
-                regexp = Regexp.new(/([^;]*;\s*)/)
-                match_params = regexp.match(params)
-                if match_params != nil
-                  match.each do |attribute_string|
-                    key, value = attribute_string.split('=')
-                    attributes[key] = value
+              regexp = Regexp.new(/([^;]*;\s*)/)
+              match_params = regexp.match(params)
+              if match_params != nil
+                match.each do |attribute_string|
+                  key, value = attribute_string.split('=')
+                  attributes[key] = value
+                end
+                if kind != nil
+                  target = $locationRegistry.get_object_by_location(target_location)
+                  attributes["occi.core.target"] = target_location
+                  attributes["occi.core.source"] = source_location
+                  link = kind.entity_type.new(attributes)
+                  $locationRegistry.register_location(link.get_location(), link)
+                  entities.each do |entity|
+                    entity.links << link
                   end
-                  if kind != nil
-                    target = $locationRegistry.get_object_by_location(target_location)
-                    attributes["occi.core.target"] = target_location
-                    attributes["occi.core.source"] = source_location
-                    link = kind.entity_type.new(attributes)
-                    $locationRegistry.register_location(link.get_location(), link)
-                    entities.each do |entity|
-                      entity.links << link
-                    end
-                    target.links << link
-                    $log.debug("Link successfully created!")
-                  else
-                    raise "Kind not found in category!"
-                  end
+                  target.links << link
+                  $log.debug("Link successfully created!")
                 else
-                  raise "Could not extract parameters from request!"
+                  raise "Kind not found in category!"
                 end
               else
-                raise "Extracting information from Link failed"
+                raise "Could not extract parameters from request!"
               end
-            end if request.env['HTTP_LINK'] != nil
-          else
-            raise "Putting resources is currently not allowed"
-          end
+            else
+              raise "Extracting information from Link failed"
+            end
+          end if request.env['HTTP_LINK'] != nil
+        else
+          raise "Putting resources is currently not allowed"
         end
       end
 
