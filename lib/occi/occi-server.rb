@@ -36,6 +36,9 @@ require 'occi/Configuration'
 # Registry for all OCCI Categories
 require 'occi/CategoryRegistry'
 
+# Exceptions
+require 'occi/Exceptions'
+
 # OCCI Core classes
 require 'occi/core/Action'
 require 'occi/core/Category'
@@ -258,8 +261,7 @@ begin
       end
 
       # Invalid request url
-      $log.error("Invalid request url: #{location}")
-      response.status = HTTP_STATUS_CODE["Bad Request"]
+      raise "Invalid request url: #{location}"
 
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
@@ -468,58 +470,50 @@ begin
         action  = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="actions")[0]
         mixin   = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins")[0]
 
-        if kind == nil && action == nil && action == nil && location != "/-/"
-          $log.error("Kind/Action not found in category")
-          response.status  = HTTP_STATUS_CODE["Bad Request"]
-          break
+        if kind == nil && action == nil && location != "/-/"
+          raise "No kind / action provided!"
         end
       end
 
-      if location == "/-/" # create user defined mixin
-        if mixin == nil
-          term, scheme, kind, params = Regexp.new(/(\w+);\s*scheme="([^"]+)";\s*class="([^"]+)";(.*)/).match(request.env['HTTP_CATEGORY']).captures
-          $log.debug(term + scheme + kind + params)
-          title_match = Regexp.new(/title="([^"]*)"/).match(params)
-          title = title_match.captures[0] if title_match != nil
-          related_match = Regexp.new(/rel="([^"]*)"/).match(params)
-          related = related_match.captures[0] if related_match != nil
-          loc_match = Regexp.new(/location=([^;]*)/).match(params)
-          loc = loc_match.captures[0] if loc_match != nil
-          attributes_match = Regexp.new(/attributes="([^"]*)"/).match(params)
-          attributes = attributes_match.captures[0] if attributes_match != nil
-          actions_match = Regexp.new(/actions="([^"]*)"/).match(params)
-          actions = actions_match.captures[0] if actions_match != nil
-          entities = []
+      # Create user defined mixin
+      if location == "/-/"
+        
+        raise OCCI::MixinAlreadyExistsError, "Mixin [#{mixin}] already exists!" unless mixin == nil
 
-          rel = $categoryRegistry.get_categories_by_category_string(related, filter="mixins")[0] if related != nil
-          if rel == nil
-            $log.error("Related Mixin could not be found")
-            response.status  = HTTP_STATUS_CODE["Bad Request"]
-          end
+        term, scheme, kind, params = Regexp.new(/(\w+);\s*scheme="([^"]+)";\s*class="([^"]+)";(.*)/).match(request.env['HTTP_CATEGORY']).captures
+        $log.debug(term + scheme + kind + params)
+        title_match = Regexp.new(/title="([^"]*)"/).match(params)
+        title = title_match.captures[0] if title_match != nil
+        related_match = Regexp.new(/rel="([^"]*)"/).match(params)
+        related = related_match.captures[0] if related_match != nil
+        loc_match = Regexp.new(/location=([^;]*)/).match(params)
+        loc = loc_match.captures[0] if loc_match != nil
+        attributes_match = Regexp.new(/attributes="([^"]*)"/).match(params)
+        attributes = attributes_match.captures[0] if attributes_match != nil
+        actions_match = Regexp.new(/actions="([^"]*)"/).match(params)
+        actions = actions_match.captures[0] if actions_match != nil
+        entities = []
 
-          $log.debug("Params matched from category:")
-          $log.debug("Title: #{title}")
-          $log.debug("Related: #{related}")
-          $log.debug("Location: #{loc}")
-          $log.debug("Attributes: #{attributes}")
-          $log.debug("Actions: #{actions}")
+        $log.debug("Params matched from category:")
+        $log.debug("Title: #{title}")
+        $log.debug("Related: #{related}")
+        $log.debug("Location: #{loc}")
+        $log.debug("Attributes: #{attributes}")
+        $log.debug("Actions: #{actions}")
 
-          if term != nil && scheme != nil && kind != nil && loc != nil
-            mixin = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, rel, entities)
-            $categoryRegistry.register_mixin(mixin)
-            $locationRegistry.register_location(mixin.get_location(), mixin)
-          else
-            $log.error("Mixin definition contains errors")
-            response.status  = HTTP_STATUS_CODE["Bad Request"]
-            break
-          end
+        rel = $categoryRegistry.get_categories_by_category_string(related, filter="mixins")[0] if related != nil
+#        raise "Related mixin could not be found!" if rel == nil
+
+        if term != nil && scheme != nil && kind != nil && loc != nil
+          mixin = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, rel, entities)
+          $categoryRegistry.register_mixin(mixin)
+          $locationRegistry.register_location(mixin.get_location(), mixin)
         else
-          $log.debug("Mixin #{mixin}")
-          $log.error("Mixin already exists")
-          response.status  = HTTP_STATUS_CODE["Conflict"]
-          break
+          raise "Mixin definition contains errors"
         end
-      else # operation on resource
+
+      # operation on resource
+      else
         mixin = $locationRegistry.get_object_by_location(location)
         if mixin != nil && mixin.kind_of?(OCCI::Core::Mixin)
           request.env["HTTP_X_OCCI_LOCATION"].split(",").each do |entity_location|
@@ -601,6 +595,11 @@ begin
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
+
+    rescue OCCI::MixinAlreadyExistsError => e
+
+      $log.error(e)
+      response.status  = HTTP_STATUS_CODE["Conflict"]
 
     rescue Exception => e
 
