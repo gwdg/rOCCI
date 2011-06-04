@@ -182,7 +182,7 @@ link returns [links]:
   attribute_name_attr:   TERM_VALUE;
 
   /* e.g. "ide0" or 12 or 12.232 */
-  attribute_value_attr:  QUOTED_VALUE | DIGITS | FLOAT ;
+  attribute_value_attr:  QUOTED_VALUE | DIGITS | FLOAT | URL ;
 
 // --------------------------------------------------------------------------------------------------------------------
 /*

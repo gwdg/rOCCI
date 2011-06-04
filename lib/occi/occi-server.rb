@@ -335,14 +335,11 @@ begin
 
       # If kind is a link and no actions specified then create link
       if kind == OCCI::Core::Link::KIND or kind.related.include?(OCCI::Core::Link::KIND)
-        attributes = {}
 
-        request.env["HTTP_X_OCCI_ATTRIBUTE"].split(%r{,\s*}).each do |attribute_string|
-          key, value = attribute_string.split('=')
-          attributes[key] = value
-        end if request.env["HTTP_X_OCCI_ATTRIBUTE"] != nil
+        attributes = request.env["HTTP_X_OCCI_ATTRIBUTE"] != nil ? OCCI::Parser.new(request.env["HTTP_X_OCCI_ATTRIBUTE"]).attributes_attr : {}
 
-        $log.debug("Attributes from Link: #{attributes}")
+        $log.debug("Attributes string: " + request.env["HTTP_X_OCCI_ATTRIBUTE"])
+        $log.debug("Extracted attributes of link: #{attributes}")
 
         target_uri = URI.parse(attributes["occi.core.target"])
         target = $locationRegistry.get_object_by_location(target_uri.path)
@@ -359,70 +356,59 @@ begin
         link_location = link.get_location()
         $locationRegistry.register_location(link_location, link)
         headers['Location'] = $locationRegistry.get_absolute_location_of_object(link)
+
         $log.debug("Link with location #{link_location} succesfully created")
-
-      else # if kind is not link and no actions specified, then create resource
-
-        $log.warn("Provided location does not match location of category: #{kind.get_location} vs. #{location}") if kind.get_location != location
-
-        # Add mixins
-        mixins = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins") if request.env['HTTP_CATEGORY'] != nil
-
-        attributes = {}
-        if request.env["HTTP_X_OCCI_ATTRIBUTE"] != nil
-
-          # split http attributes at coma and remove whitespaces (regexp is used), create hash
-          request.env["HTTP_X_OCCI_ATTRIBUTE"].split(%r{,\s*}).each do |attribute_string|
-            key, value = attribute_string.split("=")
-            # if key already in attributes, then create value list else just add it
-            if attributes.has_key?(key)
-              attributes[key] = [attributes[key],value]
-            else
-              attributes[key] = value
-            end
-          end
-          # check for mandatory and unique attributes
-          #kind.attributes.check(attributes)
-        end
-
-        resource = kind.entity_type.new(attributes,mixins)
-
-        # Add links
-        if request.env['HTTP_LINK'] != nil        
-          links = OCCI::Parser.new(request.env['HTTP_LINK']).link_values
-          
-          links.each do |link_data|
-            $log.debug("Creating link, extracted link data: #{link_data}")
-            raise "Mandatory link information missing (related | target | category | location)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil && link_data.location != nil
-                
-            kind = $categoryRegistry.getKind(link_data.category)
-            raise "Kind not found in category!" if kind == nil
-            $log.debug("Link kind found: #{kind.scheme}#{kind.term}")
-
-            source = resource
-            target = $locationRegistry.get_object_by_location(link_data.target)
-            raise "Link target not found!" if target == nil
-
-            link_data.attributes["occi.core.target"] = link_data.target
-            link_data.attributes["occi.core.source"] = source.get_location()
-            
-            link = kind.entity_type.new(link_data.attributes)
-            
-            source.links << link
-            target.links << link
-
-            $locationRegistry.register_location(link.get_location(), link)
-            $log.debug("Link successfully created!")
-          end
-        end
-
-        resource.deploy()
-
-        $locationRegistry.register_location(resource.get_location, resource)
-
-        headers['Location'] = $locationRegistry.get_absolute_location_of_object(resource)
-
+        
+        break
       end
+
+      # If kind is not link and no actions specified, then create resource
+
+      $log.warn("Provided location does not match location of category: #{kind.get_location} vs. #{location}") if kind.get_location != location
+
+      # Get mixins
+      mixins = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins") if request.env['HTTP_CATEGORY'] != nil
+
+      # Get attributes
+      attributes = request.env["HTTP_X_OCCI_ATTRIBUTE"] != nil ? OCCI::Parser.new(request.env["HTTP_X_OCCI_ATTRIBUTE"]).attributes_attr : {}
+
+      # Create resource
+      resource = kind.entity_type.new(attributes, mixins)
+
+      # Add links
+      if request.env['HTTP_LINK'] != nil        
+        links = OCCI::Parser.new(request.env['HTTP_LINK']).link_values
+          
+        links.each do |link_data|
+          $log.debug("Creating link, extracted link data: #{link_data}")
+          raise "Mandatory link information missing (related | target | category | location)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil && link_data.location != nil
+                
+          kind = $categoryRegistry.getKind(link_data.category)
+          raise "Kind not found in category!" if kind == nil
+          $log.debug("Link kind found: #{kind.scheme}#{kind.term}")
+
+          source = resource
+          target = $locationRegistry.get_object_by_location(link_data.target)
+          raise "Link target not found!" if target == nil
+
+          link_data.attributes["occi.core.target"] = link_data.target
+          link_data.attributes["occi.core.source"] = source.get_location()
+            
+          link = kind.entity_type.new(link_data.attributes)
+           
+          source.links << link
+          target.links << link
+
+          $locationRegistry.register_location(link.get_location(), link)
+          $log.debug("Link successfully created!")
+        end
+      end
+
+      resource.deploy()
+
+      $locationRegistry.register_location(resource.get_location, resource)
+
+      headers['Location'] = $locationRegistry.get_absolute_location_of_object(resource)
 
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
@@ -529,12 +515,10 @@ begin
 
         # Update / add attributes
         if request.env['HTTP_X_OCCI_ATTRIBUTE'] != nil
-          request.env['HTTP_X_OCCI_ATTRIBUTE'].split(',').each do |attribute|
-            key, value = attribute.split('=')
-            entities.each do |entity|
-              entity.attributes[key] = value
-            end
-          end
+          attributes = OCCI::Parser.new(request.env["HTTP_X_OCCI_ATTRIBUTE"]).attributes_attr
+          entities.each do |entity|
+            entity.attributes.merge!(attributes)
+          end          
         end
 
         # Update / add links
