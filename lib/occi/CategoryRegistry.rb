@@ -29,7 +29,6 @@ require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
 require 'occi/mixins/Reservation'
 
-
 # OCCI Core classes
 require 'occi/core/Action'
 require 'occi/core/Category'
@@ -40,7 +39,7 @@ require 'occi/core/Mixin'
 require 'occi/core/Resource'
 
 # OCCI HTTP parsing
-require 'occi/parser/OCCIParser'
+require 'occi/rendering/http/OCCIParser'
 
 module OCCI
 

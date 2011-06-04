@@ -60,10 +60,7 @@ require 'occi/mixins/Reservation'
 # OCCI HTTP rendering
 require 'occi/rendering/http/Renderer'
 require 'occi/rendering/http/LocationRegistry'
-
-# OCCI HTTP parsing
-require 'occi/parser/OCCIParser'
-
+require 'occi/rendering/http/OCCIParser'
 
 ##############################################################################
 # Initialize logger
