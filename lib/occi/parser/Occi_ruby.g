@@ -133,11 +133,13 @@ link returns [links]:
 	 scope { link }
 	 @init { 
 	   $link_value::link = Hash.new;
-	   $link_value::link['attributes'] = Hash.new;
 	 }
 	
 	 :  target_attr related_attr self_attr? category_attr? attribute_attr?
-	    { $data = OpenStruct.new($link_value::link) } ;
+	    {
+	       $link_value::link['attributes'] = $attribute_attr.attributes if $attribute_attr.attributes != nil
+	       $data = OpenStruct.new($link_value::link)
+	    } ;
 
 	/* this value can be passed on to the rel uri rule in Location for validation with the '<' and '>' stripped */
 	target_attr:           '<' (TARGET_VALUE) ('?action=' TERM_VALUE)? '>'
@@ -146,26 +148,35 @@ link returns [links]:
                            $link_value::link['action'] = $TERM_VALUE.text;
                          };
 
-  related_attr:          ';' 'rel'        '=' QUOTED_VALUE
+  related_attr:          ';' 'rel'         '=' QUOTED_VALUE
                          { $link_value::link['related'] = remove_quotes $QUOTED_VALUE.text };
 
 	/* this value can be passed on to the uri rule in Location for validation */
-	self_attr:             ';' 'self' '=' QUOTED_VALUE
+	self_attr:             ';' 'self'        '=' QUOTED_VALUE
 	                       { $link_value::link['self'] = remove_quotes $QUOTED_VALUE.text; };
 
 	/* this value can be passed on to the uri rule in Location for validation */
-	category_attr:         ';' 'category' '=' QUOTED_VALUE
+	category_attr:         ';' 'category'    '=' QUOTED_VALUE
                          { $link_value::link['category'] = remove_quotes $QUOTED_VALUE.text; };
 
 	/* e.g. com.example.drive0.interface="ide0", com.example.drive1.interface="ide1" */
-	attribute_attr:        ';' attributes_attr ;
+	attribute_attr returns [attributes]
+
+	 :                     ';' attributes_attr
+	                       { $attributes = $attributes_attr.attributes } ;
 
 	/* e.g. com.example.drive0.interface="ide0", com.example.drive1.interface="ide1" */
-  attributes_attr:       attribute_kv_attr (',' attribute_kv_attr)* ;
+  attributes_attr returns [attributes]
+  
+    scope { data }
+    @init { $attributes_attr::data = Hash.new }
+
+    :                    attribute_kv_attr (',' attribute_kv_attr)*
+                         { $attributes = $attributes_attr::data } ;
 
   /* e.g. com.example.drive0.interface="ide0" */
   attribute_kv_attr:     attribute_name_attr '=' attribute_value_attr
-                         { $link_value::link['attributes'][$attribute_name_attr.text] = $attribute_value_attr.text; };
+                         { $attributes_attr::data[$attribute_name_attr.text] = $attribute_value_attr.text; };
 
   /* ('.' TERM_VALUE)* ; /* e.g. com.example.drive0.interface */
   attribute_name_attr:   TERM_VALUE;
@@ -185,7 +196,10 @@ e.g.
     occi.compute.state="active"
 */
 
-attribute: 'X-OCCI-Attribute' ':' attributes_attr ;
+attribute returns [attributes]
+
+  :                      'X-OCCI-Attribute' ':' attributes_attr
+                         { $attributes = $attributes_attr.attributes } ;
 
 // --------------------------------------------------------------------------------------------------------------------
 /*

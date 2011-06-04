@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: Occi_ruby.g
-# Generated at: 2011-06-03 21:19:09
+# Generated at: 2011-06-04 08:44:07
 # 
 
 # ~~~> start load path setup
@@ -112,6 +112,7 @@ module OCCI
 
     @@category_value = Scope( "category" )
     @@link_value = Scope( "link" )
+    @@attributes_attr = Scope( "data" )
 
 
     include TokenData
@@ -126,6 +127,7 @@ module OCCI
       super( input, options )
       @category_value_stack = []
       @link_value_stack = []
+      @attributes_attr_stack = []
 
 
     end
@@ -827,21 +829,21 @@ module OCCI
       # trace_in( __method__, 15 )
       @link_value_stack.push( @@link_value.new )
       data = nil
+      attribute_attr11 = nil
       # - - - - @init action - - - -
        
       	   @link_value_stack.last.link =  Hash.new
-      	   @link_value_stack.last.link['attributes'] = Hash.new;
       	 
 
       begin
-        # at line 139:6: target_attr related_attr ( self_attr )? ( category_attr )? ( attribute_attr )?
+        # at line 138:6: target_attr related_attr ( self_attr )? ( category_attr )? ( attribute_attr )?
         @state.following.push( TOKENS_FOLLOWING_target_attr_IN_link_value_754 )
         target_attr
         @state.following.pop
         @state.following.push( TOKENS_FOLLOWING_related_attr_IN_link_value_756 )
         related_attr
         @state.following.pop
-        # at line 139:31: ( self_attr )?
+        # at line 138:31: ( self_attr )?
         alt_9 = 2
         look_9_0 = @input.peek( 1 )
 
@@ -854,13 +856,13 @@ module OCCI
         end
         case alt_9
         when 1
-          # at line 139:31: self_attr
+          # at line 138:31: self_attr
           @state.following.push( TOKENS_FOLLOWING_self_attr_IN_link_value_758 )
           self_attr
           @state.following.pop
 
         end
-        # at line 139:42: ( category_attr )?
+        # at line 138:42: ( category_attr )?
         alt_10 = 2
         look_10_0 = @input.peek( 1 )
 
@@ -873,13 +875,13 @@ module OCCI
         end
         case alt_10
         when 1
-          # at line 139:42: category_attr
+          # at line 138:42: category_attr
           @state.following.push( TOKENS_FOLLOWING_category_attr_IN_link_value_761 )
           category_attr
           @state.following.pop
 
         end
-        # at line 139:57: ( attribute_attr )?
+        # at line 138:57: ( attribute_attr )?
         alt_11 = 2
         look_11_0 = @input.peek( 1 )
 
@@ -888,14 +890,17 @@ module OCCI
         end
         case alt_11
         when 1
-          # at line 139:57: attribute_attr
+          # at line 138:57: attribute_attr
           @state.following.push( TOKENS_FOLLOWING_attribute_attr_IN_link_value_764 )
-          attribute_attr
+          attribute_attr11 = attribute_attr
           @state.following.pop
 
         end
         # --> action
-         data = OpenStruct.new(@link_value_stack.last.link) 
+
+        	       @link_value_stack.last.link['attributes'] = attribute_attr11 if attribute_attr11 != nil
+        	       data = OpenStruct.new(@link_value_stack.last.link)
+        	    
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -917,22 +922,22 @@ module OCCI
     # parser rule target_attr
     # 
     # (in Occi_ruby.g)
-    # 143:2: target_attr : '<' ( TARGET_VALUE ) ( '?action=' TERM_VALUE )? '>' ;
+    # 145:2: target_attr : '<' ( TARGET_VALUE ) ( '?action=' TERM_VALUE )? '>' ;
     # 
     def target_attr
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 16 )
-      __TARGET_VALUE11__ = nil
-      __TERM_VALUE12__ = nil
+      __TARGET_VALUE12__ = nil
+      __TERM_VALUE13__ = nil
 
       begin
-        # at line 143:25: '<' ( TARGET_VALUE ) ( '?action=' TERM_VALUE )? '>'
+        # at line 145:25: '<' ( TARGET_VALUE ) ( '?action=' TERM_VALUE )? '>'
         match( T__25, TOKENS_FOLLOWING_T__25_IN_target_attr_794 )
-        # at line 143:29: ( TARGET_VALUE )
-        # at line 143:30: TARGET_VALUE
-        __TARGET_VALUE11__ = match( TARGET_VALUE, TOKENS_FOLLOWING_TARGET_VALUE_IN_target_attr_797 )
+        # at line 145:29: ( TARGET_VALUE )
+        # at line 145:30: TARGET_VALUE
+        __TARGET_VALUE12__ = match( TARGET_VALUE, TOKENS_FOLLOWING_TARGET_VALUE_IN_target_attr_797 )
 
-        # at line 143:44: ( '?action=' TERM_VALUE )?
+        # at line 145:44: ( '?action=' TERM_VALUE )?
         alt_12 = 2
         look_12_0 = @input.peek( 1 )
 
@@ -941,16 +946,16 @@ module OCCI
         end
         case alt_12
         when 1
-          # at line 143:45: '?action=' TERM_VALUE
+          # at line 145:45: '?action=' TERM_VALUE
           match( T__26, TOKENS_FOLLOWING_T__26_IN_target_attr_801 )
-          __TERM_VALUE12__ = match( TERM_VALUE, TOKENS_FOLLOWING_TERM_VALUE_IN_target_attr_803 )
+          __TERM_VALUE13__ = match( TERM_VALUE, TOKENS_FOLLOWING_TERM_VALUE_IN_target_attr_803 )
 
         end
         match( T__27, TOKENS_FOLLOWING_T__27_IN_target_attr_807 )
         # --> action
 
-                                   @link_value_stack.last.link['target'] = __TARGET_VALUE11__.text;
-                                   @link_value_stack.last.link['action'] = __TERM_VALUE12__.text;
+                                   @link_value_stack.last.link['target'] = __TARGET_VALUE12__.text;
+                                   @link_value_stack.last.link['action'] = __TERM_VALUE13__.text;
                                  
         # <-- action
 
@@ -972,21 +977,21 @@ module OCCI
     # parser rule related_attr
     # 
     # (in Occi_ruby.g)
-    # 149:3: related_attr : ';' 'rel' '=' QUOTED_VALUE ;
+    # 151:3: related_attr : ';' 'rel' '=' QUOTED_VALUE ;
     # 
     def related_attr
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 17 )
-      __QUOTED_VALUE13__ = nil
+      __QUOTED_VALUE14__ = nil
 
       begin
-        # at line 149:26: ';' 'rel' '=' QUOTED_VALUE
+        # at line 151:26: ';' 'rel' '=' QUOTED_VALUE
         match( T__15, TOKENS_FOLLOWING_T__15_IN_related_attr_852 )
         match( T__20, TOKENS_FOLLOWING_T__20_IN_related_attr_854 )
-        match( T__17, TOKENS_FOLLOWING_T__17_IN_related_attr_863 )
-        __QUOTED_VALUE13__ = match( QUOTED_VALUE, TOKENS_FOLLOWING_QUOTED_VALUE_IN_related_attr_865 )
+        match( T__17, TOKENS_FOLLOWING_T__17_IN_related_attr_864 )
+        __QUOTED_VALUE14__ = match( QUOTED_VALUE, TOKENS_FOLLOWING_QUOTED_VALUE_IN_related_attr_866 )
         # --> action
-         @link_value_stack.last.link['related'] = remove_quotes __QUOTED_VALUE13__.text 
+         @link_value_stack.last.link['related'] = remove_quotes __QUOTED_VALUE14__.text 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -1007,21 +1012,21 @@ module OCCI
     # parser rule self_attr
     # 
     # (in Occi_ruby.g)
-    # 153:2: self_attr : ';' 'self' '=' QUOTED_VALUE ;
+    # 155:2: self_attr : ';' 'self' '=' QUOTED_VALUE ;
     # 
     def self_attr
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 18 )
-      __QUOTED_VALUE14__ = nil
+      __QUOTED_VALUE15__ = nil
 
       begin
-        # at line 153:25: ';' 'self' '=' QUOTED_VALUE
-        match( T__15, TOKENS_FOLLOWING_T__15_IN_self_attr_915 )
-        match( T__28, TOKENS_FOLLOWING_T__28_IN_self_attr_917 )
-        match( T__17, TOKENS_FOLLOWING_T__17_IN_self_attr_919 )
-        __QUOTED_VALUE14__ = match( QUOTED_VALUE, TOKENS_FOLLOWING_QUOTED_VALUE_IN_self_attr_921 )
+        # at line 155:25: ';' 'self' '=' QUOTED_VALUE
+        match( T__15, TOKENS_FOLLOWING_T__15_IN_self_attr_916 )
+        match( T__28, TOKENS_FOLLOWING_T__28_IN_self_attr_918 )
+        match( T__17, TOKENS_FOLLOWING_T__17_IN_self_attr_927 )
+        __QUOTED_VALUE15__ = match( QUOTED_VALUE, TOKENS_FOLLOWING_QUOTED_VALUE_IN_self_attr_929 )
         # --> action
-         @link_value_stack.last.link['self'] = remove_quotes __QUOTED_VALUE14__.text; 
+         @link_value_stack.last.link['self'] = remove_quotes __QUOTED_VALUE15__.text; 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -1042,21 +1047,21 @@ module OCCI
     # parser rule category_attr
     # 
     # (in Occi_ruby.g)
-    # 157:2: category_attr : ';' 'category' '=' QUOTED_VALUE ;
+    # 159:2: category_attr : ';' 'category' '=' QUOTED_VALUE ;
     # 
     def category_attr
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 19 )
-      __QUOTED_VALUE15__ = nil
+      __QUOTED_VALUE16__ = nil
 
       begin
-        # at line 157:25: ';' 'category' '=' QUOTED_VALUE
-        match( T__15, TOKENS_FOLLOWING_T__15_IN_category_attr_966 )
-        match( T__29, TOKENS_FOLLOWING_T__29_IN_category_attr_968 )
-        match( T__17, TOKENS_FOLLOWING_T__17_IN_category_attr_970 )
-        __QUOTED_VALUE15__ = match( QUOTED_VALUE, TOKENS_FOLLOWING_QUOTED_VALUE_IN_category_attr_972 )
+        # at line 159:25: ';' 'category' '=' QUOTED_VALUE
+        match( T__15, TOKENS_FOLLOWING_T__15_IN_category_attr_974 )
+        match( T__29, TOKENS_FOLLOWING_T__29_IN_category_attr_976 )
+        match( T__17, TOKENS_FOLLOWING_T__17_IN_category_attr_981 )
+        __QUOTED_VALUE16__ = match( QUOTED_VALUE, TOKENS_FOLLOWING_QUOTED_VALUE_IN_category_attr_983 )
         # --> action
-         @link_value_stack.last.link['category'] = remove_quotes __QUOTED_VALUE15__.text; 
+         @link_value_stack.last.link['category'] = remove_quotes __QUOTED_VALUE16__.text; 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -1077,18 +1082,23 @@ module OCCI
     # parser rule attribute_attr
     # 
     # (in Occi_ruby.g)
-    # 161:2: attribute_attr : ';' attributes_attr ;
+    # 163:2: attribute_attr returns [attributes] : ';' attributes_attr ;
     # 
     def attribute_attr
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 20 )
+      attributes = nil
+      attributes_attr17 = nil
 
       begin
-        # at line 161:25: ';' attributes_attr
-        match( T__15, TOKENS_FOLLOWING_T__15_IN_attribute_attr_1017 )
-        @state.following.push( TOKENS_FOLLOWING_attributes_attr_IN_attribute_attr_1019 )
-        attributes_attr
+        # at line 165:25: ';' attributes_attr
+        match( T__15, TOKENS_FOLLOWING_T__15_IN_attribute_attr_1049 )
+        @state.following.push( TOKENS_FOLLOWING_attributes_attr_IN_attribute_attr_1051 )
+        attributes_attr17 = attributes_attr
         @state.following.pop
+        # --> action
+         attributes = attributes_attr17 
+        # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
         report_error(re)
@@ -1100,7 +1110,7 @@ module OCCI
 
       end
       
-      return 
+      return attributes
     end
 
 
@@ -1108,18 +1118,22 @@ module OCCI
     # parser rule attributes_attr
     # 
     # (in Occi_ruby.g)
-    # 164:3: attributes_attr : attribute_kv_attr ( ',' attribute_kv_attr )* ;
+    # 169:3: attributes_attr returns [attributes] : attribute_kv_attr ( ',' attribute_kv_attr )* ;
     # 
     def attributes_attr
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 21 )
+      @attributes_attr_stack.push( @@attributes_attr.new )
+      attributes = nil
+      # - - - - @init action - - - -
+       @attributes_attr_stack.last.data = Hash.new 
 
       begin
-        # at line 164:26: attribute_kv_attr ( ',' attribute_kv_attr )*
-        @state.following.push( TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1038 )
+        # at line 174:26: attribute_kv_attr ( ',' attribute_kv_attr )*
+        @state.following.push( TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1139 )
         attribute_kv_attr
         @state.following.pop
-        # at line 164:44: ( ',' attribute_kv_attr )*
+        # at line 174:44: ( ',' attribute_kv_attr )*
         while true # decision 13
           alt_13 = 2
           look_13_0 = @input.peek( 1 )
@@ -1135,9 +1149,9 @@ module OCCI
           end
           case alt_13
           when 1
-            # at line 164:45: ',' attribute_kv_attr
-            match( T__14, TOKENS_FOLLOWING_T__14_IN_attributes_attr_1041 )
-            @state.following.push( TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1043 )
+            # at line 174:45: ',' attribute_kv_attr
+            match( T__14, TOKENS_FOLLOWING_T__14_IN_attributes_attr_1142 )
+            @state.following.push( TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1144 )
             attribute_kv_attr
             @state.following.pop
 
@@ -1145,6 +1159,9 @@ module OCCI
             break # out of loop for decision 13
           end
         end # loop for decision 13
+        # --> action
+         attributes = @attributes_attr_stack.last.data 
+        # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
         report_error(re)
@@ -1153,10 +1170,11 @@ module OCCI
       ensure
         # -> uncomment the next line to manually enable rule tracing
         # trace_out( __method__, 21 )
+        @attributes_attr_stack.pop
 
       end
       
-      return 
+      return attributes
     end
 
 
@@ -1164,25 +1182,25 @@ module OCCI
     # parser rule attribute_kv_attr
     # 
     # (in Occi_ruby.g)
-    # 167:3: attribute_kv_attr : attribute_name_attr '=' attribute_value_attr ;
+    # 178:3: attribute_kv_attr : attribute_name_attr '=' attribute_value_attr ;
     # 
     def attribute_kv_attr
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 22 )
-      attribute_name_attr16 = nil
-      attribute_value_attr17 = nil
+      attribute_name_attr18 = nil
+      attribute_value_attr19 = nil
 
       begin
-        # at line 167:26: attribute_name_attr '=' attribute_value_attr
-        @state.following.push( TOKENS_FOLLOWING_attribute_name_attr_IN_attribute_kv_attr_1063 )
-        attribute_name_attr16 = attribute_name_attr
+        # at line 178:26: attribute_name_attr '=' attribute_value_attr
+        @state.following.push( TOKENS_FOLLOWING_attribute_name_attr_IN_attribute_kv_attr_1191 )
+        attribute_name_attr18 = attribute_name_attr
         @state.following.pop
-        match( T__17, TOKENS_FOLLOWING_T__17_IN_attribute_kv_attr_1065 )
-        @state.following.push( TOKENS_FOLLOWING_attribute_value_attr_IN_attribute_kv_attr_1067 )
-        attribute_value_attr17 = attribute_value_attr
+        match( T__17, TOKENS_FOLLOWING_T__17_IN_attribute_kv_attr_1193 )
+        @state.following.push( TOKENS_FOLLOWING_attribute_value_attr_IN_attribute_kv_attr_1195 )
+        attribute_value_attr19 = attribute_value_attr
         @state.following.pop
         # --> action
-         @link_value_stack.last.link['attributes'][( attribute_name_attr16 && @input.to_s( attribute_name_attr16.start, attribute_name_attr16.stop ) )] = ( attribute_value_attr17 && @input.to_s( attribute_value_attr17.start, attribute_value_attr17.stop ) ); 
+         @attributes_attr_stack.last.data[( attribute_name_attr18 && @input.to_s( attribute_name_attr18.start, attribute_name_attr18.stop ) )] = ( attribute_value_attr19 && @input.to_s( attribute_value_attr19.start, attribute_value_attr19.stop ) ); 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -1204,7 +1222,7 @@ module OCCI
     # parser rule attribute_name_attr
     # 
     # (in Occi_ruby.g)
-    # 171:3: attribute_name_attr : TERM_VALUE ;
+    # 182:3: attribute_name_attr : TERM_VALUE ;
     # 
     def attribute_name_attr
       # -> uncomment the next line to manually enable rule tracing
@@ -1215,8 +1233,8 @@ module OCCI
       return_value.start = @input.look
 
       begin
-        # at line 171:26: TERM_VALUE
-        match( TERM_VALUE, TOKENS_FOLLOWING_TERM_VALUE_IN_attribute_name_attr_1109 )
+        # at line 182:26: TERM_VALUE
+        match( TERM_VALUE, TOKENS_FOLLOWING_TERM_VALUE_IN_attribute_name_attr_1237 )
         # - - - - - - - rule clean up - - - - - - - -
         return_value.stop = @input.look( -1 )
 
@@ -1239,7 +1257,7 @@ module OCCI
     # parser rule attribute_value_attr
     # 
     # (in Occi_ruby.g)
-    # 174:3: attribute_value_attr : ( QUOTED_VALUE | DIGITS | FLOAT );
+    # 185:3: attribute_value_attr : ( QUOTED_VALUE | DIGITS | FLOAT );
     # 
     def attribute_value_attr
       # -> uncomment the next line to manually enable rule tracing
@@ -1281,19 +1299,24 @@ module OCCI
     # parser rule attribute
     # 
     # (in Occi_ruby.g)
-    # 188:1: attribute : 'X-OCCI-Attribute' ':' attributes_attr ;
+    # 199:1: attribute returns [attributes] : 'X-OCCI-Attribute' ':' attributes_attr ;
     # 
     def attribute
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 25 )
+      attributes = nil
+      attributes_attr20 = nil
 
       begin
-        # at line 188:12: 'X-OCCI-Attribute' ':' attributes_attr
-        match( T__30, TOKENS_FOLLOWING_T__30_IN_attribute_1143 )
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_attribute_1145 )
-        @state.following.push( TOKENS_FOLLOWING_attributes_attr_IN_attribute_1147 )
-        attributes_attr
+        # at line 201:26: 'X-OCCI-Attribute' ':' attributes_attr
+        match( T__30, TOKENS_FOLLOWING_T__30_IN_attribute_1300 )
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_attribute_1302 )
+        @state.following.push( TOKENS_FOLLOWING_attributes_attr_IN_attribute_1304 )
+        attributes_attr20 = attributes_attr
         @state.following.pop
+        # --> action
+         attributes = attributes_attr20 
+        # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
         report_error(re)
@@ -1305,7 +1328,7 @@ module OCCI
 
       end
       
-      return 
+      return attributes
     end
 
 
@@ -1313,17 +1336,17 @@ module OCCI
     # parser rule location
     # 
     # (in Occi_ruby.g)
-    # 198:1: location : 'X-OCCI-Location' ':' location_values ;
+    # 212:1: location : 'X-OCCI-Location' ':' location_values ;
     # 
     def location
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 26 )
 
       begin
-        # at line 198:11: 'X-OCCI-Location' ':' location_values
-        match( T__31, TOKENS_FOLLOWING_T__31_IN_location_1159 )
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_location_1161 )
-        @state.following.push( TOKENS_FOLLOWING_location_values_IN_location_1163 )
+        # at line 212:11: 'X-OCCI-Location' ':' location_values
+        match( T__31, TOKENS_FOLLOWING_T__31_IN_location_1343 )
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_location_1345 )
+        @state.following.push( TOKENS_FOLLOWING_location_values_IN_location_1347 )
         location_values
         @state.following.pop
 
@@ -1345,16 +1368,16 @@ module OCCI
     # parser rule location_values
     # 
     # (in Occi_ruby.g)
-    # 199:1: location_values : URL ( ',' URL )* ;
+    # 213:1: location_values : URL ( ',' URL )* ;
     # 
     def location_values
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 27 )
 
       begin
-        # at line 199:19: URL ( ',' URL )*
-        match( URL, TOKENS_FOLLOWING_URL_IN_location_values_1170 )
-        # at line 199:23: ( ',' URL )*
+        # at line 213:19: URL ( ',' URL )*
+        match( URL, TOKENS_FOLLOWING_URL_IN_location_values_1354 )
+        # at line 213:23: ( ',' URL )*
         while true # decision 14
           alt_14 = 2
           look_14_0 = @input.peek( 1 )
@@ -1365,9 +1388,9 @@ module OCCI
           end
           case alt_14
           when 1
-            # at line 199:24: ',' URL
-            match( T__14, TOKENS_FOLLOWING_T__14_IN_location_values_1173 )
-            match( URL, TOKENS_FOLLOWING_URL_IN_location_values_1175 )
+            # at line 213:24: ',' URL
+            match( T__14, TOKENS_FOLLOWING_T__14_IN_location_values_1357 )
+            match( URL, TOKENS_FOLLOWING_URL_IN_location_values_1359 )
 
           else
             break # out of loop for decision 14
@@ -1454,35 +1477,35 @@ module OCCI
     TOKENS_FOLLOWING_T__27_IN_target_attr_807 = Set[ 1 ]
     TOKENS_FOLLOWING_T__15_IN_related_attr_852 = Set[ 20 ]
     TOKENS_FOLLOWING_T__20_IN_related_attr_854 = Set[ 17 ]
-    TOKENS_FOLLOWING_T__17_IN_related_attr_863 = Set[ 5 ]
-    TOKENS_FOLLOWING_QUOTED_VALUE_IN_related_attr_865 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__15_IN_self_attr_915 = Set[ 28 ]
-    TOKENS_FOLLOWING_T__28_IN_self_attr_917 = Set[ 17 ]
-    TOKENS_FOLLOWING_T__17_IN_self_attr_919 = Set[ 5 ]
-    TOKENS_FOLLOWING_QUOTED_VALUE_IN_self_attr_921 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__15_IN_category_attr_966 = Set[ 29 ]
-    TOKENS_FOLLOWING_T__29_IN_category_attr_968 = Set[ 17 ]
-    TOKENS_FOLLOWING_T__17_IN_category_attr_970 = Set[ 5 ]
-    TOKENS_FOLLOWING_QUOTED_VALUE_IN_category_attr_972 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__15_IN_attribute_attr_1017 = Set[ 4 ]
-    TOKENS_FOLLOWING_attributes_attr_IN_attribute_attr_1019 = Set[ 1 ]
-    TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1038 = Set[ 1, 14 ]
-    TOKENS_FOLLOWING_T__14_IN_attributes_attr_1041 = Set[ 4 ]
-    TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1043 = Set[ 1, 14 ]
-    TOKENS_FOLLOWING_attribute_name_attr_IN_attribute_kv_attr_1063 = Set[ 17 ]
-    TOKENS_FOLLOWING_T__17_IN_attribute_kv_attr_1065 = Set[ 5, 7, 8 ]
-    TOKENS_FOLLOWING_attribute_value_attr_IN_attribute_kv_attr_1067 = Set[ 1 ]
-    TOKENS_FOLLOWING_TERM_VALUE_IN_attribute_name_attr_1109 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__17_IN_related_attr_864 = Set[ 5 ]
+    TOKENS_FOLLOWING_QUOTED_VALUE_IN_related_attr_866 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__15_IN_self_attr_916 = Set[ 28 ]
+    TOKENS_FOLLOWING_T__28_IN_self_attr_918 = Set[ 17 ]
+    TOKENS_FOLLOWING_T__17_IN_self_attr_927 = Set[ 5 ]
+    TOKENS_FOLLOWING_QUOTED_VALUE_IN_self_attr_929 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__15_IN_category_attr_974 = Set[ 29 ]
+    TOKENS_FOLLOWING_T__29_IN_category_attr_976 = Set[ 17 ]
+    TOKENS_FOLLOWING_T__17_IN_category_attr_981 = Set[ 5 ]
+    TOKENS_FOLLOWING_QUOTED_VALUE_IN_category_attr_983 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__15_IN_attribute_attr_1049 = Set[ 4 ]
+    TOKENS_FOLLOWING_attributes_attr_IN_attribute_attr_1051 = Set[ 1 ]
+    TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1139 = Set[ 1, 14 ]
+    TOKENS_FOLLOWING_T__14_IN_attributes_attr_1142 = Set[ 4 ]
+    TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1144 = Set[ 1, 14 ]
+    TOKENS_FOLLOWING_attribute_name_attr_IN_attribute_kv_attr_1191 = Set[ 17 ]
+    TOKENS_FOLLOWING_T__17_IN_attribute_kv_attr_1193 = Set[ 5, 7, 8 ]
+    TOKENS_FOLLOWING_attribute_value_attr_IN_attribute_kv_attr_1195 = Set[ 1 ]
+    TOKENS_FOLLOWING_TERM_VALUE_IN_attribute_name_attr_1237 = Set[ 1 ]
     TOKENS_FOLLOWING_set_IN_attribute_value_attr_0 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__30_IN_attribute_1143 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_attribute_1145 = Set[ 4 ]
-    TOKENS_FOLLOWING_attributes_attr_IN_attribute_1147 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__31_IN_location_1159 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_location_1161 = Set[ 9 ]
-    TOKENS_FOLLOWING_location_values_IN_location_1163 = Set[ 1 ]
-    TOKENS_FOLLOWING_URL_IN_location_values_1170 = Set[ 1, 14 ]
-    TOKENS_FOLLOWING_T__14_IN_location_values_1173 = Set[ 9 ]
-    TOKENS_FOLLOWING_URL_IN_location_values_1175 = Set[ 1, 14 ]
+    TOKENS_FOLLOWING_T__30_IN_attribute_1300 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__13_IN_attribute_1302 = Set[ 4 ]
+    TOKENS_FOLLOWING_attributes_attr_IN_attribute_1304 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__31_IN_location_1343 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__13_IN_location_1345 = Set[ 9 ]
+    TOKENS_FOLLOWING_location_values_IN_location_1347 = Set[ 1 ]
+    TOKENS_FOLLOWING_URL_IN_location_values_1354 = Set[ 1, 14 ]
+    TOKENS_FOLLOWING_T__14_IN_location_values_1357 = Set[ 9 ]
+    TOKENS_FOLLOWING_URL_IN_location_values_1359 = Set[ 1, 14 ]
 
   end # class Parser < ANTLR3::Parser
 
