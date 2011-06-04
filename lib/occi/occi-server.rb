@@ -299,15 +299,13 @@ begin
       $log.debug("Request Location #{location}")
       $log.debug("Request query string #{request.query_string()}")
 
-      if request.env['HTTP_CATEGORY'] != nil
+      raise "No category header provided in request!" unless request.env['HTTP_CATEGORY'] != nil
         
-        # Get first kind from supplied category string
-        kind    = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="kinds")[0]
-        action  = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="actions")[0]
-        raise "Kind/Action not found in category!" if kind == nil && action == nil
-      else
-        raise "No Category provided in request!"
-      end
+      # Get first kind from supplied category string
+      kind    = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="kinds")[0]
+      action  = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="actions")[0]
+
+      raise "Kind/Action not found in category!" if kind == nil && action == nil
 
       $log.debug("Kind found: #{kind.term}") if kind != nil
       $log.debug("Action found: #{action.category.title}") if action != nil
@@ -320,16 +318,13 @@ begin
           $log.debug("Action from query string: #{action_params}")
           entities = $locationRegistry.get_resources_below_location(location)
           method = request.env["HTTP_X_OCCI_ATTRIBUTE"]
-          if entities != nil
-            # TODO trigger action!
-            #            action.trigger(entities,method)
-            $log.debug("Action [#{action}] to be triggered on [#{entities.length}] entities:")
-            delegator = OCCI::ActionDelegator.instance
-            entities.each do |entity|
-              delegator.delegate_action(action, method, entity)
-            end
-          else
-            raise "No entities corresponding to location [#{location}] could be found!"
+          
+          raise "No entities corresponding to location [#{location}] could be found!" if entities == nil
+          
+          $log.debug("Action [#{action}] to be triggered on [#{entities.length}] entities:")
+          delegator = OCCI::ActionDelegator.instance
+          entities.each do |entity|
+            delegator.delegate_action(action, method, entity)
           end
         else
           raise "Action matching failed!"
@@ -348,9 +343,11 @@ begin
         target_uri = URI.parse(attributes["occi.core.target"])
         target = $locationRegistry.get_object_by_location(target_uri.path)
         $log.debug("target entity of Link: #{target}")
+
         source_uri = URI.parse(attributes["occi.core.source"])
         source = $locationRegistry.get_object_by_location(source_uri.path)
         $log.debug("source entity of Link: #{source}")
+
         link = kind.entity_type.new(attributes)
         source.links << link
         target.links << link
@@ -387,43 +384,33 @@ begin
         resource = kind.entity_type.new(attributes,mixins)
 
         # Add links
-        request.env['HTTP_LINK'].split(',').each do |link_string|
-          $log.debug("Requested link: #{link_string}")
-          attributes = {}
-          target_location = link_string.scan(/<([^>]*)>;/).transpose.to_s
-          related = link_string.scan(/rel="([^"]*)";/).transpose.to_s
-          self_string = link_string.scan(/self="([^"]*)";/).transpose.to_s
-          category_string = link_string.scan(/category="([^"]*)";/).transpose.to_s
-          link_attributes = link_string.scan(/category="[^"]*";\s*([^$]*)/).transpose.to_s
-          link_attributes.split(';').each do |attribute_string|
-            key, value = attribute_string.split('=')
-            attributes[key] = value
-          end if link_attributes != ""
-          $log.debug("target: #{target_location}")
-          $log.debug("category: #{category_string}")
-          if target_location != "" && category_string != ""
-            kind = $categoryRegistry.getKind(category_string)
-            $log.debug("Link kind found: #{kind.scheme}#{kind.term}") if kind != nil
+        if request.env['HTTP_LINK'] != nil        
+          links = OCCI::Parser.new(request.env['HTTP_LINK']).link_values
+          
+          links.each do |link_data|
+            $log.debug("Creating link, extracted link data: #{link_data}")
+            raise "Mandatory link information missing (related | target | category | location)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil && link_data.location != nil
+                
+            kind = $categoryRegistry.getKind(link_data.category)
+            raise "Kind not found in category!" if kind == nil
+            $log.debug("Link kind found: #{kind.scheme}#{kind.term}")
 
-            if kind != nil
-              target = $locationRegistry.get_object_by_location(target_location)
-              raise "Target not found" if target == nil
-              source = resource
-              attributes["occi.core.target"] = target_location
-              attributes["occi.core.source"] = source.get_location()
-              link = kind.entity_type.new(attributes)
-              source.links << link
-              target.links << link
-              $locationRegistry.register_location(link.get_location(), link)
-              $log.debug("Link successfully created")
-            else
-              raise "Kind not found in category!"
-            end
+            source = resource
+            target = $locationRegistry.get_object_by_location(link_data.target)
+            raise "Link target not found!" if target == nil
 
-          else
-            raise "Extracting information from Link failed!"
+            link_data.attributes["occi.core.target"] = link_data.target
+            link_data.attributes["occi.core.source"] = source.get_location()
+            
+            link = kind.entity_type.new(link_data.attributes)
+            
+            source.links << link
+            target.links << link
+
+            $locationRegistry.register_location(link.get_location(), link)
+            $log.debug("Link successfully created!")
           end
-        end if request.env['HTTP_LINK'] != nil
+        end
 
         resource.deploy()
 
