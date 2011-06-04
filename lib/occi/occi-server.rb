@@ -305,32 +305,36 @@ begin
       kind    = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="kinds")[0]
       action  = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="actions")[0]
 
-      raise "Kind/Action not found in category!" if kind == nil && action == nil
+      raise "No valid kind / action provided in category header!" if kind == nil && action == nil
 
-      $log.debug("Kind found: #{kind.term}") if kind != nil
-      $log.debug("Action found: #{action.category.title}") if action != nil
+      $log.debug("Kind found: #{kind.term}")                if kind != nil
+      $log.debug("Action found: #{action.category.title}")  if action != nil
 
+      # Trigger action on resources(s)
       if request.query_string() != ""
-        regexp = Regexp.new(/action=([^&]*)/)
+
+        regexp        = Regexp.new(/action=([^&]*)/)
         action_params = regexp.match(request.query_string())
 
-        if action_params != ""
-          $log.debug("Action from query string: #{action_params}")
-          entities = $locationRegistry.get_resources_below_location(location)
-          method = request.env["HTTP_X_OCCI_ATTRIBUTE"]
-          
-          raise "No entities corresponding to location [#{location}] could be found!" if entities == nil
-          
-          $log.debug("Action [#{action}] to be triggered on [#{entities.length}] entities:")
-          delegator = OCCI::ActionDelegator.instance
-          entities.each do |entity|
-            delegator.delegate_action(action, method, entity)
-          end
-        else
-          raise "Action matching failed!"
-        end
+        raise "Could not extract action from query-string: #{request.query_string}" if action_params == nil
 
-      elsif kind == OCCI::Core::Link::KIND or kind.related.include?(OCCI::Core::Link::KIND) # if kind is a link and no actions specified then create link
+        $log.debug("Action from query string: #{action_params}")
+        
+        entities = $locationRegistry.get_resources_below_location(location)
+        method = request.env["HTTP_X_OCCI_ATTRIBUTE"]
+          
+        raise "No entities corresponding to location [#{location}] could be found!" if entities == nil
+          
+        $log.debug("Action [#{action}] to be triggered on [#{entities.length}] entities:")
+        delegator = OCCI::ActionDelegator.instance
+        entities.each do |entity|
+          delegator.delegate_action(action, method, entity)
+        end
+        break;
+      end  
+
+      # If kind is a link and no actions specified then create link
+      if kind == OCCI::Core::Link::KIND or kind.related.include?(OCCI::Core::Link::KIND)
         attributes = {}
 
         request.env["HTTP_X_OCCI_ATTRIBUTE"].split(%r{,\s*}).each do |attribute_string|
