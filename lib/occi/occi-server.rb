@@ -479,7 +479,7 @@ begin
       # Add an resource instance to a mixin
       mixin = $locationRegistry.get_object_by_location(location)
       if mixin != nil && mixin.kind_of?(OCCI::Core::Mixin) && request.env["HTTP_X_OCCI_LOCATION"] != nil
-        request.env["HTTP_X_OCCI_LOCATION"].split(",").each do |entity_location|
+        OCCI::Parser.new(request.env["HTTP_X_OCCI_LOCATION"]).location_values.each do |entity_location|
 
           entity_uri = URI.parse(entity_location)
           entity = $locationRegistry.get_object_by_location(entity_uri.path)
@@ -580,42 +580,43 @@ begin
 
   delete '*' do
     begin
-      $log.debug("DELETE")
-      headers = {}
 
-      location          = request.path_info
-      request_locations = request.env["HTTP_X_OCCI_LOCATION"]
-      occi_locations    = request_locations.split(%r{,\s*}) if request_locations != nil
-
-      $log.debug("Requested location: #{location}")
-
-      categories = $categoryRegistry.getCategories()
-
-      entities, exact_resource_match = get_entities_by_location_from_categories(location,categories)
-
-      $log.debug("exact resource match: #{exact_resource_match}")
-
-      # location is a mixin, unassociate all resources from it
-      mixin = $locationRegistry.get_object_by_location(location)
-      if mixin != nil && mixin.kind_of?(OCCI::Core::Mixin) then
-        $log.debug("Mixin to delete")
-        $log.debug(mixin)
-        entities.each do |entity|
-          mixin.entities.delete(entity) if occi_locations.include?(entity.get_location)
-        end
-      end
-
-      if location == "/-/" # delete mixins
+      location = request.path_info
+      
+      # Location references query interface => delete provided mixin
+      if location == "/-/"
         mixin = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins")[0]
-        $log.debug("Deleting Mixin #{mixin.term}")
+        $log.info("Deleting mixin #{mixin.term}")
         $locationRegistry.unregister_location(mixin.get_location())
         $categoryRegistry.unregister(mixin)
-
-      else # delete all entities at and below the location
-        $log.debug("Entities to delete")
-        entities.each do |entity|
-          entity.delete()
+        break
+      end 
+      
+      # Location references a mixin => unassociate all provided resources (by X_OCCI_LOCATION) from it
+      object = $locationRegistry.get_object_by_location(location)
+      if object != nil && object.kind_of?(OCCI::Core::Mixin)
+        $log.info("Unassociating entities from mixin: #{object}")
+        resource_locations = request.env["HTTP_X_OCCI_LOCATION"] != nil ? OCCI::Parser.new(request.env["HTTP_X_OCCI_LOCATION"]).location_values : []
+        resource_locations.each do |location|
+          entity = $locationRegistry.get_object_by_location(location)
+          if entity == nil
+            $log.error("Could not determine entity for location: #{location}");
+            next
+          end
+          mixin.entities.delete(entity)
         end
+        break
+      end
+      
+      # Determine set of resources to be deleted
+      if object.kind_of? OCCI::Core::Entity
+        entities = [$locationRegistry.get_object_by_location(location)]
+      else
+        entities = $locationRegistry.get_resources_below_location(location)
+      end          
+      $log.info("Deleting [#{entities.size}] entities...")
+      entities.each do |entity|
+        entity.delete()
       end
 
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
@@ -628,7 +629,7 @@ begin
       response.status = HTTP_STATUS_CODE["Bad Request"]
 
     ensure
-      OCCI::Rendering::HTTP::Renderer.render_response(headers, response, request)
+      OCCI::Rendering::HTTP::Renderer.render_response({}, response, request)
     end
   end
 
@@ -653,23 +654,3 @@ end
 
 # get all Instances of Backend and store it in kind Objects in occi-service
 add_instances_from_backend_to_service
-
-def get_entities_by_location_from_categories(location,categories)
-  exact_resource_match = false
-  entities = []
-  categories.each do |category|
-    if category.get_location() == location then
-      entities.concat(category.entities)
-    else
-      category.entities.each do |entity|
-        exact_resource_match = true if entity.get_location() == location
-        entities << entity if entity.get_location().start_with?(location)
-
-      end
-    end
-  end
-
-  $log.debug("Entities corresponding to location: #{entities.length}")
-  #  $log.debug(entities)
-  return [entities, exact_resource_match]
-end

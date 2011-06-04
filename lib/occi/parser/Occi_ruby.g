@@ -209,8 +209,17 @@ e.g.
     http://example.com/compute/456
 */
 
-location: 'X-OCCI-Location' ':' location_values;
-location_values : URL (',' URL)*;
+location returns [locations]
+
+   :                     'X-OCCI-Location' ':' location_values
+                         { $locations = $location_values.locations };
+
+  location_values returns [locations]
+
+    @init { $locations = Array.new }
+
+    :                    u1 = URL      { $locations << $u1.text }
+                         (',' u2 = URL { $locations << $u2.text})*;
 
 // --------------------------------------------------------------------------------------------------------------------
 

@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: Occi_ruby.g
-# Generated at: 2011-06-04 09:27:52
+# Generated at: 2011-06-04 11:52:41
 # 
 
 # ~~~> start load path setup
@@ -1336,19 +1336,24 @@ module OCCI
     # parser rule location
     # 
     # (in Occi_ruby.g)
-    # 212:1: location : 'X-OCCI-Location' ':' location_values ;
+    # 212:1: location returns [locations] : 'X-OCCI-Location' ':' location_values ;
     # 
     def location
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 26 )
+      locations = nil
+      location_values21 = nil
 
       begin
-        # at line 212:11: 'X-OCCI-Location' ':' location_values
-        match( T__31, TOKENS_FOLLOWING_T__31_IN_location_1347 )
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_location_1349 )
-        @state.following.push( TOKENS_FOLLOWING_location_values_IN_location_1351 )
-        location_values
+        # at line 214:26: 'X-OCCI-Location' ':' location_values
+        match( T__31, TOKENS_FOLLOWING_T__31_IN_location_1376 )
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_location_1378 )
+        @state.following.push( TOKENS_FOLLOWING_location_values_IN_location_1380 )
+        location_values21 = location_values
         @state.following.pop
+        # --> action
+         locations = location_values21 
+        # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
         report_error(re)
@@ -1360,7 +1365,7 @@ module OCCI
 
       end
       
-      return 
+      return locations
     end
 
 
@@ -1368,16 +1373,24 @@ module OCCI
     # parser rule location_values
     # 
     # (in Occi_ruby.g)
-    # 213:1: location_values : URL ( ',' URL )* ;
+    # 217:3: location_values returns [locations] : u1= URL ( ',' u2= URL )* ;
     # 
     def location_values
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 27 )
+      locations = nil
+      u1 = nil
+      u2 = nil
+      # - - - - @init action - - - -
+       locations = Array.new 
 
       begin
-        # at line 213:19: URL ( ',' URL )*
-        match( URL, TOKENS_FOLLOWING_URL_IN_location_values_1358 )
-        # at line 213:23: ( ',' URL )*
+        # at line 221:26: u1= URL ( ',' u2= URL )*
+        u1 = match( URL, TOKENS_FOLLOWING_URL_IN_location_values_1459 )
+        # --> action
+         locations << u1.text 
+        # <-- action
+        # at line 222:26: ( ',' u2= URL )*
         while true # decision 14
           alt_14 = 2
           look_14_0 = @input.peek( 1 )
@@ -1388,9 +1401,12 @@ module OCCI
           end
           case alt_14
           when 1
-            # at line 213:24: ',' URL
-            match( T__14, TOKENS_FOLLOWING_T__14_IN_location_values_1361 )
-            match( URL, TOKENS_FOLLOWING_URL_IN_location_values_1363 )
+            # at line 222:27: ',' u2= URL
+            match( T__14, TOKENS_FOLLOWING_T__14_IN_location_values_1494 )
+            u2 = match( URL, TOKENS_FOLLOWING_URL_IN_location_values_1500 )
+            # --> action
+             locations << u2.text
+            # <-- action
 
           else
             break # out of loop for decision 14
@@ -1407,7 +1423,7 @@ module OCCI
 
       end
       
-      return 
+      return locations
     end
 
 
@@ -1500,12 +1516,12 @@ module OCCI
     TOKENS_FOLLOWING_T__30_IN_attribute_1304 = Set[ 13 ]
     TOKENS_FOLLOWING_T__13_IN_attribute_1306 = Set[ 4 ]
     TOKENS_FOLLOWING_attributes_attr_IN_attribute_1308 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__31_IN_location_1347 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_location_1349 = Set[ 9 ]
-    TOKENS_FOLLOWING_location_values_IN_location_1351 = Set[ 1 ]
-    TOKENS_FOLLOWING_URL_IN_location_values_1358 = Set[ 1, 14 ]
-    TOKENS_FOLLOWING_T__14_IN_location_values_1361 = Set[ 9 ]
-    TOKENS_FOLLOWING_URL_IN_location_values_1363 = Set[ 1, 14 ]
+    TOKENS_FOLLOWING_T__31_IN_location_1376 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__13_IN_location_1378 = Set[ 9 ]
+    TOKENS_FOLLOWING_location_values_IN_location_1380 = Set[ 1 ]
+    TOKENS_FOLLOWING_URL_IN_location_values_1459 = Set[ 1, 14 ]
+    TOKENS_FOLLOWING_T__14_IN_location_values_1494 = Set[ 9 ]
+    TOKENS_FOLLOWING_URL_IN_location_values_1500 = Set[ 1, 14 ]
 
   end # class Parser < ANTLR3::Parser
 

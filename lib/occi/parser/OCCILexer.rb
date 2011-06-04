@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: Occi_ruby.g
-# Generated at: 2011-06-04 09:27:52
+# Generated at: 2011-06-04 11:52:42
 # 
 
 # ~~~> start load path setup
@@ -599,8 +599,8 @@ module OCCI
 
       
       # - - - - main rule block - - - -
-      # at line 217:15: ( 'http://' | 'https://' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' )*
-      # at line 217:15: ( 'http://' | 'https://' )
+      # at line 226:15: ( 'http://' | 'https://' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' )*
+      # at line 226:15: ( 'http://' | 'https://' )
       alt_1 = 2
       look_1_0 = @input.peek( 1 )
 
@@ -637,15 +637,15 @@ module OCCI
       end
       case alt_1
       when 1
-        # at line 217:17: 'http://'
+        # at line 226:17: 'http://'
         match( "http://" )
 
       when 2
-        # at line 217:29: 'https://'
+        # at line 226:29: 'https://'
         match( "https://" )
 
       end
-      # at line 217:41: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' )*
+      # at line 226:41: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' )*
       while true # decision 2
         alt_2 = 2
         look_2_0 = @input.peek( 1 )
@@ -693,8 +693,8 @@ module OCCI
 
       
       # - - - - main rule block - - - -
-      # at line 218:15: ( '0' .. '9' )*
-      # at line 218:15: ( '0' .. '9' )*
+      # at line 227:15: ( '0' .. '9' )*
+      # at line 227:15: ( '0' .. '9' )*
       while true # decision 3
         alt_3 = 2
         look_3_0 = @input.peek( 1 )
@@ -705,7 +705,7 @@ module OCCI
         end
         case alt_3
         when 1
-          # at line 218:16: '0' .. '9'
+          # at line 227:16: '0' .. '9'
           match_range( 0x30, 0x39 )
 
         else
@@ -734,8 +734,8 @@ module OCCI
 
       
       # - - - - main rule block - - - -
-      # at line 219:15: ( '0' .. '9' | '.' )*
-      # at line 219:15: ( '0' .. '9' | '.' )*
+      # at line 228:15: ( '0' .. '9' | '.' )*
+      # at line 228:15: ( '0' .. '9' | '.' )*
       while true # decision 4
         alt_4 = 2
         look_4_0 = @input.peek( 1 )
@@ -815,8 +815,8 @@ module OCCI
 
       
       # - - - - main rule block - - - -
-      # at line 221:15: ( 'a' .. 'z' | 'A..Z' | '0' .. '9' | '-' | '_' | '.' )*
-      # at line 221:15: ( 'a' .. 'z' | 'A..Z' | '0' .. '9' | '-' | '_' | '.' )*
+      # at line 230:15: ( 'a' .. 'z' | 'A..Z' | '0' .. '9' | '-' | '_' | '.' )*
+      # at line 230:15: ( 'a' .. 'z' | 'A..Z' | '0' .. '9' | '-' | '_' | '.' )*
       while true # decision 5
         alt_5 = 7
         case look_5 = @input.peek( 1 )
@@ -829,27 +829,27 @@ module OCCI
         end
         case alt_5
         when 1
-          # at line 221:16: 'a' .. 'z'
+          # at line 230:16: 'a' .. 'z'
           match_range( 0x61, 0x7a )
 
         when 2
-          # at line 221:27: 'A..Z'
+          # at line 230:27: 'A..Z'
           match( "A..Z" )
 
         when 3
-          # at line 221:36: '0' .. '9'
+          # at line 230:36: '0' .. '9'
           match_range( 0x30, 0x39 )
 
         when 4
-          # at line 221:47: '-'
+          # at line 230:47: '-'
           match( 0x2d )
 
         when 5
-          # at line 221:53: '_'
+          # at line 230:53: '_'
           match( 0x5f )
 
         when 6
-          # at line 221:59: '.'
+          # at line 230:59: '.'
           match( 0x2e )
 
         else
@@ -878,8 +878,8 @@ module OCCI
 
       
       # - - - - main rule block - - - -
-      # at line 222:15: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '/' | '-' | '_' )*
-      # at line 222:15: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '/' | '-' | '_' )*
+      # at line 231:15: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '/' | '-' | '_' )*
+      # at line 231:15: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '/' | '-' | '_' )*
       while true # decision 6
         alt_6 = 2
         look_6_0 = @input.peek( 1 )
@@ -927,9 +927,9 @@ module OCCI
 
       
       # - - - - main rule block - - - -
-      # at line 223:15: QUOTE ( options {greedy=false; } : . )* QUOTE
+      # at line 232:15: QUOTE ( options {greedy=false; } : . )* QUOTE
       quote!
-      # at line 223:21: ( options {greedy=false; } : . )*
+      # at line 232:21: ( options {greedy=false; } : . )*
       while true # decision 7
         alt_7 = 2
         look_7_0 = @input.peek( 1 )
@@ -942,7 +942,7 @@ module OCCI
         end
         case alt_7
         when 1
-          # at line 223:49: .
+          # at line 232:49: .
           match_any
 
         else
@@ -972,7 +972,7 @@ module OCCI
 
       
       # - - - - main rule block - - - -
-      # at line 224:15: ( ' ' | '\\t' | '\\r' | '\\n' )
+      # at line 233:15: ( ' ' | '\\t' | '\\r' | '\\n' )
       if @input.peek( 1 ).between?( 0x9, 0xa ) || @input.peek(1) == 0xd || @input.peek(1) == 0x20
         @input.consume
       else
