@@ -31,9 +31,7 @@ NIC           = [ NETWORK_ID = "<%= network_id %>"]
 <%# Haizea Reservation parameters %>
 HAIZEA=	[	start 		=	"<%= attributes["occi.reservation.start"] if attributes["occi.reservation.start"]%>",
 			duration 	= 	"<%= attributes["occi.reservation.duration"] if attributes["occi.reservation.duration"]%>",
-			preemptible	= 	"<%= attributes["occi.reservation.preemptible"] if attributes["occi.reservation.preemptible"]%>"
-]
-<%end%>
+			preemptible	= 	"<%= attributes["occi.reservation.preemptible"] if attributes["occi.reservation.preemptible"]%>" ]
 
 <%# Custom settings %>
 GRAPHICS      = [type="vnc"]

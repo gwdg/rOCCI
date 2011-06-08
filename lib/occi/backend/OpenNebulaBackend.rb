@@ -19,20 +19,17 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-# add OpenNebula Ruby lib to load path
-$: << ENV['ONE_LOCATION'] + '/lib/ruby'
-
 require 'rubygems'
 require 'uuidtools'
-require 'OpenNebula'
+require 'opennebula/OpenNebula'
 require 'CloudServer'
 require 'CloudClient'
 require 'Configuration'
-require 'rexml/document'
 require 'occi/ActionDelegator'
 require 'occi/backend/opennebula/Image'
 require 'occi/backend/opennebula/Network'
 require 'occi/backend/opennebula/VirtualMachine'
+require 'occi/mixins/Reservation'
 
 ##############################################################################
 # Include OpenNebula Constants
@@ -197,7 +194,7 @@ module OCCI
         end
 
         # Action stop
-        def compute_start(action, parameters, resource)
+        def compute_stop(action, parameters, resource)
           $log.debug("compute_stop: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
           vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
           case parameters
@@ -212,7 +209,7 @@ module OCCI
         end
 
         # Action restart
-        def compute_start(action, parameters, resource)
+        def compute_restart(action, parameters, resource)
           $log.debug("compute_restart: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
           vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
           case parameters
@@ -228,7 +225,7 @@ module OCCI
         end
 
         # Action suspend
-        def compute_start(action, parameters, resource)
+        def compute_suspend(action, parameters, resource)
           $log.debug("compute_suspend: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
           vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
           vm.suspend
@@ -296,7 +293,7 @@ module OCCI
       end
 
       # Action down
-      def network_up(action, parameters, resource)
+      def network_down(action, parameters, resource)
         $log.debug("network_down: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
         network=VirtualNetwork.new(VirtualNetwork.build_xml(networkObject.backend_id), @one_client)
         network.unpublish
