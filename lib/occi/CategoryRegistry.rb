@@ -27,7 +27,6 @@ require 'occi/infrastructure/Network'
 require 'occi/infrastructure/Networkinterface'
 require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
-
 # OCCI Core classes
 require 'occi/core/Action'
 require 'occi/core/Category'
@@ -37,10 +36,15 @@ require 'occi/core/Link'
 require 'occi/core/Mixin'
 require 'occi/core/Resource'
 
+# OCCI HTTP parsing
+require 'occi/rendering/http/OCCIParser'
 
 module OCCI
+
+  # ---------------------------------------------------------------------------------------------------------------------
   class CategoryRegistry
 
+    # ---------------------------------------------------------------------------------------------------------------------
     # initialize and register all kinds and mixins of the OCCI Core document
     def initialize()
       @kinds = {}
@@ -63,18 +67,21 @@ module OCCI
       register_mixin(OCCI::Infrastructure::Ipnetworking::MIXIN)
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def register_kind(kind)
       key = kind.scheme + kind.term
       @kinds[key] = kind
       register_actions(kind.actions)
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def register_mixin(mixin)
       key = mixin.scheme + mixin.term
       @mixins[key] = mixin
       register_actions(mixin.actions)
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def register_actions(actions)
       actions.each do |action|
         key = action.category.scheme + action.category.term
@@ -82,6 +89,7 @@ module OCCI
       end
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def unregister(category)
       key = category.scheme + category.term
       deleted = false
@@ -91,35 +99,43 @@ module OCCI
       $log.error("Category could not be deleted") if deleted == false
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def getKinds()
       return @kinds.values
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def getMixins()
       return @mixins.values
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def getActions()
       return @actions.values
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def getCategories()
       categories = @kinds.values + @mixins.values
       return categories
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def getKind(key)
       @kinds.fetch(key, nil)
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def getMixin(key)
       @mixins.fetch(key, nil)
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def getAction(key)
       @actions.fetch(key, nil)
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def get_category(key)
       categories = {}
       categories.merge!(@kinds)
@@ -127,38 +143,35 @@ module OCCI
       categories.fetch(key) { raise "Category " + key + " not found" }
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     # Find corresponding Kind to given category string
     def get_categories_by_category_string(categoryString, filter="all")
-      # initialize list of categories
-      categories = []
-        
-      # regular expression to split category string in different components
-      regexp = Regexp.new(/(\w+)?;\s*scheme="([^`;]+)?"(.*)/)
 
-      # there may be multiple categories
-      categoryString.split(",").each do |category_string|
-        # match category string to corresponding parameters
-        match = regexp.match(category_string)
-        if match != nil then
-          term, scheme = match.captures
-          key = scheme + term
-          category = case filter
-          when "kinds" then $categoryRegistry.getKind(key)
-          when "mixins" then $categoryRegistry.getMixin(key)
-          when "actions" then $categoryRegistry.getAction(key)
-          else
-            $categoryRegistry.get_category(key)
-          end
+      all_categories      = OCCI::Parser.new(categoryString).category_values
+      filtered_categories = []
+
+      all_categories.each do |category_data|
+        if category_data.term != nil && category_data.scheme != nil
+          key = category_data.scheme + category_data.term
+          category = 
+            case filter
+              when "kinds"    then $categoryRegistry.getKind(key)
+              when "mixins"   then $categoryRegistry.getMixin(key)
+              when "actions"  then $categoryRegistry.getAction(key)
+            else
+              $categoryRegistry.get_category(key)
+            end
           # Do not add nil values to categories array
-          categories << category if category != nil
+          if category != nil
+            filtered_categories << category
+            $log.debug("Category found: #{category.scheme}#{category.term}")
+          end
         end
       end
-      categories.each do |category|
-        $log.debug("Category found: #{category.scheme}#{category.term}")
-      end
-      return categories
+      return filtered_categories
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def get_mixin_by_location(location)
       getMixins().each do |mixin|
         return mixin if mixin.get_location() == location
@@ -167,6 +180,7 @@ module OCCI
       return nil
     end
 
+    # ---------------------------------------------------------------------------------------------------------------------
     def get_entities_by_location(location)
       entities = []
       getCategories().each do |category|
