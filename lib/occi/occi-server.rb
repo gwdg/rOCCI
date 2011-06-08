@@ -58,7 +58,10 @@ require 'occi/infrastructure/Ipnetworking'
 require 'occi/mixins/Reservation'
 
 # OCCI HTTP rendering
-require 'occi/rendering/http/RequestHandler'
+require 'occi/rendering/http/Get'
+require 'occi/rendering/http/Put'
+require 'occi/rendering/http/Post'
+require 'occi/rendering/http/Delete'
 require 'occi/rendering/http/Renderer'
 require 'occi/rendering/http/LocationRegistry'
 require 'occi/rendering/http/OCCIParser'
@@ -173,25 +176,25 @@ begin
 
       # Query interface: return all supported kinds + mixins
       if location == "/-/"
-        headers = OCCI::Rendering::HTTP::RequestHandler.query_interface_list_all(request.env)
+        headers = OCCI::Rendering::HTTP::Get.query_interface_list_all(request.env)
         break
       end
 
       # Render exact matches referring to kinds / mixins
       if $locationRegistry.get_object_by_location(location) != nil && $locationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Category)
-        headers = OCCI::Rendering::HTTP::RequestHandler.type_list_resources(request.env, location)
+        headers = OCCI::Rendering::HTTP::Get.type_list_resources(request.env, location)
         break
       end
 
       # Render exact matches referring to resources
       if $locationRegistry.get_object_by_location(location) != nil && $locationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Resource)
-        headers = OCCI::Rendering::HTTP::RequestHandler.resource_render(location)
+        headers = OCCI::Rendering::HTTP::Get.resource_render(location)
         break
       end
 
       # Render locations ending with "/", which are not exact matches
       if location.end_with?("/")
-        headers = OCCI::Rendering::HTTP::RequestHandler.resources_list(request.env, location)
+        headers = OCCI::Rendering::HTTP::Get.resources_list(request.env, location)
         break
       end
 
@@ -242,18 +245,18 @@ begin
 
       # Trigger action on resources(s)
       if action != nil
-        OCCI::Rendering::HTTP::RequestHandler.resources_trigger_action(request.env, location)
+        OCCI::Rendering::HTTP::Post.resources_trigger_action(request.env, location)
         break;
       end  
 
       # If kind is a link and no actions specified then create link
       if kind == OCCI::Core::Link::KIND or kind.related.include?(OCCI::Core::Link::KIND)
-        OCCI::Rendering::HTTP::RequestHandler.resource_create_link(request.env)
+        OCCI::Rendering::HTTP::Post.resource_create_link(request.env)
         break
       end
 
       # If kind is not link and no actions specified, then create resource
-      headers = OCCI::Rendering::HTTP::RequestHandler.resource_create(request.env, location)
+      headers = OCCI::Rendering::HTTP::Post.resource_create(request.env, location)
 
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
@@ -298,20 +301,20 @@ begin
 
       # Create user defined mixin
       if location == "/-/"
-         OCCI::Rendering::HTTP::RequestHandler.create_mixin(request.env)       
+         OCCI::Rendering::HTTP::Put.create_mixin(request.env)       
          break
       end
 
       # Add an resource instance to a mixin
       mixin = $locationRegistry.get_object_by_location(location)
       if mixin != nil && mixin.kind_of?(OCCI::Core::Mixin) && request.env["HTTP_X_OCCI_LOCATION"] != nil
-         OCCI::Rendering::HTTP::RequestHandler.add_resource_to_mixin(request.env, location)
+         OCCI::Rendering::HTTP::Put.add_resource_to_mixin(request.env, location)
         break
       end
 
       # Update resource instance(s) at the given location
       if $locationRegistry.get_object_by_location(location) != nil
-         OCCI::Rendering::HTTP::RequestHandler.update_resource(request.env, location)
+         OCCI::Rendering::HTTP::Put.update_resource(request.env, location)
         break
       end
 
@@ -347,19 +350,19 @@ begin
       
       # Location references query interface => delete provided mixin
       if location == "/-/"
-        OCCI::Rendering::HTTP::RequestHandler.delete_mixin(request.env)
+        OCCI::Rendering::HTTP::Delete.delete_mixin(request.env)
         break
       end 
       
       # Location references a mixin => unassociate all provided resources (by X_OCCI_LOCATION) from it
       object = $locationRegistry.get_object_by_location(location)
       if object != nil && object.kind_of?(OCCI::Core::Mixin)
-          OCCI::Rendering::HTTP::RequestHandler.unassociate_resources_from_mixin(request.env, location)
+          OCCI::Rendering::HTTP::Delete.unassociate_resources_from_mixin(request.env, location)
         break
       end
       
       # Determine set of resources to be deleted
-      OCCI::Rendering::HTTP::RequestHandler.delete_entities(location)
+      OCCI::Rendering::HTTP::Delete.delete_entities(location)
 
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)

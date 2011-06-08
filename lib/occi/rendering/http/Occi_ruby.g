@@ -36,7 +36,7 @@ options { language = Ruby; }
 @members {
 
   def emit_error_message(message)
-    \$log.warn(message)
+    \$log.warn("Grammer: " + message)
   end
 
   def remove_quotes(s)
