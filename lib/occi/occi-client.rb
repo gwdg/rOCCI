@@ -25,7 +25,6 @@
 # gems
 require 'rubygems'
 require 'typhoeus'
-#require 'sinatra'
 require 'logger'
 
 # Ruby standard library
@@ -36,18 +35,6 @@ require 'benchmark'
 # Server configuration
 require 'occi/Configuration'
 
-# Registry for all OCCI Categories
-#require 'CategoryRegistry'
-
-# OCCI Core classes
-#require 'core/Action'
-#require 'core/Category'
-#require 'core/Entity'
-#require 'core/Kind'
-#require 'core/Link'
-#require 'core/Mixin'
-#require 'core/Resource'
-
 # OCCI Infrastructure classes
 require 'occi/infrastructure/Compute'
 require 'occi/infrastructure/Storage'
@@ -55,7 +42,7 @@ require 'occi/infrastructure/Network'
 require 'occi/infrastructure/Networkinterface'
 require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
-require 'occi/infrastructure/Reservation'
+#require 'occi/infrastructure/Reservation'
 
 # OCCI HTTP rendering
 require 'occi/rendering/http/Renderer'
