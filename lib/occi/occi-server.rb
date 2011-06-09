@@ -75,12 +75,7 @@ $log = Logger.new(STDOUT)
 ##############################################################################
 # Read configuration file and set loglevel
 
-if ARGV[0] != nil
-  CONFIGURATION_FILE = ARGV[0]
-else
-  $log.error("A configuration file needs to be provided in the arguments for occi-server")
-  break
-end
+CONFIGURATION_FILE = 'etc/occi-server.conf'
 
 ## initialize temporary image path
 $image_path = ""
@@ -137,15 +132,6 @@ rescue RuntimeError => e
   exit 1
 end
 $backend.print_configuration
-
-##############################################################################
-# Configuration of Sinatra web application framework
-
-set :host, $config["server"]
-set :port, $config["port"]
-# use mongrel server
-set :server, %w[mongrel]
-set :run, true
 
 ##############################################################################
 # Configuration of HTTP Authentication
