@@ -32,21 +32,21 @@ module OCCI
         module_function
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.delete_mixin(request_header)
+        def self.delete_mixin(request)
 
-          mixin = $categoryRegistry.get_categories_by_category_string(request_header['HTTP_CATEGORY'], filter="mixins")[0]
+          mixin = $categoryRegistry.get_categories_by_category_string(request['HTTP_CATEGORY'], filter="mixins")[0]
           $log.info("Deleting mixin #{mixin.term}")
           $locationRegistry.unregister_location(mixin.get_location())
           $categoryRegistry.unregister(mixin)
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.unassociate_resources_from_mixin(request_header, location)
+        def self.unassociate_resources_from_mixin(request, location)
 
           object = $locationRegistry.get_object_by_location(location)
           $log.info("Unassociating entities from mixin: #{object}")
 
-          resource_locations = request_header["HTTP_X_OCCI_LOCATION"] != nil ? OCCI::Parser.new(request_header["HTTP_X_OCCI_LOCATION"]).location_values : []
+          resource_locations = request["HTTP_X_OCCI_LOCATION"] != nil ? OCCI::Parser.new(request["HTTP_X_OCCI_LOCATION"]).location_values : []
           resource_locations.each do |location|
             entity = $locationRegistry.get_object_by_location(location)
             if entity == nil

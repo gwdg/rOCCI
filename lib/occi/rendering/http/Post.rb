@@ -32,7 +32,7 @@ module OCCI
         module_function
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.resources_trigger_action(request_header, location)
+        def self.resources_trigger_action(request, location)
           
           $log.info("Triggering action on resource(s)...")
           
@@ -42,10 +42,10 @@ module OCCI
 #          raise "Could not extract action from query-string: #{request.query_string}" if action_params == nil
 #          $log.debug("Action from query string: #{action_params}")
           
-          action  = $categoryRegistry.get_categories_by_category_string(request_header['HTTP_CATEGORY'], filter="actions")[0]
+          action  = $categoryRegistry.get_categories_by_category_string(request['HTTP_CATEGORY'], filter="actions")[0]
           
           entities  = $locationRegistry.get_resources_below_location(location)
-          method    = request_header["HTTP_X_OCCI_ATTRIBUTE"]
+          method    = request["HTTP_X_OCCI_ATTRIBUTE"]
             
           raise "No entities corresponding to location [#{location}] could be found!" if entities == nil
             
@@ -57,14 +57,14 @@ module OCCI
         end
   
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.resource_create_link(request_header)
+        def self.resource_create_link(request)
           
           $log.info("Creating link...")
           
           kind        = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="kinds")[0]
-          attributes  = request_header["HTTP_X_OCCI_ATTRIBUTE"] != nil ? OCCI::Parser.new(request_header["HTTP_X_OCCI_ATTRIBUTE"]).attributes_attr : {}
+          attributes  = request["HTTP_X_OCCI_ATTRIBUTE"] != nil ? OCCI::Parser.new(request["HTTP_X_OCCI_ATTRIBUTE"]).attributes_attr : {}
   
-          $log.debug("Attributes string: " + request_header["HTTP_X_OCCI_ATTRIBUTE"])
+          $log.debug("Attributes string: " + request["HTTP_X_OCCI_ATTRIBUTE"])
           $log.debug("Extracted attributes of link: #{attributes}")
   
           target_uri = URI.parse(attributes["occi.core.target"])
@@ -81,32 +81,32 @@ module OCCI
   
           link_location = link.get_location()
           $locationRegistry.register_location(link_location, link)
-          headers['Location'] = $locationRegistry.get_absolute_location_of_object(link)
+          headers['Location'] = $locationRegistry.get_absolute_location_of_object(link,request.url)
   
           $log.debug("Link succesfully created at location [#{link_location}]")
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.resource_create(request_header, location)
+        def self.resource_create(request, location)
           
           $log.info("Creating resource...")  
 
-          kind = $categoryRegistry.get_categories_by_category_string(request_header['HTTP_CATEGORY'], filter="kinds")[0]
+          kind = $categoryRegistry.get_categories_by_category_string(request['HTTP_CATEGORY'], filter="kinds")[0]
 
           $log.warn("Provided location does not match location of category: #{kind.get_location} vs. #{location}") if kind.get_location != location
     
           # Get mixins
-          mixins = $categoryRegistry.get_categories_by_category_string(request_header['HTTP_CATEGORY'], filter="mixins") if request_header['HTTP_CATEGORY'] != nil
+          mixins = $categoryRegistry.get_categories_by_category_string(request['HTTP_CATEGORY'], filter="mixins") if request['HTTP_CATEGORY'] != nil
     
           # Get attributes
-          attributes = request_header["HTTP_X_OCCI_ATTRIBUTE"] != nil ? OCCI::Parser.new(request_header["HTTP_X_OCCI_ATTRIBUTE"]).attributes_attr : {}
+          attributes = request["HTTP_X_OCCI_ATTRIBUTE"] != nil ? OCCI::Parser.new(request["HTTP_X_OCCI_ATTRIBUTE"]).attributes_attr : {}
     
           # Create resource
           resource = kind.entity_type.new(attributes, mixins)
     
           # Add links
-          if request_header['HTTP_LINK'] != nil        
-            links = OCCI::Parser.new(request_header['HTTP_LINK']).link_values
+          if request['HTTP_LINK'] != nil        
+            links = OCCI::Parser.new(request['HTTP_LINK']).link_values
               
             links.each do |link_data|
               $log.debug("Creating link, extracted link data: #{link_data}")
@@ -138,7 +138,7 @@ module OCCI
           $locationRegistry.register_location(resource.get_location, resource)
 
           response_header = {}
-          response_header['Location'] = $locationRegistry.get_absolute_location_of_object(resource)
+          response_header['Location'] = $locationRegistry.get_absolute_location_of_object(resource,request.url)
 
           return response_header
         end

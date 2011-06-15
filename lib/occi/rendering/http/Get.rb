@@ -32,7 +32,7 @@ module OCCI
         module_function
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def query_interface_list_all(request_header)
+        def query_interface_list_all(request)
 
           $log.info("Triggering action on resource(s)...")
 
@@ -41,9 +41,9 @@ module OCCI
           actions     = []
           categories  = []
     
-          if request_header['HTTP_CATEGORY'] != nil && request_header['HTTP_CATEGORY'] != ""
+          if request['HTTP_CATEGORY'] != nil && request['HTTP_CATEGORY'] != ""
             # Find categories corresponding to supplied category string
-            categories = $categoryRegistry.get_categories_by_category_string(request_header['HTTP_CATEGORY'])
+            categories = $categoryRegistry.get_categories_by_category_string(request['HTTP_CATEGORY'])
           else
             categories  = $categoryRegistry.getCategories()
             actions     = $categoryRegistry.getActions()
@@ -62,7 +62,7 @@ module OCCI
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def type_list_resources(request_header, location)
+        def type_list_resources(request, location)
         
           category = $locationRegistry.get_object_by_location(location)
           raise "Only mixins / kinds are supported for exact match rendering: location: #{location}; object: #{category}" if !category.instance_variable_defined?(:@entities)
@@ -88,17 +88,17 @@ module OCCI
         end
   
         # ---------------------------------------------------------------------------------------------------------------------
-        def resources_list(request_header, location)
+        def resources_list(request, location)
   
           $log.info("Listing all resource instances below location: #{location}")
   
           resources = $locationRegistry.get_resources_below_location(location)
           locations = []
   
-          if request_header['HTTP_CATEGORY'] != nil && request_header['HTTP_CATEGORY'] != ""
+          if request['HTTP_CATEGORY'] != nil && request['HTTP_CATEGORY'] != ""
   
             # Filtered version
-            categories = $categoryRegistry.get_categories_by_category_string(request_header['HTTP_CATEGORY'])
+            categories = $categoryRegistry.get_categories_by_category_string(request['HTTP_CATEGORY'])
   
             filter = {}
             categories.each do |category|

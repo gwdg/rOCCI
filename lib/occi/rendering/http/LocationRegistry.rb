@@ -122,8 +122,8 @@ module OCCI
         end
         
         # ---------------------------------------------------------------------------------------------------------------------
-        def get_absolute_location_of_object(object)
-          return $config["server"] + ':' + $config["port"] + @locations[generate_key(object)]
+        def get_absolute_location_of_object(object,url)
+          return url + @locations[generate_key(object)]
         end
         
         # ---------------------------------------------------------------------------------------------------------------------
