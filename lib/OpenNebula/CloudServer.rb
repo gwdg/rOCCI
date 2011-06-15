@@ -14,8 +14,8 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
-require 'Configuration'
-require 'OpenNebula'
+require 'opennebula/Configuration'
+require 'opennebula/OpenNebula'
 require 'pp'
 
 ##############################################################################
