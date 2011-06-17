@@ -123,7 +123,9 @@ module OCCI
         
         # ---------------------------------------------------------------------------------------------------------------------
         def get_absolute_location_of_object(object,url)
-          return url + @locations[generate_key(object)]
+          location = get_location_of_object(object)
+          # TODO: HTTP or HTTPS? Maybe create a config value for this
+          return 'http://' + url + @locations[generate_key(object)]
         end
         
         # ---------------------------------------------------------------------------------------------------------------------

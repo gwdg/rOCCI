@@ -36,11 +36,11 @@ module OCCI
 
           $log.info("Creating user defined mixin...")
   
-          mixin   = $categoryRegistry.get_categories_by_category_string(request['HTTP_CATEGORY'], filter="mixins")[0]
+          mixin   = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins")[0]
   
           raise OCCI::MixinAlreadyExistsError, "Mixin [#{mixin}] already exists!" unless mixin == nil
   
-          mixin_category_data = OCCI::Parser.new(request['HTTP_CATEGORY']).category_value
+          mixin_category_data = OCCI::Parser.new(request.env['HTTP_CATEGORY']).category_value
           $log.debug("Category data for mixin: #{mixin_category_data}")
   
           raise "Mandatory information missing (term | scheme | location)!" unless mixin_category_data.term != nil && mixin_category_data.scheme != nil && mixin_category_data.location != nil
@@ -60,7 +60,7 @@ module OCCI
 
           mixin = $locationRegistry.get_object_by_location(location)
 
-          OCCI::Parser.new(request["HTTP_X_OCCI_LOCATION"]).location_values.each do |entity_location|
+          OCCI::Parser.new(request.env["HTTP_X_OCCI_LOCATION"]).location_values.each do |entity_location|
 
             entity_uri = URI.parse(entity_location)
             entity = $locationRegistry.get_object_by_location(entity_uri.path)
@@ -87,25 +87,25 @@ module OCCI
           $log.info("Updating [#{entities.size}] entities...")
   
           # Update / add mixins
-          if request['HTTP_CATEGORY'] != nil
-            mixins = $categoryRegistry.get_categories_by_category_string(request['HTTP_CATEGORY'], filter="mixins") 
+          if request.env['HTTP_CATEGORY'] != nil
+            mixins = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins") 
             entities.each do |entity|
               entity.mixins = mixins
             end
           end
   
           # Update / add attributes
-          if request['HTTP_X_OCCI_ATTRIBUTE'] != nil
-            attributes = OCCI::Parser.new(request["HTTP_X_OCCI_ATTRIBUTE"]).attributes_attr
+          if request.env['HTTP_X_OCCI_ATTRIBUTE'] != nil
+            attributes = OCCI::Parser.new(request.env["HTTP_X_OCCI_ATTRIBUTE"]).attributes_attr
             entities.each do |entity|
               entity.attributes.merge!(attributes)
             end          
           end
   
           # Update / add links
-          if request['HTTP_LINK'] != nil
+          if request.env['HTTP_LINK'] != nil
   
-            links = OCCI::Parser.new(request['HTTP_LINK']).link_values
+            links = OCCI::Parser.new(request.env['HTTP_LINK']).link_values
             
             links.each do |link_data|
               $log.debug("Extracted link data: #{link_data}")

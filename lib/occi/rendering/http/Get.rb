@@ -41,9 +41,9 @@ module OCCI
           actions     = []
           categories  = []
     
-          if request['HTTP_CATEGORY'] != nil && request['HTTP_CATEGORY'] != ""
+          if request.env['HTTP_CATEGORY'] != nil && request.env['HTTP_CATEGORY'] != ""
             # Find categories corresponding to supplied category string
-            categories = $categoryRegistry.get_categories_by_category_string(request['HTTP_CATEGORY'])
+            categories = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'])
           else
             categories  = $categoryRegistry.getCategories()
             actions     = $categoryRegistry.getActions()
@@ -95,10 +95,10 @@ module OCCI
           resources = $locationRegistry.get_resources_below_location(location)
           locations = []
   
-          if request['HTTP_CATEGORY'] != nil && request['HTTP_CATEGORY'] != ""
+          if request.env['HTTP_CATEGORY'] != nil && request.env['HTTP_CATEGORY'] != ""
   
             # Filtered version
-            categories = $categoryRegistry.get_categories_by_category_string(request['HTTP_CATEGORY'])
+            categories = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'])
   
             filter = {}
             categories.each do |category|
