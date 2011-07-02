@@ -2,7 +2,14 @@ OCCI_ID       = <%= attributes["occi.core.id"]%>
 NAME          = <%= attributes['occi.core.title'] %>
 DESCRIPTION   = <%= attributes['occi.core.summary'] if attributes['occi.core.summary'] %>
 
-TYPE          = <%= attributes['opennebula.image.type'].upcase if attributes['opennebula.image.type'] %>
+<% if attributes['opennebula.image.type'] %>
+TYPE          = <%= attributes['opennebula.image.type'].upcase %>
+<% elseif $image_path != '' %>
+TYPE          = OS
+<% elseif attributes['occi.storage.size'] %>
+TYPE          = DATABLOCK
+<% end %>
+
 PUBLIC        = <%= attributes['opennebula.image.public'].upcase if attributes['opennebula.image.public'] %>
 PERSISTENT    = <%= attributes['opennebula.image.persistent'].upcase if attributes['opennebula.image.persistent'] %>
 DEV_PREFIX    = <%= attributes['opennebula.image.dev_prefix'].downcase if attributes['opennebula.image.dev_prefix'] %>
@@ -11,9 +18,12 @@ PATH          = <%= $image_path %>
 
 <% if attributes['occi.storage.size'] %>
 SIZE          = <%= attributes['occi.storage.size'] %>
+<% else %>
+SIZE          = <%= File.new($image_path).size %>
+<% end %>
+
 <% if attributes['opennebula.image.fstype'] %>
 FSTYPE        = <%= attributes['occi.storage.fstype'] %>
-<% else %>
+<% elseif $image_path == '' %>
 FSTYPE        = ext3
-<% end %>
 <% end %>

@@ -188,6 +188,11 @@ module OpenNebula
         def resubmit
             action('resubmit')
         end
+        
+        # Reboot a VM
+        def reboot
+            action('reboot')
+        end
 
         # Saves a running VM and starts it again in the specified host
         def migrate(host_id)

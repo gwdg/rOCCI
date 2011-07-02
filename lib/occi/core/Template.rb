@@ -15,17 +15,41 @@
 ##############################################################################
 
 ##############################################################################
-# Description: registry for all Category/Kind/Mixin instances currently 
-#              known to the OCCI server
+# Description: OCCI Infrastructure Compute
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'singleton'
+
+require 'occi/core/Mixin'
+
 module OCCI
-  
-  # Tried to create an already existing mixin
-  class MixinAlreadyExistsError < RuntimeError; end
-    
-  # Tried to create an already existing mixin
-  class BackendError < RuntimeError; end
-  
+  module Core
+    class Template < OCCI::Core::Mixin
+      
+      attr_accessor :template_location
+
+      # Define appropriate mixin
+      begin
+        # Define actions
+        actions = []
+
+        related = []
+        entities = []
+
+        term    = "tpl"
+        scheme  = "http://schemas.ogf.org/occi/core#"
+        title   = "Template"
+
+        attributes = OCCI::Core::Attributes.new()
+          
+        MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
+      end
+
+      def initialize(term, scheme, title, attributes, actions, related, entities)
+        super(term, scheme, title, attributes, actions, related, entities)
+      end
+
+    end
+  end
 end

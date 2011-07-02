@@ -77,9 +77,6 @@ module OCCI
         return []
       end
       
-      def print_configuration()
-      end
-      
     end
   end  
 end

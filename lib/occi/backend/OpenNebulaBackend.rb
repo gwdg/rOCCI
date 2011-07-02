@@ -38,17 +38,24 @@ include OpenNebula
 
 module OCCI
   module Backend
-    class OpenNebulaBackend < CloudServer
+    class OpenNebulaBackend
+      
       def initialize(configfile)
         $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::Image::MIXIN)
         $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::Network::MIXIN)
         $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::VirtualMachine::MIXIN)
         $categoryRegistry.register_mixin(OCCI::Mixins::Reservation::MIXIN)
-        super(configfile)
-        network_get_all()
-        storage_get_all()
-        compute_get_all()
+
+        # TODO: create mixins from existing templates
+
+        # initialize OpenNebula connection
+        @one_client = Client.new('oneadmin:oneadmin',$config['one_xmlrpc'])
         
+        network_get_all
+        storage_get_all
+        compute_get_all_instances
+        compute_get_all_templates
+
         # create action delegator
         delegator = OCCI::ActionDelegator.instance
 
@@ -57,11 +64,11 @@ module OCCI
         delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_STOP,  self, :compute_stop)
         delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_RESTART, self, :compute_restart)
         delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_SUSPEND, self, :compute_suspend)
-        
+
         # register methods for network actions
         delegator.register_method_for_action(OCCI::Infrastructure::Network::ACTION_UP, self, :network_up)
         delegator.register_method_for_action(OCCI::Infrastructure::Network::ACTION_DOWN, self, :network_down)
-        
+
         # register methods for storage actions
         delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_ONLINE, self, :storage_online)
         delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_OFFLINE, self, :storage_offline)
@@ -75,14 +82,26 @@ module OCCI
       TEMPLATESTORAGERAWFILE = 'occi_one_template_storage.erb'
 
       ########################################################################
-      # Virtual Machine methods
+      # Virtual Machine Template methods
 
-      # CREATE VM
-      def create_compute_instance(computeObject)
+      # CREATE COMPUTE INSTANCE
+      def create_compute_instance(occi_compute_object)
+        one_compute_object=VirtualMachine.new(VirtualMachine.build_xml, @one_client)
+        create_compute_object(occi_compute_object,one_compute_object)
+      end
+
+      # CREATE COMPUTE TEMPLATE
+      def create_compute_template(occi_compute_object)
+        one_compute_object=Template.new(Template.build_xml, @one_client)
+        create_compute_object(occi_compute_object,one_compute_object)
+      end
+
+      # CREATE COMPUTE OBJECT
+      def create_compute_object(occi_compute_object,one_compute_object)
         storage_ids = []
         network_ids = []
-        attributes = computeObject.attributes
-        links = computeObject.links
+        attributes = occi_compute_object.attributes
+        links = occi_compute_object.links
         if links != nil
           links.each do
             |link|
@@ -95,142 +114,173 @@ module OCCI
             end
           end
         end
-        vm=VirtualMachine.new(VirtualMachine.build_xml, @one_client)
-        @templateRaw = @config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
-        template = ERB.new(File.read(@templateRaw)).result(binding)
+        @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
+        compute_template = ERB.new(File.read(@templateRaw)).result(binding)
         $log.debug("Parsed template #{template}")
-        rc = vm.allocate(template)
+        rc = one_compute_object.allocate(compute_template)
+        if OpenNebula.is_error?(rc)
+          $log.warn("Problem with creation of compute resource. Error message: #{rc}")
+        end
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
-        computeObject.backend_id = vm.id
-        $log.debug("OpenNebula ID of virtual machine: #{computeObject.backend_id}")
+        occi_compute_object.backend_id = one_compute_object.id
+        $log.debug("OpenNebula ID of virtual machine: #{occi_compute_object.backend_id}")
       end
 
-      # DELETE VM
-      def delete_compute_instance(computeObject)
-        vm=VirtualMachine.new(VirtualMachine.build_xml(computeObject.backend_id), @one_client)
-        rc = vm.delete
+      # DELETE COMPUTE INSTANCE
+      def delete_compute_instance(occi_compute_object)
+        one_compute_object=VirtualMachine.new(Template.build_xml(occi_compute_object.backend_id), @one_client)
+        delete_compute_object(occi_compute_object,one_compute_object)
+      end
+
+      # DELETE COMPUTE TEMPLATE
+      def delete_compute_template(occi_compute_object)
+        one_compute_object=Template.new(Template.build_xml(occi_compute_object.backend_id), @one_client)
+        delete_compute_object(occi_compute_object,one_compute_object)
+      end
+
+      # DELETE COMPUTE OBJECT
+      def delete_compute_object(occi_compute_object,one_compute_object)
+        rc = one_compute_object.delete
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
       end
 
-      # GET ALL VMs
-      def compute_get_all()
-        vmpool=VirtualMachinePool.new(@one_client)
-        vmpool.info
-        vmpool.each do |vm|
+      # GET ALL COMPUTE INSTANCES
+      def compute_get_all_instances()
+        compute_object_pool=VirtualMachinePool.new(@one_client)
+        compute_object_pool.info
+        compute_get_all_objects(compute_object_pool)
+      end
+
+      # GET ALL COMPUTE TEMPLATES
+      def compute_get_all_templates()
+        compute_object_pool=TemplatePool.new(@one_client)
+        compute_object_pool.info
+        compute_get_all_objects(compute_object_pool)
+      end
+
+      # GET ALL COMPUTE OBJECTS
+      def compute_get_all_objects(compute_object_pool)
+        compute_object_pool.each do |compute_object|
+          compute_get_object(compute_object)
+        end
+      end
+
+      # GET COMPUTE OBJECT
+      def compute_get_object(compute_object)
+        attributes = {}
+        # parse all parameters from OpenNebula to OCCI
+        attributes['occi.core.id'] = compute_object['TEMPLATE/OCCI_ID']
+        attributes['occi.core.title'] = compute_object['NAME']
+        attributes['occi.core.summary'] = compute_object['TEMPLATE/DESCRIPTION']
+        attributes['occi.compute.cores'] = compute_object['TEMPLATE/CPU']
+        if compute_object['TEMPLATE/ARCHITECTURE'] == "x86_64"
+          attributes['occi.compute.architecture'] = "x64"
+        else
+          attributes['occi.compute.architecture'] = "x86"
+        end
+        attributes['occi.compute.memory'] = compute_object['TEMPLATE/MEMORY']
+        attributes['opennebula.vm.vcpu'] = compute_object['TEMPLATE/VCPU']
+        attributes['opennebula.vm.boot'] = compute_object['TEMPLATE/BOOT']
+
+        mixins = [OCCI::Backend::OpenNebula::VirtualMachine::MIXIN]
+
+        resource = OCCI::Infrastructure::Compute.new(attributes,mixins)
+        resource.backend_id = compute_object.id
+        $log.debug("Backend ID: #{resource.backend_id}")
+        $locationRegistry.register_location(resource.get_location, resource)
+
+        # create links for all storage instances
+        compute_object['TEMPLATE/DISK/IMAGE_ID'].each do |image_id|
           attributes = {}
-          # parse all parameters from OpenNebula to OCCI
-          attributes['occi.core.id'] = vm['TEMPLATE/OCCI_ID']
-          attributes['occi.core.title'] = vm['NAME']
-          attributes['occi.core.summary'] = vm['TEMPLATE/DESCRIPTION']
-          attributes['occi.compute.cores'] = vm['TEMPLATE/CPU']
-          if vm['TEMPLATE/ARCHITECTURE'] == "x86_64"
-            attributes['occi.compute.architecture'] = "x64"
-          else
-            attributes['occi.compute.architecture'] = "x86"
+          target = nil
+          $log.debug("Image ID: #{image_id}")
+          OCCI::Infrastructure::Storage::KIND.entities.each do |storage|
+            $log.debug("Storage Backend ID: #{storage.backend_id}")
+            $log.debug(storage.backend_id.to_i == image_id.to_i)
+            target = storage if storage.backend_id.to_i == image_id.to_i
           end
-          attributes['occi.compute.memory'] = vm['TEMPLATE/MEMORY']
-          attributes["opennebula.vm.vcpu"] = vm['TEMPLATE/VCPU']
-          attributes["opennebula.vm.boot"] = vm['TEMPLATE/BOOT']
+          break if target == nil
+          source = resource
+          attributes["occi.core.target"] = target.get_location
+          attributes["occi.core.source"] = source.get_location
+          link = OCCI::Core::Link.new(attributes)
+          source.links << link
+          target.links << link
+          $locationRegistry.register_location(link.get_location, link)
+          $log.debug("Link successfully created")
+        end if compute_object['TEMPLATE/DISK/IMAGE_ID']
 
-          mixins = [OCCI::Backend::OpenNebula::VirtualMachine::MIXIN]
-
-          resource = OCCI::Infrastructure::Compute.new(attributes,mixins)
-          resource.backend_id = vm.id
-          $log.debug("Backend ID: #{resource.backend_id}")
-          $locationRegistry.register_location(resource.get_location, resource)
-
-          # create links for all images
-          vm['TEMPLATE/DISK/IMAGE_ID'].each do |image_id|
-            attributes = {}
-            target = nil
-            $log.debug("Image ID: #{image_id}")
-            OCCI::Infrastructure::Storage::KIND.entities.each do |storage|
-              $log.debug("Storage Backend ID: #{storage.backend_id}")
-              $log.debug(storage.backend_id.to_i == image_id.to_i)
-              target = storage if storage.backend_id.to_i == image_id.to_i
-            end
-            break if target == nil
-            source = resource
-            attributes["occi.core.target"] = target.get_location
-            attributes["occi.core.source"] = source.get_location
-            link = OCCI::Core::Link.new(attributes)
-            source.links << link
-            target.links << link
-            $locationRegistry.register_location(link.get_location, link)
-            $log.debug("Link successfully created")
-          end if vm['TEMPLATE/DISK/IMAGE_ID']
-
-          #create links for all networks
-          $log.debug("NETWORK_ID #{vm['TEMPLATE/NIC/NETWORK_ID']}")
-          vm.retrieve_elements('TEMPLATE/NIC/NETWORK_ID').each do |network_id|
-            attributes = {}
-            $log.debug("Network ID: #{network_id}")
-            target = nil
-            OCCI::Infrastructure::Network::KIND.entities.each do |network|
-              $log.debug("Network Backend ID: #{network.backend_id}")
-              $log.debug(network.backend_id.to_i == network_id.to_i)
-              target = network if network.backend_id.to_i == network_id.to_i
-              $log.debug(target.kind.term) if target != nil
-            end
-            break if target == nil
-            source = resource
-            attributes["occi.core.target"] = target.get_location
-            attributes["occi.core.source"] = source.get_location
-            link = OCCI::Core::Link.new(attributes)
-            source.links << link
-            target.links << link
-            $locationRegistry.register_location(link.get_location, link)
-            $log.debug("Link successfully created")
-          end if vm['TEMPLATE/NIC/NETWORK_ID']
-        end
-
-        # Action start
-        def compute_start(action, parameters, resource)
-          $log.debug("compute_start: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
-          vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
-          vm.resume
-          $log.debug("VM Info: #{vm.info}")
-        end
-
-        # Action stop
-        def compute_stop(action, parameters, resource)
-          $log.debug("compute_stop: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
-          vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
-          case parameters
-          when "graceful"
-            vm.shutdown
-          when "acpioff"
-            vm.shutdown
-          when "poweroff"
-            vm.cancel
+        #create links for all network instances
+        compute_object['TEMPLATE/NIC/NETWORK_ID'].each do |network_id|
+          attributes = {}
+          $log.debug("Network ID: #{network_id}")
+          target = nil
+          OCCI::Infrastructure::Network::KIND.entities.each do |network|
+            $log.debug("Network Backend ID: #{network.backend_id}")
+            $log.debug(network.backend_id.to_i == network_id.to_i)
+            target = network if network.backend_id.to_i == network_id.to_i
+            $log.debug(target.kind.term) if target != nil
           end
-          $log.debug("VM Info: #{vm.info}")
-        end
+          break if target == nil
+          source = resource
+          attributes["occi.core.target"] = target.get_location
+          attributes["occi.core.source"] = source.get_location
+          link = OCCI::Core::Link.new(attributes)
+          source.links << link
+          target.links << link
+          $locationRegistry.register_location(link.get_location, link)
+          $log.debug("Link successfully created")
+        end if compute_object['TEMPLATE/NIC/NETWORK_ID']
+      end
 
-        # Action restart
-        def compute_restart(action, parameters, resource)
-          $log.debug("compute_restart: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
-          vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
-          case parameters
-          when "graceful"
-            vm.restart
-          when "warm"
-            vm.restart
-          when "cold"
-            vm.cancel
-            vm.resubmit
-          end
-          $log.debug("VM Info: #{vm.info}")
-        end
+      # COMPUTE ACTIONS
 
-        # Action suspend
-        def compute_suspend(action, parameters, resource)
-          $log.debug("compute_suspend: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
-          vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
-          vm.suspend
-          $log.debug("VM Info: #{vm.info}")
-        end
+      # Action start
+      def compute_start(action, parameters, resource)
+        $log.debug("compute_start: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
+        rc = vm.resume
+        $log.debug("VM Info: #{vm.info}")
+      end
 
+      # Action stop
+      def compute_stop(action, parameters, resource)
+        $log.debug("compute_stop: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
+        # TODO: implement parameters when available in OpenNebula
+        case parameters
+        when "graceful"
+          vm.shutdown
+        when "acpioff"
+          vm.shutdown
+        when "poweroff"
+          vm.shutdown
+        end
+        $log.debug("VM Info: #{vm.info}")
+      end
+
+      # Action restart
+      def compute_restart(action, parameters, resource)
+        $log.debug("compute_restart: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
+        # TODO: implement parameters when available in OpenNebula
+        case parameters
+        when "graceful"
+          vm.resubmit
+        when "warm"
+          vm.resubmit
+        when "cold"
+          vm.resubmit
+        end
+        $log.debug("VM Info: #{vm.info}")
+      end
+
+      # Action suspend
+      def compute_suspend(action, parameters, resource)
+        $log.debug("compute_suspend: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        vm=VirtualMachine.new(VirtualMachine.build_xml(resource.backend_id), @one_client)
+        vm.suspend
+        $log.debug("VM Info: #{vm.info}")
       end
 
       ########################################################################
@@ -240,7 +290,7 @@ module OCCI
       def create_network_instance(networkObject)
         attributes = networkObject.attributes
         network=VirtualNetwork.new(VirtualNetwork.build_xml(), @one_client)
-        @templateRaw = @config["TEMPLATE_LOCATION"] + TEMPLATENETWORKRAWFILE
+        @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATENETWORKRAWFILE
         template = ERB.new(File.read(@templateRaw)).result(binding)
         $log.debug("Parsed template #{template}")
         rc = network.allocate(template)
@@ -286,16 +336,16 @@ module OCCI
       # Action up
       def network_up(action, parameters, resource)
         $log.debug("network_up: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
-        network=VirtualNetwork.new(VirtualNetwork.build_xml(networkObject.backend_id), @one_client)
-        network.publish
+        network=VirtualNetwork.new(VirtualNetwork.build_xml(resource.backend_id), @one_client)
+        network.enable
         $log.debug("VM Info: #{network.info}")
       end
 
       # Action down
       def network_down(action, parameters, resource)
         $log.debug("network_down: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
-        network=VirtualNetwork.new(VirtualNetwork.build_xml(networkObject.backend_id), @one_client)
-        network.unpublish
+        network=VirtualNetwork.new(VirtualNetwork.build_xml(resource.backend_id), @one_client)
+        network.disable
         $log.debug("VM Info: #{network.info}")
       end
 
@@ -307,7 +357,7 @@ module OCCI
         attributes = storageObject.attributes
         image=Image.new(Image.build_xml, @one_client)
         raise "No image provided" if $image_path == ""
-        @templateRaw = @config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
+        @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
         template = ERB.new(File.read(@templateRaw)).result(binding)
         $log.debug("Parsed template #{template}")
         rc = ImageRepository.new.create(image,template)
@@ -357,7 +407,7 @@ module OCCI
       # Action online
       def storage_online(action, parameters, resource)
         $log.debug("storage_online: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
-        storage=Image.new(Image.build_xml(storageObject.backend_id), @one_client)
+        storage=Image.new(Image.build_xml(resource.backend_id), @one_client)
         storage.enable
         $log.debug("VM Info: #{network.info}")
       end
@@ -365,7 +415,7 @@ module OCCI
       # Action offline
       def storage_offline(action, parameters, resource)
         $log.debug("storage_offline: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
-        storage=Image.new(Image.build_xml(storageObject.backend_id), @one_client)
+        storage=Image.new(Image.build_xml(resource.backend_id), @one_client)
         storage.disable
         $log.debug("VM Info: #{network.info}")
       end

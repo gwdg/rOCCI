@@ -42,6 +42,7 @@ module OCCI
           attributes = OCCI::Core::Attributes.new()
           attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.vcpu', mutable = true, mandatory = false, unique = true)
           attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.boot', mutable = true, mandatory = false, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.vnc_url', mutable = true, mandatory = false, unique = true)
       
           MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
         end

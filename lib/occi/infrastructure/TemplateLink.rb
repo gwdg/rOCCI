@@ -1,12 +1,12 @@
 ##############################################################################
 #  Copyright 2011 Service Computing group, TU Dortmund
-#  
+#
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
-#  
+#
 #      http://www.apache.org/licenses/LICENSE-2.0
-#  
+#
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,17 +15,38 @@
 ##############################################################################
 
 ##############################################################################
-# Description: registry for all Category/Kind/Mixin instances currently 
-#              known to the OCCI server
+# Description: OCCI Infrastructure Storage Link
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'occi/core/Kind'
+require 'occi/core/Link'
+
 module OCCI
-  
-  # Tried to create an already existing mixin
-  class MixinAlreadyExistsError < RuntimeError; end
-    
-  # Tried to create an already existing mixin
-  class BackendError < RuntimeError; end
-  
+  module Infrastructure
+    class TemplateLink < OCCI::Core::Link
+
+      # Define appropriate kind
+      begin
+
+        actions = []
+        related = [OCCI::Core::Link::KIND]
+        entity_type = self
+        entities = []
+
+        term    = "templatelink"
+        scheme  = "http://schemas.ogf.org/occi/infrastructure#"
+        title   = "TemplateLink"
+
+        attributes = OCCI::Core::Attributes.new()
+
+        KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
+      end
+
+      def initialize(attributes, kind = OCCI::Core::TemplateLink::KIND, mixins = [])
+        super(attributes, kind, mixins)
+      end
+
+    end
+  end
 end

@@ -42,11 +42,10 @@ module OCCI
           attributes = OCCI::Core::Attributes.new()
           attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.type', mutable = true, mandatory = true, unique = true)
           attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.public', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.bridge', mutable = true, mandatory = true, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.bridge', mutable = true, mandatory = false, unique = true)
           attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.leases', mutable = true, mandatory = false, unique = false)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.address', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.size', mutable = true, mandatory = false, unique = true)
-      
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.phydev', mutable = true, mandatory = false, unique = true)
+          
           MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
         end
 

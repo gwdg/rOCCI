@@ -1,13 +1,19 @@
 OCCI_ID         = <%= attributes["occi.core.id"]%>
 NAME            = <%= attributes["occi.core.title"]%>
 DESCRIPTION     = <%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>
+VLAN_ID         = <%= attributes['occi.network.vlan'] if attributes['occi.network.vlan']%>
+PHYDEV          = <%= attributes['opennebula.network.phydev'] if attributes['opennebula.network.phydev']%>
 BRIDGE          = <%= attributes['opennebula.network.bridge'] %>
 PUBLIC          = <%= attributes['opennebula.network.public'].upcase if attributes['opennebula.network.public']%>
 
-TYPE            = <%= attributes['opennebula.network.type'].upcase %>
+<% if attributes['occi.network.allocation'] == 'static' %>
+TYPE            = FIXED
+<% else %>
+TYPE            = RANGED
+<% end %>
 
-NETWORK_ADDRESS = <%= attributes['opennebula.network.address'].upcase if attributes['opennebula.network.address']%>
-NETWORK_SIZE    = <%= attributes['opennebula.network.size'].upcase if attributes['opennebula.network.size']%>
+NETWORK_ADDRESS = <%= attributes['occi.network.address'].split('/')[0] if attributes['occi.network.address']%>
+NETWORK_SIZE    = <%= 2**(32-attributes['opennebula.network.size'].split('/')[1].to_i)  if attributes['opennebula.network.size']%>
 
 <% attributes['opennebula.network.leases'].each do |lease| %>
 LEASES          = [ <%= lease %> ]

@@ -131,7 +131,6 @@ rescue RuntimeError => e
   $log.fatal "#{e}: #{e.backtrace}"
   exit 1
 end
-$backend.print_configuration
 
 ##############################################################################
 # Configuration of HTTP Authentication

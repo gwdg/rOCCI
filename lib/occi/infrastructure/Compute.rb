@@ -86,7 +86,7 @@ module OCCI
       end
 
       def deploy
-        $backend.create_compute_instance(self)
+        template ? $backend.create_compute_instance(self) : $backend.create_compute_template(self)
       end
       
       def delete

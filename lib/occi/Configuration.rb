@@ -28,6 +28,8 @@ module OCCI
     @@mandatory_params = []
     # the backend needs to be specified, currently supported: dummy and opennebula
     @@mandatory_params << "backend"
+    # a domain name needs to be specified to determine the scheme URL
+    @@mandatory_params << "domain"
 
     ###########################################################################
     # Patterns to parse the Configuration File
