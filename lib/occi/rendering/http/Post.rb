@@ -135,6 +135,7 @@ module OCCI
           
           # Check if resource should be a template
           template = location.start_with?('template')
+          $log.debug("Resource should be a template") if template
           resource.make_template if template
     
           resource.deploy()

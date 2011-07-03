@@ -50,6 +50,7 @@ module OCCI
       def initialize(attributes, kind, mixins = [])
         attributes['occi.core.summary'] = "" if attributes['occi.core.summary'] == nil
         @links = []
+        @template = false
         super(attributes, kind, mixins)
         
         # if mixins include a template mixin, we link this entity and the template entity
@@ -71,7 +72,7 @@ module OCCI
 
       def get_location()
         @template ?  location = 'template' : location = ''
-        location << super.get_location
+        location << super
       end
 
       def make_template()

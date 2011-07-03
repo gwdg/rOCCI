@@ -28,6 +28,7 @@ module OCCI
       
       def initialize()
         @computeObjects = []
+        @computeTemplateObjects = []
         @networkObjects = []
         @storageObjects = []
         
@@ -49,8 +50,16 @@ module OCCI
         @computeObjects << computeObject
       end
       
+      def create_compute_template(computeObject)
+        @computeTemplateObjects << computeObject
+      end
+      
       def delete_compute_instance(computeObject)
         @computeObjects.delete(computeObject)
+      end
+      
+      def delete_compute_template(computeObject)
+        @computeTemplateObjects.delete(computeObject)
       end
       
       def create_network_instance(networkObject)

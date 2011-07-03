@@ -15,7 +15,7 @@
 ##############################################################################
 
 ##############################################################################
-# Description: OCCI Mixin to support OpenNebula specific image parameters
+# Description: OCCI Mixin to support OpenNebula specific network parameters
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
@@ -24,8 +24,8 @@ require 'singleton'
 
 module OCCI
   module Backend
-    module OpenNebula
-      class Image < OCCI::Core::Mixin
+    module ONE
+      class Network < OCCI::Core::Mixin
 
         # Define appropriate mixin
         begin
@@ -35,20 +35,17 @@ module OCCI
           related = []
           entities = []
 
-          term    = "image"
+          term    = "virtualnetwork"
           scheme  = "http://schemas.opennebula.org/occi/infrastructure#"
-          title   = "OpenNebula Image Mixin"
+          title   = "OpenNebula Virtual Network Mixin"
 
           attributes = OCCI::Core::Attributes.new()
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.type', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.public', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.persistent', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.dev_prefix', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.bus', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.path', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.source', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.fstype', mutable = true, mandatory = false, unique = true)
-
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.type', mutable = true, mandatory = true, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.public', mutable = true, mandatory = false, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.bridge', mutable = true, mandatory = false, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.leases', mutable = true, mandatory = false, unique = false)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.phydev', mutable = true, mandatory = false, unique = true)
+          
           MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
         end
 

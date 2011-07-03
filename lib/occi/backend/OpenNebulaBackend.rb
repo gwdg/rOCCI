@@ -22,12 +22,11 @@
 require 'rubygems'
 require 'uuidtools'
 require 'opennebula/OpenNebula'
-require 'opennebula/CloudServer'
 require 'opennebula/Configuration'
 require 'occi/ActionDelegator'
-require 'occi/backend/opennebula/Image'
-require 'occi/backend/opennebula/Network'
-require 'occi/backend/opennebula/VirtualMachine'
+require 'occi/backend/one/Image'
+require 'occi/backend/one/Network'
+require 'occi/backend/one/VirtualMachine'
 require 'occi/mixins/Reservation'
 
 ##############################################################################
@@ -41,9 +40,9 @@ module OCCI
     class OpenNebulaBackend
       
       def initialize(configfile)
-        $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::Image::MIXIN)
-        $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::Network::MIXIN)
-        $categoryRegistry.register_mixin(OCCI::Backend::OpenNebula::VirtualMachine::MIXIN)
+        $categoryRegistry.register_mixin(OCCI::Backend::ONE::Image::MIXIN)
+        $categoryRegistry.register_mixin(OCCI::Backend::ONE::Network::MIXIN)
+        $categoryRegistry.register_mixin(OCCI::Backend::ONE::VirtualMachine::MIXIN)
         $categoryRegistry.register_mixin(OCCI::Mixins::Reservation::MIXIN)
 
         # TODO: create mixins from existing templates
@@ -116,7 +115,7 @@ module OCCI
         end
         @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
         compute_template = ERB.new(File.read(@templateRaw)).result(binding)
-        $log.debug("Parsed template #{template}")
+        $log.debug("Parsed template #{compute_template}")
         rc = one_compute_object.allocate(compute_template)
         if OpenNebula.is_error?(rc)
           $log.warn("Problem with creation of compute resource. Error message: #{rc}")
@@ -140,7 +139,7 @@ module OCCI
 
       # DELETE COMPUTE OBJECT
       def delete_compute_object(occi_compute_object,one_compute_object)
-        rc = one_compute_object.delete
+        rc = one_compute_object.finalize
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
       end
 
@@ -182,7 +181,7 @@ module OCCI
         attributes['opennebula.vm.vcpu'] = compute_object['TEMPLATE/VCPU']
         attributes['opennebula.vm.boot'] = compute_object['TEMPLATE/BOOT']
 
-        mixins = [OCCI::Backend::OpenNebula::VirtualMachine::MIXIN]
+        mixins = [OCCI::Backend::ONE::VirtualMachine::MIXIN]
 
         resource = OCCI::Infrastructure::Compute.new(attributes,mixins)
         resource.backend_id = compute_object.id
@@ -323,7 +322,7 @@ module OCCI
           attributes['opennebula.network.size'] = vnet['TEMPLATE/NETWORK_SIZE']
           attributes['opennebula.network.leases'] = vnet['TEMPLATE/LEASES']
 
-          mixins = [OCCI::Backend::OpenNebula::Network::MIXIN]
+          mixins = [OCCI::Backend::ONE::Network::MIXIN]
 
           resource = OCCI::Infrastructure::Network.new(attributes,mixins)
           resource.backend_id = vnet.id
@@ -395,7 +394,7 @@ module OCCI
             attributes['occi.storage.fstype']
           end
 
-          mixins = [OCCI::Backend::OpenNebula::Image::MIXIN]
+          mixins = [OCCI::Backend::ONE::Image::MIXIN]
 
           resource = OCCI::Infrastructure::Storage.new(attributes,mixins)
           resource.backend_id = image.id

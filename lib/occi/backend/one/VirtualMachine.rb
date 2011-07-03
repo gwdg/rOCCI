@@ -15,7 +15,7 @@
 ##############################################################################
 
 ##############################################################################
-# Description: OCCI Mixin to support OpenNebula specific network parameters
+# Description: OCCI Mixin to support OpenNebula specific virtual machine parameters
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
@@ -24,8 +24,8 @@ require 'singleton'
 
 module OCCI
   module Backend
-    module OpenNebula
-      class Network < OCCI::Core::Mixin
+    module ONE
+      class VirtualMachine < OCCI::Core::Mixin
 
         # Define appropriate mixin
         begin
@@ -35,17 +35,15 @@ module OCCI
           related = []
           entities = []
 
-          term    = "virtualnetwork"
+          term    = "virtualmachine"
           scheme  = "http://schemas.opennebula.org/occi/infrastructure#"
-          title   = "OpenNebula Virtual Network Mixin"
+          title   = "OpenNebula Virtual Machine Mixin"
 
           attributes = OCCI::Core::Attributes.new()
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.type', mutable = true, mandatory = true, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.public', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.bridge', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.leases', mutable = true, mandatory = false, unique = false)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.phydev', mutable = true, mandatory = false, unique = true)
-          
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.vcpu', mutable = true, mandatory = false, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.boot', mutable = true, mandatory = false, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.vnc_url', mutable = true, mandatory = false, unique = true)
+      
           MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
         end
 

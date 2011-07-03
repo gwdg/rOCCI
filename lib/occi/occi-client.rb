@@ -429,7 +429,7 @@ begin
 
   GENERAL_OPTIONS =   { :config_file      => nil,                 # Use given config file if != nil instead of command line options
                         :host             => "http://localhost",  # Host http address to use
-                        :port             => 4567,                # Port to use
+                        :port             => 3000,                # Port to use
                         :timeout          => 10000,               # Timeout in ms to use for http requests
                         :command          => "test",              # Which command should be run
                         :log_level        => "debug",             # Logging level to use
