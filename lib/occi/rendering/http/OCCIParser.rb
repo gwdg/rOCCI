@@ -949,13 +949,12 @@ module OCCI
           # at line 145:45: '?action=' TERM_VALUE
           match( T__26, TOKENS_FOLLOWING_T__26_IN_target_attr_801 )
           __TERM_VALUE13__ = match( TERM_VALUE, TOKENS_FOLLOWING_TERM_VALUE_IN_target_attr_803 )
-
+          @link_value_stack.last.link['action'] = __TERM_VALUE13__.text;
         end
         match( T__27, TOKENS_FOLLOWING_T__27_IN_target_attr_807 )
         # --> action
 
                                    @link_value_stack.last.link['target'] = __TARGET_VALUE12__.text;
-                                   @link_value_stack.last.link['action'] = __TERM_VALUE13__.text;
                                  
         # <-- action
 

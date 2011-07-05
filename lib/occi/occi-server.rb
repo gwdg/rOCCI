@@ -214,6 +214,7 @@ begin
       if params['file'] != nil
         $log.debug("Location of Image #{params['file'][:tempfile].path}")
         $image_path = params['file'][:tempfile].path
+        File.chmod(0644,$image_path)
       end
 
       $log.debug("HTTP Category string: #{request.env['HTTP_CATEGORY']}")

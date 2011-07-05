@@ -106,11 +106,12 @@ module OCCI
     
           # Add links
           if request.env['HTTP_LINK'] != nil        
+            $log.debug("HTTP Links: #{request.env['HTTP_LINK']}")
             links = OCCI::Parser.new(request.env['HTTP_LINK']).link_values
               
             links.each do |link_data|
               $log.debug("Creating link, extracted link data: #{link_data}")
-              raise "Mandatory link information missing (related | target | category | location)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil && link_data.location != nil
+              raise "Mandatory link information missing (related | target | category | location)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil # && link_data.location != nil
                     
               kind = $categoryRegistry.getKind(link_data.category)
               raise "Kind not found in category!" if kind == nil

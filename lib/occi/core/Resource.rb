@@ -80,7 +80,7 @@ module OCCI
         related_mixin = OCCI::Infrastructure::ResourceTemplate::MIXIN if @links == []
         related_mixin = OCCI::Infrastructure::OSTemplate::MIXIN if @links != []
         term = attributes['occi.core.title'].gsub(/[^0-9A-Za-z]/, '_' + '_tpl')
-        scheme = 'http://' + $config['domain'] + '/templates/' + KIND.term
+        scheme = $config['server'] + '/templates/' + KIND.term
         title = attributes['occi.core.title']
         template_mixin = OCCI::Core::Mixin.new(term, scheme, title, nil, [], related_mixin, [])
         template_mixin.template_location = get_location

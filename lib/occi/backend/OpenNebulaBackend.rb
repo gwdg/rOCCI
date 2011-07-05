@@ -48,7 +48,7 @@ module OCCI
         # TODO: create mixins from existing templates
 
         # initialize OpenNebula connection
-        @one_client = Client.new('oneadmin:oneadmin',$config['one_xmlrpc'])
+        @one_client = Client.new($config['one_user'] + ':' + $config['one_password'],$config['one_xmlrpc'])
         
         network_get_all
         storage_get_all
@@ -307,6 +307,7 @@ module OCCI
 
       # GET ALL VNETs
       def network_get_all()
+        mixins = []
         vnetpool=VirtualNetworkPool.new(@one_client)
         vnetpool.info
         vnetpool.each do |vnet|
@@ -315,14 +316,17 @@ module OCCI
           attributes['occi.core.id'] = vnet['TEMPLATE/OCCI_ID']
           attributes['occi.core.title'] = vnet['NAME']
           attributes['occi.core.summary'] = vnet['TEMPLATE/DESCRIPTION']
-          attributes['opennebula.network.bridge'] = vnet['TEMPLATE/BRIDGE']
-          attributes['opennebula.network.public'] = vnet['TEMPLATE/PUBLIC']
-          attributes['opennebula.network.type'] = vnet['TEMPLATE/TYPE']
-          attributes['opennebula.network.address'] = vnet['TEMPLATE/NETWORK_ADDRESS']
-          attributes['opennebula.network.size'] = vnet['TEMPLATE/NETWORK_SIZE']
-          attributes['opennebula.network.leases'] = vnet['TEMPLATE/LEASES']
-
-          mixins = [OCCI::Backend::ONE::Network::MIXIN]
+          # attributes['opennebula.network.bridge'] = vnet['TEMPLATE/BRIDGE']
+          # attributes['opennebula.network.public'] = vnet['TEMPLATE/PUBLIC']
+          if vnet['TEMPLATE/TYPE'].downcase == 'fixed'
+            mixins << OCCI::Backend::ONE::Network::MIXIN
+            attributes['opennebula.network.leases'] = vnet['TEMPLATE/LEASES']
+          end
+          if vnet['TEMPLATE/TYPE'].downcase == 'ranged'
+            mixins << OCCI::Infrastructure::Ipnetworking::MIXIN
+            attributes['occi.network.allocation'] = 'dynamic' 
+            attributes['occi.network.address'] = vnet['TEMPLATE/NETWORK_ADDRESS'] + '/' + (32-(Math.log(vnet['TEMPLATE/NETWORK_SIZE'].to_i)/Math.log(2)).ceil).to_s
+          end
 
           resource = OCCI::Infrastructure::Network.new(attributes,mixins)
           resource.backend_id = vnet.id
@@ -359,7 +363,7 @@ module OCCI
         @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
         template = ERB.new(File.read(@templateRaw)).result(binding)
         $log.debug("Parsed template #{template}")
-        rc = ImageRepository.new.create(image,template)
+        rc = image.allocate(template)
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
         storageObject.backend_id = image.id
         $log.debug("OpenNebula ID of image: #{storageObject.backend_id}")
