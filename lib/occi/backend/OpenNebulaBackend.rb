@@ -166,6 +166,10 @@ module OCCI
 
       # GET COMPUTE OBJECT
       def compute_get_object(compute_object)
+        mixins = []
+        mixins << OCCI::Backend::ONE::VirtualMachine::MIXIN
+        mixins << OCCI::Backend::ONE::VNC::MIXIN
+        
         attributes = {}
         # parse all parameters from OpenNebula to OCCI
         attributes['occi.core.id'] = compute_object['TEMPLATE/OCCI_ID']
@@ -180,9 +184,27 @@ module OCCI
         attributes['occi.compute.memory'] = compute_object['TEMPLATE/MEMORY']
         attributes['opennebula.vm.vcpu'] = compute_object['TEMPLATE/VCPU']
         attributes['opennebula.vm.boot'] = compute_object['TEMPLATE/BOOT']
-
-        mixins = [OCCI::Backend::ONE::VirtualMachine::MIXIN]
-
+          
+        if compute_object['TEMPLATE/GRAPHICS/TYPE'] == 'vnc'
+          vnc_host = host = resource['HISTORY/HOSTNAME']
+          vnc_port = compute_object['TEMPLATE/GRAPHICS/PORT']
+            
+          # The noVNC proxy_port
+          proxy_port = $config[:one_vnc_proxy_base_port].to_i + vnc_port.to_i
+          
+          # CREATE PROXY FOR VNC SERVER
+          begin
+              novnc_cmd = "#{config[:novnc_path]}/utils/launch.sh"
+              IO.popen("#{novnc_cmd} --listen #{proxy_port} \
+                                            --vnc #{host}:#{vnc_port}")
+          rescue Exception => e
+              error = Error.new(e.message)
+              return error
+          end
+          attributes['opennebula.vm.vnc'] = vnc_host + vnc_port
+          attributes['opennebula.vm.web_vnc'] = $config[:server] + proxy_port
+        end
+          
         resource = OCCI::Infrastructure::Compute.new(attributes,mixins)
         resource.backend_id = compute_object.id
         $log.debug("Backend ID: #{resource.backend_id}")
@@ -426,6 +448,15 @@ module OCCI
       # Action backup
       def storage_backup(action, parameters, resource)
         $log.debug("storage_backup: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        resource.links.each do |link_resource|
+          link_resource.kind.term = "compute"
+          compute = VirtualMachine.new(VirtualMachine.build_xml(link_resource.backend_id), @one_client)
+          backup_id = compute.savedisk(resource.backend_id,"Backup " + Time.now)
+          attributes = []
+          backup = OCCI::Infrastructure::Storage.new(attributes)
+          backup.backend_id = backup_id
+          $locationRegistry.register_location(backup.get_location, backup)
+        end
         $log.debug("not yet implemented")
       end
 
