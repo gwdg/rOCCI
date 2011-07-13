@@ -14,7 +14,7 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
-module OpenNebula
+module opennebula
 
     begin
         require 'nokogiri'
