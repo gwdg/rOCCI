@@ -14,7 +14,7 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
-module opennebula
+module OpenNebula
 
     begin
         require 'nokogiri'
@@ -109,11 +109,11 @@ module opennebula
 
             if NOKOGIRI
                 @xml.xpath(filter.to_s).each { |pelem|
-                    elements_array << pelem.text if !pelem.text
+                    elements_array << pelem.text if pelem.text
                  }
             else
                 @xml.elements.each(filter.to_s) { |pelem|
-                    elements_array << pelem.text if !pelem.text
+                    elements_array << pelem.text if pelem.text
                 }
             end
             
@@ -214,14 +214,15 @@ module opennebula
 
                         str_line << n.collect {|n2|
                             if n2 && n2.class==REXML::Element
-                                str = ind_tab + n2.name + "="
-                                str += n2.text if n2.text
+                                str = ""
+                                str << ind_tab << n2.name << '='
+                                str << attr_to_str(n2.text) if n2.text
                                 str
                             end
-                        }.compact.join(","+ind_enter)
+                        }.compact.join(','+ind_enter)
                         str_line<<" ]"
                     else
-                        str_line<<n.name << "=" << n.text.to_s
+                        str_line << n.name << '=' << attr_to_str(n.text.to_s)
                     end
                     str_line
                 end
@@ -283,6 +284,17 @@ module opennebula
             end
 
             hash
+        end
+    
+    private
+        def attr_to_str(attr)
+            attr.gsub!('"',"\\\"")
+
+            if attr.match(/[=,' ']/)
+                return '"' + attr + '"'
+            end
+
+            return attr
         end
     end
 

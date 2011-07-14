@@ -17,36 +17,36 @@
 require 'opennebula/Pool'
 
 module OpenNebula
-    class ClusterPool < Pool
+    class GroupPool < Pool
         # ---------------------------------------------------------------------
         # Constants and Class attribute accessors
         # ---------------------------------------------------------------------
 
-        CLUSTER_POOL_METHODS = {
-            :info => "clusterpool.info"
+        GROUP_POOL_METHODS = {
+            :info => "grouppool.info"
         }
 
         # ---------------------------------------------------------------------
         # Class constructor & Pool Methods
         # ---------------------------------------------------------------------
-        
+
         # +client+ a Client object that represents a XML-RPC connection
         def initialize(client)
-            super('CLUSTER_POOL','CLUSTER',client)
+            super('GROUP_POOL','GROUP',client)
         end
 
         # Factory method to create User objects
         def factory(element_xml)
-            OpenNebula::Cluster.new(element_xml,@client)
+            OpenNebula::Group.new(element_xml,@client)
         end
 
         # ---------------------------------------------------------------------
         # XML-RPC Methods for the User Object
         # ---------------------------------------------------------------------
-        
-        # Retrieves all the Clusters in the pool.
+
+        # Retrieves all the Groups in the pool.
         def info()
-            super(CLUSTER_POOL_METHODS[:info])
+            super(GROUP_POOL_METHODS[:info])
         end
     end
 end

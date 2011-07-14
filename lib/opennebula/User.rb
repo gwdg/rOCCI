@@ -25,8 +25,11 @@ module OpenNebula
             :info     => "user.info",
             :allocate => "user.allocate",
             :delete   => "user.delete",
-            :passwd   => "user.passwd"
+            :passwd   => "user.passwd",
+            :chgrp    => "user.chgrp"
         }
+
+        SELF = -1
 
         # Creates a User description with just its identifier
         # this method should be used to create plain User objects.
@@ -57,7 +60,7 @@ module OpenNebula
         # ---------------------------------------------------------------------
         # XML-RPC Methods for the User Object
         # ---------------------------------------------------------------------
-        
+
         # Retrieves the information of the given User.
         def info()
             super(USER_METHODS[:info], 'USER')
@@ -89,5 +92,26 @@ module OpenNebula
             return rc
         end
 
+        # Changes the main group
+        # gid:: _Integer_ the new group id. Set to -1 to leave the current one
+        # [return] nil in case of success or an Error object
+        def chgrp(gid)
+            return Error.new('ID not defined') if !@pe_id
+
+            rc = @client.call(USER_METHODS[:chgrp],@pe_id, gid)
+            rc = nil if !OpenNebula.is_error?(rc)
+
+            return rc
+        end
+
+        # ---------------------------------------------------------------------
+        # Helpers to get User information
+        # ---------------------------------------------------------------------
+
+        # Returns the group identifier
+        # [return] _Integer_ the element's group ID
+        def gid
+            self['GID'].to_i
+        end
     end
 end

@@ -27,7 +27,8 @@ module OpenNebula
             :action   => "vm.action",
             :migrate  => "vm.migrate",
             :deploy   => "vm.deploy",
-            :savedisk => "vm.savedisk"
+            :savedisk => "vm.savedisk",
+            :chown    => "vm.chown"
         }
 
         VM_STATE=%w{INIT PENDING HOLD ACTIVE STOPPED SUSPENDED DONE FAILED}
@@ -188,11 +189,6 @@ module OpenNebula
         def resubmit
             action('resubmit')
         end
-        
-        # Reboot a VM
-        def reboot
-            action('reboot')
-        end
 
         # Saves a running VM and starts it again in the specified host
         def migrate(host_id)
@@ -229,6 +225,14 @@ module OpenNebula
             return rc
         end
 
+        # Changes the owner/group
+        # uid:: _Integer_ the new owner id. Set to -1 to leave the current one
+        # gid:: _Integer_ the new group id. Set to -1 to leave the current one
+        # [return] nil in case of success or an Error object
+        def chown(uid, gid)
+            super(VM_METHODS[:chown], uid, gid)
+        end
+
         #######################################################################
         # Helpers to get VirtualMachine information
         #######################################################################
@@ -262,6 +266,12 @@ module OpenNebula
             end
 
             short_state_str
+        end
+
+        # Returns the group identifier
+        # [return] _Integer_ the element's group ID
+        def gid
+            self['GID'].to_i
         end
 
     private

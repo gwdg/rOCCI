@@ -17,56 +17,37 @@
 require 'opennebula/Pool'
 
 module OpenNebula
-    class ImagePool < Pool
+    class AclPool < Pool
+
         #######################################################################
-        # Constants and Class attribute accessors
+        # Constants and Class Methods
         #######################################################################
-        
-        IMAGE_POOL_METHODS = {
-            :info => "imagepool.info"
+        ACL_POOL_METHODS = {
+            :info       => "acl.info",
+            :addrule    => "acl.addrule",
+            :delrule    => "acl.delrule"
         }
 
         #######################################################################
-        # Class constructor & Pool Methods
+        # Class constructor
         #######################################################################
-        
-        # +client+ a Client object that represents a XML-RPC connection
-        # +user_id+ is to refer to a Pool with Images from that user
-        def initialize(client, user_id=-1)
-            super('IMAGE_POOL','IMAGE',client)
-
-            @user_id  = user_id
+        def initialize(client)
+            super('ACL_POOL','ACL',client)
         end
 
-        # Default Factory Method for the Pools
         def factory(element_xml)
-            OpenNebula::Image.new(element_xml,@client)
+            acl=REXML::Document.new(element_xml).root
+            OpenNebula::Acl.new(acl['USER'], acl['RESOURCE'], acl['RIGHTS'])
         end
 
         #######################################################################
-        # XML-RPC Methods for the Image Object
+        # XML-RPC Methods
         #######################################################################
 
-        # Retrieves all or part of the VirtualMachines in the pool.
-        def info(*args)
-            case args.size
-                when 0
-                    info_filter(IMAGE_POOL_METHODS[:info],@user_id,-1,-1)
-                when 3
-                    info_filter(IMAGE_POOL_METHODS[:info],args[0],args[1],args[2])
-            end
-        end
-
-        def info_all()
-            return super(IMAGE_POOL_METHODS[:info])
-        end
-
-        def info_mine()
-            return super(IMAGE_POOL_METHODS[:info])
-        end
-
-        def info_group()
-            return super(IMAGE_POOL_METHODS[:info])
+        # Retrieves the ACL Pool
+        def info()
+        # Retrieves all the Acls in the pool.
+            super(ACL_POOL_METHODS[:info])
         end
     end
 end

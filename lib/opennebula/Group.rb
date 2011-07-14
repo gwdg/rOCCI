@@ -17,33 +17,31 @@
 require 'opennebula/Pool'
 
 module OpenNebula
-    class Cluster < PoolElement
+    class Group < PoolElement
         # ---------------------------------------------------------------------
         # Constants and Class Methods
         # ---------------------------------------------------------------------
-        CLUSTER_METHODS = {
-            :info       => "cluster.info",
-            :allocate   => "cluster.allocate",
-            :delete     => "cluster.delete",
-            :addhost    => "cluster.add",
-            :removehost => "cluster.remove",
+        GROUP_METHODS = {
+            :info       => "group.info",
+            :allocate   => "group.allocate",
+            :delete     => "group.delete"
         }
 
-        # Creates a Cluster description with just its identifier
-        # this method should be used to create plain Cluster objects.
+        # Creates a Group description with just its identifier
+        # this method should be used to create plain Group objects.
         # +id+ the id of the user
         #
         # Example:
-        #   cluster = Cluster.new(User.build_xml(3),rpc_client)
+        #   group = Group.new(Group.build_xml(3),rpc_client)
         #
-        def Cluster.build_xml(pe_id=nil)
+        def Group.build_xml(pe_id=nil)
             if pe_id
-                user_xml = "<CLUSTER><ID>#{pe_id}</ID></CLUSTER>"
+                group_xml = "<GROUP><ID>#{pe_id}</ID></GROUP>"
             else
-                user_xml = "<CLUSTER></CLUSTER>"
+                group_xml = "<GROUP></GROUP>"
             end
 
-            XMLElement.build_xml(user_xml,'CLUSTER')
+            XMLElement.build_xml(group_xml,'GROUP')
         end
 
         # ---------------------------------------------------------------------
@@ -56,48 +54,44 @@ module OpenNebula
         end
 
         # ---------------------------------------------------------------------
-        # XML-RPC Methods for the User Object
+        # XML-RPC Methods for the Group Object
         # ---------------------------------------------------------------------
-        
-        # Retrieves the information of the given Cluster.
+
+        # Retrieves the information of the given Group.
         def info()
-            super(CLUSTER_METHODS[:info], 'CLUSTER')
+            super(GROUP_METHODS[:info], 'GROUP')
         end
 
-        # Allocates a new Cluster in OpenNebula
+        # Allocates a new Group in OpenNebula
         #
-        # +clustername+ A string containing the name of the Cluster.
-        def allocate(clustername)
-            super(CLUSTER_METHODS[:allocate], clustername)
+        # +groupname+ A string containing the name of the Group.
+        def allocate(groupname)
+            super(GROUP_METHODS[:allocate], groupname)
         end
 
-        # Deletes the Cluster
+        # Deletes the Group
         def delete()
-            super(CLUSTER_METHODS[:delete])
+            super(GROUP_METHODS[:delete])
         end
 
-        # Add a host to the cluster
-        #
-        # +host_id+ ID of the Host to be added to the Cluster
-        def add_host(host_id)
-            return Error.new('ID not defined') if !@pe_id
+        # ---------------------------------------------------------------------
+        # Helpers to get information
+        # ---------------------------------------------------------------------
 
-            rc = @client.call(CLUSTER_METHODS[:addhost], host_id.to_i, @pe_id)
-            rc = nil if !OpenNebula.is_error?(rc)
-
-            return rc
+        # Returns whether or not the user with id 'uid' is part of this group
+        def contains(uid)
+            return self["USERS/ID[.=#{uid}]"] != nil
         end
 
-        # Remove a host from the cluster
-        #
-        # +host_id+ ID of the Host to be removed from the Cluster
-        def remove_host(host_id)
-            return Error.new('ID not defined') if !@pe_id
+        # Returns an array with the numeric user ids
+        def user_ids
+            array = Array.new
 
-            rc = @client.call(CLUSTER_METHODS[:removehost], host_id.to_i)
-            rc = nil if !OpenNebula.is_error?(rc)
+            self.each("USERS/ID") do |id|
+                array << id.text.to_i
+            end
 
-            return rc
+            return array
         end
     end
 end

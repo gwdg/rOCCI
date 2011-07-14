@@ -22,7 +22,6 @@ module OpenNebula
         include Enumerable
 
     protected
-
         #pool:: _String_ XML name of the root element
         #element:: _String_ XML name of the Pool elements
         #client::  _Client_ represents a XML-RPC connection
@@ -48,13 +47,36 @@ module OpenNebula
         #######################################################################
         # Common XML-RPC Methods for all the Pool Types
         #######################################################################
+        
+        #Gets the pool without any filter. Host, Group and User Pools
+        # xml_method:: _String_ the name of the XML-RPC method
+        def info(xml_method)
+            return xmlrpc_info(xml_method)
+        end
 
+        def info_all(xml_method)
+            return xmlrpc_info(xml_method,INFO_ALL,-1,-1)
+        end
+
+        def info_mine(xml_method)
+            return xmlrpc_info(xml_method,INFO_MINE,-1,-1)
+        end
+
+        def info_group(xml_method)
+            return xmlrpc_info(xml_method,INFO_GROUP,-1,-1)
+        end
+    
+        def info_filter(xml_method, who, start_id, end_id)
+            return xmlrpc_info(xml_method,who, start_id, end_id)
+        end
+
+    private
         # Calls to the corresponding info method to retreive the pool
         # representation in XML format
         # xml_method:: _String_ the name of the XML-RPC method
         # args:: _Array_ with additional arguments for the info call
         # [return] nil in case of success or an Error object
-        def info(xml_method,*args)
+        def xmlrpc_info(xml_method,*args)
             rc = @client.call(xml_method,*args)
 
             if !OpenNebula.is_error?(rc)
@@ -66,6 +88,10 @@ module OpenNebula
         end
 
     public
+        # Constants for info queries (include/RequestManagerPoolInfoFilter.h)
+        INFO_GROUP = -1
+        INFO_ALL   = -2
+        INFO_MINE  = -3
 
         # Iterates over every PoolElement in the Pool and calls the block with a
         # a PoolElement obtained calling the factory method
@@ -148,13 +174,12 @@ module OpenNebula
         # Calls to the corresponding update method to modify
         # the object's template
         # xml_method:: _String_ the name of the XML-RPC method
-        # name:: _String_ the name of the property to be modified
-        # value:: _String_ the new value of the property to be modified
+        # new_template:: _String_ the new template contents
         # [return] nil in case of success or an Error object
-        def update(xml_method, name, value)
+        def update(xml_method, new_template)
             return Error.new('ID not defined') if !@pe_id
 
-            rc = @client.call(xml_method,@pe_id, name, value)
+            rc = @client.call(xml_method,@pe_id, new_template)
             rc = nil if !OpenNebula.is_error?(rc)
 
             return rc
@@ -168,6 +193,21 @@ module OpenNebula
             return Error.new('ID not defined') if !@pe_id
 
             rc = @client.call(xml_method,@pe_id)
+            rc = nil if !OpenNebula.is_error?(rc)
+
+            return rc
+        end
+
+        # Calls to the corresponding chown method to modify
+        # the object's owner and group
+        # xml_method:: _String_ the name of the XML-RPC method
+        # uid:: _Integer_ the new owner id. Set to -1 to leave the current one
+        # gid:: _Integer_ the new group id. Set to -1 to leave the current one
+        # [return] nil in case of success or an Error object
+        def chown(xml_method, uid, gid)
+            return Error.new('ID not defined') if !@pe_id
+
+            rc = @client.call(xml_method,@pe_id, uid, gid)
             rc = nil if !OpenNebula.is_error?(rc)
 
             return rc

@@ -27,7 +27,15 @@ module OpenNebula
             :publish    => "vn.publish",
             :delete     => "vn.delete",
             :addleases  => "vn.addleases",
-            :rmleases   => "vn.rmleases"
+            :rmleases   => "vn.rmleases",
+            :chown      => "vn.chown"
+        }
+
+        VN_TYPES=%w{RANGED FIXED}
+
+        SHORT_VN_TYPES={
+            "RANGED" => "R",
+            "FIXED"  => "F"
         }
 
         # Creates a VirtualNetwork description with just its identifier
@@ -109,6 +117,39 @@ module OpenNebula
             rc = nil if !OpenNebula.is_error?(rc)
 
             return rc
+        end
+
+        # Changes the owner/group
+        # uid:: _Integer_ the new owner id. Set to -1 to leave the current one
+        # gid:: _Integer_ the new group id. Set to -1 to leave the current one
+        # [return] nil in case of success or an Error object
+        def chown(uid, gid)
+            super(VN_METHODS[:chown], uid, gid)
+        end
+
+        # ---------------------------------------------------------------------
+        # Helpers to get VirtualNetwork information
+        # ---------------------------------------------------------------------
+
+        # Returns the group identifier
+        # [return] _Integer_ the element's group ID
+        def gid
+            self['GID'].to_i
+        end
+
+        # Returns the type of the Virtual Network (numeric value)
+        def type
+            self['TYPE'].to_i
+        end
+
+        # Returns the type of the Virtual Network (string value)
+        def type_str
+            VN_TYPES[type]
+        end
+
+        # Returns the state of the Virtual Network (string value)
+        def short_type_str
+            SHORT_VN_TYPES[type_str]
         end
 
     private

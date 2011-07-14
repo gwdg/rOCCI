@@ -35,10 +35,12 @@ require 'opennebula/User'
 require 'opennebula/UserPool'
 require 'opennebula/Host'
 require 'opennebula/HostPool'
-require 'opennebula/Cluster'
-require 'opennebula/ClusterPool'
 require 'opennebula/Template'
 require 'opennebula/TemplatePool'
+require 'opennebula/Group'
+require 'opennebula/GroupPool'
+require 'opennebula/Acl'
+require 'opennebula/AclPool'
 
 module OpenNebula
 
