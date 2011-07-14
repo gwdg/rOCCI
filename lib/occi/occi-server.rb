@@ -29,6 +29,7 @@ require 'logger'
 
 # Ruby standard library
 require 'uri'
+require 'fileutils'
 
 # Server configuration
 require 'occi/Configuration'
@@ -165,20 +166,27 @@ begin
         break
       end
 
+      object = $locationRegistry.get_object_by_location(location)
+      
       # Render exact matches referring to kinds / mixins
-      if $locationRegistry.get_object_by_location(location) != nil && $locationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Category)
+      if object != nil && object.kind_of?(OCCI::Core::Category)
         headers = OCCI::Rendering::HTTP::Get.type_list_resources(request, location)
         break
       end
 
       # Render exact matches referring to resources
-      if $locationRegistry.get_object_by_location(location) != nil && $locationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Resource)
+      if object != nil && object.kind_of?(OCCI::Core::Resource)
+        object.refresh
         headers = OCCI::Rendering::HTTP::Get.resource_render(location)
         break
       end
 
       # Render locations ending with "/", which are not exact matches
       if location.end_with?("/")
+        resources = $locationRegistry.get_resources_below_location(location)
+        resources.each do |resource|
+          resource.refresh
+        end
         headers = OCCI::Rendering::HTTP::Get.resources_list(request, location)
         break
       end
@@ -213,8 +221,8 @@ begin
 
       if params['file'] != nil
         $log.debug("Location of Image #{params['file'][:tempfile].path}")
-        $image_path = params['file'][:tempfile].path
-        File.chmod(0644,$image_path)
+        $image_path = $config[:one_image_tmp_dir] + '/' + params['file'][:filename]
+        FileUtils.cp(params['file'][:tempfile].path, $image_path)
       end
 
       $log.debug("HTTP Category string: #{request.env['HTTP_CATEGORY']}")
@@ -229,6 +237,11 @@ begin
 
       raise "No valid kind / action category provided in category header!" if kind == nil && action == nil
 
+      # Refresh resources
+      $locationRegistry.get_resources_below_location(location).each do |resource|
+        resource.refresh
+      end
+      
       # Trigger action on resources(s)
       if action != nil
         OCCI::Rendering::HTTP::Post.resources_trigger_action(request, location)
@@ -284,6 +297,11 @@ begin
           raise "No kind / action provided!"
         end
       end
+      
+      # Refresh resources
+      $locationRegistry.get_resources_below_location(location).each do |resource|
+        resource.refresh
+      end
 
       # Create user defined mixin
       if location == "/-/"
@@ -333,6 +351,11 @@ begin
     begin
 
       location = request.path_info
+      
+      # Refresh resources
+      $locationRegistry.get_resources_below_location(location).each do |resource|
+        resource.refresh
+      end
       
       # Location references query interface => delete provided mixin
       if location == "/-/"

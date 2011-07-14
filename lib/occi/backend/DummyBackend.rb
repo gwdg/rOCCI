@@ -54,6 +54,9 @@ module OCCI
         @computeTemplateObjects << computeObject
       end
       
+      def refresh_compute_instance(computeObject)
+      end
+      
       def delete_compute_instance(computeObject)
         @computeObjects.delete(computeObject)
       end
@@ -66,12 +69,18 @@ module OCCI
         @networkObjects << networkObject
       end
       
+      def refresh_network_instance(computeObject)
+      end
+      
       def delete_network_instance(networkObject)
         @networkObjects.delete(networkObject)
       end
       
       def create_storage_instance(storageObject)
         @storageObjects << storageObject
+      end
+      
+      def refresh_storage_instance(computeObject)
       end
       
       def delete_storage_instance(storageObject)

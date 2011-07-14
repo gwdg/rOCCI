@@ -22,7 +22,6 @@
 require 'rubygems'
 require 'uuidtools'
 require 'opennebula/OpenNebula'
-require 'opennebula/Configuration'
 require 'occi/ActionDelegator'
 require 'occi/backend/one/Image'
 require 'occi/backend/one/Network'
@@ -48,8 +47,10 @@ module OCCI
         # TODO: create mixins from existing templates
 
         # initialize OpenNebula connection
+        $log.debug("Initializing connection with OpenNebula")
         @one_client = Client.new($config['one_user'] + ':' + $config['one_password'],$config['one_xmlrpc'])
         
+        $log.debug("Get existing objects from OpenNebula")
         network_get_all
         storage_get_all
         compute_get_all_instances
@@ -123,6 +124,9 @@ module OCCI
         $log.debug("Return code from OpenNebula #{rc}") if rc != nil
         occi_compute_object.backend_id = one_compute_object.id
         $log.debug("OpenNebula ID of virtual machine: #{occi_compute_object.backend_id}")
+        $log.debug("OpenNebula automatically triggers action start for Virtual Machines")
+        $log.debug("Changing state to started")
+        occi_compute_object.state_machine.transition(OCCI::Infrastructure::Compute::ACTION_START)
       end
 
       # DELETE COMPUTE INSTANCE
@@ -154,18 +158,18 @@ module OCCI
       def compute_get_all_templates()
         compute_object_pool=TemplatePool.new(@one_client)
         compute_object_pool.info
-        compute_get_all_objects(compute_object_pool)
+        compute_get_all_objects(compute_object_pool,template=true)
       end
 
       # GET ALL COMPUTE OBJECTS
-      def compute_get_all_objects(compute_object_pool)
+      def compute_get_all_objects(compute_object_pool,template=false)
         compute_object_pool.each do |compute_object|
-          compute_get_object(compute_object)
+          compute_get_object(compute_object,template)
         end
       end
 
       # GET COMPUTE OBJECT
-      def compute_get_object(compute_object)
+      def compute_get_object(compute_object,template)
         mixins = []
         mixins << OCCI::Backend::ONE::VirtualMachine::MIXIN
         mixins << OCCI::Backend::ONE::VNC::MIXIN
@@ -186,7 +190,7 @@ module OCCI
         attributes['opennebula.vm.boot'] = compute_object['TEMPLATE/BOOT']
           
         if compute_object['TEMPLATE/GRAPHICS/TYPE'] == 'vnc'
-          vnc_host = host = resource['HISTORY/HOSTNAME']
+          vnc_host = compute_object['HISTORY/HOSTNAME']
           vnc_port = compute_object['TEMPLATE/GRAPHICS/PORT']
             
           # The noVNC proxy_port
@@ -205,7 +209,16 @@ module OCCI
           attributes['opennebula.vm.web_vnc'] = $config[:server] + proxy_port
         end
           
-        resource = OCCI::Infrastructure::Compute.new(attributes,mixins)
+        # check if the resource already exists, if not, create it
+        if attributes['occi.core.id'] != nil
+          kind = OCCI::Infrastructure::Compute::KIND
+          template  ? template_string = 'template/' : template_string = ''
+          location = $locationRegistry.get_location_of_object(kind) + template_string + attributes['occi.core.id']
+          resource = $locationRegistry.get_object_by_location(location)
+        else
+          resource = OCCI::Infrastructure::Compute.new(attributes,mixins)
+        end
+        
         resource.backend_id = compute_object.id
         $log.debug("Backend ID: #{resource.backend_id}")
         $locationRegistry.register_location(resource.get_location, resource)
@@ -331,7 +344,6 @@ module OCCI
       def network_get_all()
         mixins = []
         vnetpool=VirtualNetworkPool.new(@one_client)
-        vnetpool.info
         vnetpool.each do |vnet|
           attributes = {}
           # parse all parameters from OpenNebula to OCCI

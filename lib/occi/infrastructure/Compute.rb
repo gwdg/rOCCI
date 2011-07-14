@@ -90,6 +90,10 @@ module OCCI
         @template ? $backend.create_compute_template(self) : $backend.create_compute_instance(self)
       end
       
+      def refresh
+        $backend.refresh_compute_instance(self)
+      end
+      
       def delete
         $backend.delete_compute_instance(self)
         delete_entity()

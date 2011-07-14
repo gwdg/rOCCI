@@ -134,7 +134,8 @@ module OCCI
 
     # ---------------------------------------------------------------------------------------------------------------------
     def getAction(key)
-      @actions.fetch(key, nil)
+      action = @actions.fetch(key, nil)
+      action.category if action != nil
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
@@ -166,6 +167,7 @@ module OCCI
           # Do not add nil values to categories array
           if category != nil
             filtered_categories << category
+            $log.debug(category)
             $log.debug("Category found: #{category.scheme}#{category.term}")
           end
         end

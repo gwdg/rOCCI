@@ -71,6 +71,10 @@ module OCCI
         $backend.create_network_instance(self)
       end
       
+      def refresh
+        $backend.refresh_network_instance(self)
+      end
+      
       def delete
         $backend.delete_network_instance(self)
         delete_entity()

@@ -97,6 +97,10 @@ module OCCI
         $backend.create_storage_instance(self)
       end
       
+      def refresh
+        $backend.refresh_storage_instance(self)
+      end
+      
       def delete()
         $backend.delete_storage_instance(self)
         delete_entity()
