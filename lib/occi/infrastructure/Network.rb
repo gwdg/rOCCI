@@ -42,8 +42,6 @@ module OCCI
 
         STATE_ACTIVE.add_transition(ACTION_DOWN, STATE_INACTIVE)
 
-        STATE_MACHINE = 
-
         related     = [OCCI::Core::Resource::KIND]
         entity_type = self
         entities    = []
@@ -72,7 +70,7 @@ module OCCI
       end
       
       def refresh
-        $backend.refresh_network_instance(self)
+        $backend.network_refresh_instance(self)
       end
       
       def delete

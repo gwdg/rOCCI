@@ -50,26 +50,12 @@ module OCCI
         STATE_SNAPSHOT  = OCCI::StateMachine::State.new("snapshot")
         STATE_RESIZE    = OCCI::StateMachine::State.new("resize")
         
-        # Degraded state can only be reached by backend initiated state transitions
-        STATE_DEGRADED  = OCCI::StateMachine::State.new("degraded")
-        
         STATE_OFFLINE.add_transition(ACTION_ONLINE,             STATE_ONLINE)
-        STATE_OFFLINE.add_transition(ACTION_BACKEND_DEGRADED,   STATE_DEGRADED)
         
         STATE_ONLINE.add_transition(ACTION_OFFLINE,             STATE_OFFLINE)
         STATE_ONLINE.add_transition(ACTION_BACKUP,              STATE_BACKUP)
         STATE_ONLINE.add_transition(ACTION_SNAPSHOT,            STATE_SNAPSHOT)
         STATE_ONLINE.add_transition(ACTION_RESIZE,              STATE_RESIZE)
-        STATE_ONLINE.add_transition(ACTION_BACKEND_DEGRADED,    STATE_DEGRADED)
-
-        STATE_BACKUP.add_transition(ACTION_BACKEND_COMPLETE,    STATE_ONLINE)
-        STATE_BACKUP.add_transition(ACTION_BACKEND_DEGRADED,    STATE_DEGRADED)
-
-        STATE_SNAPSHOT.add_transition(ACTION_BACKEND_COMPLETE,  STATE_ONLINE)
-        STATE_SNAPSHOT.add_transition(ACTION_BACKEND_DEGRADED,  STATE_DEGRADED)
-        
-        STATE_RESIZE.add_transition(ACTION_BACKEND_COMPLETE,    STATE_ONLINE)
-        STATE_RESIZE.add_transition(ACTION_BACKEND_DEGRADED,    STATE_DEGRADED)
 
         related     = [OCCI::Core::Resource::KIND]
         entity_type = self
@@ -98,7 +84,7 @@ module OCCI
       end
       
       def refresh
-        $backend.refresh_storage_instance(self)
+        $backend.storage_refresh_instance(self)
       end
       
       def delete()

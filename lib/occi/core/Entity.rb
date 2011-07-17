@@ -122,7 +122,7 @@ module OCCI
 
         # Make sure UUID is UNIQUE for every entity
         # TODO: occi.core.id should not be set by user but may be set by backend during startup
-        $log.debug(attributes['occi.core.id'])
+        $log.debug("OCCI ID: #{attributes['occi.core.id']}")
         attributes['occi.core.id']    = UUIDTools::UUID.timestamp_create.to_s if attributes['occi.core.id'] == nil || attributes['occi.core.id'] == ""
         attributes['occi.core.title'] = "" if attributes['occi.core.title'] == nil
 

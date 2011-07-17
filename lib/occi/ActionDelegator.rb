@@ -88,7 +88,7 @@ module OCCI
 
       # Verify
       state_machine = resource.state_machine
-      raise "Action [#{action}] not valid for current state [#{state_machine.current_state}] of resource [#{resource}]!" if !resource.state_machine.check_transition(action)
+      raise "Action [#{action}] not valid for current state [#{state_machine.current_state}] of resource [#{resource}]!" if !state_machine.check_transition(action)
       if !@actions.has_key?(action)
         $log.warn("No backend methods registered for action [#{action}] on resource [#{resource}]")
         # Adapt resource state

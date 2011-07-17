@@ -126,7 +126,7 @@ link returns [links]:
 	 @init { $link_list = Array.new; }
 
 	 :   lv1 = link_value      { $link_list << $lv1.data }
-	     (',' lv2 = link_value { $link_list << $lv2.data })*;
+	     (';,' lv2 = link_value { $link_list << $lv2.data })*;
 
 	link_value returns [data]
 	

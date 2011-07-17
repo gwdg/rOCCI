@@ -112,10 +112,13 @@ module OCCI
           else
             # Unfiltered version
             resources.each do |resource|
+              $log.debug("Resource #{resource}")
+              $log.debug("Resource location #{resource.get_location}")
               locations << $locationRegistry.get_location_of_object(resource)
             end
           end
   
+          $log.debug("Locations: #{locations}")
           return OCCI::Rendering::HTTP::Renderer.render_locations(locations)
         end        
         

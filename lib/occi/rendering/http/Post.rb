@@ -42,7 +42,7 @@ module OCCI
 #          raise "Could not extract action from query-string: #{request.query_string}" if action_params == nil
 #          $log.debug("Action from query string: #{action_params}")
           
-          action  = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="actions")[0]
+          action  = $categoryRegistry.get_action_by_category_string(request.env['HTTP_CATEGORY'])
           
           entities  = $locationRegistry.get_resources_below_location(location)
           method    = request.env["HTTP_X_OCCI_ATTRIBUTE"]
@@ -120,6 +120,8 @@ module OCCI
               source = resource
               target = $locationRegistry.get_object_by_location(link_data.target)
               raise "Link target not found!" if target == nil
+              
+              link_data.attributes = {} if link_data.attributes.nil?
     
               link_data.attributes["occi.core.target"] = link_data.target
               link_data.attributes["occi.core.source"] = source.get_location()

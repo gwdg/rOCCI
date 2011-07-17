@@ -268,6 +268,12 @@ module OCCI
         # return: text/plain and text/uri: response.body
         # return: text/occi: response[key] head
         def self.render_response(responseAttributes, response, request)
+          
+          $log.debug("### Information on the client ###")
+          $log.debug("Client IP Adress: #{request.env['REMOTE_ADDR']}")
+          $log.debug("Client User Agent: #{request.env['HTTP_USER_AGENT']}")
+          $log.debug("#################################")
+          
           # determine content type from request content type or reques accept, fallback to text/plain
           content_type = request.env['CONTENT_TYPE']
           content_type = request.env['HTTP_ACCEPT'] if request.env['HTTP_ACCEPT'] != nil

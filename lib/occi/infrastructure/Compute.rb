@@ -91,7 +91,7 @@ module OCCI
       end
       
       def refresh
-        $backend.refresh_compute_instance(self)
+        $backend.compute_refresh_instance(self)
       end
       
       def delete

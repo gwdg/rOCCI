@@ -185,8 +185,10 @@ begin
       if location.end_with?("/")
         resources = $locationRegistry.get_resources_below_location(location)
         resources.each do |resource|
-          resource.refresh
+          resource.refresh if resource.kind_of?(OCCI::Core::Resource)
         end
+        $log.debug("Location: #{location}")
+        $log.debug("Request: #{request}")
         headers = OCCI::Rendering::HTTP::Get.resources_list(request, location)
         break
       end
@@ -239,7 +241,7 @@ begin
 
       # Refresh resources
       $locationRegistry.get_resources_below_location(location).each do |resource|
-        resource.refresh
+        resource.refresh if resource.kind_of?(OCCI::Core::Category)
       end
       
       # Trigger action on resources(s)
@@ -268,10 +270,6 @@ begin
 
     ensure
       OCCI::Rendering::HTTP::Renderer.render_response(headers, response, request)
-      if $image_path != ""
-        File.delete($image_path)
-      end
-      $image_path = ""
     end
   end
 
@@ -300,7 +298,7 @@ begin
       
       # Refresh resources
       $locationRegistry.get_resources_below_location(location).each do |resource|
-        resource.refresh
+        resource.refresh if resource.kind_of?(OCCI::Core::Category)
       end
 
       # Create user defined mixin
@@ -354,7 +352,7 @@ begin
       
       # Refresh resources
       $locationRegistry.get_resources_below_location(location).each do |resource|
-        resource.refresh
+        resource.refresh if resource.kind_of?(OCCI::Core::Category)
       end
       
       # Location references query interface => delete provided mixin

@@ -784,6 +784,9 @@ module OCCI
           alt_8 = 2
           look_8_0 = @input.peek( 1 )
 
+          $log.debug("look_8_0 #{look_8_0}")
+          $log.debug("T__14 #{T__14}")
+          
           if ( look_8_0 == T__14 )
             alt_8 = 1
 
@@ -882,11 +885,18 @@ module OCCI
 
         end
         # at line 138:57: ( attribute_attr )?
-        alt_11 = 2
+        alt_11 = 4
         look_11_0 = @input.peek( 1 )
+        look_11_1 = @input.peek( 2 )
 
         if ( look_11_0 == T__15 )
           alt_11 = 1
+        end
+        if ( look_11_1 == T__14 )
+          alt_11 = 2
+        end
+        if ( look_11_1 == -1 )
+          alt_11 = 3
         end
         case alt_11
         when 1
@@ -894,7 +904,8 @@ module OCCI
           @state.following.push( TOKENS_FOLLOWING_attribute_attr_IN_link_value_764 )
           attribute_attr11 = attribute_attr
           @state.following.pop
-
+        when 2
+          @input.consume
         end
         # --> action
 

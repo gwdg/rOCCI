@@ -29,19 +29,19 @@ module OCCI
       # Define appropriate kind
       begin
 
-        # Define backend initiated actions
+        # Define actions
+        ACTION_DOWN = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storagelink/action#", term = "down",      title = "Network Action Down", attributes = [])
+        ACTION_UP   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storagelink/action#", term = "up",        title = "Network Action Up", attributes = [])
 
-        ACTION_BACKEND_START  = "start"
-        ACTION_BACKEND_STOP   = "stop"
+        actions = [ACTION_DOWN, ACTION_UP]
 
         # Define state-machine
-
         STATE_INACTIVE  = OCCI::StateMachine::State.new("inactive")
         STATE_ACTIVE    = OCCI::StateMachine::State.new("active")
+        
+        STATE_INACTIVE.add_transition(ACTION_UP, STATE_ACTIVE)
 
-        STATE_INACTIVE.add_transition(ACTION_BACKEND_START, STATE_ACTIVE)
-
-        STATE_ACTIVE.add_transition(ACTION_BACKEND_STOP,    STATE_INACTIVE)
+        STATE_ACTIVE.add_transition(ACTION_DOWN, STATE_INACTIVE)
 
         actions = []
         related = [OCCI::Core::Link::KIND]

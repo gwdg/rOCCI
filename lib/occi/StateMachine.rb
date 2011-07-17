@@ -38,8 +38,8 @@ module OCCI
       # ---------------------------------------------------------------------------------------------------------------------
       
       def get_action_name(action)
-        return action.category.term if action.kind_of?(OCCI::Core::Action)           
-        return action.to_s
+        # TODO: Fix parsing of actions
+        return action.category.term if not action.category.nil?
       end
       
       # ---------------------------------------------------------------------------------------------------------------------
@@ -85,6 +85,10 @@ module OCCI
       @current_state  = start_state
       @states         = states
       @options        = options
+    end
+    
+    def set_state(state)
+      @current_state  = state
     end
 
     # ---------------------------------------------------------------------------------------------------------------------

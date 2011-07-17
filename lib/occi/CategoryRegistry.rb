@@ -134,8 +134,7 @@ module OCCI
 
     # ---------------------------------------------------------------------------------------------------------------------
     def getAction(key)
-      action = @actions.fetch(key, nil)
-      action.category if action != nil
+      @actions.fetch(key, nil)
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
@@ -160,7 +159,7 @@ module OCCI
             case filter
               when "kinds"    then $categoryRegistry.getKind(key)
               when "mixins"   then $categoryRegistry.getMixin(key)
-              when "actions"  then $categoryRegistry.getAction(key)
+              when "actions"  then $categoryRegistry.getAction(key).category unless $categoryRegistry.getAction(key).nil?
             else
               $categoryRegistry.get_category(key)
             end
@@ -173,6 +172,16 @@ module OCCI
         end
       end
       return filtered_categories
+    end
+    
+    def get_action_by_category_string(categoryString)
+      all_categories      = OCCI::Parser.new(categoryString).category_values
+      action = nil
+
+      all_categories.each do |category_data|
+        action = getAction(category_data.scheme + category_data.term) if not (category_data.term.nil? && category_data.scheme.nil?)
+      end
+      return action
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
