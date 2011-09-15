@@ -20,7 +20,7 @@
 ##############################################################################
 
 ##############################################################################
-# Require Ruby Gems and OCCI classes
+# Require Ruby Gems
 
 # gems
 require 'rubygems'
@@ -35,6 +35,22 @@ require 'benchmark'
 # Server configuration
 require 'occi/Configuration'
 
+##############################################################################
+# Initialize logger
+
+$stdout.sync = true
+$log = Logger.new(STDOUT)
+
+##############################################################################
+# Initialize Category Registry
+
+# registry for all categories (e.g. kinds, mixins, actions)
+require 'occi/CategoryRegistry'
+$categoryRegistry = OCCI::CategoryRegistry.new
+
+##############################################################################
+# Require OCCI classes
+
 # OCCI Infrastructure classes
 require 'occi/infrastructure/Compute'
 require 'occi/infrastructure/Storage'
@@ -47,12 +63,6 @@ require 'occi/infrastructure/Ipnetworking'
 # OCCI HTTP rendering
 require 'occi/rendering/http/Renderer'
 require 'occi/rendering/http/LocationRegistry'
-
-##############################################################################
-# Initialize logger
-
-$stdout.sync = true
-$log = Logger.new(STDOUT)
 
 ##############################################################################
 # Read configuration file and set loglevel
@@ -249,6 +259,14 @@ def trigger_action(location, action, parameters = {})
   end
 
   return request  
+end
+
+# ---------------------------------------------------------------------------------------------------------------------
+def test_validate(options)
+  queue = []
+  queue << retrieve_resource('/')
+  queue << retrieve_resource('/-/')
+  return queue
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -473,13 +491,17 @@ begin
       GENERAL_OPTIONS[:config_file] = config
     end
 
-    opts.on( '-h', '--host HOSTNAME', 'Connect to host' ) do |host|
+    opts.on( '-H', '--host HOSTNAME', 'Connect to host' ) do |host|
       puts GENERAL_OPTIONS[:config_file] = config
       GENERAL_OPTIONS[:host] = host
     end
     
     opts.on( '-p', '--port PORT', Integer, 'Connect on port' ) do |port|
       GENERAL_OPTIONS[:port] = port
+    end
+    
+    opts.on( '-C', '--content-type MIME_TYPE', Integer, 'Content-Type and Accept for requests' ) do |conent_type|
+      GENERAL_OPTIONS[:content_type] = conent_type
     end
 
     opts.on( '-t', '--timeout NUM', Integer, 'Timeout for http requests in milliseconds' ) do |timeout|
@@ -512,7 +534,7 @@ begin
   
   TEST_COMMAND_PARSER = OptionParser.new do |opts|
 
-    opts.on( '-t', '--tests test1, test2, test3', Array, 'Predefined tests to run' ) do |tests|
+    opts.on( '-t', '--tests validate, test1, test2, test3', Array, 'Predefined tests to run' ) do |tests|
       TEST_OPTIONS[:tests] = tests
     end
 

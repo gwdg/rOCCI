@@ -20,7 +20,7 @@
 ##############################################################################
 
 ##############################################################################
-# Require Ruby Gems and OCCI classes
+# Require Ruby Gems
 
 # gems
 require 'rubygems'
@@ -33,39 +33,6 @@ require 'fileutils'
 
 # Server configuration
 require 'occi/Configuration'
-
-# Registry for all OCCI Categories
-require 'occi/CategoryRegistry'
-
-# Exceptions
-require 'occi/Exceptions'
-
-# OCCI Core classes
-require 'occi/core/Action'
-require 'occi/core/Category'
-require 'occi/core/Entity'
-require 'occi/core/Kind'
-require 'occi/core/Link'
-require 'occi/core/Mixin'
-require 'occi/core/Resource'
-
-# OCCI Infrastructure classes
-require 'occi/infrastructure/Compute'
-require 'occi/infrastructure/Storage'
-require 'occi/infrastructure/Network'
-require 'occi/infrastructure/Networkinterface'
-require 'occi/infrastructure/StorageLink'
-require 'occi/infrastructure/Ipnetworking'
-require 'occi/mixins/Reservation'
-
-# OCCI HTTP rendering
-require 'occi/rendering/http/Get'
-require 'occi/rendering/http/Put'
-require 'occi/rendering/http/Post'
-require 'occi/rendering/http/Delete'
-require 'occi/rendering/http/Renderer'
-require 'occi/rendering/http/LocationRegistry'
-require 'occi/rendering/http/OCCIParser'
 
 ##############################################################################
 # Initialize logger
@@ -97,41 +64,58 @@ if $config['LOG_LEVEL'] != nil
 end
 
 ##############################################################################
-# registry for all categories (e.g. kinds, mixins, actions)
-$categoryRegistry = OCCI::CategoryRegistry.new
-
-##############################################################################
-# registry for the locations of all OCCI objects
-$locationRegistry = OCCI::Rendering::HTTP::LocationRegistry.new
-
-$locationRegistry.register_location("/link/",             OCCI::Core::Link::KIND)
-
-$locationRegistry.register_location("/compute/",          OCCI::Infrastructure::Compute::KIND)
-$locationRegistry.register_location("/storage/",          OCCI::Infrastructure::Storage::KIND)
-$locationRegistry.register_location("/network/",          OCCI::Infrastructure::Network::KIND)
-
-$locationRegistry.register_location("/networkinterface/", OCCI::Infrastructure::Networkinterface::KIND)
-$locationRegistry.register_location("/storagelink/",      OCCI::Infrastructure::StorageLink::KIND)
-
-$locationRegistry.register_location("/ipnetworking/",     OCCI::Infrastructure::Ipnetworking::MIXIN)
-
-##############################################################################
 # initialize backend, currently only Dummy and OpenNebula are supported
 
 begin
   $backend = case $config["backend"]
   when "opennebula"
-    require 'occi/backend/OpenNebulaBackend'
-    OCCI::Backend::OpenNebulaBackend.new($config['OPENNEBULA_CONFIG'])
+    require 'occi/backend/OpenNebula'
+    OCCI::Backend::OpenNebula.new($config['OPENNEBULA_CONFIG'])
   when "dummy" then
-    require 'occi/backend/DummyBackend'
-    OCCI::Backend::DummyBackend.new()
+    require 'occi/backend/Dummy'
+    OCCI::Backend::Dummy.new()
   else raise "Backend '" + $config["backend"] + "' not found"
   end
 rescue RuntimeError => e
   $log.fatal "#{e}: #{e.backtrace}"
   exit 1
 end
+
+##############################################################################
+# Require OCCI classes
+
+# Exceptions
+require 'occi/Exceptions'
+
+# Category registry
+require 'occi/CategoryRegistry'
+
+# OCCI Core classes
+require 'occi/core/Action'
+require 'occi/core/Category'
+require 'occi/core/Entity'
+require 'occi/core/Kind'
+require 'occi/core/Link'
+require 'occi/core/Mixin'
+require 'occi/core/Resource'
+
+# OCCI Infrastructure classes
+require 'occi/infrastructure/Compute'
+require 'occi/infrastructure/Storage'
+require 'occi/infrastructure/Network'
+require 'occi/infrastructure/Networkinterface'
+require 'occi/infrastructure/StorageLink'
+require 'occi/infrastructure/Ipnetworking'
+require 'occi/mixins/Reservation'
+
+# OCCI HTTP rendering
+require 'occi/rendering/http/Put'
+require 'occi/rendering/http/Post'
+require 'occi/rendering/http/Delete'
+require 'occi/rendering/http/Renderer'
+require 'occi/rendering/http/LocationRegistry'
+require 'occi/rendering/http/OCCIParser'
+require 'occi/rendering/http/OCCIRequest'
 
 ##############################################################################
 # Configuration of HTTP Authentication
@@ -146,50 +130,75 @@ end
 # Sinatra methods for handling HTTP requests
 
 begin
-
   ############################################################################
   # GET request
+  
+  get '/web/' do
+    begin
+      if $config[:webinterface] == 'enabled'
+        require 'erb'
+        rhtml = ERB.new(File.read('etc/html/template.erb')).result(binding)
+        response.write(rhtml)
+        break
+      end
+    end
+  end
 
   get '*' do
     begin
+      # render general OCCI response
+      tmp = OCCI::Rendering::HTTP::Renderer.render_response(response,request)
+      response = tmp
 
-      headers = {}
+      occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request)
 
       location = request.path_info
       $log.debug("Requested location: #{location}")
 
-      $locationRegistry.dump_contexts
-
       # Query interface: return all supported kinds + mixins
       if location == "/-/"
-        headers = OCCI::Rendering::HTTP::Get.query_interface_list_all(request)
+        $log.info("Listing all kinds and mixins")
+        response = OCCI::Rendering::HTTP::Renderer.render_category_type(response, occi_request)
         break
       end
 
-      object = $locationRegistry.get_object_by_location(location)
-      
+      object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)
+
       # Render exact matches referring to kinds / mixins
       if object != nil && object.kind_of?(OCCI::Core::Category)
-        headers = OCCI::Rendering::HTTP::Get.type_list_resources(request, location)
+        raise "Only mixins / kinds are supported for exact match rendering: location: #{location}; object: #{object}" if !object.instance_variable_defined?(:@entities)
+        $log.info("Kind / mixin exact match for location [#{location}]: #{object}")
+        locations = []
+        object.entities.each do |entity|
+          locations << OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
+        end
+        response_header = OCCI::Rendering::HTTP::Renderer.render_locations(locations)
         break
       end
 
       # Render exact matches referring to resources
       if object != nil && object.kind_of?(OCCI::Core::Resource)
+        $log.info("Rendering resource [#{object}] for location [#{location}]...")
         object.refresh
-        headers = OCCI::Rendering::HTTP::Get.resource_render(location)
+        response_header = OCCI::Rendering::HTTP::Renderer.render_resource(object)
         break
       end
 
       # Render locations ending with "/", which are not exact matches
       if location.end_with?("/")
-        resources = $locationRegistry.get_resources_below_location(location)
+        $log.info("Listing all resource instances below location: #{location}")
+        resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location, occi_request.categories)
+
+        locations = []
+
+        # refresh information on all resources from backend
         resources.each do |resource|
           resource.refresh if resource.kind_of?(OCCI::Core::Resource)
+          locations << OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(resource)
         end
-        $log.debug("Location: #{location}")
-        $log.debug("Request: #{request}")
-        headers = OCCI::Rendering::HTTP::Get.resources_list(request, location)
+
+        $log.debug("Locations: #{locations}")
+        response_header = OCCI::Rendering::HTTP::Renderer.render_locations(locations)
         break
       end
 
@@ -205,8 +214,6 @@ begin
       $log.error(e)
       response.status = HTTP_STATUS_CODE["Bad Request"]
 
-    ensure
-      OCCI::Rendering::HTTP::Renderer.render_response(headers, response, request)
     end
   end
 
@@ -216,48 +223,89 @@ begin
   # Create an instance appropriate to category field and optinally link an instance to another one
   post '*' do
     begin
-      headers = {}
+      # render general OCCI response
+      tmp = OCCI::Rendering::HTTP::Renderer.render_response(response,request)
+      response = tmp
+
+      occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request)
 
       location = request.path_info
       $log.debug("Requested location: #{location}")
 
-      if params['file'] != nil
-        $log.debug("Location of Image #{params['file'][:tempfile].path}")
-        $image_path = $config[:one_image_tmp_dir] + '/' + params['file'][:filename]
-        FileUtils.cp(params['file'][:tempfile].path, $image_path)
-      end
+      # TODO: reconsider file uploads
+      #      if params['file'] != nil
+      #        $log.debug("Location of Image #{params['file'][:tempfile].path}")
+      #        $image_path = $config[:one_image_tmp_dir] + '/' + params['file'][:filename]
+      #        FileUtils.cp(params['file'][:tempfile].path, $image_path)
+      #      end
 
-      $log.debug("HTTP Category string: #{request.env['HTTP_CATEGORY']}")
-      $log.debug("Request Location #{location}")
-      $log.debug("Request query string #{request.query_string()}")
-
-      raise "No category header provided in request!" unless request.env['HTTP_CATEGORY'] != nil
-        
-      # Get first category from supplied category string
-      kind    = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="kinds")[0]
-      action  = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="actions")[0]
-
-      raise "No valid kind / action category provided in category header!" if kind == nil && action == nil
-
-      # Refresh resources
-      $locationRegistry.get_resources_below_location(location).each do |resource|
-        resource.refresh if resource.kind_of?(OCCI::Core::Category)
-      end
-      
       # Trigger action on resources(s)
-      if action != nil
-        OCCI::Rendering::HTTP::Post.resources_trigger_action(request, location)
+      unless occi_request.action.nil?
+        $log.info("Triggering action on resource(s)...")
+        resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location)
+        $log.debug(occi_request.attributes)
+        method    = request.env["HTTP_X_OCCI_ATTRIBUTE"]
+
+        raise "No entities corresponding to location [#{location}] could be found!" if entities == nil
+
+        $log.debug("Action [#{action}] to be triggered on [#{entities.length}] entities:")
+        delegator = OCCI::ActionDelegator.instance
+        resources.each do |resource|
+          resource.refresh if resource.kind_of?(OCCI::Core::Resource)
+          delegator.delegate_action(action, method, resource)
+        end
         break;
-      end  
+      end
 
       # If kind is a link and no actions specified then create link
-      if kind == OCCI::Core::Link::KIND or kind.related.include?(OCCI::Core::Link::KIND)
-        OCCI::Rendering::HTTP::Post.resource_create_link(request)
+      unless occi_request.links.empty?
+        $log.info("Creating link...")
+
+        target_uri = URI.parse(occi_request.attributes["occi.core.target"])
+        target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_uri.path)
+
+        source_uri = URI.parse(occi_request.attributes["occi.core.source"])
+        source = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(source_uri.path)
+
+        link = kind.entity_type.new(attributes)
+        source.links << link
+        target.links << link
+
+        link_location = link.get_location()
+        OCCI::Rendering::HTTP::LocationRegistry.register_location(link_location, link)
+        response['Location'] = OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(link,request.host_with_port)
         break
       end
 
       # If kind is not link and no actions specified, then create resource
-      headers = OCCI::Rendering::HTTP::Post.resource_create(request, location)
+      $log.info("Creating resource...")
+
+      # Create resource
+      unless occi_request.kind.nil?
+        $log.debug(occi_request.mixins)
+        resource = occi_request.kind.entity_type.new(occi_request.attributes, occi_request.mixins)
+
+        occi_request.links.each do |link|
+          target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.target)
+          raise "Link target not found!" if target == nil
+
+          link.attributes["occi.core.target"] = link.target
+          link.attributes["occi.core.source"] = resource.get_location
+
+          link = kind.entity_type.new(link.attributes)
+
+          resource.links << link
+          target.links << link
+
+          OCCI::Rendering::HTTP::LocationRegistry.register_location(link.get_location, link)
+        end
+
+        resource.deploy()
+
+        OCCI::Rendering::HTTP::LocationRegistry.register(resource.get_location, resource)
+
+        OCCI::Rendering::HTTP::Renderer.render_location(response, OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(resource))
+      end
 
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
@@ -268,8 +316,6 @@ begin
       $log.error(e)
       response.status  = HTTP_STATUS_CODE["Bad Request"]
 
-    ensure
-      OCCI::Rendering::HTTP::Renderer.render_response(headers, response, request)
     end
   end
 
@@ -278,45 +324,31 @@ begin
 
   put '*' do
     begin
+      # render general OCCI response
+      tmp = OCCI::Rendering::HTTP::Renderer.render_response(response,request)
+      response = tmp
+
+      occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request)
+
       location = request.path_info
-
-      headers = {}
-
-      $log.debug("HTTP Category string: #{request.env['HTTP_CATEGORY']}")
-      $log.debug("Request Location #{location}")
-      $log.debug("Request query string #{request.query_string()}")
-
-      if request.env['HTTP_CATEGORY'] != nil
-        # Get first kind from supplied category string
-        kind    = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="kinds")[0]
-        action  = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="actions")[0]
-
-        if kind == nil && action == nil && location != "/-/"
-          raise "No kind / action provided!"
-        end
-      end
-      
-      # Refresh resources
-      $locationRegistry.get_resources_below_location(location).each do |resource|
-        resource.refresh if resource.kind_of?(OCCI::Core::Category)
-      end
+      $log.debug("Requested location: #{location}")
 
       # Create user defined mixin
       if location == "/-/"
-         OCCI::Rendering::HTTP::Put.create_mixin(request)       
-         break
+        OCCI::Rendering::HTTP::Put.create_mixin(request)
+        break
       end
 
       # Add an resource instance to a mixin
-      mixin = $locationRegistry.get_object_by_location(location)
-      if mixin != nil && mixin.kind_of?(OCCI::Core::Mixin) && request.env["HTTP_X_OCCI_LOCATION"] != nil
-         OCCI::Rendering::HTTP::Put.add_resource_to_mixin(request, location)
+      unless occi_request.mixin.empty?
+        OCCI::Rendering::HTTP::Put.add_resource_to_mixin(request, location)
         break
       end
 
       # Update resource instance(s) at the given location
-      if $locationRegistry.get_object_by_location(location) != nil
-         OCCI::Rendering::HTTP::Put.update_resource(request, location)
+      if OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location) != nil
+        resource.refresh if resource.kind_of?(OCCI::Core::Resource)
+        OCCI::Rendering::HTTP::Put.update_resource(request, location)
         break
       end
 
@@ -337,8 +369,6 @@ begin
       $log.error(e)
       response.status = HTTP_STATUS_CODE["Bad Request"]
 
-    ensure
-      OCCI::Rendering::HTTP::Renderer.render_response(headers, response, request)
     end
   end
 
@@ -347,27 +377,32 @@ begin
 
   delete '*' do
     begin
+      tmp = OCCI::Rendering::HTTP::Renderer.render_response(response,request)
+      response = tmp
+
+      occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request)
 
       location = request.path_info
-      
+      $log.debug("Requested location: #{location}")
+
       # Refresh resources
-      $locationRegistry.get_resources_below_location(location).each do |resource|
-        resource.refresh if resource.kind_of?(OCCI::Core::Category)
+      OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location,occi_request.categories).each do |resource|
+        resource.refresh if resource.kind_of?(OCCI::Core::Resource)
       end
-      
+
       # Location references query interface => delete provided mixin
       if location == "/-/"
         OCCI::Rendering::HTTP::Delete.delete_mixin(request)
         break
-      end 
-      
+      end
+
       # Location references a mixin => unassociate all provided resources (by X_OCCI_LOCATION) from it
-      object = $locationRegistry.get_object_by_location(location)
+      object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)
       if object != nil && object.kind_of?(OCCI::Core::Mixin)
-          OCCI::Rendering::HTTP::Delete.unassociate_resources_from_mixin(request, location)
+        OCCI::Rendering::HTTP::Delete.unassociate_resources_from_mixin(request, location)
         break
       end
-      
+
       # Determine set of resources to be deleted
       OCCI::Rendering::HTTP::Delete.delete_entities(location)
 
@@ -379,30 +414,6 @@ begin
 
       $log.error(e)
       response.status = HTTP_STATUS_CODE["Bad Request"]
-
-    ensure
-      OCCI::Rendering::HTTP::Renderer.render_response({}, response, request)
-    end
-  end
-
-end
-
-##############################################################################
-# attic (old stuff)
-
-def add_instances_from_backend_to_service
-  kinds = $categoryRegistry.getKinds()
-  kinds.each do |kind|
-    if kind.entity_type.respond_to?(:get_ids)
-      ids = kind.entity_type.get_ids
-      ids.each do |id|
-        attributes = kind.entity_type.getInstance_id(id)
-        resource = kind.entity_type.new(attributes, nil, false)
-        kind.entities << resource
-      end
     end
   end
 end
-
-# get all Instances of Backend and store it in kind Objects in occi-service
-add_instances_from_backend_to_service

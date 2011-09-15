@@ -1,12 +1,12 @@
 ##############################################################################
 #  Copyright 2011 Service Computing group, TU Dortmund
-#  
+#
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
-#  
+#
 #      http://www.apache.org/licenses/LICENSE-2.0
-#  
+#
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'json'
 require 'occi/core/Action'
 require 'occi/core/Kind'
 require 'occi/core/Mixin'
@@ -40,111 +41,108 @@ HTTP_STATUS_CODE = {"OK" => 200,
   "Internal Server Error" => 500,
   "Not Implemented" => 501,
   "Service Unavailable" => 503}
+  
+HEADER_CATEGORY   = "Category"
+HEADER_LINK       = "Link"
+HEADER_ATTRIBUTE  = "X-OCCI-Attribute"
+HEADER_LOCATION   = "X-OCCI-Location"
 
 module OCCI
   module Rendering
     module HTTP
-
-      class Renderer
-
-        HEADER_CATEGORY   = "Category"
-        HEADER_LINK       = "Link"
-        HEADER_ATTRIBUTE  = "X-OCCI-Attribute"
-        HEADER_LOCATION   = "X-OCCI-Location"
+      module Renderer
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_category_type(object)
+        def self.render_category_type(response,occi_request)
           
-          # Determine class of object
-
-          clazz = nil
-
-          if object.kind_of? OCCI::Core::Kind
-            clazz     = "kind"
-            category  = object
-          end
-
-          if object.kind_of? OCCI::Core::Mixin
-            clazz     = "mixin"
-            category  = object
-          end
-
-          if object.kind_of? OCCI::Core::Action
-            clazz     = "action"  
-            category  = object.category
-          end
-          
-          raise "Unsupported object class: #{object.class}" if clazz == nil 
-          
-          # Render category-value
-          category_value = %Q{#{category.term}; scheme="#{category.scheme}"; class="#{clazz}";} 
-          
-          # Render category-params
-
-          category_params = ""
-
-          # "title"
-          if object.instance_variable_defined?(:@title)
-            category_params += %Q{title="#{category.title}";}
-          end
-          
-          # "related"
-          if object.instance_variable_defined?(:@related) && !object.related.empty?
-            related_value =  ""
-            object.related.each do |related|
-              related_value += related.scheme + related.term + " "
-            end
-            category_params += %Q{rel="#{related_value.strip}";}            
-          end
-
-          # "location"
-          location = $locationRegistry.get_location_of_object(category)
-          if location != nil
-            category_params += %Q{location=#{location};}
-          end
-          
-          # "attributes"
-          if clazz != "action"
+          # create category string for all categories
+          categories = []
+          occi_request.categories.each do |category|
+            # category identifier
+            category_string = %Q{#{category.term}; scheme="#{category.scheme}"; class="#{category.class_string}";}
+            # category title
+            category_string += %Q{title="#{category.title}";} if category.title
+            # related kinds
+            related_value = ""
+            category.related.each do |related|
+              related_value += related.type_identifier
+            end if defined? category.related
+            category_string += %Q{rel="#{related_value.strip}";} if related_value != ""
+            # category location
+            location = OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(category)
+            category_string += %Q{location=#{location.strip};} if defined? location.strip
+            # attributes  
             attributes = ""
             category.attributes.keys.each do |attribute|
               attributes += "#{attribute} "
-            end
-            category_params += %Q{attributes="#{attributes.strip}";}
-          end
-
-          # "actions"
-          if object.instance_variable_defined?(:@actions)
+            end if defined? category.attributes
+            category_string += %Q{attributes="#{attributes.strip}";} if attributes != ""
+            # actions
             actions = ""
             category.actions.each do |action|
               actions += action.category.scheme + action.category.term + " "
-            end
-            category_params += %Q{actions="#{actions.strip}";}
+            end if defined? category.actions
+            category_string += %Q{actions="#{actions.strip}";} if actions != ""
+            categories << category_string
           end
+          # response[HEADER_CATEGORY] = categories.join(',')
+
+          case response['Content-Type']
+          when 'application/json'
+            # dump categories as JSON string into response body
+            collection = {'Collection' => occi_request.categories.collect! {|category| category.to_hash}}
+            response.write(JSON.pretty_generate(collection))     
+          when 'text/plain'
+            categories.each do |category|
+              response.write(HEADER_CATEGORY + ': ' + category + "\n")
+            end
+          when 'text/occi'
+            # for text/occi the body needs to contain OK
+            response.write = "OK"
+          # when 'text/uri-list'
+          end
+
+          response.status = HTTP_STATUS_CODE["OK"]
+
+          return response
+        end
+        
+        def self.render_location(response, location)
           
-          header = {}
-          header[HEADER_CATEGORY] = category_value + category_params
+          response['Location'] = location
+          case response['Content-Type']
+          when 'application/json'
+            # dump categories as JSON string into response body
+            location = {'Location' => location}
+            response.write(JSON.pretty_generate(location))     
+          when 'text/plain'
+            response.write('Location: ' + location)
+          when 'text/occi'
+            # for text/occi the body needs to contain OK
+            response.write = "OK"
+          # when 'text/uri-list'
+          end
 
-          $log.debug("Rendered category object: #{category}:")
-          $log.debug(header)
+          response.status = HTTP_STATUS_CODE["OK"]
 
-          return header
+          return response
         end
 
-        # ---------------------------------------------------------------------------------------------------------------------        
+        # ---------------------------------------------------------------------------------------------------------------------
         def self.render_link_reference(link)
 
-          # Link value 
+          # Link value
           location        = $locationRegistry.get_location_of_object(link)
           target_location = link.attributes["occi.core.target"]
           target_resource = $locationRegistry.get_object_by_location(target_location)
-          target_resource_type = target_resource.kind.scheme + target_resource.kind.term 
- 
+          target_resource_type = target_resource.kind.scheme + target_resource.kind.term
+
           link_value = %Q{<#{target_location}>;rel="#{target_resource_type}";self="#{location}"}
-          
+
           # Link params
           category = link.kind
           link_params = %Q{;category="#{category.scheme + category.term}"}
-          
+
           if !link.attributes.empty?
             link.attributes.each do |name, value|
               link_params += %Q{;#{name}="#{value}"}
@@ -162,35 +160,35 @@ module OCCI
 
         # ---------------------------------------------------------------------------------------------------------------------
         def self.render_action_reference(resource, action)
-          
+
           resource_location = $locationRegistry.get_location_of_object(resource)
           action_location   = resource_location + "?action=" + action.category.term
           action_type       = action.category.scheme + action.category.term
-          
+
           link_value = %Q{<#{action_location}>;rel="#{action_type}"}
-          
+
           header = {}
           header[HEADER_LINK] = link_value
-          
+
           $log.debug("Rendered action reference (for resource): #{action}: #{resource}:")
           $log.debug(header)
-          
+
           return header
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
         def self.render_attributes(attributes)
-          
+
           return {} if attributes == nil || attributes.empty?
 
           attributes_values = []
           attributes.each do |name, value|
             attributes_values << %Q{#{name}="#{value}"}
           end
-          
+
           header = {}
           header[HEADER_ATTRIBUTE] = attributes_values
-        
+
           $log.debug("Rendered attributes: #{attributes}:")
           $log.debug(header)
 
@@ -199,9 +197,9 @@ module OCCI
 
         # ---------------------------------------------------------------------------------------------------------------------
         def self.render_locations(locations)
-          
+
           return {} if locations.empty?
-          
+
           locations_values = []
           locations.each do |location|
             locations_values << $config["server"] + ':' + $config["port"] + location
@@ -209,16 +207,16 @@ module OCCI
 
           header = {}
           header[HEADER_LOCATION] = locations_values
-          
+
           $log.debug("Rendered locations: #{locations}:")
           $log.debug(header)
-          
+
           return header
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
         def self.merge_headers(headers, headers_to_add)
-          
+
           headers.merge!(headers_to_add) { |header, value_old, value_to_add|
             if !value_old.kind_of? Array
               value_old = [value_old]
@@ -232,7 +230,7 @@ module OCCI
 
         # ---------------------------------------------------------------------------------------------------------------------
         def self.render_resource(entity)
-        
+
           $log.debug("Rendering entity: #{entity}")
 
           headers = {}
@@ -243,102 +241,66 @@ module OCCI
           entity.mixins.each do |mixin|
             merge_headers(headers, render_category_type(mixin))
           end
-          
+
           # Render attributes
           merge_headers(headers, render_attributes(entity.attributes))
-          
+
           # Render link references
           entity.links.each do |link|
             merge_headers(headers, render_link_reference(link))
           end
-          
+
           # Render action references
           # TODO: only render currently applicable actions
           entity_kind.actions.each do |action|
             merge_headers(headers, render_action_reference(entity, action))
           end
-          
+
           return headers
         end
-       
+
         # ---------------------------------------------------------------------------------------------------------------------
-        # the main render (class)method for some render operations
+        # rendering general parameters
         # responeAttributes: Hash object
         # respone: response object of Sinatra
         # return: text/plain and text/uri: response.body
         # return: text/occi: response[key] head
-        def self.render_response(responseAttributes, response, request)
-          
-          $log.debug("### Information on the client ###")
-          $log.debug("Client IP Adress: #{request.env['REMOTE_ADDR']}")
-          $log.debug("Client User Agent: #{request.env['HTTP_USER_AGENT']}")
-          $log.debug("#################################")
-          
-          # determine content type from request content type or reques accept, fallback to text/plain
-          content_type = request.env['CONTENT_TYPE']
-          content_type = request.env['HTTP_ACCEPT'] if request.env['HTTP_ACCEPT'] != nil
-          content_type = "text/plain" if content_type == "text/*" || content_type == "*/*" || content_type == "" || content_type == nil
+        def self.render_response(response, request)
+          $log.info("#################### Information on the client ####################")
+          $log.info("Client IP Adress: #{request.env['REMOTE_ADDR']}")
+          $log.info("Client User Agent: #{request.env['HTTP_USER_AGENT']}")
+          $log.info("###################################################################")
 
-          $log.debug("Accept type: #{request.env['HTTP_ACCEPT']}")
-          $log.debug("Content type: #{content_type}")
+          # determine content type from request content type or reques accept, fallback to text/plain
+          content_type = ""
+          content_type = request.env['CONTENT_TYPE'] if request.env['CONTENT_TYPE']
+          content_type = request.env['HTTP_ACCEPT'] if request.env['HTTP_ACCEPT']
+          if content_type.include?('application/json')
+            response['Content-Type'] = 'application/json'
+          elsif content_type.include?('text/html')
+            response['Content-Type'] = 'text/html'
+          elsif content_type.include?('text/plain') || content_type.include?('text/*') || content_type.include?('*/*') || content_type == ""
+            response['Content-Type'] = 'text/plain'
+          elsif content_type.include?('text/uri-list')
+            response['Content-Type'] = 'text/uri-list'
+          elsif content_type.include?('text/occi')
+            response['Content-Type'] = 'text/occi'
+          else
+            response.status = HTTP_STATUS_CODE["Unsupported Media Type"]
+            exit
+          end
+          $log.debug("Content type: #{response['Content-Type']}")
+          
+          response['Accept'] = "application/json,text/plain,text/occi"
+          $log.debug("Accept type: #{response['Accept']}")
 
           # content type independend parameters
-          response['Server'] = "OCCI/1.1"
-
-          # TODO: replace content-type matching with regular expressions
-
-          case content_type
-            when 'text/plain'
-              response['Content-Type'] = "text/plain"
-              responseAttributes.each_key do |key|
-                values = responseAttributes[key]
-                if values.size > 0 then
-                  values.each do |value|
-                    response.body << key + ": " + value + "\n"
-                  end
-                end
-              end
-              response.status = HTTP_STATUS_CODE["OK"]
-
-            when 'text/occi'
-              response['Content-Type'] = "text/occi"
-              responseAttributes.each_key do |key|
-                values = responseAttributes[key]
-                response[key] = ""
-                if values.size > 0 then
-                  values.each do |value|
-                    response[key] << "," if not response[key] == ""
-                    response[key] << value
-                  end
-                end
-              end
-              response.status = HTTP_STATUS_CODE["OK"]
-              # for text/occi the body needs to contain OK
-              response.body = "OK"
-
-            when 'text/uri-list'
-              response['Content-Type'] = "text/uri-list"
-              responseAttributes.each_key do |key|
-                values = responseAttributes[key]
-                if key == "location"
-                  if values.size > 0 then
-                    values.each do |value|
-                      response.body << value + "\n"
-                    end
-                  end
-                end
-              end
-              response.status = HTTP_STATUS_CODE["OK"]
-            else
-              response.status = HTTP_STATUS_CODE["Unsupported Media Type" ]
-          end
+          response['Server'] = "Ruby OCCI Framework/0.4 OCCI/1.1"
+          $log.debug("Server: #{response['Server']}")
           
-          $log.debug("Response headers: #{response.headers}")
-          $log.debug("Response body: #{response.body}")
+          return response
         end
-                
       end
-
     end
   end
 end

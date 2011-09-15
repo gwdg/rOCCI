@@ -35,8 +35,16 @@ module OCCI
         @unique     = unique
       end
 
-      def to_s()
+      def to_s
         @name
+      end
+      
+      def to_hash
+        hash = {}
+        hash['mutable'] = @mutable
+        hash['required'] = @mandatory
+        hash['unique'] = @unique
+        return hash
       end
     end
   end

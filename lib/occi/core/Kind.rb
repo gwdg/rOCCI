@@ -19,6 +19,7 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'json'
 require 'occi/core/Category'
 
 module OCCI
@@ -36,6 +37,19 @@ module OCCI
         @related      = (related != nil ? related : [])
         @entities     = (entities != nil ? entities : [])
         @entity_type  = entity_type
+      end
+      
+      def to_json(options={})
+        hash = {}
+        actions = @actions.collect {|action| action.category.type_identifier }
+        hash['actions'] = actions.join(',') unless actions.empty?
+        rel = @related.collect {|related| related.type_identifier}
+        hash['related'] = rel.join(',') unless rel.empty?
+        super['Category'].merge!(hash)
+      end
+      
+      def class_string
+        return 'kind'
       end
       
     end

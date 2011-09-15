@@ -19,6 +19,7 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'occi/rendering/http/LocationRegistry'
 require 'occi/core/Kind'
 
 module OCCI
@@ -41,6 +42,10 @@ module OCCI
         attributes << OCCI::Core::Attribute.new(name = 'occi.core.target', mutable = true, mandatory = true, unique = true)
           
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
+        
+        # register in category and location registry
+        OCCI::CategoryRegistry.register(KIND)
+        OCCI::Rendering::HTTP::LocationRegistry.register('/link/', KIND)
       end
       
       def initialize(attributes, kind = OCCI::Core::Link::KIND, mixins = [])

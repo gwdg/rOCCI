@@ -1,12 +1,12 @@
 ##############################################################################
 #  Copyright 2011 Service Computing group, TU Dortmund
-#  
+#
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
-#  
+#
 #      http://www.apache.org/licenses/LICENSE-2.0
-#  
+#
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,12 +19,12 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'json'
 require 'occi/core/Attributes'
 
 module OCCI
   module Core
     class Category
-
       module Related
         def self.get_all_related(categories)
           related     = []
@@ -42,22 +42,36 @@ module OCCI
       attr_reader   :term
       attr_reader   :title
       attr_reader   :attributes
-      
+
       def initialize(term, scheme, title, attributes)
         @term   = term
         @scheme = scheme
         @title  = title
         @attributes = (attributes != nil ? attributes : OCCI::Core::Attributes.new())
       end
-      
-      def get_location()
+
+      def location
         location = '/' + @term + '/'
       end
-      
-      def id
-        return @scheme + @term
+
+      def type_identifier
+        @scheme + @term
+      end
+
+      def class_string
+        #only action uses category directly
+        return 'action'
       end
       
+      def to_hash
+        hash = {}
+        hash['term'] = @term
+        hash['scheme'] = @scheme
+        hash['title'] = @title
+        hash['attributes'] = attributes.to_hash unless attributes.to_hash.empty?
+        hash['location'] = location
+        {'Category' => hash}
+      end
     end
   end
 end

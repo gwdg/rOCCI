@@ -21,6 +21,7 @@
 
 require 'rubygems'
 require 'uuidtools'
+require 'occi/CategoryRegistry'
 require 'occi/core/Attribute'
 require 'occi/core/Attributes'
 require 'occi/core/Kind'
@@ -36,8 +37,6 @@ module OCCI
       attr_reader   :mixins
       attr_reader   :kind
       attr_reader   :state_machine
-      
-      attr_accessor :backend_id
 
       # Define appropriate kind
       begin
@@ -55,6 +54,7 @@ module OCCI
         attributes << OCCI::Core::Attribute.new(name = 'occi.core.title', mutable = true,   mandatory = false,  unique = true)
 
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
+        OCCI::CategoryRegistry.register(KIND)
       end
 
       # ---------------------------------------------------------------------------------------------------------------------
@@ -139,15 +139,16 @@ module OCCI
         
         $log.debug("Mixins in entity #{@mixins}")
       end
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      def delete()
-        $log.debug("Deleting entity with location #{get_location}")
-        delete_entity()
+      
+      def finalize
+        # to be implemented in backend
       end
 
       # ---------------------------------------------------------------------------------------------------------------------
-      def delete_entity()
+      def delete
+        # finalize resource in backend
+        finalize
+        
         self.mixins.each do |mixin|
           mixin.entities.delete(self)
         end
@@ -171,16 +172,16 @@ module OCCI
       end
 
       # ---------------------------------------------------------------------------------------------------------------------
-      def get_location()
+      def get_location
         $log.debug("Kind: #{kind}")
-        $log.debug("Kind location #{$locationRegistry.get_location_of_object(kind)}")
+        $log.debug("Kind location #{OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(kind)}")
         $log.debug("ID #{attributes['occi.core.id']}")
-        location = $locationRegistry.get_location_of_object(kind) + attributes['occi.core.id']
+        location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(kind) + attributes['occi.core.id']
       end
 
       # ---------------------------------------------------------------------------------------------------------------------
-      def get_category_string()
-        self.kind.get_short_category_string()
+      def get_category_string
+        self.kind.get_short_category_string
       end
 
     end

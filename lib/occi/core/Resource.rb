@@ -19,6 +19,7 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'occi/CategoryRegistry'
 require 'occi/core/Entity'
 require 'occi/core/Kind'
 
@@ -45,6 +46,7 @@ module OCCI
         attributes << OCCI::Core::Attribute.new(name = 'links',             mutable = true, mandatory = false, unique = false)
 
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
+        OCCI::CategoryRegistry.register(KIND)
       end
 
       def initialize(attributes, kind, mixins = [])
@@ -68,11 +70,6 @@ module OCCI
             end
           end
         end
-      end
-
-      def get_location()
-        @template ?  location = 'template' : location = ''
-        location << super
       end
 
       def make_template()

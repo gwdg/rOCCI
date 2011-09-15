@@ -19,14 +19,13 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'singleton'
-
+require 'occi/CategoryRegistry'
 require 'occi/core/Mixin'
 
 module OCCI
   module Infrastructure
     class Ipnetworking < OCCI::Core::Mixin
-
+      include Singleton
       # Define appropriate mixin
       begin
         # Define actions
@@ -40,11 +39,13 @@ module OCCI
         title   = "IP Network Mixin"
 
         attributes = OCCI::Core::Attributes.new()
-        attributes << OCCI::Core::Attribute.new(name = 'occi.network.address',    mutable = true, mandatory = true,   unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.network.address',    mutable = true, mandatory = false,   unique = true)
         attributes << OCCI::Core::Attribute.new(name = 'occi.network.gateway',    mutable = true, mandatory = false,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.network.allocation', mutable = true, mandatory = true,   unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.network.allocation', mutable = true, mandatory = false,   unique = true)
           
         MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
+        
+        OCCI::CategoryRegistry.register(MIXIN)
       end
 
       def initialize(term, scheme, title, attributes, actions, related, entities)

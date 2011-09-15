@@ -1,12 +1,12 @@
 ##############################################################################
 #  Copyright 2011 Service Computing group, TU Dortmund
-#  
+#
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
-#  
+#
 #      http://www.apache.org/licenses/LICENSE-2.0
-#  
+#
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,19 +26,17 @@ require 'occi/core/Resource'
 module OCCI
   module Rendering
     module HTTP
-      
-      class LocationRegistry
-
+      module LocationRegistry
+        
         # ---------------------------------------------------------------------------------------------------------------------
         private
         # ---------------------------------------------------------------------------------------------------------------------
-        
-        HASH_SUFFIX = "_/hash/"
 
+        HASH_SUFFIX = "_/hash/"
         # ---------------------------------------------------------------------------------------------------------------------
-        def get_context(contexts)
-          return @context_root if contexts.length <= 1
-          current_context = @context_root
+        def self.get_context(contexts)
+          return @@context_root if contexts.length <= 1
+          current_context = @@context_root
           contexts[0..-2].each do |context|
             $log.debug("Searching context: " + context)
             if current_context.has_key?(context + HASH_SUFFIX)
@@ -48,17 +46,17 @@ module OCCI
             end
             # Create new context and continue there
             current_context[context + HASH_SUFFIX] = {}
-            current_context = current_context[context + HASH_SUFFIX] 
+            current_context = current_context[context + HASH_SUFFIX]
           end
           return current_context
         end
-        
+
         # ---------------------------------------------------------------------------------------------------------------------
-        def dump_context(context, padding)
+        def self.dump_context(context, padding)
           context.each {|key, value|
             if context[key].kind_of?(Hash)
               $log.debug("#{padding} context: #{key}")
-              dump_context(context[key], padding + "   ")
+              self.dump_context(context[key], padding + "   ")
               next
             end
             $log.debug("#{padding} location: #{key} : object: #{value}")
@@ -66,80 +64,76 @@ module OCCI
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def generate_key(object)
-          return object.scheme + object.term        if object.kind_of? OCCI::Core::Category
+        def self.generate_key(object)
+          return object.type_identifier if object.kind_of? OCCI::Core::Category
           return object.attributes["occi.core.id"]  if object.kind_of? OCCI::Core::Entity
           raise "Unsupported object type: #{object.class}"
         end
 
-        # ---------------------------------------------------------------------------------------------------------------------        
+        # ---------------------------------------------------------------------------------------------------------------------
         public
         # ---------------------------------------------------------------------------------------------------------------------
 
-        # ---------------------------------------------------------------------------------------------------------------------
-        def initialize
-          # Hash based representation of http namespace
-          @context_root = {}
-          
-          # Object -> location map
-          @locations    = {}
-          
-          # Location -> object map
-          @objects      = {}
-        end
-        
-        # ---------------------------------------------------------------------------------------------------------------------
-        def register_location(location, object)
+        # Hash based representation of http namespace
+        @@context_root = {}
 
-          raise "Location [#{@locations[generate_key(object)]}] already registered for object [#{object}]"  if @locations[generate_key(object)] != nil
-          raise "Object [#{@objects[location]}] already registered for location [#{location}]"              if @objects[location] != nil
-          raise "Only absolute paths (starting with '/') are supported: location provided: [#{location}])"  unless location.start_with?("/") 
+        # Object -> location map
+        @@locations    = {}
+
+        # Location -> object map
+        @@objects      = {}
+
+        # ---------------------------------------------------------------------------------------------------------------------
+        def self.register(location, object)
+
+          raise "Location [#{@@locations[generate_key(object)]}] already registered for object [#{object}]"  if @@locations[generate_key(object)] != nil
+          raise "Object [#{@@objects[location]}] already registered for location [#{location}]"              if @@objects[location] != nil
+          raise "Only absolute paths (starting with '/') are supported: location provided: [#{location}])"  unless location.start_with?("/")
 
           location_elements = location[1..-1].split('/')
           context = get_context(location_elements)
           context[location_elements[-1]] = object
 
-          @locations[generate_key(object)]  = location
-          @objects[location]                = object
+          @@locations[generate_key(object)]  = location
+          @@objects[location]                = object
         end
-        
-        # ---------------------------------------------------------------------------------------------------------------------
-        def unregister_location(location)
 
-          raise "Location [#{location}] not registered to any object" if @objects[location] == nil
+        # ---------------------------------------------------------------------------------------------------------------------
+        def self.unregister(location)
+
+          raise "Location [#{location}] not registered to any object" if @@objects[location] == nil
 
           location_elements = location.split('/')
           context = get_context(location_elements[1..-1])
           context.delete(location_elements[-1])
 
-          @locations.delete(generate_key(@objects[location]))
-          @objects.delete(location)
+          @@locations.delete(generate_key(@@objects[location]))
+          @@objects.delete(location)
         end
-        
+
         # ---------------------------------------------------------------------------------------------------------------------
-        def get_location_of_object(object)
-          return @locations[generate_key(object)]
+        def self.get_location_of_object(object)
+          return @@locations[generate_key(object)]
         end
-        
+
         # ---------------------------------------------------------------------------------------------------------------------
-        def get_absolute_location_of_object(object,url)
+        def self.get_absolute_location_of_object(object)
           location = get_location_of_object(object)
-          # TODO: HTTP or HTTPS? Maybe create a config value for this
-          return 'http://' + url + @locations[generate_key(object)]
+          return $config[:server].chomp('/') + ':' + $config[:port] + location if location
         end
-        
+
         # ---------------------------------------------------------------------------------------------------------------------
-        def get_object_by_location(location)
-          return @objects[location]
+        def self.get_object_by_location(location)
+          return @@objects[location]
         end
-        
+
         # ---------------------------------------------------------------------------------------------------------------------
-        def get_context_for_location(location)
+        def self.get_context_for_location(location)
           return get_context(location.split('/'))
         end
-        
+
         # ---------------------------------------------------------------------------------------------------------------------
-        def get_resources_below_location(location)
+        def self.get_resources_below_location(location, categories)
           context_elements_list = get_context_for_location(location).values
           resources = []
           begin
@@ -149,21 +143,22 @@ module OCCI
               next
             end
             # Only resources must be returned
-            resources << context_element if context_element.kind_of?(OCCI::Core::Entity)
+            resources << context_element if context_element.kind_of?(OCCI::Core::Entity) \
+            && categories.include?(context_element.KIND)
           end until context_elements_list.empty?
           # Test if there is an object directly under the requested location
           entity = get_object_by_location(location)
           resources << entity if entity != nil && entity.kind_of?(OCCI::Core::Entity)
           return resources
         end
-        
+
         # ---------------------------------------------------------------------------------------------------------------------
-        def dump_contexts()
-          dump_context(@context_root, "* ")
+        def self.dump_contexts()
+          dump_context(@@context_root, "* ")
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        
+
       end
     end
   end

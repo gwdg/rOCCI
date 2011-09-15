@@ -19,6 +19,7 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'occi/CategoryRegistry'
 require 'occi/core/Kind'
 require 'occi/core/Link'
 
@@ -30,10 +31,16 @@ module OCCI
       begin
 
         # Define actions
-        ACTION_DOWN = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storagelink/action#", term = "down",      title = "Network Action Down", attributes = [])
-        ACTION_UP   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storagelink/action#", term = "up",        title = "Network Action Up", attributes = [])
+        down_attributes = OCCI::Core::Attributes.new()
+        up_attributes = OCCI::Core::Attributes.new()
+        
+        ACTION_DOWN = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storagelink/action#", term = "down",      title = "Network Action Down", attributes = down_attributes)
+        ACTION_UP   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storagelink/action#", term = "up",        title = "Network Action Up", attributes = up_attributes)
 
         actions = [ACTION_DOWN, ACTION_UP]
+        
+        OCCI::CategoryRegistry.register(ACTION_DOWN.category)
+        OCCI::CategoryRegistry.register(ACTION_UP.category)
 
         # Define state-machine
         STATE_INACTIVE  = OCCI::StateMachine::State.new("inactive")
@@ -59,6 +66,7 @@ module OCCI
         attributes << OCCI::Core::Attribute.new(name = 'occi.storagelink.state',      mutable = false,  mandatory = true,   unique = true)
             
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
+        OCCI::CategoryRegistry.register(KIND)
       end
 
       def initialize(attributes, mixins = [])
