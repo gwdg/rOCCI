@@ -180,8 +180,8 @@ module OCCI
       end
 
       # ---------------------------------------------------------------------------------------------------------------------
-      def get_category_string
-        self.kind.get_short_category_string
+      def type_identifier
+        self.kind.type_identifier
       end
 
     end

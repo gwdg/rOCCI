@@ -157,8 +157,9 @@ begin
 
       # Query interface: return all supported kinds + mixins
       if location == "/-/"
-        $log.info("Listing all kinds and mixins")
-        response = OCCI::Rendering::HTTP::Renderer.render_category_type(response, occi_request)
+        $log.info("Listing all kinds and mixins ...")
+        response = OCCI::Rendering::HTTP::Renderer.render_category_type(occi_request.categories,response)
+        response.status = HTTP_STATUS_CODE["OK"]
         break
       end
 
@@ -167,20 +168,21 @@ begin
       # Render exact matches referring to kinds / mixins
       if object != nil && object.kind_of?(OCCI::Core::Category)
         raise "Only mixins / kinds are supported for exact match rendering: location: #{location}; object: #{object}" if !object.instance_variable_defined?(:@entities)
-        $log.info("Kind / mixin exact match for location [#{location}]: #{object}")
+        $log.info("Listing all entities for kind/mixin [#{object.type_identifier}] ...")
         locations = []
         object.entities.each do |entity|
           locations << OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
         end
-        response_header = OCCI::Rendering::HTTP::Renderer.render_locations(locations)
+        response = OCCI::Rendering::HTTP::Renderer.render_locations(locations,response)
+        response.status = HTTP_STATUS_CODE["OK"]
         break
       end
 
       # Render exact matches referring to resources
       if object != nil && object.kind_of?(OCCI::Core::Resource)
-        $log.info("Rendering resource [#{object}] for location [#{location}]...")
+        $log.info("Rendering resource [#{object.type_identifier}] for location [#{location}] ...")
         object.refresh
-        response_header = OCCI::Rendering::HTTP::Renderer.render_resource(object)
+        response = OCCI::Rendering::HTTP::Renderer.render_resource(object,response)
         break
       end
 
@@ -188,17 +190,12 @@ begin
       if location.end_with?("/")
         $log.info("Listing all resource instances below location: #{location}")
         resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location, occi_request.categories)
-
         locations = []
-
-        # refresh information on all resources from backend
         resources.each do |resource|
           resource.refresh if resource.kind_of?(OCCI::Core::Resource)
           locations << OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(resource)
         end
-
-        $log.debug("Locations: #{locations}")
-        response_header = OCCI::Rendering::HTTP::Renderer.render_locations(locations)
+        response_header = OCCI::Rendering::HTTP::Renderer.render_locations(locations,response)
         break
       end
 
@@ -286,6 +283,7 @@ begin
         resource = occi_request.kind.entity_type.new(occi_request.attributes, occi_request.mixins)
 
         occi_request.links.each do |link|
+          $log.debug(link)
           target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.target)
           raise "Link target not found!" if target == nil
 
@@ -301,10 +299,12 @@ begin
         end
 
         resource.deploy()
+        
+        $log.debug('Location:' + resource.get_location)
 
         OCCI::Rendering::HTTP::LocationRegistry.register(resource.get_location, resource)
 
-        OCCI::Rendering::HTTP::Renderer.render_location(response, OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(resource))
+        OCCI::Rendering::HTTP::Renderer.render_location(OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(resource),response)
       end
 
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content

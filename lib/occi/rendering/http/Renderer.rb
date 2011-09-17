@@ -53,11 +53,10 @@ module OCCI
       module Renderer
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_category_type(response,occi_request)
-          
+        def self.render_category_type(categories,response)
+          category_values =[]
           # create category string for all categories
-          categories = []
-          occi_request.categories.each do |category|
+          Array(categories).each do |category|
             # category identifier
             category_string = %Q{#{category.term}; scheme="#{category.scheme}"; class="#{category.class_string}";}
             # category title
@@ -83,65 +82,60 @@ module OCCI
               actions += action.category.scheme + action.category.term + " "
             end if defined? category.actions
             category_string += %Q{actions="#{actions.strip}";} if actions != ""
-            categories << category_string
+            category_values << category_string
           end
-          # response[HEADER_CATEGORY] = categories.join(',')
 
           case response['Content-Type']
           when 'application/json'
             # dump categories as JSON string into response body
-            collection = {'Collection' => occi_request.categories.collect! {|category| category.to_hash}}
+            collection = {'Collection' => category_values.collect! {|category| category.to_hash}}
             response.write(JSON.pretty_generate(collection))     
           when 'text/plain'
-            categories.each do |category|
+            category_values.each do |category|
               response.write(HEADER_CATEGORY + ': ' + category + "\n")
             end
           when 'text/occi'
-            # for text/occi the body needs to contain OK
+            # for text/occi the body needs to contain OK          
+            response[HEADER_CATEGORY] = category_values.join(',')
             response.write = "OK"
           # when 'text/uri-list'
           end
-
-          response.status = HTTP_STATUS_CODE["OK"]
 
           return response
         end
         
-        def self.render_location(response, location)
+        def self.render_location(location, response)
           
           response['Location'] = location
           case response['Content-Type']
           when 'application/json'
-            # dump categories as JSON string into response body
-            location = {'Location' => location}
-            response.write(JSON.pretty_generate(location))     
+            response.write(JSON.pretty_generate({'Location' => location}))     
           when 'text/plain'
-            response.write('Location: ' + location)
+            response.write('X-OCCI-Location: ' + location)
           when 'text/occi'
             # for text/occi the body needs to contain OK
             response.write = "OK"
-          # when 'text/uri-list'
+          when 'text/uri-list'
+            response.write(location)
           end
-
-          response.status = HTTP_STATUS_CODE["OK"]
 
           return response
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_link_reference(link)
+        def self.render_link_reference(link,response)
 
           # Link value
-          location        = $locationRegistry.get_location_of_object(link)
+          location        = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(link)
           target_location = link.attributes["occi.core.target"]
-          target_resource = $locationRegistry.get_object_by_location(target_location)
-          target_resource_type = target_resource.kind.scheme + target_resource.kind.term
+          target_resource = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
+          target_resource_type = target_resource.kind.type_identifier
 
           link_value = %Q{<#{target_location}>;rel="#{target_resource_type}";self="#{location}"}
 
           # Link params
           category = link.kind
-          link_params = %Q{;category="#{category.scheme + category.term}"}
+          link_params = %Q{;category="#{category.type_identifier}"}
 
           if !link.attributes.empty?
             link.attributes.each do |name, value|
@@ -149,69 +143,71 @@ module OCCI
             end
           end
 
-          header = {}
-          header[HEADER_LINK] = link_value + link_params
+          response[HEADER_LINK] = link_value + link_params
 
-          $log.debug("Rendered link reference: #{link}:")
-          $log.debug(header)
-
-          return header
+          return response
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_action_reference(resource, action)
+        def self.render_action_reference(action,resource,response)
 
-          resource_location = $locationRegistry.get_location_of_object(resource)
+          resource_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(resource)
           action_location   = resource_location + "?action=" + action.category.term
-          action_type       = action.category.scheme + action.category.term
+          action_type       = action.category.type_identifier
 
           link_value = %Q{<#{action_location}>;rel="#{action_type}"}
 
-          header = {}
-          header[HEADER_LINK] = link_value
+          response[HEADER_LINK] = link_value
 
-          $log.debug("Rendered action reference (for resource): #{action}: #{resource}:")
-          $log.debug(header)
-
-          return header
+          return response
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_attributes(attributes)
-
-          return {} if attributes == nil || attributes.empty?
+        def self.render_attributes(attributes,response)
 
           attributes_values = []
           attributes.each do |name, value|
-            attributes_values << %Q{#{name}="#{value}"}
+            attributes_values << %Q{#{name}=#{value}}
           end
 
-          header = {}
-          header[HEADER_ATTRIBUTE] = attributes_values
+          case response['Content-Type']
+          when 'application/json'
+            response.write(JSON.pretty_generate({'Location' => location}))     
+          when 'text/plain'
+            attributes_values.each do |attribute|
+              response.write('X-OCCI-Attribute: ' + attribute + "\n")
+            end
+          when 'text/occi'
+            # for text/occi the body needs to contain OK
+            response['X-OCCI-Attribute'] = attributes_values.join(',')
+            response.write = "OK"
+          end
 
-          $log.debug("Rendered attributes: #{attributes}:")
-          $log.debug(header)
-
-          return header
+          return response
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_locations(locations)
-
-          return {} if locations.empty?
+        def self.render_locations(locations,response)
 
           locations_values = []
           locations.each do |location|
             locations_values << $config["server"] + ':' + $config["port"] + location
           end
 
-          header = {}
-          header[HEADER_LOCATION] = locations_values
+          case response['Content-Type']
+          when 'application-json'
+            response.write(JSON.pretty_generate({'X-OCCI-Location' => locations_values.to_json}))   
+          when 'text/plain'
+            response.write(locations_values.collect {|location| 'X-OCCI-Location: ' + location})
+          when 'text/occi'
+            response['X-OCCI-Location'] = locations_values.join(',')
+            # for text/occi the body needs to contain OK
+            response.write = "OK"
+          when 'text/uri-list'
+            response.write(locations_values.join(','))
+          end 
 
-          $log.debug("Rendered locations: #{locations}:")
-          $log.debug(header)
-
-          return header
+          return response
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -229,34 +225,29 @@ module OCCI
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_resource(entity)
-
-          $log.debug("Rendering entity: #{entity}")
-
-          headers = {}
-          entity_kind = entity.kind
-
-          # Render related kind / mixins
-          merge_headers(headers, render_category_type(entity_kind))
-          entity.mixins.each do |mixin|
-            merge_headers(headers, render_category_type(mixin))
+        def self.render_resource(resource,response)
+          # render kind of entity
+          response = render_category_type(resource.kind,response)
+          # render mixins of entity
+          resource.mixins.each do |mixin|
+            response = render_category_type(mixin,response)
           end
 
           # Render attributes
-          merge_headers(headers, render_attributes(entity.attributes))
+          response = render_attributes(resource.attributes,response)
 
           # Render link references
-          entity.links.each do |link|
-            merge_headers(headers, render_link_reference(link))
+          resource.links.each do |link|
+            response = render_link_reference(link,response)
           end
 
           # Render action references
           # TODO: only render currently applicable actions
-          entity_kind.actions.each do |action|
-            merge_headers(headers, render_action_reference(entity, action))
+          resource.kind.actions.each do |action|
+            response = render_action_reference(action,resource,response)
           end
 
-          return headers
+          return response
         end
 
         # ---------------------------------------------------------------------------------------------------------------------

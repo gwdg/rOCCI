@@ -42,14 +42,14 @@ $stdout.sync = true
 $log = Logger.new(STDOUT)
 
 ##############################################################################
-# Initialize Category Registry
+# Require OCCI classes
 
 # registry for all categories (e.g. kinds, mixins, actions)
 require 'occi/CategoryRegistry'
-$categoryRegistry = OCCI::CategoryRegistry.new
 
-##############################################################################
-# Require OCCI classes
+# OCCI HTTP rendering
+require 'occi/rendering/http/Renderer'
+require 'occi/rendering/http/LocationRegistry'
 
 # OCCI Infrastructure classes
 require 'occi/infrastructure/Compute'
@@ -59,10 +59,6 @@ require 'occi/infrastructure/Networkinterface'
 require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
 #require 'occi/infrastructure/Reservation'
-
-# OCCI HTTP rendering
-require 'occi/rendering/http/Renderer'
-require 'occi/rendering/http/LocationRegistry'
 
 ##############################################################################
 # Read configuration file and set loglevel
@@ -104,9 +100,6 @@ class Array
     return "[" + self.join(", ") + "]"
   end
 end
-
-# registry for the locations of all OCCI objects
-$locationRegistry = OCCI::Rendering::HTTP::LocationRegistry.new
 
 $objects = []
 
