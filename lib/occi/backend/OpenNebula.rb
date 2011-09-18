@@ -461,7 +461,7 @@ module OCCI
         # Storage class
 
         class Storage
-          attr_reader @backend_id
+          attr_reader :backend_id
           
           TEMPLATESTORAGERAWFILE = 'occi_one_template_storage.erb'
 
