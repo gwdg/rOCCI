@@ -218,7 +218,7 @@ begin
   post '*' do
     begin
       # render general OCCI response
-      
+
       tmp = OCCI::Rendering::HTTP::Renderer.render_response(response,request)
       response = tmp
 
@@ -328,34 +328,23 @@ begin
       if location == "/-/"
         $log.info("Creating user defined mixin...")
 
-        mixin   = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins")[0]
+        raise OCCI::MixinAlreadyExistsError, "Mixin [#{occi_request.mixins}] already exists!" unless occi_request.mixins.empty?
+        raise "Location #{mixins.last.location} already used for another object. " unless OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(occi_request.mixins.last.location).nil?
 
-        raise OCCI::MixinAlreadyExistsError, "Mixin [#{mixin}] already exists!" unless mixin == nil
-
-        mixin_category_data = OCCI::Parser.new(request.env['HTTP_CATEGORY']).category_value
-        $log.debug("Category data for mixin: #{mixin_category_data}")
-
-        raise "Mandatory information missing (term | scheme | location)!" unless mixin_category_data.term != nil && mixin_category_data.scheme != nil && mixin_category_data.location != nil
-        raise "Category class must be set to 'mixin'!"                    unless mixin_category_data.clazz == "mixin"
-
-        raise "Location #{mixin_category_data.location} already used for another object: " +
-        $locationRegistry.get_object_by_location(mixin_category_data.location) unless $locationRegistry.get_object_by_location(mixin_category_data.location) == nil
-
-        related_mixin = $categoryRegistry.get_categories_by_category_string(related, filter="mixins")[0] if mixin_category_data.related != nil
-        mixin = OCCI::Core::Mixin.new(mixin_category_data.term, mixin_category_data.scheme, mixin_category_data.title, nil, [], related_mixin, [])
-        $categoryRegistry.register_mixin(mixin)
-        $locationRegistry.register_location(mixin_category_data.location, mixin)
+        related_mixin = OCCI::CategoryRegistry.get_by_id(occi_request.mixin.rel)
+        mixin = OCCI::Core::Mixin.new(occi_request.mixin.term, occi_request.mixin.scheme, occi_request.mixin.title, nil, [], related_mixin, [])
+        OCCI::CategoryRegistry.register_mixin(mixin)
+        OCCI::Rendering::HTTP::LocationRegistry.register_location(mixin.location, mixin)
         break
       end
 
       # Add an resource instance to a mixin
-      unless occi_request.mixin.empty?
-        mixin = $locationRegistry.get_object_by_location(location)
+      unless occi_request.mixins.empty?
+        mixin = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)
 
-        OCCI::Parser.new(request.env["HTTP_X_OCCI_LOCATION"]).location_values.each do |entity_location|
-
-          entity_uri = URI.parse(entity_location)
-          entity = $locationRegistry.get_object_by_location(entity_uri.path)
+        occi_request.locations.each do |location|
+          entity_uri = URI.parse(location)
+          entity = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(entity_uri.path)
 
           raise "No entity found at location: #{entity_location}"                                       if entity == nil
           raise "Object referenced by uri [#{entity_location}] is not a OCCI::Core::Resource instance!" if !entity.kind_of?(OCCI::Core::Resource)
@@ -371,58 +360,48 @@ begin
       if OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location) != nil
         resource.refresh if resource.kind_of?(OCCI::Core::Resource)
         # Determine set of resources to be updated
-        if $locationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Resource)
-          entities = [$locationRegistry.get_object_by_location(location)]
+        if OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Resource)
+          entities = [OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)]
         else
-          entities = $locationRegistry.get_resources_below_location(location)
+          entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location)
         end
         $log.info("Updating [#{entities.size}] entities...")
 
-        # Update / add mixins
-        if request.env['HTTP_CATEGORY'] != nil
-          mixins = $categoryRegistry.get_categories_by_category_string(request.env['HTTP_CATEGORY'], filter="mixins")
-          entities.each do |entity|
-            entity.mixins = mixins
-          end
-        end
+        # add mixins
+        entities.each do |entity|
+          entity.mixins = occi_request.mixins
+        end unless occi_request.mixins.empty?
 
         # Update / add attributes
-        if request.env['HTTP_X_OCCI_ATTRIBUTE'] != nil
-          attributes = OCCI::Parser.new(request.env["HTTP_X_OCCI_ATTRIBUTE"]).attributes_attr
-          entities.each do |entity|
-            entity.attributes.merge!(attributes)
-          end
-        end
+        entities.each do |entity|
+          entity.attributes.merge!(occi_request.attributes)
+        end unless occi_request.attributes.empt?
 
         # Update / add links
-        if request.env['HTTP_LINK'] != nil
 
-          links = OCCI::Parser.new(request.env['HTTP_LINK']).link_values
-
-          links.each do |link_data|
+          occi_request.links.each do |link_data|
             $log.debug("Extracted link data: #{link_data}")
             raise "Mandatory information missing (related | target | category)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil
 
-            kind = $categoryRegistry.get_categories_by_category_string(link_data.category, filter="kinds")[0]
+            kind = OCCI::CategoryRegistry.get_categories_by_category_string(link_data.category, filter="kinds")[0]
             raise "No kind for category string: #{link_data.category}" unless kind != nil
 
             entities.each do |entity|
 
-              target          = $locationRegistry.get_object_by_location(target_location)
-              source_location = $locationRegistry.get_location_of_object(entity)
+              target          = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
+              source_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
 
               attributes = link_data.attributes.clone
               attributes["occi.core.target"] = target_location
               attributes["occi.core.source"] = source_location
 
               link = kind.entity_type.new(attributes)
-              $locationRegistry.register_location(link.get_location(), link)
+              OCCI::Rendering::HTTP::LocationRegistry.register_location(link.get_location(), link)
 
               target.links << link
               entity.links << link
             end
           end
-        end
         break
       end
 

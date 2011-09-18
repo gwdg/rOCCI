@@ -82,7 +82,7 @@ module OCCI
           @categories = OCCI::CategoryRegistry.get_all(@parsed_categories).to_a
           @kind = @categories.select {|category| category.kind_of?(OCCI::Core::Kind)}.last
           @action = @categories.select {|category| category.kind_of?(OCCI::Core::Action)}.last
-          @mixin = @categories.select {|category| category.kind_of?(OCCI::Core::Mixin)}.last
+          @mixin = @parsed_categories.last
           @mixins = @categories.select {|category| category.kind_of?(OCCI::Core::Mixin)}
         end
 
