@@ -22,6 +22,8 @@
 require 'rubygems'
 require 'uuidtools'
 require 'opennebula/OpenNebula'
+require 'occi/CategoryRegistry'
+require 'occi/rendering/http/LocationRegistry'
 require 'occi/ActionDelegator'
 require 'occi/backend/one/Image'
 require 'occi/backend/one/Network'
