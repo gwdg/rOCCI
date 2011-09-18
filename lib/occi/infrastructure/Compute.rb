@@ -34,10 +34,10 @@ module OCCI
       
       case $config["backend"]
       when 'opennebula'
-        require 'occi/backend/opennebula/Compute'
+        require 'occi/backend/OpenNebula'
         include OCCI::Backend::OpenNebula::Compute
       when 'dummy'
-        require 'occi/backend/dummy/Compute'
+        require 'occi/backend/Dummy'
         include OCCI::Backend::Dummy::Compute
       end if $config
 

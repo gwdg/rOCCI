@@ -32,10 +32,10 @@ module OCCI
       
       case $config["backend"]
       when 'opennebula'
-        require 'occi/backend/opennebula/Network'
+        require 'occi/backend/OpenNebula'
         include OCCI::Backend::OpenNebula::Network
       when 'dummy'
-        require 'occi/backend/dummy/Network'
+        require 'occi/backend/Dummy'
         include OCCI::Backend::Dummy::Network
       end if $config
 

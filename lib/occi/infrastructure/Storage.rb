@@ -32,10 +32,10 @@ module OCCI
       
       case $config["backend"]
       when 'opennebula'
-        require 'occi/backend/opennebula/Storage'
+        require 'occi/backend/OpenNebula'
         include OCCI::Backend::OpenNebula::Storage
       when 'dummy'
-        require 'occi/backend/dummy/Storage'
+        require 'occi/backend/Dummy'
         include OCCI::Backend::Dummy::Storage
       end if $config
 
