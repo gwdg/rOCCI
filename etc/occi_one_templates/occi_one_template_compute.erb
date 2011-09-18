@@ -22,6 +22,12 @@ BOOT          = hd
 <% storage_ids.each do |storage_id| %>
 DISK          = [ IMAGE_ID = "<%= storage_id %>"]
 <%end%>
+
+<%# Links to external storage %>
+<% storagelinks.each do |storagelink| %>
+TYPE          = "OS"
+SOURCE        = <%= storagelink %>
+<%end%>
    
 <%# Links to networks %>
 <% network_ids.each do |network_id| %>

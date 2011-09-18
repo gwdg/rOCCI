@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Ruby OCCI Framework</title>
+    
+    <script src="../js/jquery-1.6.3.min.js"></script>
+    <script src="../js/jquery.layout-latest.js"></script>
+    <script>
+     $(document).ready(function() {
+       $("#logfile").load("../logfile.txt");
+       var refreshId = setInterval(function() {
+       $("#logfile").load('../logfile.txt');
+       }, 3000);
+       $.ajaxSetup({ cache: false });
+     });
+
+    $(document).ready(function () {
+      $('body').layout({ applyDefaultStyles: true });
+      var myLayout = $('body').layout();
+      myLayout.sizePane("south", 300);
+    });
+
+    </script>
+  </head>
+  <body style="margin:0px; padding:0px;">
+    <div class="ui-layout-center">Center</div>
+    <div id="log" class="ui-layout-south"><pre id="logfile"></pre></div>
+  </body>
+</html>
