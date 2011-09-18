@@ -168,7 +168,6 @@ module OCCI
           source.links.delete(link)
         end if links != nil
         kind.entities.delete(self)
-        $locationRegistry.unregister_location(get_location())
       end
 
       # ---------------------------------------------------------------------------------------------------------------------

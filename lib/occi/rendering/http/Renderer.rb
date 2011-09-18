@@ -114,7 +114,7 @@ module OCCI
             response.write('X-OCCI-Location: ' + location)
           when 'text/occi'
             # for text/occi the body needs to contain OK
-            response.write = "OK"
+            response.write('OK')
           when 'text/uri-list'
             response.write(location)
           end
@@ -198,7 +198,7 @@ module OCCI
           when 'application-json'
             response.write(JSON.pretty_generate({'X-OCCI-Location' => locations_values.to_json}))   
           when 'text/plain'
-            response.write(locations_values.collect {|location| 'X-OCCI-Location: ' + location})
+            response.write(locations_values.collect {|location| 'X-OCCI-Location: ' + location}.join("\n"))
           when 'text/occi'
             response['X-OCCI-Location'] = locations_values.join(',')
             # for text/occi the body needs to contain OK
