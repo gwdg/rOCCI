@@ -41,10 +41,10 @@ module OCCI
     class OpenNebula
       attr_reader :one_client
       def initialize(configfile)
-        $categoryRegistry.register_mixin(OCCI::Backend::ONE::Image::MIXIN)
-        $categoryRegistry.register_mixin(OCCI::Backend::ONE::Network::MIXIN)
-        $categoryRegistry.register_mixin(OCCI::Backend::ONE::VirtualMachine::MIXIN)
-        $categoryRegistry.register_mixin(OCCI::Mixins::Reservation::MIXIN)
+        OCCI::CategoryRegistry.register_mixin(OCCI::Backend::ONE::Image::MIXIN)
+        OCCI::CategoryRegistry.register_mixin(OCCI::Backend::ONE::Network::MIXIN)
+        OCCI::CategoryRegistry.register_mixin(OCCI::Backend::ONE::VirtualMachine::MIXIN)
+        OCCI::CategoryRegistry.register_mixin(OCCI::Mixins::Reservation::MIXIN)
 
         # TODO: create mixins from existing templates
 
@@ -189,7 +189,7 @@ module OCCI
             occi_object.backend_id = backend_object.id
             $log.debug("Backend ID: #{occi_object.backend_id}")
             $log.debug("OCCI compute object location: #{occi_object.get_location}")
-            $locationRegistry.register_location(occi_object.get_location, occi_object)
+            OCCI::Rendering::HTTP::LocationRegistry.register_location(occi_object.get_location, occi_object)
             occi_object = self.parse_links(occi_object,backend_object)
             occi_objects << occi_object if not occi_object.nil?
           end
@@ -280,7 +280,7 @@ module OCCI
             link = OCCI::Core::Link.new(attributes)
             source.links << link
             target.links << link
-            $locationRegistry.register_location(link.get_location, link)
+            OCCI::Rendering::HTTP::LocationRegistry.register_location(link.get_location, link)
             $log.debug("Link successfully created")
           end if backend_object['TEMPLATE/DISK/IMAGE_ID']
 
@@ -302,7 +302,7 @@ module OCCI
             link = OCCI::Core::Link.new(attributes)
             source.links << link
             target.links << link
-            $locationRegistry.register_location(link.get_location, link)
+            OCCI::Rendering::HTTP::LocationRegistry.register_location(link.get_location, link)
             $log.debug("Link successfully created")
           end if backend_object['TEMPLATE/NIC/NETWORK_ID']
         end
@@ -436,7 +436,7 @@ module OCCI
               occi_object = self.parse_backend_object(backend_object)
               occi_object.backend_id = vnet.id
               $log.debug("Backend ID: #{resource.backend_id}")
-              $locationRegistry.register_location(occi_object.get_location, occi_object)
+              OCCI::Rendering::HTTP::LocationRegistry.register_location(occi_object.get_location, occi_object)
               occi_objects << occi_object
             end
             return occi_objects
@@ -563,7 +563,7 @@ module OCCI
 #              attributes = []
 #              backup = OCCI::Infrastructure::Storage.new(attributes)
 #              backup.backend_id = backup_id
-#              $locationRegistry.register_location(backup.get_location, backup)
+#              OCCI::Rendering::HTTP::LocationRegistry.register_location(backup.get_location, backup)
 #            end
             $log.debug("not yet implemented")
           end
