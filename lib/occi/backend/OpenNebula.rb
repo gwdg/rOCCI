@@ -87,16 +87,19 @@ module OCCI
 
           storage_ids = []
           network_ids = []
+          storagelinks = []
 
           if @links != nil
             @links.each do
               |link|
-              target = $locationRegistry.get_object_by_location(link.attributes['occi.core.target'])
+              target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.attributes['occi.core.target'])
               case target.kind.term
-              when "storage"
+              when 'storage'
                 storage_ids << target.backend_id
-              when "network"
+              when 'network'
                 network_ids << target.backend_id
+              when 'storagelink'
+                storagelinks << link.attributes['occi.core.target']
               end
             end
           end
