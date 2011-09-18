@@ -28,11 +28,15 @@ module OCCI
       attr_reader :mandatory
       attr_reader :unique
       
-      def initialize(name, mutable, mandatory, unique)
+      def initialize(name, mutable, mandatory, unique, type = String, default = "", min=0,max=0)
         @name       = name
         @mutable    = mutable
         @mandatory  = mandatory
         @unique     = unique
+        @type = type
+        @default = default
+        @min = min
+        @max = max
       end
 
       def to_s
@@ -44,6 +48,10 @@ module OCCI
         hash['mutable'] = @mutable
         hash['required'] = @mandatory
         hash['unique'] = @unique
+        hash['type'] = @type
+        hash['default'] = @default
+        hash['min'] = @min
+        hash['max'] = @max
         return hash
       end
     end

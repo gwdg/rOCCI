@@ -20,6 +20,8 @@
 ##############################################################################
 
 require 'occi/core/Mixin'
+require 'occi/core/Attribute'
+require 'occi/core/Attributes'
 require 'singleton'
 
 module OCCI

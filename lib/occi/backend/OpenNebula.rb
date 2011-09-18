@@ -28,7 +28,6 @@ require 'occi/backend/one/Network'
 require 'occi/backend/one/VirtualMachine'
 require 'occi/backend/one/VNC'
 require 'occi/mixins/Reservation'
-require 'occi/mixins/ResourceTemplate'
 
 ##############################################################################
 # Include OpenNebula Constants

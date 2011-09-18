@@ -20,6 +20,7 @@
 ##############################################################################
 
 require 'json'
+require 'occi/core/Category'
 
 module OCCI
   module Core
