@@ -24,6 +24,9 @@ require 'occi/backend/Backend'
 module OCCI
   module Backend
     class Dummy
+      
+      def register_existing_resources
+      end
 
       module Compute 
         include OCCI::Backend::Compute

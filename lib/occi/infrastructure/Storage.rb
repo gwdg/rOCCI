@@ -28,11 +28,14 @@ require 'occi/ActionDelegator'
 module OCCI
   module Infrastructure
     class Storage < OCCI::Core::Resource
+      attr_reader :backend_id
       
       case $config["backend"]
       when 'opennebula'
+        require 'occi/backend/opennebula/Storage'
         include OCCI::Backend::OpenNebula::Storage
       when 'dummy'
+        require 'occi/backend/dummy/Storage'
         include OCCI::Backend::Dummy::Storage
       end if $config
 

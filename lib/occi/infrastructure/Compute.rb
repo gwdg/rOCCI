@@ -28,12 +28,16 @@ require 'occi/ActionDelegator'
 
 module OCCI
   module Infrastructure
+    attr_reader :backend_id
+    
     class Compute < OCCI::Core::Resource
       
       case $config["backend"]
       when 'opennebula'
+        require 'occi/backend/opennebula/Compute'
         include OCCI::Backend::OpenNebula::Compute
       when 'dummy'
+        require 'occi/backend/dummy/Compute'
         include OCCI::Backend::Dummy::Compute
       end if $config
 

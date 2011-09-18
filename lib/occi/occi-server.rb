@@ -81,6 +81,9 @@ rescue RuntimeError => e
   exit 1
 end
 
+$log.debug("Get existing resources from backend")
+$backend.register_existing_resources
+
 ##############################################################################
 # Require OCCI classes
 
