@@ -144,7 +144,7 @@ module OCCI
             end
             # Only resources must be returned
             resources << context_element if context_element.kind_of?(OCCI::Core::Entity) \
-            && categories.include?(context_element.KIND)
+            && categories.include?(context_element.kind)
           end until context_elements_list.empty?
           # Test if there is an object directly under the requested location
           entity = get_object_by_location(location)

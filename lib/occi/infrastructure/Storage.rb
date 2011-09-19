@@ -28,7 +28,7 @@ require 'occi/ActionDelegator'
 module OCCI
   module Infrastructure
     class Storage < OCCI::Core::Resource
-      attr_reader :backend_id
+      attr_accessor :backend_id
       
       case $config["backend"]
       when 'opennebula'

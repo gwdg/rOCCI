@@ -58,14 +58,13 @@ module OCCI
 
           $log.debug(params)
           params.values.each do |body|
-            $log.debug(body)
             if body.kind_of?(String)
               parse_text(body)
             elsif body.kind_of?(Hash)
               if body['type'].include?('application/json')
                 # try to parse body as JSON object
                 parse_json(body)
-              elsif body['type'].include?('application/json') # text/plain
+              elsif body['type'].include?('text/plain') # text/plain
                 parse_text(body)
               end unless body['type'].nil?
             end

@@ -30,13 +30,6 @@ require 'occi/backend/one/Network'
 require 'occi/backend/one/VirtualMachine'
 require 'occi/backend/one/VNC'
 require 'occi/mixins/Reservation'
-require 'occi/infrastructure/Compute'
-require 'occi/infrastructure/Network'
-require 'occi/infrastructure/Storage'
-
-##############################################################################
-# Include OpenNebula Constants
-##############################################################################
 
 include OpenNebula
 
@@ -44,7 +37,7 @@ module OCCI
   module Backend
     class OpenNebula
       attr_reader :one_client
-      def initialize(configfile)
+      def initialize
         OCCI::CategoryRegistry.register(OCCI::Backend::ONE::Image::MIXIN)
         OCCI::CategoryRegistry.register(OCCI::Backend::ONE::Network::MIXIN)
         OCCI::CategoryRegistry.register(OCCI::Backend::ONE::VirtualMachine::MIXIN)
@@ -68,8 +61,8 @@ module OCCI
       end
 
       def check_rc(rc)
-        if is_error?(rc)
-          $log.warn("Error message from OpenNebula: #{rc.to_str}")
+        if rc.class == Error
+          raise OCCI::BackendError, "Error message from OpenNebula: #{rc.to_str}"
           # TODO: return failed!
         end
       end
@@ -133,11 +126,11 @@ module OCCI
           end
           backend_object.info
 
-          occi_object = self.parse_backend_object(backend_object,@attributes)
+          occi_object = OCCI::Backend::OpenNebula::Compute.parse_backend_object(backend_object)
           # TODO: parse links?
 
           # merge new attributes with existing attributes, by overwriting existing attributes with refreshed values
-          @attributes.merge!(occi_object.attributesattributes)
+          @attributes.merge!(occi_object.attributes)
           # concat mixins and remove duplicate mixins
           @mixins.concat(occi_object.mixins).uniq!
           # update state
@@ -185,7 +178,7 @@ module OCCI
           occi_objects = []
           backend_object_pool.each do |backend_object|
             $log.debug("ONE compute object: #{backend_object}")
-            attributes, mixins = self.parse_backend_object(backend_object)
+            attributes, mixins = OCCI::Backend::OpenNebula::Compute.parse_backend_object(backend_object)
             mixins << OCCI::Infrastructure::ResourceTemplate::MIXIN if template
             $log.debug("Attributes: #{attributes}")
             $log.debug("Mixins: #{mixins}")
@@ -193,7 +186,7 @@ module OCCI
             occi_object.backend_id = backend_object.id
             $log.debug("Backend ID: #{occi_object.backend_id}")
             $log.debug("OCCI compute object location: #{occi_object.get_location}")
-            OCCI::Rendering::HTTP::LocationRegistry.register_location(occi_object.get_location, occi_object)
+            OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
             occi_object = self.parse_links(occi_object,backend_object)
             occi_objects << occi_object if not occi_object.nil?
           end
@@ -206,6 +199,7 @@ module OCCI
           mixins = []
           mixins << OCCI::Backend::ONE::VirtualMachine::MIXIN
 
+          backend_object.info
           # parse all parameters from OpenNebula to OCCI
           attributes['occi.core.id'] = backend_object['TEMPLATE/OCCI_ID']
           attributes['occi.core.title'] = backend_object['NAME']
@@ -284,7 +278,7 @@ module OCCI
             link = OCCI::Core::Link.new(attributes)
             source.links << link
             target.links << link
-            OCCI::Rendering::HTTP::LocationRegistry.register_location(link.get_location, link)
+            OCCI::Rendering::HTTP::LocationRegistry.register(link.get_location, link)
             $log.debug("Link successfully created")
           end if backend_object['TEMPLATE/DISK/IMAGE_ID']
 
@@ -306,7 +300,7 @@ module OCCI
             link = OCCI::Core::Link.new(attributes)
             source.links << link
             target.links << link
-            OCCI::Rendering::HTTP::LocationRegistry.register_location(link.get_location, link)
+            OCCI::Rendering::HTTP::LocationRegistry.register(link.get_location, link)
             $log.debug("Link successfully created")
           end if backend_object['TEMPLATE/NIC/NETWORK_ID']
         end
@@ -384,7 +378,7 @@ module OCCI
         def refresh
           backend_object=VirtualNetwork.new(VirtualNetwork.build_xml(@backend_id), $backend.one_client)
 
-          occi_object = self.parse_backend_object(backend_object,@attributes)
+          occi_object = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
 
           if occi_object.nil? then
             $log.warn("Problem refreshing network with backend id #{backend_id}")
@@ -392,7 +386,7 @@ module OCCI
           end
 
             # merge new attributes with existing attributes, by overwriting existing attributes with refreshed values
-            @attributes.merge!(occi_object.attributesattributes)
+            @attributes.merge!(occi_object.attributes)
             # concat mixins and remove duplicate mixins
             @mixins.concat(occi_object.mixins).uniq!
             # update state
@@ -406,13 +400,14 @@ module OCCI
           # DELETE VNET
           def finalize
             backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(@backend_id), $backend.one_client)
-            rc = network.delete
+            rc = backend_object.delete
             $backend.check_rc(rc)
           end
 
           def self.parse_backend_object(backend_object)
             attributes = {}
             mixins = []
+            backend_object.info
             # parse all parameters from OpenNebula to OCCI
             attributes['occi.core.id'] = backend_object['TEMPLATE/OCCI_ID']
             attributes['occi.core.title'] = backend_object['NAME']
@@ -442,10 +437,10 @@ module OCCI
             backend_object_pool=VirtualNetworkPool.new($backend.one_client)
             backend_object_pool.info_all
             backend_object_pool.each do |backend_object|
-              occi_object = self.parse_backend_object(backend_object)
-              occi_object.backend_id = vnet.id
-              $log.debug("Backend ID: #{resource.backend_id}")
-              OCCI::Rendering::HTTP::LocationRegistry.register_location(occi_object.get_location, occi_object)
+              occi_object = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
+              occi_object.backend_id = backend_object.id
+              $log.debug("Backend ID: #{occi_object.backend_id}")
+              OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
               occi_objects << occi_object
             end
             return occi_objects
@@ -509,7 +504,7 @@ module OCCI
           def refresh
             backend_object=Image.new(Image.build_xml(@backend_id), $backend.one_client)
 
-            occi_object = self.parse_backend_object(backend_object)
+            occi_object = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
 
             if occi_object.nil? then
               $log.warn("Problem refreshing network with backend id #{backend_id}")
@@ -527,6 +522,7 @@ module OCCI
           def self.parse_backend_object(backend_object)
             attributes = {}
             mixins = []
+            backend_object.info
             # parse all parameters from OpenNebula to OCCI
             attributes['occi.core.id'] = backend_object['TEMPLATE/OCCI_ID']
             attributes['occi.core.title'] = backend_object['NAME']
@@ -554,9 +550,13 @@ module OCCI
             backend_object_pool=ImagePool.new($backend.one_client)
             backend_object_pool.info_all
             backend_object_pool.each do |backend_object|
-              @backend_id = backend_object.id
-              $log.debug("Backend ID: #{@backend_id}")              
+              occi_object = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
+              occi_object.backend_id = backend_object.id
+              $log.debug("Backend ID: #{occi_object.backend_id}")    
+              OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
+              occi_objects << occi_object          
             end
+            return occi_objects
           end
 
           # Action online
@@ -582,7 +582,7 @@ module OCCI
 #              attributes = []
 #              backup = OCCI::Infrastructure::Storage.new(attributes)
 #              backup.backend_id = backup_id
-#              OCCI::Rendering::HTTP::LocationRegistry.register_location(backup.get_location, backup)
+#              OCCI::Rendering::HTTP::LocationRegistry.register(backup.get_location, backup)
 #            end
             $log.debug("not yet implemented")
           end

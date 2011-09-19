@@ -70,7 +70,7 @@ begin
   $backend = case $config["backend"]
   when "opennebula"
     require 'occi/backend/OpenNebula'
-    OCCI::Backend::OpenNebula.new($config['OPENNEBULA_CONFIG'])
+    OCCI::Backend::OpenNebula.new()
   when "dummy" then
     require 'occi/backend/Dummy'
     OCCI::Backend::Dummy.new()
@@ -80,9 +80,6 @@ rescue RuntimeError => e
   $log.fatal "#{e}: #{e.backtrace}"
   exit 1
 end
-
-$log.debug("Get existing resources from backend")
-$backend.register_existing_resources
 
 ##############################################################################
 # Require OCCI classes
@@ -125,6 +122,12 @@ if $config['username'] != nil and $config['password'] != nil
     [username, password] == [$config['username'], $config['password']]
   end
 end
+
+##############################################################################
+# Get existing resources from backend
+
+$log.debug("Get existing resources from backend")
+$backend.register_existing_resources
 
 ##############################################################################
 # Sinatra methods for handling HTTP requests
