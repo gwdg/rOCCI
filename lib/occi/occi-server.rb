@@ -252,7 +252,7 @@ begin
       end
 
       # If kind is a link and no actions specified then create link
-      unless occi_request.links.empty?
+      if occi_request.kind.kind_of?(OCCI::Core::Link)
         $log.info("Creating link...")
 
         target_uri = URI.parse(occi_request.attributes["occi.core.target"])
@@ -281,21 +281,27 @@ begin
 
         occi_request.links.each do |link|
           $log.debug(link)
-          target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.target)
-          raise "Link target not found!" if target == nil
 
-          link.attributes["occi.core.target"] = link.target
-          link.attributes["occi.core.source"] = resource.get_location
+          attributes = {}
+          attributes = link.attributes unless link.attributes.nil?
+            
+          attributes["occi.core.target"] = link.target
+          attributes["occi.core.source"] = resource.get_location
 
-          link = kind.entity_type.new(link.attributes)
+          link_kind = OCCI::CategoryRegistry.get_by_id(link.category)
+          occi_link = link_kind.entity_type.new(attributes)
+          
+          if URI.parse(link.target).relative?
+            target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.target)
+            target.links << occi_link
+          end
+          
+          resource.links << occi_link
 
-          resource.links << link
-          target.links << link
-
-          OCCI::Rendering::HTTP::LocationRegistry.register_location(link.get_location, link)
+          OCCI::Rendering::HTTP::LocationRegistry.register(occi_link.get_location, occi_link)
         end
 
-        resource.deploy()
+        resource.deploy
 
         $log.debug('Location:' + resource.get_location)
 

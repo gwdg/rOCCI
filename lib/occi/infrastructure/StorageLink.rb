@@ -67,6 +67,7 @@ module OCCI
             
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
         OCCI::CategoryRegistry.register(KIND)
+        OCCI::Rendering::HTTP::LocationRegistry.register('/storagelink/', KIND)
       end
 
       def initialize(attributes, mixins = [])
@@ -74,7 +75,6 @@ module OCCI
         # Initialize resource state
         attributes['occi.storagelink.state'] = state_machine.current_state.name
         super(attributes, OCCI::Infrastructure::StorageLink::KIND, mixins)
-        $backend.createStorageLinkInstance(self)
       end
 
       def update_state

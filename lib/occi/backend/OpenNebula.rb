@@ -47,11 +47,11 @@ module OCCI
 
         # initialize OpenNebula connection
         $log.debug("Initializing connection with OpenNebula")
-        
+
         # TODO: check for error!
         @one_client = Client.new($config['one_user'] + ':' + $config['one_password'],$config['one_xmlrpc'])
       end
-      
+
       def register_existing_resources
         # get all compute objects
         OCCI::Backend::OpenNebula::Compute.register_all_instances
@@ -71,16 +71,13 @@ module OCCI
       # COMPUTE class
 
       module Compute
-        
+
         TEMPLATECOMPUTERAWFILE = 'occi_one_template_compute.erb'
-        
         def deploy
           # initialize backend object as VM or VM template
-          if template
-            backend_object=VirtualMachine.new(VirtualMachine.build_xml, $backend.one_client)
-          else
-            backend_object=Template.new(Template.build_xml, $backend.one_client)
-          end
+          # TODO: figure out templates
+          # backend_object=Template.new(Template.build_xml, $backend.one_client)
+          backend_object=VirtualMachine.new(VirtualMachine.build_xml, $backend.one_client)
 
           storage_ids = []
           network_ids = []
@@ -89,14 +86,17 @@ module OCCI
           if @links != nil
             @links.each do
               |link|
-              target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.attributes['occi.core.target'])
-              case target.kind.term
-              when 'storage'
-                storage_ids << target.backend_id
-              when 'network'
-                network_ids << target.backend_id
-              when 'storagelink'
+              $log.debug(link.kind)
+              if link.kind.term == 'storagelink'
                 storagelinks << link.attributes['occi.core.target']
+              elsif link.kind.term == 'link'
+                target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.attributes['occi.core.target'])
+                case target.kind.term
+                when 'storage'
+                  storage_ids << target.backend_id
+                when 'network'
+                  network_ids << target.backend_id
+                end
               end
             end
           end
@@ -107,23 +107,20 @@ module OCCI
           compute_template = ERB.new(File.read(@templateRaw)).result(binding)
           $log.debug("Parsed template #{compute_template}")
           rc = backend_object.allocate(compute_template)
-          if OpenNebula.is_error?(rc)
-            $log.warn("Problem with creation of compute resource. Error message: #{rc}")
-          end
+          $backend.check_rc(rc)
           $log.debug("Return code from OpenNebula #{rc}") if rc != nil
           @backend_id = backend_object.id
           $log.debug("OpenNebula ID of virtual machine: #{@backend_id}")
           $log.debug("OpenNebula automatically triggers action start for Virtual Machines")
           $log.debug("Changing state to started")
         end
-        
+
         def refresh
           $log.debug("Refreshing compute object with backend ID: #{@backend_id}")
-          if template
-            backend_object = VirtualMachine.new(VirtualMachine.build_xml(occi_compute_object.backend_id), $backend.one_client)
-          else
-            backend_object = Template.new(Template.build_xml(occi_compute_object.backend_id), $backend.one_client)
-          end
+          backend_object = VirtualMachine.new(VirtualMachine.build_xml(@backend_id), $backend.one_client)
+          # TODO: figure out templates
+          #backend_object = Template.new(Template.build_xml(occi_compute_object.backend_id), $backend.one_client)
+          
           backend_object.info
 
           occi_object = OCCI::Backend::OpenNebula::Compute.parse_backend_object(backend_object)
@@ -136,7 +133,7 @@ module OCCI
           # update state
           update_state(backend_object)
         end
-        
+
         def update_state(backend_object)
           $log.debug("current VM state is: #{backend_object.lcm_state_str}")
           state = case backend_object.lcm_state_str
@@ -149,11 +146,10 @@ module OCCI
         end
 
         def finalize
-          if template
-            backend_object=VirtualMachine.new(VirtualMachine.build_xml(@backend_id), $backend.one_client)
-          else
-            backend_object=Template.new(Template.build_xml(@backend_id), $backend.one_client)
-          end
+          backend_object=VirtualMachine.new(VirtualMachine.build_xml(@backend_id), $backend.one_client)
+          
+          # TODO: figure out templates
+          # backend_object=Template.new(Template.build_xml(@backend_id), $backend.one_client)
 
           rc = backend_object.finalize
           $backend.check_rc(rc)
@@ -199,6 +195,7 @@ module OCCI
           mixins = []
           mixins << OCCI::Backend::ONE::VirtualMachine::MIXIN
 
+          attributes = {}
           backend_object.info
           # parse all parameters from OpenNebula to OCCI
           attributes['occi.core.id'] = backend_object['TEMPLATE/OCCI_ID']
@@ -348,7 +345,7 @@ module OCCI
         end
 
         # Action suspend
-        def compute_suspend(action, parameters, resource)
+        def suspend(parameters)
           backend_object=VirtualMachine.new(VirtualMachine.build_xml(@backend_id), $backend.one_client)
           rc = vm.suspend
           $backend.check_rc(rc)
@@ -361,7 +358,6 @@ module OCCI
       module Network
 
         TEMPLATENETWORKRAWFILE = 'occi_one_template_network.erb'
-
         # CREATE VNET
         def deploy
           backend_object=VirtualNetwork.new(VirtualNetwork.build_xml(), $backend.one_client)
@@ -382,221 +378,222 @@ module OCCI
 
           if occi_object.nil? then
             $log.warn("Problem refreshing network with backend id #{backend_id}")
-            break 
+            break
           end
 
-            # merge new attributes with existing attributes, by overwriting existing attributes with refreshed values
-            @attributes.merge!(occi_object.attributes)
-            # concat mixins and remove duplicate mixins
-            @mixins.concat(occi_object.mixins).uniq!
-            # update state
-            update_state(backend_object)
-          end
-          
+          # merge new attributes with existing attributes, by overwriting existing attributes with refreshed values
+          @attributes.merge!(occi_object.attributes)
+          # concat mixins and remove duplicate mixins
+          @mixins.concat(occi_object.mixins).uniq!
+          # update state
+          update_state(backend_object)
+        end
+
         def update_state(backend_object)
           #TODO: check network states. Currently this is not properly implemented in OpenNebula
         end
 
-          # DELETE VNET
-          def finalize
-            backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(@backend_id), $backend.one_client)
-            rc = backend_object.delete
-            $backend.check_rc(rc)
-          end
-
-          def self.parse_backend_object(backend_object)
-            attributes = {}
-            mixins = []
-            backend_object.info
-            # parse all parameters from OpenNebula to OCCI
-            attributes['occi.core.id'] = backend_object['TEMPLATE/OCCI_ID']
-            attributes['occi.core.title'] = backend_object['NAME']
-            attributes['occi.core.summary'] = backend_object['TEMPLATE/DESCRIPTION']
-            # attributes['opennebula.network.bridge'] = vnet['TEMPLATE/BRIDGE']
-            # attributes['opennebula.network.public'] = vnet['TEMPLATE/PUBLIC']
-            if backend_object['TEMPLATE/TYPE'].downcase == 'fixed'
-              mixins << OCCI::Backend::ONE::Network::MIXIN
-              # attributes['opennebula.network.leases'] = backend_object['TEMPLATE/LEASES']
-              mixins << OCCI::Infrastructure::Ipnetworking::MIXIN
-              attributes['occi.network.allocation'] = 'static'
-            end
-            if backend_object['TEMPLATE/TYPE'].downcase == 'ranged'
-              require 'occi/infrastructure/Ipnetworking'
-              mixins << OCCI::Infrastructure::Ipnetworking::MIXIN
-              attributes['occi.network.allocation'] = 'dynamic'
-              attributes['occi.network.address'] = backend_object['TEMPLATE/NETWORK_ADDRESS'] + '/' + (32-(Math.log(backend_object['TEMPLATE/NETWORK_SIZE'].to_i)/Math.log(2)).ceil).to_s
-            end
-
-            occi_object = OCCI::Infrastructure::Network.new(attributes,mixins)
-            return occi_object
-          end
-
-          # GET ALL VNETs
-          def self.register_all_instances
-            occi_objects = []
-            backend_object_pool=VirtualNetworkPool.new($backend.one_client)
-            backend_object_pool.info_all
-            backend_object_pool.each do |backend_object|
-              occi_object = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
-              occi_object.backend_id = backend_object.id
-              $log.debug("Backend ID: #{occi_object.backend_id}")
-              OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
-              occi_objects << occi_object
-            end
-            return occi_objects
-          end
-
-          # Action up
-          def up(parameters)
-            backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(@backend_id), $backend.one_client)
-            network.enable
-            $backend.check_rc(rc)
-          end
-
-          # Action down
-          def down(parameters)
-            backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(@backend_id), $backend.one_client)
-            network.disable
-            $backend.check_rc(rc)
-          end
-
+        # DELETE VNET
+        def finalize
+          backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(@backend_id), $backend.one_client)
+          rc = backend_object.delete
+          $backend.check_rc(rc)
         end
 
-        ########################################################################
-        # Storage class
-
-        module Storage
-          
-          TEMPLATESTORAGERAWFILE = 'occi_one_template_storage.erb'
-
-          # CREATE STORAGE
-          def deploy
-            backend_object = Image.new(Image.build_xml, $backend.one_client)
-            # check creation of images
-            raise "No image provided" if $image_path == ""
-            @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
-            template = ERB.new(File.read(@templateRaw)).result(binding)
-            $log.debug("Parsed template #{template}")
-            rc = backend_object.allocate(template)
-            $backend.check_rc(rc)
-            @backend_id = backend_object.id
-            $log.debug("OpenNebula ID of image: #{@backend_id}")
+        def self.parse_backend_object(backend_object)
+          attributes = {}
+          mixins = []
+          backend_object.info
+          attributes = {}
+          # parse all parameters from OpenNebula to OCCI
+          attributes['occi.core.id'] = backend_object['TEMPLATE/OCCI_ID']
+          attributes['occi.core.title'] = backend_object['NAME']
+          attributes['occi.core.summary'] = backend_object['TEMPLATE/DESCRIPTION']
+          # attributes['opennebula.network.bridge'] = vnet['TEMPLATE/BRIDGE']
+          # attributes['opennebula.network.public'] = vnet['TEMPLATE/PUBLIC']
+          if backend_object['TEMPLATE/TYPE'].downcase == 'fixed'
+            mixins << OCCI::Backend::ONE::Network::MIXIN
+            # attributes['opennebula.network.leases'] = backend_object['TEMPLATE/LEASES']
+            mixins << OCCI::Infrastructure::Ipnetworking::MIXIN
+            attributes['occi.network.allocation'] = 'static'
           end
-          
-          def update_state(backend_object)
-            $log.debug("current Image state is: #{backend_object.short_state_str}")
-            state = case backend_object.short_state_str
-              when "READY" || "USED" || "LOCKED" then OCCI::Infrastructure::Storage::STATE_ONLINE 
-              else OCCI::Infrastructure::Compute::STATE_OFFLINE
-            end
-            @state_machine.set_state(state)
-            @attributes['occi.storage.state'] = @state_machine.current_state.name
+          if backend_object['TEMPLATE/TYPE'].downcase == 'ranged'
+            require 'occi/infrastructure/Ipnetworking'
+            mixins << OCCI::Infrastructure::Ipnetworking::MIXIN
+            attributes['occi.network.allocation'] = 'dynamic'
+            attributes['occi.network.address'] = backend_object['TEMPLATE/NETWORK_ADDRESS'] + '/' + (32-(Math.log(backend_object['TEMPLATE/NETWORK_SIZE'].to_i)/Math.log(2)).ceil).to_s
           end
 
-          # DELETE STORAGE / IMAGE
-          def finalize
-            backend_object = Image.new(Image.build_xml(@backend_id), $backend.one_client)
-            rc = backend_object.delete
-            $backend.check_rc(rc)
+          occi_object = OCCI::Infrastructure::Network.new(attributes,mixins)
+          return occi_object
+        end
+
+        # GET ALL VNETs
+        def self.register_all_instances
+          occi_objects = []
+          backend_object_pool=VirtualNetworkPool.new($backend.one_client)
+          backend_object_pool.info_all
+          backend_object_pool.each do |backend_object|
+            occi_object = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
+            occi_object.backend_id = backend_object.id
+            $log.debug("Backend ID: #{occi_object.backend_id}")
+            OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
+            occi_objects << occi_object
+          end
+          return occi_objects
+        end
+
+        # Action up
+        def up(parameters)
+          backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(@backend_id), $backend.one_client)
+          network.enable
+          $backend.check_rc(rc)
+        end
+
+        # Action down
+        def down(parameters)
+          backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(@backend_id), $backend.one_client)
+          network.disable
+          $backend.check_rc(rc)
+        end
+
+      end
+
+      ########################################################################
+      # Storage class
+
+      module Storage
+
+        TEMPLATESTORAGERAWFILE = 'occi_one_template_storage.erb'
+        # CREATE STORAGE
+        def deploy
+          backend_object = Image.new(Image.build_xml, $backend.one_client)
+          # check creation of images
+          raise "No image provided" if $image_path == ""
+          @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
+          template = ERB.new(File.read(@templateRaw)).result(binding)
+          $log.debug("Parsed template #{template}")
+          rc = backend_object.allocate(template)
+          $backend.check_rc(rc)
+          @backend_id = backend_object.id
+          $log.debug("OpenNebula ID of image: #{@backend_id}")
+        end
+
+        def update_state(backend_object)
+          $log.debug("current Image state is: #{backend_object.short_state_str}")
+          state = case backend_object.short_state_str
+          when "READY" || "USED" || "LOCKED" then OCCI::Infrastructure::Storage::STATE_ONLINE
+          else OCCI::Infrastructure::Compute::STATE_OFFLINE
+          end
+          @state_machine.set_state(state)
+          @attributes['occi.storage.state'] = @state_machine.current_state.name
+        end
+
+        # DELETE STORAGE / IMAGE
+        def finalize
+          backend_object = Image.new(Image.build_xml(@backend_id), $backend.one_client)
+          rc = backend_object.delete
+          $backend.check_rc(rc)
+        end
+
+        # REFRESH IMAGES
+        def refresh
+          backend_object=Image.new(Image.build_xml(@backend_id), $backend.one_client)
+
+          occi_object = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
+
+          if occi_object.nil? then
+            $log.warn("Problem refreshing network with backend id #{backend_id}")
+            break
           end
 
-          # REFRESH IMAGES
-          def refresh
-            backend_object=Image.new(Image.build_xml(@backend_id), $backend.one_client)
+          # merge new attributes with existing attributes, by overwriting existing attributes with refreshed values
+          @attributes.merge!(occi_object.attributes)
+          # concat mixins and remove duplicate mixins
+          @mixins.concat(occi_object.mixins).uniq!
+          # update state
+          update_state(backend_object)
+        end
 
+        def self.parse_backend_object(backend_object)
+          attributes = {}
+          mixins = []
+          backend_object.info
+          attributes = {}
+          # parse all parameters from OpenNebula to OCCI
+          attributes['occi.core.id'] = backend_object['TEMPLATE/OCCI_ID']
+          attributes['occi.core.title'] = backend_object['NAME']
+          attributes['occi.core.summary'] = backend_object['TEMPLATE/DESCRIPTION']
+          attributes['opennebula.image.type'] = backend_object['TEMPLATE/TYPE']
+          attributes['opennebula.image.public'] = backend_object['TEMPLATE/PUBLIC']
+          attributes['opennebula.image.persistent'] = backend_object['TEMPLATE/PERSISTENT']
+          attributes['opennebula.image.dev_prefix'] = backend_object['TEMPLATE/DEV_PREFIX']
+          attributes['opennebula.image.bus'] = backend_object['TEMPLATE/BUS']
+          if backend_object['TEMPLATE/SIZE'] != nil
+            attributes['occi.storage.size'] = backend_object['TEMPLATE/SIZE']
+          end
+          if backend_object['TEMPLATE/FSTYPE'] != nil
+            attributes['occi.storage.fstype']
+          end
+
+          mixins = [OCCI::Backend::ONE::Image::MIXIN]
+
+          resource = OCCI::Infrastructure::Storage.new(attributes,mixins)
+        end
+
+        # GET ALL IMAGEs
+        def self.register_all_instances
+          occi_objects = []
+          backend_object_pool=ImagePool.new($backend.one_client)
+          backend_object_pool.info_all
+          backend_object_pool.each do |backend_object|
             occi_object = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
-
-            if occi_object.nil? then
-              $log.warn("Problem refreshing network with backend id #{backend_id}")
-              break
-            end
-
-            # merge new attributes with existing attributes, by overwriting existing attributes with refreshed values
-            @attributes.merge!(occi_object.attributes)
-            # concat mixins and remove duplicate mixins
-            @mixins.concat(occi_object.mixins).uniq!
-            # update state
-            update_state(backend_object)
+            occi_object.backend_id = backend_object.id
+            $log.debug("Backend ID: #{occi_object.backend_id}")
+            OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
+            occi_objects << occi_object
           end
+          return occi_objects
+        end
 
-          def self.parse_backend_object(backend_object)
-            attributes = {}
-            mixins = []
-            backend_object.info
-            # parse all parameters from OpenNebula to OCCI
-            attributes['occi.core.id'] = backend_object['TEMPLATE/OCCI_ID']
-            attributes['occi.core.title'] = backend_object['NAME']
-            attributes['occi.core.summary'] = backend_object['TEMPLATE/DESCRIPTION']
-            attributes['opennebula.image.type'] = backend_object['TEMPLATE/TYPE']
-            attributes['opennebula.image.public'] = backend_object['TEMPLATE/PUBLIC']
-            attributes['opennebula.image.persistent'] = backend_object['TEMPLATE/PERSISTENT']
-            attributes['opennebula.image.dev_prefix'] = backend_object['TEMPLATE/DEV_PREFIX']
-            attributes['opennebula.image.bus'] = backend_object['TEMPLATE/BUS']
-            if backend_object['TEMPLATE/SIZE'] != nil
-              attributes['occi.storage.size'] = backend_object['TEMPLATE/SIZE']
-            end
-            if backend_object['TEMPLATE/FSTYPE'] != nil
-              attributes['occi.storage.fstype']
-            end
+        # Action online
+        def online(parameters)
+          backend_object = Image.new(Image.build_xml(@backend_id), $backend.one_client)
+          rc = backend_object.enable
+          $backend.check_rc(rc)
+        end
 
-            mixins = [OCCI::Backend::ONE::Image::MIXIN]
+        # Action offline
+        def offline(parameters)
+          backend_object = Image.new(Image.build_xml(@backend_id), $backend.one_client)
+          rc = backend_object.disable
+          $backend.check_rc(rc)
+        end
 
-            resource = OCCI::Infrastructure::Storage.new(attributes,mixins)
-          end
+        # Action backup
+        def backup(parameters)
+          #            @links.each do |link|
+          #              link_resource.kind.term = "compute"
+          #              compute = VirtualMachine.new(VirtualMachine.build_xml(link_resource.backend_id), $backend.one_client)
+          #              backup_id = compute.savedisk(resource.backend_id,"Backup " + Time.now)
+          #              attributes = []
+          #              backup = OCCI::Infrastructure::Storage.new(attributes)
+          #              backup.backend_id = backup_id
+          #              OCCI::Rendering::HTTP::LocationRegistry.register(backup.get_location, backup)
+          #            end
+          $log.debug("not yet implemented")
+        end
 
-          # GET ALL IMAGEs
-          def self.register_all_instances
-            occi_objects = []
-            backend_object_pool=ImagePool.new($backend.one_client)
-            backend_object_pool.info_all
-            backend_object_pool.each do |backend_object|
-              occi_object = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
-              occi_object.backend_id = backend_object.id
-              $log.debug("Backend ID: #{occi_object.backend_id}")    
-              OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
-              occi_objects << occi_object          
-            end
-            return occi_objects
-          end
+        # Action snapshot
+        def snapshot(parameters)
+          $log.debug("not yet implemented")
+        end
 
-          # Action online
-          def online(parameters)
-            backend_object = Image.new(Image.build_xml(@backend_id), $backend.one_client)
-            rc = backend_object.enable
-            $backend.check_rc(rc)
-          end
-
-          # Action offline
-          def offline(parameters)
-            backend_object = Image.new(Image.build_xml(@backend_id), $backend.one_client)
-            rc = backend_object.disable
-            $backend.check_rc(rc)
-          end
-
-          # Action backup
-          def backup(parameters)
-#            @links.each do |link|
-#              link_resource.kind.term = "compute"
-#              compute = VirtualMachine.new(VirtualMachine.build_xml(link_resource.backend_id), $backend.one_client)
-#              backup_id = compute.savedisk(resource.backend_id,"Backup " + Time.now)
-#              attributes = []
-#              backup = OCCI::Infrastructure::Storage.new(attributes)
-#              backup.backend_id = backup_id
-#              OCCI::Rendering::HTTP::LocationRegistry.register(backup.get_location, backup)
-#            end
-            $log.debug("not yet implemented")
-          end
-
-          # Action snapshot
-          def snapshot(parameters)
-            $log.debug("not yet implemented")
-          end
-
-          # Action resize
-          def resize(parameters)
-            $log.debug("not yet implemented")
-          end
+        # Action resize
+        def resize(parameters)
+          $log.debug("not yet implemented")
         end
       end
     end
   end
+end

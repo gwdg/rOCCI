@@ -80,7 +80,7 @@ module OCCI
           category.attributes.each do |name, attribute_def|
             raise "Attribute [#{name}] already defined in category [#{attribute_categories[name]}], redefinition from category [#{category}]!" if attribute_definitions.has_key?(name)
             attribute_definitions[name] = attribute_def
-            attribute_categories[name]  = category            
+            attribute_categories[name]  = category
           end
         end
         
@@ -157,13 +157,13 @@ module OCCI
         links.each do |link|
           $log.debug("occi.core.target #{link.attributes["occi.core.target"]}")
           target_uri = URI.parse(link.attributes["occi.core.target"])
-          target = $locationRegistry.get_object_by_location(target_uri.path)
-          $log.debug("Target #{target}")
-          target.links.delete(link)
+          target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_uri.path)
+          $log.debug("Target #{target}") unless target.nil?
+          target.links.delete(link) unless target.nil?
 
           $log.debug("occi.core.source #{link.attributes["occi.core.source"]}")
           source_uri = URI.parse(link.attributes["occi.core.source"])
-          source = $locationRegistry.get_object_by_location(source_uri.path)
+          source = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(source_uri.path)
           $log.debug("Source #{source}")
           source.links.delete(link)
         end if links != nil
