@@ -174,11 +174,10 @@ module OCCI
           occi_objects = []
           backend_object_pool.each do |backend_object|
             $log.debug("ONE compute object: #{backend_object}")
-            attributes, mixins = OCCI::Backend::OpenNebula::Compute.parse_backend_object(backend_object)
+            occi_object = OCCI::Backend::OpenNebula::Compute.parse_backend_object(backend_object)
+            raise "Error creating occi resource from backend" if occi_object.nil?
             mixins << OCCI::Infrastructure::ResourceTemplate::MIXIN if template
-            $log.debug("Attributes: #{attributes}")
-            $log.debug("Mixins: #{mixins}")
-            occi_object = OCCI::Infrastructure::Compute.new(attributes,mixins)
+            $log.debug(occi_object.methods) unless occi_object.nil?
             occi_object.backend_id = backend_object.id
             $log.debug("Backend ID: #{occi_object.backend_id}")
             $log.debug("OCCI compute object location: #{occi_object.get_location}")
@@ -237,11 +236,10 @@ module OCCI
               # CREATE PROXY FOR VNC SERVER
               begin
                 novnc_cmd = "#{$config[:novnc_path]}/utils/launch.sh"
-                pipe = IO.popen("#{novnc_cmd} --listen #{proxy_port} \
-                                            --vnc #{vnc_host}:#{vnc_port}")
+                pipe = IO.popen("#{novnc_cmd} --listen #{proxy_port} --vnc #{vnc_host}:#{vnc_port}")
 
                 if pipe
-                  vnc_url = $config[:server] + ':' + vnc_port + '/vnc_auto.html?host=' + vnc_proxy_host + '&port=' + vnc_port
+                  vnc_url = $config[:server].chomp('/') + ':' + vnc_port + '/vnc_auto.html?host=' + vnc_proxy_host + '&port=' + vnc_port
                   $log.debug("VNC URL: #{vnc_url}")
                   attributes['opennebula.vm.vnc'] = vnc_host + ':' + vnc_port
                   attributes['opennebula.vm.web_vnc'] = vnc_url

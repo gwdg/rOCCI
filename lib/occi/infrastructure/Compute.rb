@@ -129,6 +129,10 @@ module OCCI
         super(attributes, OCCI::Infrastructure::Compute::KIND ,mixins)
       end
 
+      def backend_id=(id)
+        @backend_id=id
+      end
+        
     end
   end
 end

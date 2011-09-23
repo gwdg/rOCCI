@@ -104,6 +104,7 @@ module OCCI
           return response
         end
         
+        # render single location if a new resource has been created (e.g. use Location instead of X-OCCI-Location)
         def self.render_location(location, response)
           
           response['Location'] = location
@@ -111,7 +112,7 @@ module OCCI
           when 'application/json'
             response.write(JSON.pretty_generate({'Location' => location}))     
           when 'text/plain'
-            response.write('X-OCCI-Location: ' + location)
+            response.write('Location : ' + location)
           when 'text/occi'
             # for text/occi the body needs to contain OK
             response.write('OK')
