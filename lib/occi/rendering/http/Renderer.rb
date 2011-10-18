@@ -97,7 +97,7 @@ module OCCI
           when 'text/occi'
             # for text/occi the body needs to contain OK          
             response[HEADER_CATEGORY] = category_values.join(',')
-            response.write = "OK"
+            response.write('OK')
           # when 'text/uri-list'
           end
 
@@ -130,7 +130,11 @@ module OCCI
           location        = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(link)
           target_location = link.attributes["occi.core.target"]
           target_resource = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
-          target_resource_type = target_resource.kind.type_identifier
+          if target_resource.nil? 
+            target_resource_type = OCCI::Core::Link::KIND.type_identifier
+          else
+            target_resource_type = target_resource.kind.type_identifier
+          end
 
           link_value = %Q{<#{target_location}>;rel="#{target_resource_type}";self="#{location}"}
 
