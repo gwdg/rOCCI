@@ -176,8 +176,7 @@ module OCCI
             $log.debug("ONE compute object: #{backend_object}")
             occi_object = OCCI::Backend::OpenNebula::Compute.parse_backend_object(backend_object)
             raise "Error creating occi resource from backend" if occi_object.nil?
-            mixins << OCCI::Infrastructure::ResourceTemplate::MIXIN if template
-            $log.debug(occi_object.methods) unless occi_object.nil?
+            $log.debug(occi_object.methods)
             occi_object.backend_id = backend_object.id
             $log.debug("Backend ID: #{occi_object.backend_id}")
             $log.debug("OCCI compute object location: #{occi_object.get_location}")
