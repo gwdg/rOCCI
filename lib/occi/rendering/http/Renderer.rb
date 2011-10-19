@@ -196,7 +196,7 @@ module OCCI
 
           locations_values = []
           locations.each do |location|
-            locations_values << $config["server"] + ':' + $config["port"] + location unless location.nil?
+            locations_values << $config["server"].chomp('/') + ':' + $config["port"] + location unless location.nil?
           end
 
           case response['Content-Type']
