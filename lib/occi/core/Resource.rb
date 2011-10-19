@@ -56,20 +56,20 @@ module OCCI
         super(attributes, kind, mixins)
         
         # if mixins include a template mixin, we link this entity and the template entity
-        mixins.each do |mixin|
-          mixin.related.each do |related|
-            if related.term == 'tpl'
-              source = self
-              target = mixin.template_location
-              attributes = {}
-              attributes['occi.core.source'] = source.get_location
-              attributes['occi.core.target'] = target.get_location
-              OCCI::Infrastructure::TemplateLink.new(attributes)
-              target.links << links
-              source.links << links
-            end
-          end
-        end
+#        mixins.each do |mixin|
+#          mixin.related.each do |related|
+#            if related.term == 'tpl'
+#              source = self
+#              target = mixin.template_location
+#              attributes = {}
+#              attributes['occi.core.source'] = source.get_location
+#              attributes['occi.core.target'] = target.get_location
+#              OCCI::Infrastructure::TemplateLink.new(attributes)
+#              target.links << links
+#              source.links << links
+#            end
+#          end
+#        end
       end
 
       def make_template()
