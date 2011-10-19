@@ -29,26 +29,10 @@ module OCCI
 
       # Define appropriate kind
       begin
-        
-        # Define actions
-        down_attributes = OCCI::Core::Attributes.new()
-        up_attributes = OCCI::Core::Attributes.new()
-        
-        ACTION_DOWN = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/networkinterface/action#", term = "down",      title = "Network Action Down", attributes = down_attributes)
-        ACTION_UP   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/networkinterface/action#", term = "up",        title = "Network Action Up", attributes = up_attributes)
-
-        actions = [ACTION_DOWN, ACTION_UP]
-        
-        OCCI::CategoryRegistry.register(ACTION_DOWN.category)
-        OCCI::CategoryRegistry.register(ACTION_UP.category)
 
         # Define state-machine
         STATE_INACTIVE  = OCCI::StateMachine::State.new("inactive")
         STATE_ACTIVE    = OCCI::StateMachine::State.new("active")
-        
-        STATE_INACTIVE.add_transition(ACTION_UP, STATE_ACTIVE)
-
-        STATE_ACTIVE.add_transition(ACTION_DOWN, STATE_INACTIVE)
         
         actions = []
         related = [OCCI::Core::Link::KIND]
