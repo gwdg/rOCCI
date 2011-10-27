@@ -134,11 +134,12 @@ module OCCI
             # concat mixins and remove duplicate mixins
             @mixins.concat(occi_object.mixins).uniq!
             # update state
-            update_state(backend_object)
+            update_state
           end
         end
 
-        def update_state(backend_object)
+        def update_state
+          backend_object = VirtualMachine.new(VirtualMachine.build_xml(@backend_id), $backend.one_client)
           $log.debug("current VM state is: #{backend_object.lcm_state_str}")
           state = case backend_object.lcm_state_str
             when "PROLOG" , "BOOT" , "RUNNING" , "SAVE_STOP" , "SAVE_SUSPEND" , "SAVE_MIGRATE" , "MIGRATE" , "PROLOG_MIGRATE" , "PROLOG_RESUME" then OCCI::Infrastructure::Compute::STATE_ACTIVE
@@ -396,11 +397,11 @@ module OCCI
             # concat mixins and remove duplicate mixins
             @mixins.concat(occi_object.mixins).uniq!
             # update state
-            update_state(backend_object)
+            update_state
           end
         end
 
-        def update_state(backend_object)
+        def update_state
           #TODO: check network states. Currently this is not properly implemented in OpenNebula
         end
 
@@ -510,7 +511,8 @@ module OCCI
           $log.debug("OpenNebula ID of image: #{@backend_id}")
         end
 
-        def update_state(backend_object)
+        def update_state
+          backend_object = Image.new(Image.build_xml(@backend_id), $backend.one_client)
           $log.debug("current Image state is: #{backend_object.short_state_str}")
           state = case backend_object.short_state_str
           when "READY" , "USED" , "LOCKED" then OCCI::Infrastructure::Storage::STATE_ONLINE
@@ -542,7 +544,7 @@ module OCCI
             # concat mixins and remove duplicate mixins
             @mixins.concat(occi_object.mixins).uniq!
             # update state
-            update_state(backend_object)
+            update_state
           end
         end
 
