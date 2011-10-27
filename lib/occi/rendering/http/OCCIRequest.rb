@@ -79,10 +79,10 @@ module OCCI
           $log.debug(@attributes)
 
           @categories = OCCI::CategoryRegistry.get_all(@parsed_categories).to_a
-          @kind = @categories.select {|category| category.kind_of?(OCCI::Core::Kind)}.last
-          @action_category = @categories.select {|category| category.kind_of?(OCCI::Core::Category)}.last
+          @kind = @categories.select {|category| category.kind_of?(OCCI::Core::Kind)}.last if @parsed_categories.length > 0
+          @action_category = @categories.select {|category| category.kind_of?(OCCI::Core::Category)}.last if @parsed_categories.length > 0
           @mixin = @parsed_categories.last
-          @mixins = @categories.select {|category| category.kind_of?(OCCI::Core::Mixin)}
+          @mixins = @categories.select {|category| category.kind_of?(OCCI::Core::Mixin)} if @parsed_categories.length > 0
         end
 
         def parse_json(body)
