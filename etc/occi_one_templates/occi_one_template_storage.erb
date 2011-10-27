@@ -4,9 +4,9 @@ DESCRIPTION   = <%= attributes['occi.core.summary'] if attributes['occi.core.sum
 
 <% if attributes['opennebula.image.type'] %>
 TYPE          = <%= attributes['opennebula.image.type'].upcase %>
-<% elseif $image_path != '' or storagelink != '' %>
+<% elsif $image_path != '' %>
 TYPE          = OS
-<% elseif attributes['occi.storage.size'] %>
+<% elsif attributes['occi.storage.size'] %>
 TYPE          = DATABLOCK
 <% end %>
 
@@ -15,11 +15,7 @@ TYPE          = DATABLOCK
 DEV_PREFIX    = <%= attributes['opennebula.image.dev_prefix'].downcase if attributes['opennebula.image.dev_prefix'] %>
 BUS           = <%= attributes['opennebula.image.bus'].downcase if attributes['opennebula.image.bus'] %>
 
-<% if storagelink != '' %>
-PATH          = <%= storagelink %>
-<% elseif $image_path != '' %>
 PATH          = <%= $image_path %>
-<% end %>
 
 <% if attributes['occi.storage.size'] %>
 SIZE          = <%= attributes['occi.storage.size'] %>
@@ -29,6 +25,6 @@ SIZE          = <%= File.size($image_path) %>
 
 <% if attributes['opennebula.image.fstype'] %>
 FSTYPE        = <%= attributes['occi.storage.fstype'] %>
-<% elseif $image_path == '' %>
+<% elsif $image_path == '' %>
 FSTYPE        = ext3
 <% end %>
