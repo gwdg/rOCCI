@@ -101,7 +101,7 @@ module OCCI
         target = @targets[target_id]
         $log.debug("Invoking method [#{target[:method]}] of object [#{target[:object]}]...")
         # TODO: define some convention for result handling!
-        result = target[:object].send(target[:method], action, parameters, resource)
+        result = target[:object].send(target[:method], parameters)
       end
 
       # Adapt resource state
