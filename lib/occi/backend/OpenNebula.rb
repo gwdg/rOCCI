@@ -495,6 +495,7 @@ module OCCI
               $log.debug(link.kind)
               if link.kind.term == 'storagelink'
                 storagelink = link.attributes['occi.core.target']
+              end
             end
           end
           
