@@ -246,6 +246,7 @@ begin
         delegator = OCCI::ActionDelegator.instance
         resources.each do |resource|
           resource.refresh if resource.kind_of?(OCCI::Core::Resource)
+          action = nil
           resource.kind.actions.each do |existing_action|
             action = existing_action if existing_action.category == occi_request.action_category
           end
