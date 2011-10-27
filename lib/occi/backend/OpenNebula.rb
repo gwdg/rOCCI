@@ -501,7 +501,7 @@ module OCCI
           end
           
           # check creation of images
-          raise "No image provided" if $image_path == ""
+          raise "No image or storagelink provided" if $image_path == "" and storagelink == ""
           @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
           template = ERB.new(File.read(@templateRaw)).result(binding)
           $log.debug("Parsed template #{template}")
