@@ -489,6 +489,15 @@ module OCCI
         # CREATE STORAGE
         def deploy
           backend_object = Image.new(Image.build_xml, $backend.one_client)
+          
+          if @links != nil
+            @links.each do |link|
+              $log.debug(link.kind)
+              if link.kind.term == 'storagelink'
+                storagelink = link.attributes['occi.core.target']
+            end
+          end
+          
           # check creation of images
           raise "No image provided" if $image_path == ""
           @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
