@@ -107,7 +107,7 @@ module OCCI
             @attributes.merge!(OCCI::Parser.new(line.gsub('X-OCCI-Attribute: ','').chomp).attributes_attr) if line.start_with?('X-OCCI-Attribute')
             @locations.concat(OCCI::Parser.new(line.gsub('X-OCCI-Location: ','').chomp).location_values) if line.start_with?('X-OCCI-Location')
           end
-          body.close
+          body.close unless body.kind_of?(String)
         end
       end
     end
