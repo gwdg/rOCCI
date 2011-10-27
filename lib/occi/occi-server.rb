@@ -234,18 +234,22 @@ begin
       $log.debug("Requested location: #{location}")
 
       # Trigger action on resources(s)
-      unless occi_request.action.nil?
+      unless occi_request.action_category.nil?
         $log.info("Triggering action on resource(s)...")
-        resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location)
+        resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location,occi_request.categories)
         $log.debug(occi_request.attributes)
         method    = request.env["HTTP_X_OCCI_ATTRIBUTE"]
 
-        raise "No entities corresponding to location [#{location}] could be found!" if entities == nil
+        raise "No entities corresponding to location [#{location}] could be found!" if resources.nil?
 
-        $log.debug("Action [#{action}] to be triggered on [#{entities.length}] entities:")
+        $log.debug("Action [#{occi_request.action_category.type_identifier}] to be triggered on [#{resources.length}] entities:")
         delegator = OCCI::ActionDelegator.instance
         resources.each do |resource|
           resource.refresh if resource.kind_of?(OCCI::Core::Resource)
+          resource.kind.actions.each do |existing_action|
+            action = existing_action if existing_action.category == occi_request.action_category
+          end
+          raise "No action found for action #{occi_request.action_category.type_identifier} and resource {#{resource.kind.type_identifier}" if action.nil?
           delegator.delegate_action(action, method, resource)
         end
         break;
