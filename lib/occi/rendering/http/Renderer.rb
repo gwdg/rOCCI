@@ -185,7 +185,7 @@ module OCCI
           when 'text/occi'
             # for text/occi the body needs to contain OK
             response['X-OCCI-Attribute'] = attributes_values.join(',')
-            response.write = "OK"
+            response.write("OK")
           end
 
           return response
@@ -207,7 +207,7 @@ module OCCI
           when 'text/occi'
             response['X-OCCI-Location'] = locations_values.join(',')
             # for text/occi the body needs to contain OK
-            response.write = "OK"
+            response.write("OK")
           when 'text/uri-list'
             response.write(locations_values.join(','))
           end 
