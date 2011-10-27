@@ -491,17 +491,19 @@ module OCCI
         def deploy
           backend_object = Image.new(Image.build_xml, $backend.one_client)
           
+          storagelink = nil
+          
           if @links != nil
             @links.each do |link|
               $log.debug(link.kind)
               if link.kind.term == 'storagelink'
-                storagelink = link.attributes['occi.core.target']
+                $image_path = link.attributes['occi.core.target']
               end
             end
           end
           
           # check creation of images
-          raise "No image or storagelink provided" if $image_path == "" and storagelink == ""
+          raise "No image or storagelink provided" if $image_path == ""
           @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
           template = ERB.new(File.read(@templateRaw)).result(binding)
           $log.debug("Parsed template #{template}")
