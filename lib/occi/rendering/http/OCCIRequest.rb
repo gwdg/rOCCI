@@ -30,7 +30,7 @@ module OCCI
         attr_reader :links
         attr_reader :attributes
         attr_reader :locations
-        attr_reader :action
+        attr_reader :action_category
         attr_reader :kind
         attr_reader :mixins
         def initialize(request,params)
