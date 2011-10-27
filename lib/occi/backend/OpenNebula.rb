@@ -141,9 +141,9 @@ module OCCI
         def update_state(backend_object)
           $log.debug("current VM state is: #{backend_object.lcm_state_str}")
           state = case backend_object.lcm_state_str
-          when "PROLOG" || "BOOT" || "RUNNING" || "SAVE_STOP" || "SAVE_SUSPEND" || "SAVE_MIGRATE" || "MIGRATE" || "PROLOG_MIGRATE" || "PROLOG_RESUME" then OCCI::Infrastructure::Compute::STATE_ACTIVE
-          when "SUSPENDED" then OCCI::Infrastructure::Compute::STATE_SUSPENDED
-          else OCCI::Infrastructure::Compute::STATE_INACTIVE
+            when "PROLOG" , "BOOT" , "RUNNING" , "SAVE_STOP" , "SAVE_SUSPEND" , "SAVE_MIGRATE" , "MIGRATE" , "PROLOG_MIGRATE" , "PROLOG_RESUME" then OCCI::Infrastructure::Compute::STATE_ACTIVE
+            when "SUSPENDED" then OCCI::Infrastructure::Compute::STATE_SUSPENDED
+            else OCCI::Infrastructure::Compute::STATE_INACTIVE
           end
           @state_machine.set_state(state)
           @attributes['occi.compute.state'] = @state_machine.current_state.name
@@ -513,7 +513,7 @@ module OCCI
         def update_state(backend_object)
           $log.debug("current Image state is: #{backend_object.short_state_str}")
           state = case backend_object.short_state_str
-          when "READY" || "USED" || "LOCKED" then OCCI::Infrastructure::Storage::STATE_ONLINE
+          when "READY" , "USED" , "LOCKED" then OCCI::Infrastructure::Storage::STATE_ONLINE
           else OCCI::Infrastructure::Storage::STATE_OFFLINE
           end
           @state_machine.set_state(state)
