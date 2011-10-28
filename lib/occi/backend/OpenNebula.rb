@@ -407,7 +407,7 @@ module OCCI
         def update_state
           state = OCCI::Infrastructure::Network::STATE_ACTIVE
           @state_machine.set_state(state)
-          @attributes['occi.storage.state'] = @state_machine.current_state.name
+          @attributes['occi.network.state'] = @state_machine.current_state.name
         end
 
         # DELETE VNET
