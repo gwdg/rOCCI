@@ -140,6 +140,7 @@ module OCCI
 
         def update_state
           backend_object = VirtualMachine.new(VirtualMachine.build_xml(@backend_id), $backend.one_client)
+          backend_object.info
           $log.debug("current VM state is: #{backend_object.lcm_state_str}")
           state = case backend_object.lcm_state_str
             when "PROLOG" , "BOOT" , "RUNNING" , "SAVE_STOP" , "SAVE_SUSPEND" , "SAVE_MIGRATE" , "MIGRATE" , "PROLOG_MIGRATE" , "PROLOG_RESUME" then OCCI::Infrastructure::Compute::STATE_ACTIVE
@@ -386,6 +387,8 @@ module OCCI
         def refresh
           backend_object=VirtualNetwork.new(VirtualNetwork.build_xml(@backend_id), $backend.one_client)
 
+          backend_object.info
+          
           occi_object = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
 
           if occi_object.nil? then
@@ -514,6 +517,7 @@ module OCCI
 
         def update_state
           backend_object = Image.new(Image.build_xml(@backend_id), $backend.one_client)
+          backend_object.info
           $log.debug("current Image state is: #{backend_object.short_state_str}")
           state = case backend_object.short_state_str
           when "READY" , "USED" , "LOCKED" then OCCI::Infrastructure::Storage::STATE_ONLINE
@@ -534,6 +538,8 @@ module OCCI
         def refresh
           backend_object=Image.new(Image.build_xml(@backend_id), $backend.one_client)
 
+          backend_object.info
+          
           occi_object = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
 
           if occi_object.nil? then
