@@ -405,7 +405,9 @@ module OCCI
         end
 
         def update_state
-          #TODO: check network states. Currently this is not properly implemented in OpenNebula
+          state = OCCI::Infrastructure::Network::STATE_ACTIVE
+          @state_machine.set_state(state)
+          @attributes['occi.storage.state'] = @state_machine.current_state.name
         end
 
         # DELETE VNET
