@@ -518,8 +518,8 @@ module OCCI
         def update_state
           backend_object = Image.new(Image.build_xml(@backend_id), $backend.one_client)
           backend_object.info
-          $log.debug("current Image state is: #{backend_object.short_state_str}")
-          state = case backend_object.short_state_str
+          $log.debug("current Image state is: #{backend_object.state_str}")
+          state = case backend_object.state_str
           when "READY" , "USED" , "LOCKED" then OCCI::Infrastructure::Storage::STATE_ONLINE
           else OCCI::Infrastructure::Storage::STATE_OFFLINE
           end
