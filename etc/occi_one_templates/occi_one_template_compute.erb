@@ -27,6 +27,7 @@ DISK          = [ IMAGE_ID = "<%= storage_id %>"]
 DISK = [
 <% storagelinks.each do |storagelink| %>
 TYPE          = "OS",
+TARGET        = "hda",
 SOURCE        = <%= storagelink %>
 <%end%>
 ]
