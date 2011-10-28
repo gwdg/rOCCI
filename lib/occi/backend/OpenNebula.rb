@@ -495,7 +495,6 @@ module OCCI
           
           if @links != nil
             @links.each do |link|
-              $log.debug(link.kind)
               if link.kind.term == 'storagelink'
                 $image_path = link.attributes['occi.core.target']
               end
@@ -538,7 +537,7 @@ module OCCI
           occi_object = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
 
           if occi_object.nil? then
-            $log.warn("Problem refreshing network with backend id #{backend_id}")
+            $log.warn("Problem refreshing storage with backend id #{backend_id}")
           else
 
             # merge new attributes with existing attributes, by overwriting existing attributes with refreshed values

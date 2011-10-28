@@ -56,7 +56,7 @@ module OCCI
         id = category.type_identifier if category.type_identifier
         occi_categories << self.get_by_id(id)
       end
-      return occi_categories if occi_categories != []
+      return occi_categories if occi_categories != [] or categories.length > 0
       return @@categories_by_id.values
     end
   end

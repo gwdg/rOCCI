@@ -169,7 +169,7 @@ begin
       object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)
 
       # Render exact matches referring to kinds / mixins
-      if object != nil && object.kind_of?(OCCI::Core::Category)
+      if object != nil and (object.kind_of?(OCCI::Core::Kind) or object.kind_of?(OCCI::Core::Mixin))
         raise "Only mixins / kinds are supported for exact match rendering: location: #{location}; object: #{object}" if !object.instance_variable_defined?(:@entities)
         $log.info("Listing all entities for kind/mixin [#{object.type_identifier}] ...")
         locations = []
@@ -182,7 +182,7 @@ begin
       end
 
       # Render exact matches referring to resources
-      if object != nil && object.kind_of?(OCCI::Core::Resource)
+      if object != nil and object.kind_of?(OCCI::Core::Resource)
         $log.info("Rendering resource [#{object.type_identifier}] for location [#{location}] ...")
         object.refresh
         response = OCCI::Rendering::HTTP::Renderer.render_resource(object,response)
