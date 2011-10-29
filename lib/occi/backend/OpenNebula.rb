@@ -141,9 +141,9 @@ module OCCI
           backend_object.info
           $log.debug("current VM state is: #{backend_object.lcm_state_str}")
           state = case backend_object.lcm_state_str
-            when "PROLOG" , "BOOT" , "RUNNING" , "SAVE_STOP" , "SAVE_SUSPEND" , "SAVE_MIGRATE" , "MIGRATE" , "PROLOG_MIGRATE" , "PROLOG_RESUME" then OCCI::Infrastructure::Compute::STATE_ACTIVE
-            when "SUSPENDED" then OCCI::Infrastructure::Compute::STATE_SUSPENDED
-            else OCCI::Infrastructure::Compute::STATE_INACTIVE
+          when "PROLOG" , "BOOT" , "RUNNING" , "SAVE_STOP" , "SAVE_SUSPEND" , "SAVE_MIGRATE" , "MIGRATE" , "PROLOG_MIGRATE" , "PROLOG_RESUME" then OCCI::Infrastructure::Compute::STATE_ACTIVE
+          when "SUSPENDED" then OCCI::Infrastructure::Compute::STATE_SUSPENDED
+          else OCCI::Infrastructure::Compute::STATE_INACTIVE
           end
           @state_machine.set_state(state)
           @attributes['occi.compute.state'] = @state_machine.current_state.name
@@ -154,7 +154,8 @@ module OCCI
 
           rc = backend_object.finalize
           $backend.check_rc(rc)
-          @backend[:novnc_pipe].close unless @backend[:novnc_pipe].nil?
+          $log.debug("killing NoVNC pipe with pid #@backend[:novnc_pipe].pid") unless @backend[:novnc_pipe].nil?
+          Process.kill 'INT', @backend[:novnc_pipe].pid unless @backend[:novnc_pipe].nil?
         end
 
         # GET ALL COMPUTE INSTANCES
@@ -219,12 +220,21 @@ module OCCI
           attributes['opennebula.vm.vcpu'] = backend_object['TEMPLATE/VCPU']
           attributes['opennebula.vm.boot'] = backend_object['TEMPLATE/BOOT']
 
+          # check if object already exists
+          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/compute/' +  occi_id)
+          if occi_object.nil?
+            occi_object = OCCI::Infrastructure::Compute.new(attributes,mixins)
+          else
+            occi_object.attributes.merge!(attributes)
+          end
+
+          # VNC handling
           if backend_object['TEMPLATE/GRAPHICS/TYPE'] == 'vnc' \
           and backend_object['HISTORY_RECORDS/HISTORY/HOSTNAME'] \
           and not $config[:novnc_path].nil? \
           and not $config[:vnc_proxy_base_port].nil?
 
-            mixins << OCCI::Backend::ONE::VNC::MIXIN
+            occi_object.mixins << OCCI::Backend::ONE::VNC::MIXIN
 
             vnc_host = backend_object['HISTORY_RECORDS/HISTORY/HOSTNAME']
             vnc_port = backend_object['TEMPLATE/GRAPHICS/PORT']
@@ -233,14 +243,14 @@ module OCCI
 
             # The noVNC proxy_port
             proxy_port = $config[:vnc_proxy_base_port].to_i + vnc_port.to_i
-              
+
             $log.debug("NOVNC path: #{$config[:novnc_path]}")
             $log.debug("Graphics type: #{backend_object['TEMPLATE/GRAPHICS/TYPE']}")
             $log.debug("VNC base port: #{$config[:vnc_proxy_base_port]}")
             $log.debug("VNC port: #{vnc_port}")
             $log.debug("VNC host: #{vnc_host}")
 
-            if attributes['opennebula.vm.vnc'].nil? or @backend[:novnc_pipe].nil?
+            if occi_object.attributes['opennebula.vm.vnc'].nil? or occi_object.backend[:novnc_pipe].nil?
 
               # CREATE PROXY FOR VNC SERVER
               begin
@@ -250,9 +260,9 @@ module OCCI
                 if pipe
                   vnc_url = $config[:server].chomp('/') + ':' + vnc_port + '/vnc_auto.html?host=' + vnc_proxy_host + '&port=' + vnc_port
                   $log.debug("VNC URL: #{vnc_url}")
-                  @backend[:novnc_pipe] = pipe
-                  attributes['opennebula.vm.vnc'] = vnc_host + ':' + vnc_port
-                  attributes['opennebula.vm.web_vnc'] = vnc_url
+                  occi_object.backend[:novnc_pipe] = pipe
+                  occi_object.attributes['opennebula.vm.vnc'] = vnc_host + ':' + vnc_port
+                  occi_object.attributes['opennebula.vm.web_vnc'] = vnc_url
                 end
               rescue Exception => e
                 $log.error("Error in creating VNC proxy: #{e.message}")
@@ -260,13 +270,6 @@ module OCCI
             end
           end
 
-          # check if object already exists
-          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/compute/' +  occi_id)
-          if occi_object.nil?
-            occi_object = OCCI::Infrastructure::Compute.new(attributes,mixins)
-          else
-            occi_object.attributes.merge!(attributes)
-          end
           return occi_object
         end
 
@@ -387,7 +390,7 @@ module OCCI
           backend_object=VirtualNetwork.new(VirtualNetwork.build_xml(@backend[:id]), $backend.one_client)
 
           backend_object.info
-          
+
           occi_object = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
 
           if occi_object.nil? then
@@ -501,9 +504,9 @@ module OCCI
         # CREATE STORAGE
         def deploy
           backend_object = Image.new(Image.build_xml, $backend.one_client)
-          
+
           storagelink = nil
-          
+
           if @links != nil
             @links.each do |link|
               if link.kind.term == 'storagelink'
@@ -511,7 +514,7 @@ module OCCI
               end
             end
           end
-          
+
           # check creation of images
           raise "No image or storagelink provided" if $image_path == ""
           @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
@@ -547,7 +550,7 @@ module OCCI
           backend_object=Image.new(Image.build_xml(@backend[:id]), $backend.one_client)
 
           backend_object.info
-          
+
           occi_object = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
 
           if occi_object.nil? then
