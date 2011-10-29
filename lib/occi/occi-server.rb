@@ -321,7 +321,7 @@ begin
 
     rescue Exception => e
 
-      $log.error(e)
+      # $log.error(e)
       response.status  = HTTP_STATUS_CODE["Bad Request"]
 
     end

@@ -29,7 +29,6 @@ require 'occi/ActionDelegator'
 module OCCI
   module Infrastructure    
     class Compute < OCCI::Core::Resource
-      attr_accessor :backend_id
       
       case $config["backend"]
       when 'opennebula'
@@ -128,11 +127,6 @@ module OCCI
 
         super(attributes, OCCI::Infrastructure::Compute::KIND ,mixins)
       end
-
-      def backend_id=(id)
-        @backend_id=id
-      end
-        
     end
   end
 end

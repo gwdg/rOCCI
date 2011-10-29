@@ -37,6 +37,8 @@ module OCCI
       attr_reader   :mixins
       attr_reader   :kind
       attr_reader   :state_machine
+      
+      attr_reader   :backend
 
       # Define appropriate kind
       begin
@@ -119,6 +121,8 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------
       def initialize(attributes, kind, mixins)
+        
+        @backend = {}
 
         # Make sure UUID is UNIQUE for every entity
         # TODO: occi.core.id should not be set by user but may be set by backend during startup
@@ -136,6 +140,8 @@ module OCCI
         @attributes = attributes
 
         kind.entities << self
+        
+        
         
         $log.debug("Mixins in entity #{@mixins}")
       end

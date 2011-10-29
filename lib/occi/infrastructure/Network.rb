@@ -26,9 +26,7 @@ require 'occi/ActionDelegator'
 
 module OCCI
   module Infrastructure
-    class Network < OCCI::Core::Resource
-      attr_accessor :backend_id
-      
+    class Network < OCCI::Core::Resource    
       case $config["backend"]
       when 'opennebula'
         require 'occi/backend/OpenNebula'
