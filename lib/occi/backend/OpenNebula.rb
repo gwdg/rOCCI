@@ -197,14 +197,12 @@ module OCCI
 
         # PARSE OPENNEBULA COMPUTE OBJECT
         def self.parse_backend_object(backend_object)
-          require 'json'
-          $log.debug("ONE compute object: #{backend_object.to_hash.to_json}")
-
-          # check if object already exists
-          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/compute/' +  backend_object['TEMPLATE/OCCI_ID']) if backend_object['TEMPLATE/OCCI_ID']
-          return occi_object unless occi_object.nil?
-          # TODO: fix parsing of resources not created through OCCI server
-          return nil if backend_object['TEMPLATE/OCCI_ID'].nil?
+          if backend_object['TEMPLATE/OCCI_ID'].nil?
+            raise "no backend ID found" if backend_object.id.nil?
+            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,backend_object.id)
+          else
+            occi_id = backend_object['TEMPLATE/OCCI_ID']
+          end
 
           mixins = []
           mixins << OCCI::Backend::ONE::VirtualMachine::MIXIN
@@ -212,7 +210,7 @@ module OCCI
           attributes = {}
           backend_object.info
           # parse all parameters from OpenNebula to OCCI
-          attributes['occi.core.id'] = backend_object['TEMPLATE/OCCI_ID']
+          attributes['occi.core.id'] = occi_id
           attributes['occi.core.title'] = backend_object['NAME']
           attributes['occi.core.summary'] = backend_object['TEMPLATE/DESCRIPTION']
           attributes['occi.compute.cores'] = backend_object['TEMPLATE/CPU']
@@ -265,7 +263,13 @@ module OCCI
             end
           end
 
-          occi_object = OCCI::Infrastructure::Compute.new(attributes,mixins)
+          # check if object already exists
+          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/compute/' +  occi_id)
+          if occi_object.nil?
+            occi_object = OCCI::Infrastructure::Compute.new(attributes,mixins)
+          else
+            occi_object.attributes.merge!(attributes)
+          end
           return occi_object
         end
 
@@ -418,18 +422,19 @@ module OCCI
         end
 
         def self.parse_backend_object(backend_object)
-          # check if object already exists
-          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/network/' +  backend_object['TEMPLATE/OCCI_ID']) if backend_object['TEMPLATE/OCCI_ID']
-          return occi_object unless occi_object.nil?
-          # TODO: fix parsing of resources not created through OCCI server
-          return nil if backend_object['TEMPLATE/OCCI_ID'].nil?
+          if backend_object['TEMPLATE/OCCI_ID'].nil?
+            raise "no backend ID found" if backend_object.id.nil?
+            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,backend_object.id)
+          else
+            occi_id = backend_object['TEMPLATE/OCCI_ID']
+          end
 
           attributes = {}
           mixins = []
           backend_object.info
           attributes = {}
           # parse all parameters from OpenNebula to OCCI
-          attributes['occi.core.id'] = backend_object['TEMPLATE/OCCI_ID']
+          attributes['occi.core.id'] = occi_id
           attributes['occi.core.title'] = backend_object['NAME']
           attributes['occi.core.summary'] = backend_object['TEMPLATE/DESCRIPTION']
           # attributes['opennebula.network.bridge'] = vnet['TEMPLATE/BRIDGE']
@@ -447,7 +452,13 @@ module OCCI
             attributes['occi.network.address'] = backend_object['TEMPLATE/NETWORK_ADDRESS'] + '/' + (32-(Math.log(backend_object['TEMPLATE/NETWORK_SIZE'].to_i)/Math.log(2)).ceil).to_s
           end
 
-          occi_object = OCCI::Infrastructure::Network.new(attributes,mixins)
+          # check if object already exists
+          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/network/' +  occi_id)
+          if occi_object.nil?
+            occi_object = OCCI::Infrastructure::Network.new(attributes,mixins)
+          else
+            occi_object.attributes.merge!(attributes)
+          end
           return occi_object
         end
 
@@ -558,18 +569,19 @@ module OCCI
         end
 
         def self.parse_backend_object(backend_object)
-          # check if object already exists
-          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/storage/' +  backend_object['TEMPLATE/OCCI_ID']) if backend_object['TEMPLATE/OCCI_ID']
-          return occi_object unless occi_object.nil?
-          # TODO: fix parsing of resources not created through OCCI server
-          return nil if backend_object['TEMPLATE/OCCI_ID'].nil?
+          if backend_object['TEMPLATE/OCCI_ID'].nil?
+            raise "no backend ID found" if backend_object.id.nil?
+            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,backend_object.id)
+          else
+            occi_id = backend_object['TEMPLATE/OCCI_ID']
+          end
 
           attributes = {}
           mixins = []
           backend_object.info
           attributes = {}
           # parse all parameters from OpenNebula to OCCI
-          attributes['occi.core.id'] = backend_object['TEMPLATE/OCCI_ID']
+          attributes['occi.core.id'] = occi_id
           attributes['occi.core.title'] = backend_object['NAME']
           attributes['occi.core.summary'] = backend_object['TEMPLATE/DESCRIPTION']
           attributes['opennebula.image.type'] = backend_object['TEMPLATE/TYPE']
@@ -586,7 +598,14 @@ module OCCI
 
           mixins = [OCCI::Backend::ONE::Image::MIXIN]
 
-          resource = OCCI::Infrastructure::Storage.new(attributes,mixins)
+          # check if object already exists
+          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/storage/' +  occi_id)
+          if occi_object.nil?
+            occi_object = OCCI::Infrastructure::Storage.new(attributes,mixins)
+          else
+            occi_object.attributes.merge!(attributes)
+          end
+          return occi_object
         end
 
         # GET ALL IMAGEs
