@@ -20,7 +20,7 @@ PATH          = <%= $image_path %>
 <% if attributes['occi.storage.size'] %>
 SIZE          = <%= attributes['occi.storage.size'] %>
 <% else %>
-SIZE          = <%= File.size($image_path) if File.exists($image_path)%>
+SIZE          = <%= File.size($image_path) if File.exists?($image_path)%>
 <% end %>
 
 <% if attributes['opennebula.image.fstype'] %>
