@@ -34,6 +34,7 @@ HTTP_STATUS_CODE = {"OK" => 200,
   "Bad Request" => 400,
   "Unauthorized" => 401,
   "Forbidden" =>403,
+  "Not Found" =>404,
   "Method Not Allowed" => 405,
   "Conflict" => 409,
   "Gone" => 410,
@@ -41,7 +42,7 @@ HTTP_STATUS_CODE = {"OK" => 200,
   "Internal Server Error" => 500,
   "Not Implemented" => 501,
   "Service Unavailable" => 503}
-  
+
 HEADER_CATEGORY   = "Category"
 HEADER_LINK       = "Link"
 HEADER_ATTRIBUTE  = "X-OCCI-Attribute"
@@ -51,7 +52,6 @@ module OCCI
   module Rendering
     module HTTP
       module Renderer
-
         # ---------------------------------------------------------------------------------------------------------------------
         def self.render_category_type(categories,response)
           category_values =[]
@@ -70,7 +70,7 @@ module OCCI
             # category location
             location = OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(category)
             category_string += %Q{location=#{location.strip};} if defined? location.strip
-            # attributes  
+            # attributes
             attributes = ""
             category.attributes.keys.each do |attribute|
               attributes += "#{attribute} "
@@ -89,28 +89,28 @@ module OCCI
           when 'application/json'
             # dump categories as JSON string into response body
             collection = {'Collection' => category_values.collect! {|category| category.to_hash}}
-            response.write(JSON.pretty_generate(collection))     
+            response.write(JSON.pretty_generate(collection))
           when 'text/plain'
             category_values.each do |category|
               response.write(HEADER_CATEGORY + ': ' + category + "\n")
             end
           when 'text/occi'
-            # for text/occi the body needs to contain OK          
+            # for text/occi the body needs to contain OK
             response[HEADER_CATEGORY] = category_values.join(',')
             response.write('OK')
-          # when 'text/uri-list'
+            # when 'text/uri-list'
           end
 
           return response
         end
-        
+
         # render single location if a new resource has been created (e.g. use Location instead of X-OCCI-Location)
         def self.render_location(location, response)
-          
+
           response['Location'] = location
           case response['Content-Type']
           when 'application/json'
-            response.write(JSON.pretty_generate({'Location' => location}))     
+            response.write(JSON.pretty_generate({'Location' => location}))
           when 'text/plain'
             response.write('Location : ' + location)
           when 'text/occi'
@@ -130,7 +130,7 @@ module OCCI
           location        = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(link)
           target_location = link.attributes["occi.core.target"]
           target_resource = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
-          if target_resource.nil? 
+          if target_resource.nil?
             target_resource_type = OCCI::Core::Link::KIND.type_identifier
           else
             target_resource_type = target_resource.kind.type_identifier
@@ -149,6 +149,14 @@ module OCCI
           end
 
           response[HEADER_LINK] = link_value + link_params
+
+          case response['Content-Type']
+          when 'application/json'
+            # TODO: implement JSON rendering
+            #response.write(JSON.pretty_generate({'Link' => location}))
+          when 'text/plain'
+            response.write('Link : ' + location)
+          end
 
           return response
         end
@@ -177,7 +185,7 @@ module OCCI
 
           case response['Content-Type']
           when 'application/json'
-            response.write(JSON.pretty_generate({'Location' => location}))     
+            response.write(JSON.pretty_generate({'Location' => location}))
           when 'text/plain'
             attributes_values.each do |attribute|
               response.write('X-OCCI-Attribute: ' + attribute + "\n")
@@ -201,7 +209,7 @@ module OCCI
 
           case response['Content-Type']
           when 'application-json'
-            response.write(JSON.pretty_generate({'X-OCCI-Location' => locations_values.to_json}))   
+            response.write(JSON.pretty_generate({'X-OCCI-Location' => locations_values.to_json}))
           when 'text/plain'
             response.write(locations_values.collect {|location| 'X-OCCI-Location: ' + location}.join("\n"))
           when 'text/occi'
@@ -210,7 +218,7 @@ module OCCI
             response.write("OK")
           when 'text/uri-list'
             response.write(locations_values.join(','))
-          end 
+          end
 
           return response
         end
@@ -286,14 +294,14 @@ module OCCI
             exit
           end
           $log.debug("Content type: #{response['Content-Type']}")
-          
+
           response['Accept'] = "application/json,text/plain,text/occi"
           $log.debug("Accept type: #{response['Accept']}")
 
           # content type independend parameters
           response['Server'] = "Ruby OCCI Framework/0.4 OCCI/1.1"
           $log.debug("Server: #{response['Server']}")
-          
+
           return response
         end
       end
