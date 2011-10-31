@@ -41,9 +41,7 @@ module OCCI
       begin
         # Define actions
         restart_attributes = OCCI::Core::Attributes.new()
-        restart_attributes << OCCI::Core::Attribute.new(name = 'graceful', mutable = false, mandatory = false, unique = true)
-        restart_attributes << OCCI::Core::Attribute.new(name = 'warm', mutable = false, mandatory = false, unique = true)
-        restart_attributes << OCCI::Core::Attribute.new(name = 'cold', mutable = false, mandatory = false, unique = true)
+        restart_attributes << OCCI::Core::Attribute.new(name = 'method', mutable = false, mandatory = false, unique = true)
         
         ACTION_RESTART = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "restart",
         title = "Compute Action Restart",   attributes = restart_attributes)
@@ -54,16 +52,13 @@ module OCCI
         title = "Compute Action Start",     attributes = start_attributes)
          
         stop_attributes = OCCI::Core::Attributes.new()
-        stop_attributes << OCCI::Core::Attribute.new(name = 'graceful', mutable = false, mandatory = false, unique = true)
-        stop_attributes << OCCI::Core::Attribute.new(name = 'acpioff', mutable = false, mandatory = false, unique = true)
-        stop_attributes << OCCI::Core::Attribute.new(name = 'poweroff', mutable = false, mandatory = false, unique = true)
-        
+        stop_attributes << OCCI::Core::Attribute.new(name = 'method', mutable = false, mandatory = false, unique = true)
+       
         ACTION_STOP    = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "stop",
         title = "Compute Action Stop",      attributes = stop_attributes)
 
         suspend_attributes = OCCI::Core::Attributes.new()
-        suspend_attributes << OCCI::Core::Attribute.new(name = 'hibernate', mutable = false, mandatory = false, unique = true)
-        suspend_attributes << OCCI::Core::Attribute.new(name = 'suspend', mutable = false, mandatory = false, unique = true)
+        suspend_attributes << OCCI::Core::Attribute.new(name = 'method', mutable = false, mandatory = false, unique = true)
           
         ACTION_SUSPEND = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/compute/action#", term = "suspend",
         title = "Compute Action Suspend",   attributes = suspend_attributes)
