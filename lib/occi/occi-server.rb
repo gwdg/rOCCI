@@ -159,7 +159,7 @@ begin
       $log.debug("Requested location: #{location}")
 
       # Query interface: return all supported kinds + mixins
-      if location == "/-/"
+      if location == "/-/" or location == "/.well-known/org/ogf/occi/-/"
         $log.info("Listing all kinds and mixins ...")
         response = OCCI::Rendering::HTTP::Renderer.render_category_type(occi_request.categories,response)
         response.status = HTTP_STATUS_CODE["OK"]
@@ -193,6 +193,12 @@ begin
       if location.end_with?("/")
         $log.info("Listing all resource instances below location: #{location}")
         resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location, occi_request.categories)
+        
+        # When no resources found, return Not Found
+        if resources.nil?
+          response.status = HTTP_STATUS_CODE["Not Found"]
+          break
+        end
         locations = []
         resources.each do |resource|
           resource.refresh if resource.kind_of?(OCCI::Core::Resource)
@@ -205,6 +211,7 @@ begin
       # Invalid request url
       raise "Invalid request url: #{location}"
 
+      response.status = HTTP_STATUS_CODE["Not Found"]
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
@@ -253,7 +260,7 @@ begin
           raise "No action found for action #{occi_request.action_category.type_identifier} and resource {#{resource.kind.type_identifier}" if action.nil?
           delegator.delegate_action(action, method, resource)
         end
-        break;
+        break
       end
 
       # If kind is a link and no actions specified then create link
@@ -276,11 +283,10 @@ begin
         break
       end
 
-      # If kind is not link and no actions specified, then create resource
-      $log.info("Creating resource...")
-
       # Create resource
       unless occi_request.kind.nil?
+        # If kind is not link and no actions specified, then create resource
+        $log.info("Creating resource...")
         $log.debug(occi_request.mixins)
         resource = occi_request.kind.entity_type.new(occi_request.attributes, occi_request.mixins)
 
@@ -289,18 +295,18 @@ begin
 
           attributes = {}
           attributes = link.attributes unless link.attributes.nil?
-            
+
           attributes["occi.core.target"] = link.target
           attributes["occi.core.source"] = resource.get_location
 
           link_kind = OCCI::CategoryRegistry.get_by_id(link.category)
           occi_link = link_kind.entity_type.new(attributes)
-          
+
           if URI.parse(link.target).relative?
             target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.target)
             target.links << occi_link
           end
-          
+
           resource.links << occi_link
 
           OCCI::Rendering::HTTP::LocationRegistry.register(occi_link.get_location, occi_link)
@@ -313,8 +319,10 @@ begin
         OCCI::Rendering::HTTP::LocationRegistry.register(resource.get_location, resource)
 
         OCCI::Rendering::HTTP::Renderer.render_location(OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(resource),response)
+        break
       end
 
+      response.status  = HTTP_STATUS_CODE["Not Found"]
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
@@ -396,32 +404,33 @@ begin
 
         # Update / add links
 
-          occi_request.links.each do |link_data|
-            $log.debug("Extracted link data: #{link_data}")
-            raise "Mandatory information missing (related | target | category)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil
+        occi_request.links.each do |link_data|
+          $log.debug("Extracted link data: #{link_data}")
+          raise "Mandatory information missing (related | target | category)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil
 
-            kind = OCCI::CategoryRegistry.get_categories_by_category_string(link_data.category, filter="kinds")[0]
-            raise "No kind for category string: #{link_data.category}" unless kind != nil
+          kind = OCCI::CategoryRegistry.get_categories_by_category_string(link_data.category, filter="kinds")[0]
+          raise "No kind for category string: #{link_data.category}" unless kind != nil
 
-            entities.each do |entity|
+          entities.each do |entity|
 
-              target          = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
-              source_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
+            target          = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
+            source_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
 
-              attributes = link_data.attributes.clone
-              attributes["occi.core.target"] = target_location
-              attributes["occi.core.source"] = source_location
+            attributes = link_data.attributes.clone
+            attributes["occi.core.target"] = target_location
+            attributes["occi.core.source"] = source_location
 
-              link = kind.entity_type.new(attributes)
-              OCCI::Rendering::HTTP::LocationRegistry.register_location(link.get_location(), link)
+            link = kind.entity_type.new(attributes)
+            OCCI::Rendering::HTTP::LocationRegistry.register_location(link.get_location(), link)
 
-              target.links << link
-              entity.links << link
-            end
+            target.links << link
+            entity.links << link
           end
+        end
         break
       end
 
+      response.status  = HTTP_STATUS_CODE["Not Found"]
       # Create resource instance at the given location
       raise "Creating resources with method 'put' is currently not possible!"
 
@@ -485,12 +494,16 @@ begin
         entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location)
       end
 
-      entities.each do |entity|
-        location = entity.get_location
-        entity.delete()
-        OCCI::Rendering::HTTP::LocationRegistry.unregister(location)
+      if not entities.nil?
+        entities.each do |entity|
+          location = entity.get_location
+          entity.delete()
+          OCCI::Rendering::HTTP::LocationRegistry.unregister(location)
+        end
+        break
       end
 
+      response.status = HTTP_STATUS_CODE["Not Found"]
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil

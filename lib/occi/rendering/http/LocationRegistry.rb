@@ -138,6 +138,7 @@ module OCCI
           resources = []
           begin
             context_element = context_elements_list.shift
+            return nil if context_element.nil?
             if context_element.kind_of? Hash
               context_elements_list += context_element.values
               next
