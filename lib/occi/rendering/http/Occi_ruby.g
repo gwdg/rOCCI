@@ -223,7 +223,7 @@ location returns [locations]
 URL:          ( 'http://' | 'https://' )( 'a'..'z' | 'A'..'Z' | '0'..'9' | '@' | ':' | '%' | '_' | '\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' )*;
 DIGITS:       ('0'..'9')* ;
 FLOAT:        ('0'..'9' | '.')* ;
-QUOTE:        '"' | '\'' ;
+QUOTE:        ('"' | '\'') ;
 TERM_VALUE:   ('a'..'z' | 'A..Z' | '0'..'9' | '-' | '_' | '.')* ;
 TARGET_VALUE: ('a'..'z' | 'A'..'Z' | '0'..'9' | '/' | '-' | '_')* ;
 QUOTED_VALUE: QUOTE ( options {greedy=false;} : . )* QUOTE ;

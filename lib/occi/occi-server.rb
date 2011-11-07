@@ -240,7 +240,7 @@ begin
       location = request.path_info
       $log.debug("Requested location: #{location}")
 
-      # Trigger action on resources(s)
+      # Trigger action on resource(s)
       unless occi_request.action_category.nil?
         $log.info("Triggering action on resource(s)...")
         resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location,occi_request.categories)

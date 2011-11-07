@@ -26,15 +26,19 @@ DISK          = [ IMAGE_ID = "<%= storage_id %>"]
 <%# Links to external storage %>
 DISK = [
 <% storagelinks.each do |storagelink| %>
-TYPE          = "OS",
-TARGET        = "hda",
-SOURCE        = <%= storagelink %>
+  TYPE          = "OS",
+  TARGET        = "hda",
+  SOURCE        = <%= storagelink %>
 <%end%>
 ]
    
 <%# Links to networks %>
 <% network_ids.each do |network_id| %>
-NIC           = [ NETWORK_ID = "<%= network_id %>"]
+NIC           = [ 
+  NETWORK_ID = <%= network_id %>
+  IP         = <%= attributes["occi.networkinferface.address"] if attributes["occi.networkinferface.address"]%>
+  MAC        = <%= attributes["occi.networkinferface.mac"] if attributes["occi.networkinferface.mac"]%>
+]
 <%end%>
 
 <%# Haizea Reservation parameters %>

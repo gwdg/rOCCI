@@ -126,6 +126,7 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         def self.render_link_reference(link,response)
 
+          
           # Link value
           location        = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(link)
           target_location = link.attributes["occi.core.target"]
@@ -135,27 +136,19 @@ module OCCI
           else
             target_resource_type = target_resource.kind.type_identifier
           end
+          category = link.kind.type_identifier
+          attributes = link.attributes.map { |key,value| %Q{#{key}="#{value}"} unless value.empty? }.join(';').to_s
 
-          link_value = %Q{<#{target_location}>;rel="#{target_resource_type}";self="#{location}"}
+          link_string = %Q{<#{target_location}>;rel="#{target_resource_type}";self="#{location}";category="#{category}";#{attributes}}
 
-          # Link params
-          category = link.kind
-          link_params = %Q{;category="#{category.type_identifier}"}
-
-          if !link.attributes.empty?
-            link.attributes.each do |name, value|
-              link_params += %Q{;#{name}="#{value}"}
-            end
-          end
-
-          response[HEADER_LINK] = link_value + link_params
+          response[HEADER_LINK] = link_string
 
           case response['Content-Type']
           when 'application/json'
             # TODO: implement JSON rendering
             #response.write(JSON.pretty_generate({'Link' => location}))
           when 'text/plain'
-            response.write('Link : ' + location)
+            response.write('Link : ' + link_string + "\n")
           end
 
           return response
@@ -217,7 +210,7 @@ module OCCI
             # for text/occi the body needs to contain OK
             response.write("OK")
           when 'text/uri-list'
-            response.write(locations_values.join(','))
+            response.write(locations_values.collect {|location| location}.join("\n"))
           end
 
           return response

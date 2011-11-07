@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: Occi_ruby.g
-# Generated at: 2011-10-15 20:03:25
+# Generated at: 2011-11-07 09:48:50
 # 
 
 # ~~~> start load path setup
@@ -783,7 +783,7 @@ module OCCI
 
       
       # - - - - main rule block - - - -
-      # at line 
+      # at line 226:15: ( '\"' | '\\'' )
       if @input.peek(1) == 0x22 || @input.peek(1) == 0x27
         @input.consume
       else

@@ -44,11 +44,21 @@ module OCCI
           @parsed_categories = []
 
           # read in all headers (equal to text/occi content type)
+          $log.debug("##### Parsing HTTP header #####")
+          $log.debug("Parsing Categories: #{request.env['HTTP_CATEGORY']}") if request.env['HTTP_CATEGORY']
           @parsed_categories.concat(OCCI::Parser.new(request.env['HTTP_CATEGORY'].to_s).category_values) if request.env['HTTP_CATEGORY']
+          $log.debug("Parsed categories: #{@parsed_categories}")
+          $log.debug("Parsing Links: #{request.env['HTTP_LINK']}") if request.env['HTTP_LINK']
           @links.concat(OCCI::Parser.new(request.env['HTTP_LINK'].to_s).link_values) if request.env['HTTP_LINK']
+          $log.debug("Parsed links: #{@links}")
+          $log.debug("Parsing X-OCCI-Attribute: #{request.env['HTTP_X_OCCI_ATTRIBUTE']}") if request.env['HTTP_X_OCCI_ATTRIBUTE']
           @attributes.merge!(OCCI::Parser.new(request.env['HTTP_X_OCCI_ATTRIBUTE'].to_s).attributes_attr) if request.env['HTTP_X_OCCI_ATTRIBUTE']
+          $log.debug("Parsed X-OCCI-Attributes: #{@attributes}")
+          $log.debug("Parsing Location: #{request.env['HTTP_X_OCCI_LOCATION']}")
           @locations.concat(OCCI::Parser.new(request.env['HTTP_X_OCCI_LOCATION'].to_s).location_values) if request.env['HTTP_X_OCCI_LOCATION']
-
+          $log.debug("Parsed Location: #{@locations}")
+          $log.debug("##### Finnished parsing HTTP header #####")
+            
           # handle file upload
           if params['file'] != nil
             $log.debug("Location of Image #{params['file'][:tempfile].path}")
@@ -56,8 +66,8 @@ module OCCI
             FileUtils.cp(params['file'][:tempfile].path, $image_path)
           end
 
-          $log.debug(params)
-          params.values.each do |body|
+          $log.debug(request.POST)
+          request.POST.values.each do |body|
             if body.kind_of?(String)
               parse_text(body)
             elsif body.kind_of?(Hash)
@@ -81,6 +91,7 @@ module OCCI
           @categories = OCCI::CategoryRegistry.get_all(@parsed_categories).to_a
           @kind = @categories.select {|category| category.kind_of?(OCCI::Core::Kind)}.last if @parsed_categories.length > 0
           @action_category = @categories.select {|category| category.instance_of?(OCCI::Core::Category)}.last if @parsed_categories.length > 0
+          $log.debug("Action Category: #{@action_category}")
           @mixin = @parsed_categories.last
           @mixins = @categories.select {|category| category.kind_of?(OCCI::Core::Mixin)} if @parsed_categories.length > 0
         end
