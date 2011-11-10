@@ -247,7 +247,7 @@ begin
         raise OCCI::MixinAlreadyExistsError, "Mixin [#{occi_request.mixins}] already exists!" unless occi_request.mixins.empty?
 
         begin
-        related_mixin = OCCI::CategoryRegistry.get_by_id(occi_request.mixin.rel)
+        related_mixin = OCCI::CategoryRegistry.get_by_id(occi_request.mixin.rel) unless occi_request.mixin.rel.nil?
         rescue OCCI::CategoryNotFoundException => e
           $log.info(e.message)
         end
