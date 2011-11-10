@@ -260,8 +260,8 @@ begin
 
       # Trigger action on resource(s)
       unless occi_request.action_category.nil?
-        $log.info("Triggering action on resource(s)...")
-        resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location,OCCI::CategoryRegistry.get_all)
+        $log.info("Triggering action on resource(s) below location #{location}")
+        resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location, OCCI::CategoryRegistry.get_all)
         method = request.env["HTTP_X_OCCI_ATTRIBUTE"]
 
         raise "No entities corresponding to location [#{location}] could be found!" if resources.nil?

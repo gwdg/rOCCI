@@ -60,7 +60,7 @@ module OCCI
           $log.warn(e.message)
         end
       end
-      return occi_categories if occi_categories != [] or categories.length > 0
+      return occi_categories if not occi_categories.empty? or categories.length > 0
       return @@categories_by_id.values
     end
   end
