@@ -336,7 +336,7 @@ begin
         break
       end
 
-      response.status  = HTTP_STATUS_CODE["Not Found"]
+      response.status  = HTTP_STATUS_CODE["OK"]
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
