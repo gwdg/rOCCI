@@ -31,6 +31,8 @@ module OCCI
     
   class MixinNotFoundException < RuntimeError; end
     
+  class OCCI::MixinCreationException < RuntimeError; end
+    
   # Tried to create an already existing mixin
   class BackendError < RuntimeError; end
   

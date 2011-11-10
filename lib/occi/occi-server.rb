@@ -253,6 +253,7 @@ begin
           $log.info(e.message)
         end
         mixin = OCCI::Core::Mixin.new(occi_request.mixin.term, occi_request.mixin.scheme, occi_request.mixin.title, nil, [], related_mixin, [])
+        raise OCCI::MixinCreationException, 'Cannot create mixin' if mixin.nil?
         OCCI::CategoryRegistry.register_mixin(mixin)
         OCCI::Rendering::HTTP::LocationRegistry.register_location(mixin.location, mixin)
         $log.info("Mixin successfully created")
@@ -341,14 +342,17 @@ begin
         break
       end
 
-      response.status  = HTTP_STATUS_CODE["OK"]
+      response.status  = HTTP_STATUS_CODE["Not found"]
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
 
+    rescue OCCI::MixinCreationException => e
+      $log.error(e.message)
+      
     rescue Exception => e
 
-      $log.error(e.message)
+      $log.error(e)
       response.status  = HTTP_STATUS_CODE["Bad Request"]
 
     end
