@@ -491,7 +491,7 @@ begin
       if object.kind_of? OCCI::Core::Entity
         entities = [OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)]
       else
-        entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location)
+        entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location,occi_request.categories)
       end
 
       if not entities.nil?

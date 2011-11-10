@@ -57,6 +57,7 @@ module OCCI
         begin
           occi_categories << self.get_by_id(id)
         rescue OCCI::CategoryNotFoundException => e
+          $log.warn(e.message)
         end
       end
       return occi_categories if occi_categories != [] or categories.length > 0
