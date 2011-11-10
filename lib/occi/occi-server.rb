@@ -247,10 +247,15 @@ begin
         raise OCCI::MixinAlreadyExistsError, "Mixin [#{occi_request.mixins}] already exists!" unless occi_request.mixins.empty?
         raise "Location #{mixins.last.location} already used for another object. " unless OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(occi_request.mixins.last.location).nil?
 
+        begin
         related_mixin = OCCI::CategoryRegistry.get_by_id(occi_request.mixin.rel)
+        rescue OCCI::CategoryNotFoundException => e
+          $log.info(e.message)
+        end
         mixin = OCCI::Core::Mixin.new(occi_request.mixin.term, occi_request.mixin.scheme, occi_request.mixin.title, nil, [], related_mixin, [])
         OCCI::CategoryRegistry.register_mixin(mixin)
         OCCI::Rendering::HTTP::LocationRegistry.register_location(mixin.location, mixin)
+        $log.info("Mixin successfully created")
         break
       end
 
@@ -343,7 +348,7 @@ begin
 
     rescue Exception => e
 
-      # $log.error(e)
+      $log.error(e.message)
       response.status  = HTTP_STATUS_CODE["Bad Request"]
 
     end
