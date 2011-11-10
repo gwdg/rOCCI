@@ -245,7 +245,6 @@ begin
         $log.info("Creating user defined mixin...")
 
         raise OCCI::MixinAlreadyExistsError, "Mixin [#{occi_request.mixins}] already exists!" unless occi_request.mixins.empty?
-        raise "Location #{mixins.last.location} already used for another object. " unless OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(occi_request.mixins.last.location).nil?
 
         begin
         related_mixin = OCCI::CategoryRegistry.get_by_id(occi_request.mixin.rel)
@@ -255,7 +254,6 @@ begin
         mixin = OCCI::Core::Mixin.new(occi_request.mixin.term, occi_request.mixin.scheme, occi_request.mixin.title, nil, [], related_mixin, [])
         raise OCCI::MixinCreationException, 'Cannot create mixin' if mixin.nil?
         OCCI::CategoryRegistry.register_mixin(mixin)
-        OCCI::Rendering::HTTP::LocationRegistry.register_location(mixin.location, mixin)
         $log.info("Mixin successfully created")
         break
       end
