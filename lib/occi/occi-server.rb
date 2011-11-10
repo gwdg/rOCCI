@@ -253,7 +253,7 @@ begin
         end
         mixin = OCCI::Core::Mixin.new(occi_request.mixin.term, occi_request.mixin.scheme, occi_request.mixin.title, nil, [], related_mixin, [])
         raise OCCI::MixinCreationException, 'Cannot create mixin' if mixin.nil?
-        OCCI::CategoryRegistry.register_mixin(mixin)
+        OCCI::CategoryRegistry.register(mixin)
         $log.info("Mixin successfully created")
         break
       end
