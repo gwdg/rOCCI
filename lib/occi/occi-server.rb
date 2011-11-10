@@ -261,9 +261,8 @@ begin
       # Trigger action on resource(s)
       unless occi_request.action_category.nil?
         $log.info("Triggering action on resource(s)...")
-        resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location,occi_request.categories)
-        $log.debug(occi_request.attributes)
-        method    = request.env["HTTP_X_OCCI_ATTRIBUTE"]
+        resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location,OCCI::CategoryRegistry.get_all)
+        method = request.env["HTTP_X_OCCI_ATTRIBUTE"]
 
         raise "No entities corresponding to location [#{location}] could be found!" if resources.nil?
 
@@ -477,7 +476,6 @@ begin
         raise OCCI::MixinNotFoundException if occi_request.mixins.empty?
         occi_request.mixins.each do |mixin|
           $log.info("Deleting mixin #{mixin.type_identifier}")
-          OCCI::Rendering::HTTP::LocationRegistry.unregister(mixin.get_location)
           OCCI::CategoryRegistry.unregister(mixin)
         end
         break

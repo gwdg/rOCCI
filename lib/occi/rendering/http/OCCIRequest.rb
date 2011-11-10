@@ -41,6 +41,7 @@ module OCCI
           @attributes = {}
           @kind = nil
           @action = nil
+          @action_category = nil
           @mixins = []
           @parsed_categories = []
 
