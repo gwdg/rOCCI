@@ -239,6 +239,20 @@ begin
 
       location = request.path_info
       $log.debug("Requested location: #{location}")
+      
+      # Create user defined mixin
+      if location == "/-/" or location == "/.well-known/org/ogf/occi/-/"
+        $log.info("Creating user defined mixin...")
+
+        raise OCCI::MixinAlreadyExistsError, "Mixin [#{occi_request.mixins}] already exists!" unless occi_request.mixins.empty?
+        raise "Location #{mixins.last.location} already used for another object. " unless OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(occi_request.mixins.last.location).nil?
+
+        related_mixin = OCCI::CategoryRegistry.get_by_id(occi_request.mixin.rel)
+        mixin = OCCI::Core::Mixin.new(occi_request.mixin.term, occi_request.mixin.scheme, occi_request.mixin.title, nil, [], related_mixin, [])
+        OCCI::CategoryRegistry.register_mixin(mixin)
+        OCCI::Rendering::HTTP::LocationRegistry.register_location(mixin.location, mixin)
+        break
+      end
 
       # Trigger action on resource(s)
       unless occi_request.action_category.nil?
@@ -348,20 +362,6 @@ begin
 
       location = request.path_info
       $log.debug("Requested location: #{location}")
-
-      # Create user defined mixin
-      if location == "/-/" or location == "/.well-known/org/ogf/occi/-/"
-        $log.info("Creating user defined mixin...")
-
-        raise OCCI::MixinAlreadyExistsError, "Mixin [#{occi_request.mixins}] already exists!" unless occi_request.mixins.empty?
-        raise "Location #{mixins.last.location} already used for another object. " unless OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(occi_request.mixins.last.location).nil?
-
-        related_mixin = OCCI::CategoryRegistry.get_by_id(occi_request.mixin.rel)
-        mixin = OCCI::Core::Mixin.new(occi_request.mixin.term, occi_request.mixin.scheme, occi_request.mixin.title, nil, [], related_mixin, [])
-        OCCI::CategoryRegistry.register_mixin(mixin)
-        OCCI::Rendering::HTTP::LocationRegistry.register_location(mixin.location, mixin)
-        break
-      end
 
       # Add an resource instance to a mixin
       unless occi_request.mixins.empty?
