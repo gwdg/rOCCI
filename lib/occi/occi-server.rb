@@ -510,10 +510,10 @@ begin
       # (or fail utterly while trying to do that!)
       nil
       
-    rescue CategoryMissingException => e
+    rescue OCCI::CategoryMissingException => e
       response.status = HTTP_STATUS_CODE["Bad Request"]
         
-    rescue MixinNotFoundException => e
+    rescue OCCI::MixinNotFoundException => e
       response.status = HTTP_STATUS_CODE["Not Found"]
 
     rescue Exception => e
