@@ -215,11 +215,6 @@ begin
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
-      
-    rescue OCCI::CategoryNotFoundException => e
-  
-      $log.error(e)
-      response.status  = HTTP_STATUS_CODE["OK"]
 
     rescue Exception => e
 
