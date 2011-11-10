@@ -193,7 +193,7 @@ begin
       if location.end_with?("/")
         $log.info("Listing all resource instances below location: #{location}")
         resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location, occi_request.categories)
-        
+
         # When no resources found, return Not Found
         if resources.nil?
           response.status = HTTP_STATUS_CODE["Not Found"]
@@ -239,7 +239,7 @@ begin
 
       location = request.path_info
       $log.debug("Requested location: #{location}")
-      
+
       # Create user defined mixin
       if location == "/-/" or location == "/.well-known/org/ogf/occi/-/"
         $log.info("Creating user defined mixin...")
@@ -466,11 +466,13 @@ begin
 
       # Location references query interface => delete provided mixin
       if location == "/-/" or location == "/.well-known/org/ogf/occi/-/"
-        raise OCCI::CategoryMissingException if mixin.nil?
-        raise OCCI::MixinNotFoundException if mixins.empty?
-        $log.info("Deleting mixin #{occi_request.mixin.term}")
-        OCCI::Rendering::HTTP::LocationRegistry.unregister(mixin.get_location)
-        OCCI::CategoryRegistry.unregister(mixin)
+        raise OCCI::CategoryMissingException if occi_request.mixin.nil?
+        raise OCCI::MixinNotFoundException if occi_request.mixins.empty?
+        occi_request.mixins.each do |mixin|
+          $log.info("Deleting mixin #{mixin.type_identifier}")
+          OCCI::Rendering::HTTP::LocationRegistry.unregister(mixin.get_location)
+          OCCI::CategoryRegistry.unregister(mixin)
+        end
         break
       end
 
@@ -509,10 +511,10 @@ begin
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
-      
+
     rescue OCCI::CategoryMissingException => e
       response.status = HTTP_STATUS_CODE["Bad Request"]
-        
+
     rescue OCCI::MixinNotFoundException => e
       response.status = HTTP_STATUS_CODE["Not Found"]
 
