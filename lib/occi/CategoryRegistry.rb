@@ -41,7 +41,7 @@ module OCCI
 
     # ---------------------------------------------------------------------------------------------------------------------
     def self.get_by_id(id)
-      @@categories_by_id.fetch(id) { raise "Category with key " + id + " not found" }
+      @@categories_by_id.fetch(id) { raise OCCI::CategoryNotFoundException, "Category with key " + id + " not found" }
     end
 
     def self.get_by_location(location)

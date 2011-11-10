@@ -25,6 +25,8 @@ module OCCI
   # Tried to create an already existing mixin
   class MixinAlreadyExistsError < RuntimeError; end
     
+  class CategoryNotFoundException < RuntimeError; end
+    
   # Tried to create an already existing mixin
   class BackendError < RuntimeError; end
   

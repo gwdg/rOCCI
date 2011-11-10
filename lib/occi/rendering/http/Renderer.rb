@@ -148,7 +148,7 @@ module OCCI
             # TODO: implement JSON rendering
             #response.write(JSON.pretty_generate({'Link' => location}))
           when 'text/plain'
-            response.write('Link : ' + link_string + "\n")
+            response.write('Link: ' + link_string + "\n")
           end
 
           return response
