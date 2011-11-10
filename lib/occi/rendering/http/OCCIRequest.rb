@@ -32,6 +32,7 @@ module OCCI
         attr_reader :locations
         attr_reader :action_category
         attr_reader :kind
+        attr_reader :mixin
         attr_reader :mixins
         def initialize(request,params)
           parsed_categories = []

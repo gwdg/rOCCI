@@ -466,7 +466,9 @@ begin
 
       # Location references query interface => delete provided mixin
       if location == "/-/" or location == "/.well-known/org/ogf/occi/-/"
-        $log.info("Deleting mixin #{occi_request.mixin.type_identifier}")
+        raise OCCI::CategoryMissingException if mixin.nil?
+        raise OCCI::MixinNotFoundException if mixins.empty?
+        $log.info("Deleting mixin #{occi_request.mixin.term}")
         OCCI::Rendering::HTTP::LocationRegistry.unregister(mixin.get_location)
         OCCI::CategoryRegistry.unregister(mixin)
         break
@@ -507,6 +509,12 @@ begin
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
+      
+    rescue CategoryMissingException => e
+      response.status = HTTP_STATUS_CODE["Bad Request"]
+        
+    rescue MixinNotFoundException => e
+      response.status = HTTP_STATUS_CODE["Not Found"]
 
     rescue Exception => e
 
