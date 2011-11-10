@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Global configuration
-URI="http://ls38.itmc.tu-dortmund.de:3000"
+URI="http://localhost:3000"
 
 # network parameters
 NET_CATEGORY='network;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind";,'

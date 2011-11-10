@@ -350,7 +350,7 @@ begin
       $log.debug("Requested location: #{location}")
 
       # Create user defined mixin
-      if location == "/-/"
+      if location == "/-/" or location == "/.well-known/org/ogf/occi/-/"
         $log.info("Creating user defined mixin...")
 
         raise OCCI::MixinAlreadyExistsError, "Mixin [#{occi_request.mixins}] already exists!" unless occi_request.mixins.empty?
@@ -465,7 +465,7 @@ begin
       $log.debug("Requested location: #{location}")
 
       # Location references query interface => delete provided mixin
-      if location == "/-/"
+      if location == "/-/" or location == "/.well-known/org/ogf/occi/-/"
         $log.info("Deleting mixin #{occi_request.mixin.type_identifier}")
         OCCI::Rendering::HTTP::LocationRegistry.unregister(mixin.get_location)
         OCCI::CategoryRegistry.unregister(mixin)
