@@ -49,7 +49,7 @@ module OCCI
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
-    def self.get_all(categories)
+    def self.get_all(categories = [])
       occi_categories = []
       categories.each do |category|
         id = category.scheme + category.term if category.scheme
