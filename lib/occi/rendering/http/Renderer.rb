@@ -206,7 +206,7 @@ module OCCI
           when 'text/plain'
             response.write(locations_values.collect {|location| 'X-OCCI-Location: ' + location}.join("\n"))
           when 'text/occi'
-            response['X-OCCI-Location'] = locations_values.join(',')
+            response['X-OCCI-Location'] = locations_values.join(', ')
             # for text/occi the body needs to contain OK
             response.write("OK")
           when 'text/uri-list'
