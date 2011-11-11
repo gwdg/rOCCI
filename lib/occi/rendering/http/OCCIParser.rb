@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: Occi_ruby.g
-# Generated at: 2011-11-07 09:48:50
+# Generated at: 2011-11-11 14:07:20
 # 
 
 # ~~~> start load path setup
@@ -75,13 +75,12 @@ module OCCI
 
     # define the token constants
     define_tokens( :T__29 => 29, :T__28 => 28, :T__27 => 27, :T__26 => 26, 
-                   :T__25 => 25, :T__24 => 24, :T__23 => 23, :T__22 => 22, 
-                   :DIGITS => 8, :T__21 => 21, :T__20 => 20, :TARGET_VALUE => 6, 
-                   :TERM_VALUE => 4, :FLOAT => 9, :QUOTED_VALUE => 5, :EOF => -1, 
-                   :URL => 7, :T__30 => 30, :T__19 => 19, :QUOTE => 10, 
-                   :T__31 => 31, :WS => 11, :T__16 => 16, :T__15 => 15, 
-                   :T__18 => 18, :T__17 => 17, :T__12 => 12, :T__14 => 14, 
-                   :T__13 => 13 )
+                   :T__25 => 25, :T__24 => 24, :T__23 => 23, :ESC => 10, 
+                   :T__22 => 22, :DIGITS => 8, :T__21 => 21, :T__20 => 20, 
+                   :TARGET_VALUE => 6, :TERM_VALUE => 4, :FLOAT => 9, :QUOTED_VALUE => 5, 
+                   :EOF => -1, :URL => 7, :T__30 => 30, :T__19 => 19, :T__31 => 31, 
+                   :WS => 11, :T__16 => 16, :T__15 => 15, :T__18 => 18, 
+                   :T__17 => 17, :T__12 => 12, :T__14 => 14, :T__13 => 13 )
 
     # register the proper human-readable name or literal value
     # for each token type
@@ -90,7 +89,7 @@ module OCCI
     # created from literal values in the grammar, do not
     # have descriptive names
     register_names( "TERM_VALUE", "QUOTED_VALUE", "TARGET_VALUE", "URL", 
-                    "DIGITS", "FLOAT", "QUOTE", "WS", "'Category'", "':'", 
+                    "DIGITS", "FLOAT", "ESC", "WS", "'Category'", "':'", 
                     "';,'", "';'", "'scheme'", "'='", "'class'", "'title'", 
                     "'rel'", "'location'", "'attributes'", "'actions'", 
                     "'Link'", "'<'", "'>'", "'self'", "'category'", "','", 
