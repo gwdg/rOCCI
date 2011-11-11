@@ -208,9 +208,6 @@ begin
         break
       end
 
-      # Invalid request url
-      raise "Invalid request url: #{location}"
-
       response.status = HTTP_STATUS_CODE["Not Found"]
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
@@ -243,17 +240,19 @@ begin
       # Create user defined mixin
       if location == "/-/" or location == "/.well-known/org/ogf/occi/-/"
         $log.info("Creating user defined mixin...")
+        $log.info(occi_request.mixin)
 
         raise OCCI::MixinAlreadyExistsError, "Mixin [#{occi_request.mixins}] already exists!" unless occi_request.mixins.empty?
 
         begin
-        related_mixin = OCCI::CategoryRegistry.get_by_id(occi_request.mixin.rel) unless occi_request.mixin.rel.nil?
+          related_mixin = OCCI::CategoryRegistry.get_by_id(occi_request.mixin.related) unless occi_request.mixin.related.nil?
         rescue OCCI::CategoryNotFoundException => e
-          $log.info(e.message)
+          $log.warn(e.message)
         end
         mixin = OCCI::Core::Mixin.new(occi_request.mixin.term, occi_request.mixin.scheme, occi_request.mixin.title, nil, [], related_mixin, [])
         raise OCCI::MixinCreationException, 'Cannot create mixin' if mixin.nil?
         OCCI::CategoryRegistry.register(mixin)
+        OCCI::Rendering::HTTP::LocationRegistry.register(occi_request.mixin.location,mixin)
         $log.info("Mixin successfully created")
         break
       end
@@ -279,10 +278,7 @@ begin
         end
         break
       end
-      
-      $log.debug(occi_request.kind.type_identifier)
-      $log.debug(occi_request.kind.entity_type.superclass.inspect)
-      
+
       # If kind is a link and no actions specified then create link
       if occi_request.kind.entity_type.ancestors.include?(OCCI::Core::Link)
         $log.info("Creating link...")
@@ -300,7 +296,7 @@ begin
         OCCI::Rendering::HTTP::LocationRegistry.register(link_location, link)
         response['Location'] = OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(link)
         break
-      end
+      end unless occi_request.kind.nil?
 
       # Create resource
       unless occi_request.kind.nil?
@@ -341,6 +337,29 @@ begin
         break
       end
 
+      # Associate resource instances With a Mixin
+      if not OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location).nil?
+        $log.debug("Associate resource instances With a Mixin")
+        mixin = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)
+        raise "mixin not found" unless mixin.kind_of?(OCCI::Core::Mixin)
+        $log.debug("Locations: #{occi_request.locations}")
+        entities = []
+        occi_request.locations.each do |loc|
+          entities << OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
+        end
+        entities.compact! # remove nil entries
+        $log.info("Adding [#{entities.size}] entities to mixin...")
+
+        # add entities to mixin
+        entities.each do |entity|
+          entity.mixins  << mixin
+          entity.mixins.uniq!
+          mixin.entities  << entity
+          mixin.entities.uniq!
+        end
+        break
+      end
+
       response.status  = HTTP_STATUS_CODE["Not Found"]
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
@@ -348,7 +367,7 @@ begin
 
     rescue OCCI::MixinCreationException => e
       $log.error(e.message)
-      
+
     rescue Exception => e
 
       $log.error(e)
@@ -390,7 +409,7 @@ begin
       end
 
       # Update resource instance(s) at the given location
-      if OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location) != nil
+      if not OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location).nil?
         resource.refresh if resource.kind_of?(OCCI::Core::Resource)
         # Determine set of resources to be updated
         if OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Resource)
@@ -402,12 +421,12 @@ begin
 
         # add mixins
         entities.each do |entity|
-          entity.mixins = occi_request.mixins
+          entity.mixins.concat(occi_request.mixins).uniq!
         end unless occi_request.mixins.empty?
 
         # Update / add attributes
         entities.each do |entity|
-          entity.attributes.merge!(occi_request.attributes)
+          entity.attributes.merge!(occi_request.attributes).compact!
         end unless occi_request.attributes.empt?
 
         # Update / add links
@@ -418,7 +437,7 @@ begin
 
           kind = OCCI::CategoryRegistry.get_categories_by_category_string(link_data.category, filter="kinds")[0]
           raise "No kind for category string: #{link_data.category}" unless kind != nil
-          
+
           target_location = link_data.target_attr
           target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
 
