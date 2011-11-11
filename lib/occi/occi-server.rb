@@ -279,24 +279,26 @@ begin
         end
         break
       end
-
+      
+      $log.debug(occi_request.kind.type_identifier)
+      $log.debug(occi_request.kind.entity_type.superclass.inspect)
+      
       # If kind is a link and no actions specified then create link
-      if occi_request.kind.kind_of?(OCCI::Core::Link)
+      if occi_request.kind.entity_type.ancestors.include?(OCCI::Core::Link)
         $log.info("Creating link...")
-
-        target_uri = URI.parse(occi_request.attributes["occi.core.target"])
+        target_uri = URI.parse(occi_request.attributes["occi.core.target"].chomp('"').reverse.chomp('"').reverse)
         target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_uri.path)
 
-        source_uri = URI.parse(occi_request.attributes["occi.core.source"])
+        source_uri = URI.parse(occi_request.attributes["occi.core.source"].chomp('"').reverse.chomp('"').reverse)
         source = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(source_uri.path)
 
-        link = kind.entity_type.new(attributes)
+        link = occi_request.kind.entity_type.new(occi_request.attributes)
         source.links << link
         target.links << link
 
         link_location = link.get_location()
-        OCCI::Rendering::HTTP::LocationRegistry.register_location(link_location, link)
-        response['Location'] = OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(link,request.host_with_port)
+        OCCI::Rendering::HTTP::LocationRegistry.register(link_location, link)
+        response['Location'] = OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(link)
         break
       end
 
@@ -313,7 +315,7 @@ begin
           attributes = {}
           attributes = link.attributes unless link.attributes.nil?
 
-          attributes["occi.core.target"] = link.target
+          attributes["occi.core.target"] = link.target.chomp('"').reverse.chomp('"').reverse
           attributes["occi.core.source"] = resource.get_location
 
           link_kind = OCCI::CategoryRegistry.get_by_id(link.category)
@@ -416,14 +418,16 @@ begin
 
           kind = OCCI::CategoryRegistry.get_categories_by_category_string(link_data.category, filter="kinds")[0]
           raise "No kind for category string: #{link_data.category}" unless kind != nil
+          
+          target_location = link_data.target_attr
+          target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
 
           entities.each do |entity|
 
-            target          = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
             source_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
 
             attributes = link_data.attributes.clone
-            attributes["occi.core.target"] = target_location
+            attributes["occi.core.target"] = target_location.chomp('"').reverse.chomp('"').reverse
             attributes["occi.core.source"] = source_location
 
             link = kind.entity_type.new(attributes)

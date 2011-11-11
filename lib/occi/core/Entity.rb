@@ -159,16 +159,16 @@ module OCCI
           mixin.entities.delete(self)
         end
         # remove all links from this entity and from all linked entities
-        links = @links.clone() if @links != []
+        links = @links.clone unless @links.nil?
         links.each do |link|
-          $log.debug("occi.core.target #{link.attributes["occi.core.target"]}")
-          target_uri = URI.parse(link.attributes["occi.core.target"])
+          $log.debug("occi.core.target #{link.attributes["occi.core.target"].chomp('"').reverse.chomp('"').reverse}")
+          target_uri = URI.parse(link.attributes["occi.core.target"].chomp('"').reverse.chomp('"').reverse)
           target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_uri.path)
           $log.debug("Target #{target}") unless target.nil?
           target.links.delete(link) unless target.nil?
 
-          $log.debug("occi.core.source #{link.attributes["occi.core.source"]}")
-          source_uri = URI.parse(link.attributes["occi.core.source"])
+          $log.debug("occi.core.source #{link.attributes["occi.core.source"].chomp('"').reverse.chomp('"').reverse}")
+          source_uri = URI.parse(link.attributes["occi.core.source"].chomp('"').reverse.chomp('"').reverse)
           source = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(source_uri.path)
           $log.debug("Source #{source}")
           source.links.delete(link)
