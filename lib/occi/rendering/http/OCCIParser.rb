@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: Occi_ruby.g
-# Generated at: 2011-11-11 14:07:20
+# Generated at: 2011-11-11 22:49:57
 # 
 
 # ~~~> start load path setup
@@ -622,21 +622,21 @@ module OCCI
     # parser rule location_attr
     # 
     # (in Occi_ruby.g)
-    # 99:2: location_attr : ';' 'location' '=' TARGET_VALUE ;
+    # 99:2: location_attr : ';' 'location' '=' QUOTED_VALUE ;
     # 
     def location_attr
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 10 )
-      __TARGET_VALUE7__ = nil
+      __QUOTED_VALUE7__ = nil
 
       begin
-        # at line 99:22: ';' 'location' '=' TARGET_VALUE
+        # at line 99:22: ';' 'location' '=' QUOTED_VALUE
         match( T__15, TOKENS_FOLLOWING_T__15_IN_location_attr_517 )
         match( T__21, TOKENS_FOLLOWING_T__21_IN_location_attr_519 )
         match( T__17, TOKENS_FOLLOWING_T__17_IN_location_attr_523 )
-        __TARGET_VALUE7__ = match( TARGET_VALUE, TOKENS_FOLLOWING_TARGET_VALUE_IN_location_attr_525 )
+        __QUOTED_VALUE7__ = match( QUOTED_VALUE, TOKENS_FOLLOWING_QUOTED_VALUE_IN_location_attr_525 )
         # --> action
-         @category_value_stack.last.category['location'] = __TARGET_VALUE7__.text 
+         @category_value_stack.last.category['location'] = remove_quotes __QUOTED_VALUE7__.text 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -1468,8 +1468,8 @@ module OCCI
     TOKENS_FOLLOWING_QUOTED_VALUE_IN_rel_attr_477 = Set[ 1 ]
     TOKENS_FOLLOWING_T__15_IN_location_attr_517 = Set[ 21 ]
     TOKENS_FOLLOWING_T__21_IN_location_attr_519 = Set[ 17 ]
-    TOKENS_FOLLOWING_T__17_IN_location_attr_523 = Set[ 6 ]
-    TOKENS_FOLLOWING_TARGET_VALUE_IN_location_attr_525 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__17_IN_location_attr_523 = Set[ 5 ]
+    TOKENS_FOLLOWING_QUOTED_VALUE_IN_location_attr_525 = Set[ 1 ]
     TOKENS_FOLLOWING_T__15_IN_c_attributes_attr_562 = Set[ 22 ]
     TOKENS_FOLLOWING_T__22_IN_c_attributes_attr_564 = Set[ 17 ]
     TOKENS_FOLLOWING_T__17_IN_c_attributes_attr_566 = Set[ 5 ]

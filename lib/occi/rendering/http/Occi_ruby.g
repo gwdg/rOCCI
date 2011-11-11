@@ -96,8 +96,8 @@ category returns [categories]:
                       { $category_value::category['related'] = remove_quotes $QUOTED_VALUE.text };
 
 	/* this value can be passed on to the uri rule in Location for validation */
-	location_attr:      ';' 'location'   '=' TARGET_VALUE
-                      { $category_value::category['location'] = $TARGET_VALUE.text };
+	location_attr:      ';' 'location'   '=' QUOTED_VALUE
+                      { $category_value::category['location'] = remove_quotes $QUOTED_VALUE.text };
 	
 	/* these value once extracted can be passed on to the attributes_attr rule */
 	c_attributes_attr:  ';' 'attributes' '=' QUOTED_VALUE
