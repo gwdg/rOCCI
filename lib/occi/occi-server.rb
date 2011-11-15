@@ -252,7 +252,7 @@ begin
         mixin = OCCI::Core::Mixin.new(occi_request.mixin.term, occi_request.mixin.scheme, occi_request.mixin.title, nil, [], related_mixin, [])
         raise OCCI::MixinCreationException, 'Cannot create mixin' if mixin.nil?
         OCCI::CategoryRegistry.register(mixin)
-        OCCI::Rendering::HTTP::LocationRegistry.register(occi_request.mixin.location,mixin)
+        OCCI::Rendering::HTTP::LocationRegistry.register(URI.parse(occi_request.mixin.location.chomp('"').reverse.chomp('"').reverse).path,mixin)
         $log.info("Mixin successfully created")
         break
       end
@@ -395,8 +395,7 @@ begin
         mixin = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)
 
         occi_request.locations.each do |location|
-          entity_uri = URI.parse(location)
-          entity = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(entity_uri.path)
+          entity = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(URI.parse(location).path)
 
           raise "No entity found at location: #{entity_location}"                                       if entity == nil
           raise "Object referenced by uri [#{entity_location}] is not a OCCI::Core::Resource instance!" if !entity.kind_of?(OCCI::Core::Resource)
@@ -507,11 +506,11 @@ begin
       # Location references a mixin => unassociate all provided resources (by X_OCCI_LOCATION) from it
       object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)
       if object != nil && object.kind_of?(OCCI::Core::Mixin)
-        object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)
-        $log.info("Unassociating entities from mixin: #{object}")
+        mixin = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)
+        $log.info("Unassociating entities from mixin: #{mixin}")
 
-        occi_request.locations.each do |location|
-          entity = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)
+        occi_request.locations.each do |loc|
+          entity = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
           mixin.entities.delete(entity)
         end
         break
