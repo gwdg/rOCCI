@@ -274,8 +274,6 @@ module OCCI
           content_type = request.env['HTTP_ACCEPT'] if request.env['HTTP_ACCEPT']
           if content_type.include?('application/json')
             response['Content-Type'] = 'application/json'
-          elsif content_type.include?('text/html')
-            response['Content-Type'] = 'text/html'
           elsif content_type.include?('text/plain') || content_type.include?('text/*') || content_type.include?('*/*') || content_type == ""
             response['Content-Type'] = 'text/plain'
           elsif content_type.include?('text/uri-list')
@@ -284,7 +282,7 @@ module OCCI
             response['Content-Type'] = 'text/occi'
           else
             response.status = HTTP_STATUS_CODE["Unsupported Media Type"]
-            exit
+            raise "Unsupported Media Type"
           end
           $log.debug("Content type: #{response['Content-Type']}")
 
