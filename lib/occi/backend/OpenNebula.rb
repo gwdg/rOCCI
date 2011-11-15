@@ -196,7 +196,7 @@ module OCCI
         def self.parse_backend_object(backend_object)
           if backend_object['TEMPLATE/OCCI_ID'].nil?
             raise "no backend ID found" if backend_object.id.nil?
-            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,backend_object.id)
+            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,backend_object.id.to_s)
           else
             occi_id = backend_object['TEMPLATE/OCCI_ID']
           end
@@ -422,7 +422,7 @@ module OCCI
         def self.parse_backend_object(backend_object)
           if backend_object['TEMPLATE/OCCI_ID'].nil?
             raise "no backend ID found" if backend_object.id.nil?
-            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,backend_object.id)
+            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,backend_object.id.to_s)
           else
             occi_id = backend_object['TEMPLATE/OCCI_ID']
           end
@@ -569,7 +569,7 @@ module OCCI
         def self.parse_backend_object(backend_object)
           if backend_object['TEMPLATE/OCCI_ID'].nil?
             raise "no backend ID found" if backend_object.id.nil?
-            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,backend_object.id)
+            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,backend_object.id.to_s)
           else
             occi_id = backend_object['TEMPLATE/OCCI_ID']
           end
