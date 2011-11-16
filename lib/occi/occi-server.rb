@@ -164,6 +164,7 @@ begin
         locations = []
         object.entities.each do |entity|
           # skip entity if kind is not in requested categories
+          $log.debug(entity.kind.type_identifier)
           next unless occi_request.categories.include?(entity.kind)
           # skip entity if it doesn't contain requested attributes
           next unless (entity.attributes.keys & occi_request.attributes.keys) == occi_request.attributes.keys
@@ -555,7 +556,11 @@ begin
         raise OCCI::MixinNotFoundException if occi_request.mixins.empty?
         occi_request.mixins.each do |mixin|
           $log.info("Deleting mixin #{mixin.type_identifier}")
+          mixin.entities.each do |entity|
+            entity.delete(mixin)
+          end
           OCCI::CategoryRegistry.unregister(mixin)
+          OCCI::Rendering::HTTP::LocationRegistry.unregister(OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(mixin))
         end
         break
       end
