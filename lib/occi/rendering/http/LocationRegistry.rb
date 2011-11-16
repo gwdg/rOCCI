@@ -86,8 +86,8 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         def self.register(location, object)
 
-          raise "Location [#{@@locations[generate_key(object)]}] already registered for object [#{object}]"  if @@locations[generate_key(object)] != nil
-          raise "Object [#{@@objects[location]}] already registered for location [#{location}]"              if @@objects[location] != nil
+          raise OCCI::LocationAlreadyRegisteredException, "Location [#{@@locations[generate_key(object)]}] already registered for object [#{object}]"  if @@locations[generate_key(object)] != nil
+          raise OCCI::LocationAlreadyRegisteredException, "Object [#{@@objects[location]}] already registered for location [#{location}]"              if @@objects[location] != nil
           raise "Only absolute paths (starting with '/') are supported: location provided: [#{location}])"  unless location.start_with?("/")
 
           location_elements = location[1..-1].split('/')

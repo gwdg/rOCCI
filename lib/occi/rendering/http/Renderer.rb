@@ -231,26 +231,26 @@ module OCCI
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_resource(resource,response)
+        def self.render_entity(entity,response)
           # render kind of entity
-          response = render_category_type(resource.kind,response)
+          response = render_category_type(entity.kind,response)
           # render mixins of entity
-          resource.mixins.each do |mixin|
+          entity.mixins.each do |mixin|
             response = render_category_type(mixin,response)
           end
 
           # Render attributes
-          response = render_attributes(resource.attributes,response)
+          response = render_attributes(entity.attributes,response)
 
           # Render link references
-          resource.links.each do |link|
+          entity.links.each do |link|
             response = render_link_reference(link,response)
-          end
+          end if entity.kind_of?(OCCI::Core::Resource)
 
           # Render action references
           # TODO: only render currently applicable actions
-          resource.kind.actions.each do |action|
-            response = render_action_reference(action,resource,response)
+          entity.kind.actions.each do |action|
+            response = render_action_reference(action,entity,response)
           end
 
           return response

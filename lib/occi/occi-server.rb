@@ -136,17 +136,6 @@ begin
   ############################################################################
   # GET request
 
-  get '/web/' do
-    begin
-      if $config[:webinterface] == 'enabled'
-        require 'erb'
-        rhtml = ERB.new(File.read('etc/html/template.erb')).result(binding)
-        response.write(rhtml)
-        break
-      end
-    end
-  end
-
   get '*' do
     begin
       # render general OCCI response
@@ -171,21 +160,27 @@ begin
       # Render exact matches referring to kinds / mixins
       if object != nil and (object.kind_of?(OCCI::Core::Kind) or object.kind_of?(OCCI::Core::Mixin))
         raise "Only mixins / kinds are supported for exact match rendering: location: #{location}; object: #{object}" if !object.instance_variable_defined?(:@entities)
-        $log.info("Listing all entities for kind/mixin [#{object.type_identifier}] ...")
+        $log.info("Listing all entities for kind/mixin #{object.type_identifier} ...")
         locations = []
         object.entities.each do |entity|
-          locations << OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
+          # skip entity if kind is not in requested categories
+          next unless occi_request.categories.include?(entity.kind)
+          # skip entity if it doesn't contain requested attributes
+          next unless (entity.attributes.keys & occi_request.attributes.keys) == occi_request.attributes.keys
+          loc = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
+          $log.debug("Rendering location: #{loc}")
+          locations << loc
         end
         response = OCCI::Rendering::HTTP::Renderer.render_locations(locations,response)
         response.status = HTTP_STATUS_CODE["OK"]
         break
       end
 
-      # Render exact matches referring to resources
-      if object != nil and object.kind_of?(OCCI::Core::Resource)
-        $log.info("Rendering resource [#{object.type_identifier}] for location [#{location}] ...")
-        object.refresh
-        response = OCCI::Rendering::HTTP::Renderer.render_resource(object,response)
+      # Render exact matches referring to an entity
+      if object != nil and object.kind_of?(OCCI::Core::Entity)
+        $log.info("Rendering entity [#{object.type_identifier}] for location [#{location}] ...")
+        object.refresh if object.kind_of?(OCCI::Core::Resource)
+        response = OCCI::Rendering::HTTP::Renderer.render_entity(object,response)
         break
       end
 
@@ -294,6 +289,7 @@ begin
 
         link_location = link.get_location()
         OCCI::Rendering::HTTP::LocationRegistry.register(link_location, link)
+        $log.debug("Link created with location: #{link_location}")
         response['Location'] = OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(link)
         break
       end unless occi_request.kind.nil?
@@ -337,25 +333,63 @@ begin
         break
       end
 
-      # Associate resource instances With a Mixin
+      # Update resource instance(s) at the given location
       if not OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location).nil?
-        $log.debug("Associate resource instances With a Mixin")
-        mixin = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)
-        raise "mixin not found" unless mixin.kind_of?(OCCI::Core::Mixin)
-        $log.debug("Locations: #{occi_request.locations}")
         entities = []
-        occi_request.locations.each do |loc|
-          entities << OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
+        # Determine set of resources to be updated
+        if OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Resource)
+          entities = [OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)]
+        elsif not OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Category)
+          entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location, OCCI::CategoryRegistry.get_all)
+        elsif OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Category)
+          object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)
+          occi_request.locations.each do |loc|
+            entities << OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
+          end
         end
-        entities.compact! # remove nil entries
-        $log.info("Adding [#{entities.size}] entities to mixin...")
+        $log.info("Updating [#{entities.size}] entities...")
 
-        # add entities to mixin
+        # add mixins
         entities.each do |entity|
-          entity.mixins  << mixin
-          entity.mixins.uniq!
-          mixin.entities  << entity
-          mixin.entities.uniq!
+          $log.debug("Adding entity: #{entity.get_location} to mixin #{object.type_identifier}")
+          entity.mixins.push(object).uniq!
+          object.entities.push(entity).uniq!
+        end if object.kind_of?(OCCI::Core::Mixin)
+
+        # Update / add attributes
+        entities.each do |entity|
+          # refresh information from backend for entities of type resource
+          entity.refresh if entity.kind_of?(OCCI::Core::Resource)
+          $log.debug("Adding the following attribute to mixin: #{occi_request.attributes}")
+          entity.attributes.merge!(occi_request.attributes)
+        end unless occi_request.attributes.empty?
+
+        # Update / add links
+
+        occi_request.links.each do |link_data|
+          $log.debug("Extracted link data: #{link_data}")
+          raise "Mandatory information missing (related | target | category)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil
+
+          kind = OCCI::CategoryRegistry.get_categories_by_category_string(link_data.category, filter="kinds")[0]
+          raise "No kind for category string: #{link_data.category}" unless kind != nil
+
+          target_location = link_data.target_attr
+          target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
+
+          entities.each do |entity|
+
+            source_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
+
+            attributes = link_data.attributes.clone
+            attributes["occi.core.target"] = target_location.chomp('"').reverse.chomp('"').reverse
+            attributes["occi.core.source"] = source_location
+
+            link = kind.entity_type.new(attributes)
+            OCCI::Rendering::HTTP::LocationRegistry.register_location(link.get_location(), link)
+
+            target.links << link
+            entity.links << link
+          end
         end
         break
       end
@@ -364,6 +398,10 @@ begin
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
+
+    rescue OCCI::LocationAlreadyRegisteredException => e
+      $log.error(e.message)
+      response.status = HTTP_STATUS_CODE["Conflict"]
 
     rescue OCCI::MixinCreationException => e
       $log.error(e.message)
@@ -409,27 +447,42 @@ begin
 
       # Update resource instance(s) at the given location
       if not OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location).nil?
-        resource.refresh if resource.kind_of?(OCCI::Core::Resource)
+        entities = []
         # Determine set of resources to be updated
         if OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Resource)
           entities = [OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)]
-        else
-          entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location)
+        elsif not OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Category)
+          entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location, OCCI::CategoryRegistry.get_all)
+        elsif OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location).kind_of?(OCCI::Core::Category)
+          object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(location)
+          occi_request.locations.each do |loc|
+            entities << OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
+          end
         end
         $log.info("Updating [#{entities.size}] entities...")
 
-        # add mixins
+        # full update of mixins
+        object.entities.each do |entity|
+          entity.mixins.delete(object)  
+          object.entities.delete(entity)
+        end if object.kind_of?(OCCI::Core::Mixin)
+        
         entities.each do |entity|
-          entity.mixins.concat(occi_request.mixins).uniq!
-        end unless occi_request.mixins.empty?
+          $log.debug("Adding entity: #{entity.get_location} to mixin #{object.type_identifier}")
+          entity.mixins.push(object).uniq!
+          object.entities.push(entity).uniq!
+        end if object.kind_of?(OCCI::Core::Mixin)
 
-        # Update / add attributes
+        # full update of attributes
         entities.each do |entity|
-          entity.attributes.merge!(occi_request.attributes).compact!
-        end unless occi_request.attributes.empt?
+          # refresh information from backend for entities of type resource
+          # TODO: full update
+          entity.attributes.merge!(occi_request.attributes)
+          # TODO: update entity in backend
+        end unless occi_request.attributes.empty?
 
-        # Update / add links
-
+        # full update of links
+        # TODO: full update
         occi_request.links.each do |link_data|
           $log.debug("Extracted link data: #{link_data}")
           raise "Mandatory information missing (related | target | category)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil
@@ -466,9 +519,13 @@ begin
       # (or fail utterly while trying to do that!)
       nil
 
+    rescue OCCI::LocationAlreadyRegisteredException => e
+      $log.error(e.message)
+      response.status = HTTP_STATUS_CODE["Conflict"]
+
     rescue OCCI::MixinAlreadyExistsError => e
 
-      $log.error(e)
+      $log.error(e.message)
       response.status  = HTTP_STATUS_CODE["Conflict"]
 
     rescue Exception => e
@@ -512,6 +569,7 @@ begin
         occi_request.locations.each do |loc|
           entity = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
           mixin.entities.delete(entity)
+          entity.mixins.delete(mixin)
         end
         break
       end
@@ -528,7 +586,7 @@ begin
       if not entities.nil?
         entities.each do |entity|
           location = entity.get_location
-          entity.delete()
+          entity.delete
           OCCI::Rendering::HTTP::LocationRegistry.unregister(location)
         end
         break
