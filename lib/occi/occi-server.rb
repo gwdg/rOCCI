@@ -164,8 +164,7 @@ begin
         locations = []
         object.entities.each do |entity|
           # skip entity if kind is not in requested categories
-          $log.debug(entity.kind.type_identifier)
-          next unless occi_request.categories.include?(entity.kind)
+          next unless occi_request.categories.include?(entity.kind) or (occi_request.categories & entity.mixins) == occi_request.categories
           # skip entity if it doesn't contain requested attributes
           next unless (entity.attributes.keys & occi_request.attributes.keys) == occi_request.attributes.keys
           loc = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
@@ -174,6 +173,7 @@ begin
         end
         response = OCCI::Rendering::HTTP::Renderer.render_locations(locations,response)
         response.status = HTTP_STATUS_CODE["OK"]
+        $log.debug(response)
         break
       end
 
@@ -460,7 +460,7 @@ begin
             entities << OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
           end
         end
-        $log.info("Updating [#{entities.size}] entities...")
+        $log.info("Full update for [#{entities.size}] entities...")
 
         # full update of mixins
         object.entities.each do |entity|
