@@ -67,7 +67,11 @@ module OCCI
             $image_path = $config[:one_image_tmp_dir] + '/' + params['file'][:filename]
             FileUtils.cp(params['file'][:tempfile].path, $image_path)
           end
-
+          
+          $log.debug("HTTP Request Headers: ")
+          request.env.each do |k,v|
+            $log.debug(k + ":" + v) if k.contains('HTTP')
+          end
           $log.debug(request.POST)
           request.POST.values.each do |body|
             if body.kind_of?(String)

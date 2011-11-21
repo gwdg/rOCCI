@@ -264,6 +264,8 @@ begin
         $log.debug("Action [#{occi_request.action_category.type_identifier}] to be triggered on [#{resources.length}] entities:")
         delegator = OCCI::ActionDelegator.instance
         resources.each do |resource|
+          # TODO: check why networkinterface is showing up under /compute/
+          next unless resource.kind_of?(OCCI::Core::Resource)
           resource.refresh if resource.kind_of?(OCCI::Core::Resource)
           action = nil
           resource.kind.actions.each do |existing_action|
