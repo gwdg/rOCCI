@@ -238,7 +238,7 @@ begin
         $log.info("Creating user defined mixin...")
         $log.info(occi_request.mixin)
 
-        raise OCCI::MixinAlreadyExistsError, "Mixin [#{occi_request.mixins}] already exists!" unless occi_request.mixins.empty?
+        raise OCCI::MixinAlreadyExistsError, "Mixin already exists!" unless occi_request.mixins.empty?
 
         begin
           related_mixin = OCCI::CategoryRegistry.get_by_id(occi_request.mixin.related) unless occi_request.mixin.related.nil?
