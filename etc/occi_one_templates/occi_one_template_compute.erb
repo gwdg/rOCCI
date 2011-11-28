@@ -20,7 +20,7 @@ BOOT          = hd
 
 <%# Links to images %>
 <% storages.each do |storage,link| %>
-DISK          = [ IMAGE_ID = "<%= storage.backend_id %>"]
+DISK          = [ IMAGE_ID = "<%= storage.backend[:id] %>"]
 <%end%>
 
 <%# Links to external storage %>
@@ -36,7 +36,7 @@ DISK = [
 NIC           = [ 
   <% "IP         = " + link.attributes["occi.networkinferface.address"] + "," if link.attributes["occi.networkinferface.address"]%>
   <% "MAC        = " + link.attributes["occi.networkinferface.mac"] + "," if link.attributes["occi.networkinferface.mac"]%>
-  NETWORK_ID = <%= network.backend_id %>
+  NETWORK_ID = <%= network.backend[:id] %>
 ]
 <%end%>
 
