@@ -24,7 +24,7 @@ DISK          = [ IMAGE_ID = "<%= storage.backend_id %>"]
 <%end%>
 
 <%# Links to external storage %>
-<% external_storage.each do |storage_URI| %>
+<% external_storages.each do |storage_URI| %>
 DISK = [
   TYPE          = "OS",
   SOURCE        = <%= storage_URI %>
