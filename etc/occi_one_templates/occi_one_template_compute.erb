@@ -34,8 +34,8 @@ DISK = [
 <%# Links to networks %>
 <% networks.each do |network,link| %>
 NIC           = [ 
-  <% "IP         = " + link.attributes["occi.networkinferface.address"] if link.attributes["occi.networkinferface.address"] ","%>
-  <% "MAC        = " + link.attributes["occi.networkinferface.mac"] if link.attributes["occi.networkinferface.mac"] ","%>
+  <% "IP         = " + link.attributes["occi.networkinferface.address"] if link.attributes["occi.networkinferface.address"] + ","%>
+  <% "MAC        = " + link.attributes["occi.networkinferface.mac"] if link.attributes["occi.networkinferface.mac"] + ","%>
   NETWORK_ID = <%= network.backend_id %>
 ]
 <%end%>
