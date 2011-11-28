@@ -79,29 +79,37 @@ module OCCI
           # backend_object=Template.new(Template.build_xml, $backend.one_client)
           backend_object=VirtualMachine.new(VirtualMachine.build_xml, $backend.one_client)
 
-          storage_ids = []
-          network_ids = []
-          storagelinks = []
+          storages = []
+          networks = []
 
           if @links != nil
             @links.each do
               |link|
               $log.debug(link.kind)
-              if link.kind.term == 'storagelink'
-                storagelinks << link.attributes['occi.core.target']
-              elsif link.kind.term == 'link'
-                target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.attributes['occi.core.target'])
+              target_URI = link.attributes['occi.core.target'] if URI.parse(link.attributes['occi.core.target']).absolute?
+              target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.attributes['occi.core.target'])
+              case link.kind.term 
+              when 'storagelink'
+                # TODO: incorporate mountpoint here (e.g. occi.storagelink.mountpoint )
+                if not target.nil?
+                  storages << [target, link]
+                elsif not target_URI.nil?
+                  external_storages << target_URI
+                end
+              when 'networkinterface'
+                if not target.nil?
+                  networks << [target, link]
+                end
+              when 'link'
                 case target.kind.term
                 when 'storage'
-                  storage_ids << target.backend[:id]
+                  storages << [target, link]
                 when 'network'
-                  network_ids << target.backend[:id]
-                end
+                  networks << [target, link]
+                end unless target.nil?
               end
             end
           end
-          $log.debug("Storage IDs: #{storage_ids}")
-          $log.debug("Network IDs: #{network_ids}")
 
           @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
           compute_template = ERB.new(File.read(@templateRaw)).result(binding)
