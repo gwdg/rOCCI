@@ -81,6 +81,7 @@ module OCCI
 
           storages = []
           networks = []
+          external_storages = []
 
           if @links != nil
             @links.each do
