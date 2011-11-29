@@ -305,7 +305,7 @@ module OCCI
             attributes["occi.core.source"] = source.get_location
             occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,image_id.to_s)
             # check if link already exists
-            storagelink_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(OCCI::Infrastructure::StorageLink.kind)
+            storagelink_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(OCCI::Infrastructure::StorageLink::KIND)
             link = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(storagelink_location + occi_id)
             if link.nil?
               # create new link
@@ -337,7 +337,7 @@ module OCCI
             attributes["occi.core.target"] = target.get_location
             attributes["occi.core.source"] = source.get_location
             # check if link already exists
-            networkinterface_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(OCCI::Infrastructure::Networkinterface.kind)
+            networkinterface_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(OCCI::Infrastructure::Networkinterface::KIND)
             link = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(networkinterface_location + occi_id)
             if link.nil?
               # create new link
