@@ -230,6 +230,7 @@ module OCCI
           occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/compute/' +  occi_id)
           if occi_object.nil?
             occi_object = OCCI::Infrastructure::Compute.new(attributes,mixins)
+            occi_object.backend[:id] = backend_object.id
             OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
           else
             occi_object.attributes.merge!(attributes)
@@ -296,6 +297,7 @@ module OCCI
             end
             if target == nil
               backend_object = Image.new(Image.build_xml(image_id), $backend.one_client)
+              backend_object.info
               target = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
             end
             source = occi_object
@@ -321,6 +323,7 @@ module OCCI
             end
             if target == nil
               backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(network_id), $backend.one_client)
+              backend_object.info
               target = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
             end            
             source = occi_object
@@ -474,6 +477,7 @@ module OCCI
           occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/network/' +  occi_id)
           if occi_object.nil?
             occi_object = OCCI::Infrastructure::Network.new(attributes,mixins)
+            occi_object.backend[:id] = backend_object.id
             OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
           else
             occi_object.attributes.merge!(attributes)
@@ -542,7 +546,6 @@ module OCCI
           $log.debug("Parsed template #{template}")
           rc = backend_object.allocate(template)
           $backend.check_rc(rc)
-          @backend[:id] = backend_object.id
           $log.debug("OpenNebula ID of image: #{@backend[:id]}")
         end
 
@@ -620,6 +623,7 @@ module OCCI
           occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/storage/' +  occi_id)
           if occi_object.nil?
             occi_object = OCCI::Infrastructure::Storage.new(attributes,mixins)
+            occi_object.backend[:id] = backend_object.id
             OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
           else
             occi_object.attributes.merge!(attributes)
