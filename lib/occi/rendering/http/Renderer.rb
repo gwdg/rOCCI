@@ -128,7 +128,7 @@ module OCCI
 
           
           # Link value
-          location        = link.get_location
+          location        = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(link)
           target_location = link.attributes["occi.core.target"]
           target_resource = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
           if target_resource.nil?
@@ -138,6 +138,7 @@ module OCCI
           end
           category = link.kind.type_identifier
           attributes = link.attributes.map { |key,value| %Q{#{key}="#{value}"} unless value.empty? }.join(';').to_s
+          attributes << ";" unless attributes.empty?
 
           link_string = %Q{<#{target_location}>;rel="#{target_resource_type}";self="#{location}";category="#{category}";#{attributes}}
 
