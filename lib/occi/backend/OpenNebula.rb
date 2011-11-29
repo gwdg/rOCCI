@@ -295,7 +295,7 @@ module OCCI
               target = storage if storage.backend[:id].to_i == image_id.to_i
             end
             if target == nil
-              backend_object = Image.new(Image.build_xml, $backend.one_client)
+              backend_object = Image.new(Image.build_xml(image_id), $backend.one_client)
               target = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
             end
             source = occi_object
@@ -320,7 +320,7 @@ module OCCI
               $log.debug(target.kind.term) if target != nil
             end
             if target == nil
-              backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(@backend[:id]), $backend.one_client)
+              backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(network_id), $backend.one_client)
               target = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
             end            
             source = occi_object
