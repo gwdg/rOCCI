@@ -191,12 +191,9 @@ module OCCI
               $log.debug("Error creating occi resource from backend")
             else
               $log.debug(occi_object.methods)
-              occi_object.backend[:id] = backend_object.id
               $log.debug("Backend ID: #{occi_object.backend[:id]}")
               $log.debug("OCCI compute object location: #{occi_object.get_location}")
-              OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
-              occi_object = self.parse_links(occi_object,backend_object)
-              occi_objects << occi_object if not occi_object.nil?
+              occi_objects << occi_object
             end
           end
         end
@@ -279,8 +276,17 @@ module OCCI
             end
           end
           
+          begin
+          OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
+          rescue OCCI::LocationAlreadyRegisteredException => e
+            # OCCI object was only updated, links don't need to be updated
+            $log.info("OCCI compute object updated")
+            return occi_object
+          end
+          
+          occi_object.backend[:id] = backend_object.id
           occi_object = self.parse_links(occi_object,backend_object)
-
+          $log.info("OCCI compute object created")
           return occi_object
         end
 
@@ -299,6 +305,7 @@ module OCCI
             source = occi_object
             attributes["occi.core.target"] = target.get_location
             attributes["occi.core.source"] = source.get_location
+            # TODO: check if link already exists!
             link = OCCI::Core::Link.new(attributes)
             source.links << link
             target.links << link
@@ -320,6 +327,7 @@ module OCCI
             source = occi_object
             attributes["occi.core.target"] = target.get_location
             attributes["occi.core.source"] = source.get_location
+            # TODO: check if link already exists!
             link = OCCI::Core::Link.new(attributes)
             source.links << link
             target.links << link
