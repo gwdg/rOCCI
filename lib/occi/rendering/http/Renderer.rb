@@ -128,7 +128,7 @@ module OCCI
 
           
           # Link value
-          location        = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(link)
+          location        = link.get_location
           target_location = link.attributes["occi.core.target"]
           target_resource = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
           if target_resource.nil?
