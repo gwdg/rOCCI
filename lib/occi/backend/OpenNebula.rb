@@ -311,10 +311,10 @@ module OCCI
               # create new link
               attributes['occi.core.id'] = occi_id
               link = OCCI::Infrastructure::StorageLink.new(attributes)
+              OCCI::Rendering::HTTP::LocationRegistry.register(link.get_location, link)
             end
             source.links << link
             target.links << link
-            OCCI::Rendering::HTTP::LocationRegistry.register(link.get_location, link)
             $log.debug("Link successfully created")
           end if backend_object['TEMPLATE/DISK/IMAGE_ID']
 
@@ -344,10 +344,10 @@ module OCCI
               # create new link
               attributes['occi.core.id'] = occi_id
               link = OCCI::Infrastructure::Networkinterface.new(attributes)
+              OCCI::Rendering::HTTP::LocationRegistry.register(link.get_location, link)
             end
             source.links << link
             target.links << link
-            OCCI::Rendering::HTTP::LocationRegistry.register(link.get_location, link)
             $log.debug("Link successfully created")
           end if backend_object['TEMPLATE/NIC/NETWORK_ID']
 
