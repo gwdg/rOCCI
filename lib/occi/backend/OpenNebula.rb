@@ -278,6 +278,8 @@ module OCCI
               end
             end
           end
+          
+          occi_object = self.parse_links(occi_object,backend_object)
 
           return occi_object
         end
@@ -324,6 +326,8 @@ module OCCI
             OCCI::Rendering::HTTP::LocationRegistry.register(link.get_location, link)
             $log.debug("Link successfully created")
           end if backend_object['TEMPLATE/NIC/NETWORK_ID']
+            
+          return occi_object
         end
 
         # COMPUTE ACTIONS
