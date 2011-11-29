@@ -89,7 +89,7 @@ module OCCI
               $log.debug(link.kind)
               target_URI = link.attributes['occi.core.target'] if URI.parse(link.attributes['occi.core.target']).absolute?
               target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.attributes['occi.core.target'])
-              case link.kind.term 
+              case link.kind.term
               when 'storagelink'
                 # TODO: incorporate mountpoint here (e.g. occi.storagelink.mountpoint )
                 if not target.nil?
@@ -230,6 +230,7 @@ module OCCI
           occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/compute/' +  occi_id)
           if occi_object.nil?
             occi_object = OCCI::Infrastructure::Compute.new(attributes,mixins)
+            OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
           else
             occi_object.attributes.merge!(attributes)
           end
@@ -275,18 +276,10 @@ module OCCI
               end
             end
           end
-          
-          begin
-          OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
-          rescue OCCI::LocationAlreadyRegisteredException => e
-            # OCCI object was only updated, links don't need to be updated
-            $log.info("OCCI compute object updated")
-            return occi_object
-          end
-          
+
           occi_object.backend[:id] = backend_object.id
           occi_object = self.parse_links(occi_object,backend_object)
-          $log.info("OCCI compute object created")
+          $log.info("OCCI compute object created/updated")
           return occi_object
         end
 
@@ -301,7 +294,10 @@ module OCCI
               $log.debug("Storage Backend ID: #{storage.backend[:id]}")
               target = storage if storage.backend[:id].to_i == image_id.to_i
             end
-            break if target == nil
+            if target == nil
+              backend_object = Image.new(Image.build_xml, $backend.one_client)
+              target = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
+            end
             source = occi_object
             attributes["occi.core.target"] = target.get_location
             attributes["occi.core.source"] = source.get_location
@@ -323,7 +319,10 @@ module OCCI
               target = network if network.backend[:id].to_i == network_id.to_i
               $log.debug(target.kind.term) if target != nil
             end
-            break if target == nil
+            if target == nil
+              backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(@backend[:id]), $backend.one_client)
+              target = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
+            end            
             source = occi_object
             attributes["occi.core.target"] = target.get_location
             attributes["occi.core.source"] = source.get_location
@@ -334,7 +333,7 @@ module OCCI
             OCCI::Rendering::HTTP::LocationRegistry.register(link.get_location, link)
             $log.debug("Link successfully created")
           end if backend_object['TEMPLATE/NIC/NETWORK_ID']
-            
+
           return occi_object
         end
 
@@ -475,6 +474,7 @@ module OCCI
           occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/network/' +  occi_id)
           if occi_object.nil?
             occi_object = OCCI::Infrastructure::Network.new(attributes,mixins)
+            OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
           else
             occi_object.attributes.merge!(attributes)
           end
@@ -493,7 +493,6 @@ module OCCI
             else
               occi_object.backend[:id] = backend_object.id
               $log.debug("Backend ID: #{occi_object.backend[:id]}")
-              OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
               occi_objects << occi_object
             end
           end
@@ -621,6 +620,7 @@ module OCCI
           occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/storage/' +  occi_id)
           if occi_object.nil?
             occi_object = OCCI::Infrastructure::Storage.new(attributes,mixins)
+            OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
           else
             occi_object.attributes.merge!(attributes)
           end
@@ -639,7 +639,6 @@ module OCCI
             else
               occi_object.backend[:id] = backend_object.id
               $log.debug("Backend ID: #{occi_object.backend[:id]}")
-              OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
               occi_objects << occi_object
             end
           end
