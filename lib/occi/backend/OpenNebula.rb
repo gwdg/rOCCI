@@ -478,13 +478,13 @@ module OCCI
             mixins << OCCI::Backend::ONE::Network::MIXIN
             # attributes['opennebula.network.leases'] = backend_object['TEMPLATE/LEASES']
             mixins << OCCI::Infrastructure::Ipnetworking::MIXIN
-            attributes['occi.network.allocation'] = 'static'
+            attributes['occi.networkinterface.allocation'] = 'static'
           end
           if backend_object['TEMPLATE/TYPE'].downcase == 'ranged'
             require 'occi/infrastructure/Ipnetworking'
             mixins << OCCI::Infrastructure::Ipnetworking::MIXIN
-            attributes['occi.network.allocation'] = 'dynamic'
-            attributes['occi.network.address'] = backend_object['TEMPLATE/NETWORK_ADDRESS'] + '/' + (32-(Math.log(backend_object['TEMPLATE/NETWORK_SIZE'].to_i)/Math.log(2)).ceil).to_s
+            attributes['occi.networkinterface.allocation'] = 'dynamic'
+            attributes['occi.networkinterface.address'] = backend_object['TEMPLATE/NETWORK_ADDRESS'] + '/' + (32-(Math.log(backend_object['TEMPLATE/NETWORK_SIZE'].to_i)/Math.log(2)).ceil).to_s
           end
 
           # check if object already exists
