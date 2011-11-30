@@ -331,6 +331,7 @@ begin
 
           if URI.parse(link.target).relative?
             target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.target)
+            raise "target #{link.target} not found"
             target.links << occi_link
           end
 
