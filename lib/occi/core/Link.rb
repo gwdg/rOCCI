@@ -48,8 +48,8 @@ module OCCI
         OCCI::Rendering::HTTP::LocationRegistry.register('/link/', KIND)
       end
       
-      def initialize(attributes, mixins = [])
-        super(attributes, OCCI::Core::Link::KIND, mixins)
+      def initialize(attributes, mixins = [], kind = OCCI::Core::Link::KIND)
+        super(attributes, mixins, kind)
       end
       
     end

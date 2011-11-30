@@ -89,7 +89,7 @@ module OCCI
         delegator.register_method_for_action(OCCI::Infrastructure::Network::ACTION_UP, self, :up)
         delegator.register_method_for_action(OCCI::Infrastructure::Network::ACTION_DOWN, self, :down)
 
-        super(attributes, OCCI::Infrastructure::Network::KIND, mixins)
+        super(attributes, mixins, OCCI::Infrastructure::Network::KIND)
       end
     end
   end

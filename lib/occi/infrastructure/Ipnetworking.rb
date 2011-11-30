@@ -47,11 +47,6 @@ module OCCI
         
         OCCI::CategoryRegistry.register(MIXIN)
       end
-
-      def initialize(term, scheme, title, attributes, actions, related, entities)
-        super(term, scheme, title, attributes, actions, related, entities)
-      end
-
     end
   end
 end

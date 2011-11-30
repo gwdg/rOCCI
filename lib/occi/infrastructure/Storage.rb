@@ -113,7 +113,7 @@ module OCCI
         delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_SNAPSHOT, self, :snapshot)
         delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_RESIZE, self, :resize)
 
-        super(attributes, OCCI::Infrastructure::Storage::KIND, mixins)
+        super(attributes, mixins, OCCI::Infrastructure::Storage::KIND)
       end
     end
   end
