@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: Occi_ruby.g
-# Generated at: 2011-11-11 22:49:57
+# Generated at: 2011-11-30 08:53:12
 # 
 
 # ~~~> start load path setup
@@ -92,8 +92,8 @@ module OCCI
                     "DIGITS", "FLOAT", "ESC", "WS", "'Category'", "':'", 
                     "';,'", "';'", "'scheme'", "'='", "'class'", "'title'", 
                     "'rel'", "'location'", "'attributes'", "'actions'", 
-                    "'Link'", "'<'", "'>'", "'self'", "'category'", "','", 
-                    "'X-OCCI-Attribute'", "'X-OCCI-Location'" )
+                    "'Link'", "'<'", "'>'", "'self'", "'category'", "'X-OCCI-Attribute'", 
+                    "'X-OCCI-Location'", "','" )
     
   end
 
@@ -160,8 +160,8 @@ module OCCI
           case look_1 = @input.peek( 1 )
           when T__12 then alt_1 = 1
           when T__24 then alt_1 = 2
-          when T__30 then alt_1 = 3
-          when T__31 then alt_1 = 4
+          when T__29 then alt_1 = 3
+          when T__30 then alt_1 = 4
           end
           case alt_1
           when 1
@@ -1125,7 +1125,7 @@ module OCCI
     # parser rule attributes_attr
     # 
     # (in Occi_ruby.g)
-    # 166:3: attributes_attr returns [attributes] : attribute_kv_attr ( ',' attribute_kv_attr )* ;
+    # 166:3: attributes_attr returns [attributes] : attribute_kv_attr ( ';' attribute_kv_attr )* ;
     # 
     def attributes_attr
       # -> uncomment the next line to manually enable rule tracing
@@ -1136,23 +1136,23 @@ module OCCI
        @attributes_attr_stack.last.data = Hash.new 
 
       begin
-        # at line 171:26: attribute_kv_attr ( ',' attribute_kv_attr )*
+        # at line 171:26: attribute_kv_attr ( ';' attribute_kv_attr )*
         @state.following.push( TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1124 )
         attribute_kv_attr
         @state.following.pop
-        # at line 171:44: ( ',' attribute_kv_attr )*
+        # at line 171:44: ( ';' attribute_kv_attr )*
         while true # decision 13
           alt_13 = 2
           look_13_0 = @input.peek( 1 )
 
-          if ( look_13_0 == T__29 )
+          if ( look_13_0 == T__15 )
             alt_13 = 1
 
           end
           case alt_13
           when 1
-            # at line 171:45: ',' attribute_kv_attr
-            match( T__29, TOKENS_FOLLOWING_T__29_IN_attributes_attr_1127 )
+            # at line 171:45: ';' attribute_kv_attr
+            match( T__15, TOKENS_FOLLOWING_T__15_IN_attributes_attr_1127 )
             @state.following.push( TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1129 )
             attribute_kv_attr
             @state.following.pop
@@ -1311,7 +1311,7 @@ module OCCI
 
       begin
         # at line 198:26: 'X-OCCI-Attribute' ':' attributes_attr
-        match( T__30, TOKENS_FOLLOWING_T__30_IN_attribute_1289 )
+        match( T__29, TOKENS_FOLLOWING_T__29_IN_attribute_1289 )
         match( T__13, TOKENS_FOLLOWING_T__13_IN_attribute_1291 )
         @state.following.push( TOKENS_FOLLOWING_attributes_attr_IN_attribute_1293 )
         attributes_attr20 = attributes_attr
@@ -1348,7 +1348,7 @@ module OCCI
 
       begin
         # at line 211:26: 'X-OCCI-Location' ':' location_values
-        match( T__31, TOKENS_FOLLOWING_T__31_IN_location_1361 )
+        match( T__30, TOKENS_FOLLOWING_T__30_IN_location_1361 )
         match( T__13, TOKENS_FOLLOWING_T__13_IN_location_1363 )
         @state.following.push( TOKENS_FOLLOWING_location_values_IN_location_1365 )
         location_values21 = location_values
@@ -1397,14 +1397,14 @@ module OCCI
           alt_14 = 2
           look_14_0 = @input.peek( 1 )
 
-          if ( look_14_0 == T__29 )
+          if ( look_14_0 == T__31 )
             alt_14 = 1
 
           end
           case alt_14
           when 1
             # at line 219:27: ',' u2= URL
-            match( T__29, TOKENS_FOLLOWING_T__29_IN_location_values_1479 )
+            match( T__31, TOKENS_FOLLOWING_T__31_IN_location_values_1479 )
             u2 = match( URL, TOKENS_FOLLOWING_URL_IN_location_values_1485 )
             # --> action
              locations << u2.text
@@ -1430,10 +1430,10 @@ module OCCI
 
 
 
-    TOKENS_FOLLOWING_category_IN_headers_38 = Set[ 1, 12, 24, 30, 31 ]
-    TOKENS_FOLLOWING_link_IN_headers_42 = Set[ 1, 12, 24, 30, 31 ]
-    TOKENS_FOLLOWING_attribute_IN_headers_46 = Set[ 1, 12, 24, 30, 31 ]
-    TOKENS_FOLLOWING_location_IN_headers_50 = Set[ 1, 12, 24, 30, 31 ]
+    TOKENS_FOLLOWING_category_IN_headers_38 = Set[ 1, 12, 24, 29, 30 ]
+    TOKENS_FOLLOWING_link_IN_headers_42 = Set[ 1, 12, 24, 29, 30 ]
+    TOKENS_FOLLOWING_attribute_IN_headers_46 = Set[ 1, 12, 24, 29, 30 ]
+    TOKENS_FOLLOWING_location_IN_headers_50 = Set[ 1, 12, 24, 29, 30 ]
     TOKENS_FOLLOWING_T__12_IN_category_71 = Set[ 13 ]
     TOKENS_FOLLOWING_T__13_IN_category_73 = Set[ 4 ]
     TOKENS_FOLLOWING_category_values_IN_category_75 = Set[ 1 ]
@@ -1507,23 +1507,23 @@ module OCCI
     TOKENS_FOLLOWING_QUOTED_VALUE_IN_category_attr_968 = Set[ 1 ]
     TOKENS_FOLLOWING_T__15_IN_attribute_attr_1034 = Set[ 4 ]
     TOKENS_FOLLOWING_attributes_attr_IN_attribute_attr_1036 = Set[ 1 ]
-    TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1124 = Set[ 1, 29 ]
-    TOKENS_FOLLOWING_T__29_IN_attributes_attr_1127 = Set[ 4 ]
-    TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1129 = Set[ 1, 29 ]
+    TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1124 = Set[ 1, 15 ]
+    TOKENS_FOLLOWING_T__15_IN_attributes_attr_1127 = Set[ 4 ]
+    TOKENS_FOLLOWING_attribute_kv_attr_IN_attributes_attr_1129 = Set[ 1, 15 ]
     TOKENS_FOLLOWING_attribute_name_attr_IN_attribute_kv_attr_1176 = Set[ 17 ]
     TOKENS_FOLLOWING_T__17_IN_attribute_kv_attr_1178 = Set[ 5, 7, 8, 9 ]
     TOKENS_FOLLOWING_attribute_value_attr_IN_attribute_kv_attr_1180 = Set[ 1 ]
     TOKENS_FOLLOWING_TERM_VALUE_IN_attribute_name_attr_1222 = Set[ 1 ]
     TOKENS_FOLLOWING_set_IN_attribute_value_attr_0 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__30_IN_attribute_1289 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__29_IN_attribute_1289 = Set[ 13 ]
     TOKENS_FOLLOWING_T__13_IN_attribute_1291 = Set[ 4 ]
     TOKENS_FOLLOWING_attributes_attr_IN_attribute_1293 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__31_IN_location_1361 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__30_IN_location_1361 = Set[ 13 ]
     TOKENS_FOLLOWING_T__13_IN_location_1363 = Set[ 7 ]
     TOKENS_FOLLOWING_location_values_IN_location_1365 = Set[ 1 ]
-    TOKENS_FOLLOWING_URL_IN_location_values_1444 = Set[ 1, 29 ]
-    TOKENS_FOLLOWING_T__29_IN_location_values_1479 = Set[ 7 ]
-    TOKENS_FOLLOWING_URL_IN_location_values_1485 = Set[ 1, 29 ]
+    TOKENS_FOLLOWING_URL_IN_location_values_1444 = Set[ 1, 31 ]
+    TOKENS_FOLLOWING_T__31_IN_location_values_1479 = Set[ 7 ]
+    TOKENS_FOLLOWING_URL_IN_location_values_1485 = Set[ 1, 31 ]
 
   end # class Parser < ANTLR3::Parser
 
