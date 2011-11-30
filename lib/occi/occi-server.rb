@@ -302,6 +302,7 @@ begin
         # If kind is not link and no actions specified, then create resource
         $log.info("Creating resource...")
         resource = occi_request.kind.entity_type.new(occi_request.attributes, occi_request.mixins)
+        $log.debug("Resource attributes #{resource.attributes}")
 
         occi_request.links.each do |link|
           $log.debug(link)
