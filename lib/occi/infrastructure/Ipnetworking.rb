@@ -35,7 +35,7 @@ module OCCI
         entities = []
 
         term    = "ipnetwork"
-        scheme  = "http://schemas.ogf.org/occi/infrastructure/network#"
+        scheme  = "http://schemas.ogf.org/occi/infrastructure/networkinterface#"
         title   = "IP Network Mixin"
 
         attributes = OCCI::Core::Attributes.new()
