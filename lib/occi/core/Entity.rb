@@ -75,7 +75,8 @@ module OCCI
         attribute_categories  = {}
 
         # Attribute definitions from kind + mixins
-        categories = Category::Related::get_all_related([kind]) + Category::Related::get_all_related(mixins)
+        categories = Category::Related::get_all_related([kind])
+        categories += Category::Related::get_all_related(mixins) unless mixins.empty?
 
         # Attribute definitions from all mixins
         categories.each do |category|
