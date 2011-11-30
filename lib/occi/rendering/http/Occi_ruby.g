@@ -168,7 +168,7 @@ link returns [links]:
     scope { data }
     @init { $attributes_attr::data = Hash.new }
 
-    :                    attribute_kv_attr (',' attribute_kv_attr)*
+    :                    attribute_kv_attr (';' attribute_kv_attr)*
                          { $attributes = $attributes_attr::data } ;
 
   /* e.g. com.example.drive0.interface="ide0" */
