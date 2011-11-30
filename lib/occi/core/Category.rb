@@ -32,7 +32,7 @@ module OCCI
           while !to_process.empty? do
             element = to_process.shift
             related << element unless related.include?(element)
-            to_process.concat(element.related) unless element.empty?
+            to_process.concat(element.related)
           end
           return related
         end

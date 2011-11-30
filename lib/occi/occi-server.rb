@@ -327,6 +327,7 @@ begin
           end
             
           occi_link = link_kind.entity_type.new(link_attributes,link_mixins)
+          $log.debug("Link Mixins: #{occi_link.mixins}")
 
           if URI.parse(link.target).relative?
             target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.target)
