@@ -313,7 +313,8 @@ begin
           link_attributes["occi.core.source"] = resource.get_location
 
           link_mixins = []   
-          link_data.category.split(' ').each do |link_category|
+          link_kind = nil
+          link.category.split(' ').each do |link_category|
             begin
               cat = OCCI::CategoryRegistry.get_by_id(link_category)
             rescue OCCI::CategoryNotFoundException => e
@@ -501,7 +502,8 @@ begin
           $log.debug("Extracted link data: #{link_data}")
           raise "Mandatory information missing (related | target | category)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil
 
-          link_mixins = []   
+          link_mixins = []  
+          link_kind = nil 
           link_data.category.split(' ').each do |link_category|
             begin
               cat = OCCI::CategoryRegistry.get_by_id(link_category)

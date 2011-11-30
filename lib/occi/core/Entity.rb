@@ -137,12 +137,13 @@ module OCCI
         # Must be called AFTER kind + mixins are set
         check_attributes(attributes)
 
+        # remove quotes at beginning and end of attributes
+        attributes.each { |k,v| attributes[k] = v.chomp('"').reverse.chomp('"').reverse }
+        
         @attributes = attributes
 
         kind.entities << self
-        
-        
-        
+
         $log.debug("Mixins in entity #{@mixins}")
       end
       
