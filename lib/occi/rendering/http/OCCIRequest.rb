@@ -118,7 +118,7 @@ module OCCI
         end
 
         def parse_text(body)
-          body.each do |line|
+          body.each_line do |line|
             @parsed_categories.concat(OCCI::Parser.new(line.gsub('Category: ','').chomp).category_values) if line.start_with?('Category')
             @links.concat(OCCI::Parser.new(line.gsub('Link: ','').chomp).link_values) if line.start_with?('Link')
             @attributes.merge!(OCCI::Parser.new(line.gsub('X-OCCI-Attribute: ','').chomp).attributes_attr) if line.start_with?('X-OCCI-Attribute')
