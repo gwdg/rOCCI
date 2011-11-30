@@ -34,7 +34,7 @@ module OCCI
         related = []
         entities = []
 
-        term    = "ipnetwork"
+        term    = "ipnetworkinterface"
         scheme  = "http://schemas.ogf.org/occi/infrastructure/networkinterface#"
         title   = "IP Network Mixin"
 
