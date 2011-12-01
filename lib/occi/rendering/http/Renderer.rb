@@ -229,8 +229,8 @@ module OCCI
           end
 
           case response['Content-Type']
-          when 'application-json'
-            response.write(JSON.pretty_generate({'X-OCCI-Location' => locations_values.to_json}))
+          when 'application/json'
+            response.write(JSON.pretty_generate(locations_values.collect {|location| {'X-OCCI-Location: ' => location} } ) )
           when 'text/plain'
             response.write(locations_values.collect {|location| 'X-OCCI-Location: ' + location}.join("\n"))
           when 'text/occi'

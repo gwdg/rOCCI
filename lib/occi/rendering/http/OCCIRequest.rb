@@ -79,9 +79,9 @@ module OCCI
             elsif body.kind_of?(Hash)
               if body['type'].include?('application/json')
                 # try to parse body as JSON object
-                parse_json(body)
+                parse_json(body.read)
               elsif body['type'].include?('text/plain') # text/plain
-                parse_text(body)
+                parse_text(body.read)
               end unless body['type'].nil?
             end
           end
@@ -103,7 +103,7 @@ module OCCI
         end
 
         def parse_json(body)
-          doc = JSON.parse(request.body.read)
+          doc = JSON.parse(body)
           collection = doc['collection']
           Array(doc['links']).each do |link|
             @links.concat(link)
@@ -118,15 +118,7 @@ module OCCI
         end
 
         def parse_text(body)
-          if body.respond_to?("read")
-            body_string = body.read
-            body.close
-          elsif body.kind_of?(String)
-            body_string = body
-          else
-            body_string = ""
-          end
-          body_string.each_line do |line|
+          body.each_line do |line|
             @parsed_categories.concat(OCCI::Parser.new(line.gsub('Category: ','').chomp).category_values) if line.start_with?('Category')
             @links.concat(OCCI::Parser.new(line.gsub('Link: ','').chomp).link_values) if line.start_with?('Link')
             @attributes.merge!(OCCI::Parser.new(line.gsub('X-OCCI-Attribute: ','').chomp).attributes_attr) if line.start_with?('X-OCCI-Attribute')
