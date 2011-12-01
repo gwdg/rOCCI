@@ -290,9 +290,8 @@ module OCCI
           backend_object['TEMPLATE/DISK/IMAGE_ID'].each do |image_id|
             attributes = {}
             target = nil
-            $log.debug("Image ID: #{image_id}")
+            $log.debug("Storage Backend ID: #{image_id}")
             OCCI::Infrastructure::Storage::KIND.entities.each do |storage|
-              $log.debug("Storage Backend ID: #{storage.backend[:id]}")
               target = storage if storage.backend[:id].to_i == image_id.to_i
             end
             if target == nil
@@ -321,14 +320,13 @@ module OCCI
           #create links for all network instances
           backend_object['TEMPLATE/NIC/NETWORK_ID'].each do |network_id|
             attributes = {}
-            $log.debug("Network ID: #{network_id}")
+            $log.debug("Network Backend ID: #{network_id}")
             target = nil
             OCCI::Infrastructure::Network::KIND.entities.each do |network|
-              $log.debug("Network Backend ID: #{network.backend[:id]}")
               target = network if network.backend[:id].to_i == network_id.to_i
               $log.debug(target.kind.term) if target != nil
             end
-            if target == nil
+            if target.nil?
               backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(network_id), $backend.one_client)
               backend_object.info
               target = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
