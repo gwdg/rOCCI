@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# test if curl is installed
+$ hash curl 2>&- || { echo >&2 "I require the curl binary but it's not installed.  Aborting."; exit 1; }
+
+# test if dialog is installed
+$ hash dialog 2>&- || { echo >&2 "I require the dialog binary but it's not installed.  Aborting."; exit 1; }
+
+# create ttylinux.img file if it does not exist
+touch ttylinux.img
+
 # Global configuration
 URI="http://localhost:3000"
 
