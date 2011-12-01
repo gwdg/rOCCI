@@ -24,7 +24,7 @@ require 'occi/core/Mixin'
 
 module OCCI
   module Infrastructure
-    class Ipnetworking < OCCI::Core::Mixin
+    class IPNetworkInterface < OCCI::Core::Mixin
       include Singleton
       # Define appropriate mixin
       begin
@@ -34,14 +34,14 @@ module OCCI
         related = []
         entities = []
 
-        term    = "ipnetwork"
-        scheme  = "http://schemas.ogf.org/occi/infrastructure/network#"
-        title   = "IP Network Mixin"
+        term    = "ipnetworkinterface"
+        scheme  = "http://schemas.ogf.org/occi/infrastructure/networkinterface#"
+        title   = "IP Networkinterface Mixin"
 
         attributes = OCCI::Core::Attributes.new()
-        attributes << OCCI::Core::Attribute.new(name = 'occi.network.address',    mutable = true, mandatory = false,   unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.network.gateway',    mutable = true, mandatory = false,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.network.allocation', mutable = true, mandatory = false,   unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.address',    mutable = true, mandatory = false,   unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.gateway',    mutable = true, mandatory = false,  unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.allocation', mutable = true, mandatory = false,   unique = true)
           
         MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
         
