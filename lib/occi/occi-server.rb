@@ -114,7 +114,7 @@ require 'occi/infrastructure/Network'
 require 'occi/infrastructure/Networkinterface'
 require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
-require 'occi/mixins/Reservation'
+require 'occi/extensions/Reservation'
 
 # OCCI HTTP rendering
 require 'occi/rendering/http/Renderer'

@@ -29,7 +29,7 @@ require 'occi/backend/one/Image'
 require 'occi/backend/one/Network'
 require 'occi/backend/one/VirtualMachine'
 require 'occi/backend/one/VNC'
-require 'occi/mixins/Reservation'
+require 'occi/extensions/Reservation'
 
 include OpenNebula
 
