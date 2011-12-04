@@ -65,10 +65,10 @@ end
 
 if !$config["NFS_SUPPORT"].nil? && ["true"].include?($config["NFS_SUPPORT"].downcase)
   $log.info("Enabling NFS storage support...")
-  $config["NFS_SUPPORT"] = true
+  $nfs_support = true
 else
   $log.info("Disabling NFS storage support...")
-  $config["NFS_SUPPORT"] = false 
+  $nfs_support = false 
 end
 
 ##############################################################################
