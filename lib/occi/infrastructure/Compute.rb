@@ -120,7 +120,7 @@ module OCCI
         delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_RESTART, self, :restart)
         delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_SUSPEND, self, :suspend)
 
-        super(attributes, OCCI::Infrastructure::Compute::KIND ,mixins)
+        super(attributes ,mixins, OCCI::Infrastructure::Compute::KIND)
       end
     end
   end

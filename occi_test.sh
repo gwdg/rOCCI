@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# test if curl is installed
+hash curl 2>&- || { echo >&2 "I require the curl binary but it's not installed.  Aborting."; exit 1; }
+
+# test if dialog is installed
+hash dialog 2>&- || { echo >&2 "I require the dialog binary but it's not installed.  Aborting."; exit 1; }
+
+# create ttylinux.img file if it does not exist
+touch ttylinux.img
+
 # Global configuration
 URI="http://localhost:3000"
 
@@ -168,15 +177,23 @@ function crud_compute_cdmi {
     NETWORK_LOCATION=`curl -vs -X POST --header "Content-Type: $CONTENT_TYPE" --header "Accept: $ACCEPT" --header "Category: $NET_CATEGORY" --header "X-OCCI-Attribute: $NET_ATTRIBUTE" $NET_LOCATION`
     read -p "Press any key to continue..."
     echo '################ Creating compute'
-    COM_LINK="<${NETWORK_LOCATION#*$URI}>"';rel="http://schemas.ogf.org/occi/infrastructure#network";category="http://schemas.ogf.org/occi/core#link";,'
-    COM_LINK+="<$CDMI_OBJECT_URI>"';rel="http://schemas.ogf.org/occi/core#link";category="http://schemas.ogf.org/occi/infrastructure#storagelink";'"occi.storagelink.deviceid=\"$CDMI_CONTAINER_ID\";"
+    COM_LINK="<${NETWORK_LOCATION#*$URI}>"';rel="http://schemas.ogf.org/occi/core#link";category="http://schemas.ogf.org/occi/infrastructure#networkinterface";occi.networkinterface.mac="00:11:22:33:44:55";occi.networkinterface.interface="eth0";'
+    COM_LINK+=",<$CDMI_OBJECT_URI>"';rel="http://schemas.ogf.org/occi/core#link";category="http://schemas.ogf.org/occi/infrastructure#storagelink";'"occi.storagelink.deviceid=\"$CDMI_CONTAINER_ID\";"
     COMPUTE_LOCATION=`curl -vs -X POST --header "Content-Type: $CONTENT_TYPE" --header "Accept: $ACCEPT" --header "Link: $COM_LINK" --header "Category: $COM_CATEGORY" --header "X-OCCI-Attribute: $COM_ATTRIBUTE" $COM_LOCATION`
     ;;
   'text/plain')
-    BODY="Category: $NET_CATEGORY
-X-OCCI-Attribute: $NET_ATTRIBUTE
+	  echo '################ Creating network'
+		NET_BODY="Category: $NET_CATEGORY
+X-OCCI-Attribute: $NET_ATTRIBUTE"
+		NETWORK_LOCATION=`curl -vs -X POST --form "occi=$NET_BODY" --header "Content-Type: $CONTENT_TYPE" --header "Accept: $ACCEPT" --header "Category: $NET_CATEGORY" $NET_LOCATION`
+		read -p "Press any key to continue..."
+		echo '################ Creating compute'
+		COM_LINK="<${NETWORK_LOCATION#*$URI}>"';rel="http://schemas.ogf.org/occi/core#link";category="http://schemas.ogf.org/occi/infrastructure#networkinterface";occi.networkinterface.mac="00:11:22:33:44:55";occi.networkinterface.interface="eth0";'
+		COM_LINK+=",<$CDMI_OBJECT_URI>"';rel="http://schemas.ogf.org/occi/core#link";category="http://schemas.ogf.org/occi/infrastructure#storagelink";'"occi.storagelink.deviceid=\"$CDMI_CONTAINER_ID\";"
+    COM_BODY="Category: $COM_CATEGORY
+X-OCCI-Attribute: $COM_ATTRIBUTE
 Link: $COM_LINK"
-    COMPUTE_LOCATION=`curl -vs -X POST --form "occi=$BODY" --header "Accept: $ACCEPT" --header "Category: $NET_CATEGORY" $NET_LOCATION`
+    COMPUTE_LOCATION=`curl -vs -X POST --form "occi=$COM_BODY" --header "Accept: $ACCEPT" --header "Category: $COM_CATEGORY" $COM_LOCATION`
     ;;
   esac
   if [ "$COMPUTE_LOCATION" = "" ]; then exit;fi

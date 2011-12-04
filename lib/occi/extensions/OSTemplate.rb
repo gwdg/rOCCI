@@ -44,11 +44,6 @@ module OCCI
         MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
         OCCI::CategoryRegistry.register(MIXIN)
       end
-
-      def initialize(term, scheme, title, attributes, actions, related, entities)
-        super(term, scheme, title, attributes, actions, related, entities)
-      end
-
     end
   end
 end

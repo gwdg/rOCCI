@@ -309,23 +309,38 @@ begin
       unless occi_request.kind.nil?
         # If kind is not link and no actions specified, then create resource
         $log.info("Creating resource...")
-        $log.debug(occi_request.mixins)
         resource = occi_request.kind.entity_type.new(occi_request.attributes, occi_request.mixins)
+        $log.debug("Resource attributes #{resource.attributes}")
 
         occi_request.links.each do |link|
           $log.debug(link)
 
-          attributes = {}
-          attributes = link.attributes unless link.attributes.nil?
+          link_attributes = {}
+          link_attributes = link.attributes unless link.attributes.nil?
 
-          attributes["occi.core.target"] = link.target.chomp('"').reverse.chomp('"').reverse
-          attributes["occi.core.source"] = resource.get_location
+          link_attributes["occi.core.target"] = link.target.chomp('"').reverse.chomp('"').reverse
+          link_attributes["occi.core.source"] = resource.get_location
 
-          link_kind = OCCI::CategoryRegistry.get_by_id(link.category)
-          occi_link = link_kind.entity_type.new(attributes)
+          link_mixins = []   
+          link_kind = nil
+          link.category.split(' ').each do |link_category|
+            begin
+              cat = OCCI::CategoryRegistry.get_by_id(link_category)
+            rescue OCCI::CategoryNotFoundException => e
+              $log.info("Category #{link_category} not found")
+              next
+            end
+            link_kind = cat if cat.kind_of?(OCCI::Core::Kind)
+            link_mixins << cat if cat.kind_of?(OCCI::Core::Mixin)
+            raise "No kind found for link category #{link_category}" if link_kind.nil?
+          end
+            
+          occi_link = link_kind.entity_type.new(link_attributes,link_mixins)
+          $log.debug("Link Mixins: #{occi_link.mixins}")
 
           if URI.parse(link.target).relative?
             target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.target)
+            raise "target #{link.target} not found" if target.nil?
             target.links << occi_link
           end
 
@@ -493,13 +508,25 @@ begin
         end unless occi_request.attributes.empty?
 
         # full update of links
-        # TODO: full update
+        # TODO: full update e.g. delete old links first
         occi_request.links.each do |link_data|
           $log.debug("Extracted link data: #{link_data}")
           raise "Mandatory information missing (related | target | category)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil
 
-          kind = OCCI::CategoryRegistry.get_categories_by_category_string(link_data.category, filter="kinds")[0]
-          raise "No kind for category string: #{link_data.category}" unless kind != nil
+          link_mixins = []  
+          link_kind = nil 
+          link_data.category.split(' ').each do |link_category|
+            begin
+              cat = OCCI::CategoryRegistry.get_by_id(link_category)
+            rescue OCCI::CategoryNotFoundException => e
+              $log.info("Category #{link_category} not found")
+              next
+            end
+            link_kind = cat if cat.kind_of?(OCCI::Core::Kind)
+            link_mixins << cat if cat.kind_of?(OCCI::Core::Mixin)
+          end
+            
+          raise "No kind for link category #{link_data.category} found" if link_kind.nil?
 
           target_location = link_data.target_attr
           target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
@@ -508,11 +535,11 @@ begin
 
             source_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
 
-            attributes = link_data.attributes.clone
-            attributes["occi.core.target"] = target_location.chomp('"').reverse.chomp('"').reverse
-            attributes["occi.core.source"] = source_location
+            link_attributes = link_data.attributes.clone
+            link_attributes["occi.core.target"] = target_location.chomp('"').reverse.chomp('"').reverse
+            link_attributes["occi.core.source"] = source_location
 
-            link = kind.entity_type.new(attributes)
+            link = link_kind.entity_type.new(link_attributes,link_mixins)
             OCCI::Rendering::HTTP::LocationRegistry.register_location(link.get_location(), link)
 
             target.links << link

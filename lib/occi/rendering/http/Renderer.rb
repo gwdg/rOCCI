@@ -104,6 +104,34 @@ module OCCI
           return response
         end
 
+        def self.render_category_short(categories,response)
+          category_values =[]
+          # create category string for all categories
+          Array(categories).each do |category|
+            # category identifier
+            category_string = %Q{#{category.term}; scheme="#{category.scheme}"; class="#{category.class_string}";}
+            category_values << category_string
+          end
+
+          case response['Content-Type']
+          when 'application/json'
+            # dump categories as JSON string into response body
+            collection = {'Collection' => category_values.collect! {|category| category.to_hash}}
+            response.write(JSON.pretty_generate(collection))
+          when 'text/plain'
+            category_values.each do |category|
+              response.write(HEADER_CATEGORY + ': ' + category + "\n")
+            end
+          when 'text/occi'
+            # for text/occi the body needs to contain OK
+            response[HEADER_CATEGORY] = category_values.join(',')
+            response.write('OK')
+            # when 'text/uri-list'
+          end
+
+          return response
+        end
+
         # render single location if a new resource has been created (e.g. use Location instead of X-OCCI-Location)
         def self.render_location(location, response)
 
@@ -126,7 +154,6 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         def self.render_link_reference(link,response)
 
-          
           # Link value
           location        = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(link)
           target_location = link.attributes["occi.core.target"]
@@ -138,6 +165,7 @@ module OCCI
           end
           category = link.kind.type_identifier
           attributes = link.attributes.map { |key,value| %Q{#{key}="#{value}"} unless value.empty? }.join(';').to_s
+          attributes << ";" unless attributes.empty?
 
           link_string = %Q{<#{target_location}>;rel="#{target_resource_type}";self="#{location}";category="#{category}";#{attributes}}
 
@@ -233,7 +261,7 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         def self.render_entity(entity,response)
           # render kind of entity
-          response = render_category_type(entity.kind,response)
+          response = render_category_short(entity.kind,response)
           # render mixins of entity
           entity.mixins.each do |mixin|
             response = render_category_type(mixin,response)

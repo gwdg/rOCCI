@@ -19,25 +19,24 @@ BOOT          = hd
 <% end %>
 
 <%# Links to images %>
-<% storage_ids.each do |storage_id| %>
-DISK          = [ IMAGE_ID = "<%= storage_id %>"]
+<% storages.each do |storage,link| %>
+DISK          = [ IMAGE_ID = "<%= storage.backend[:id] %>"]
 <%end%>
 
 <%# Links to external storage %>
-<% storagelinks.each do |storagelink| %>
+<% external_storages.each do |storage_URI| %>
 DISK = [
   TYPE          = "OS",
-  TARGET        = "hda",
-  SOURCE        = <%= storagelink %>
+  SOURCE        = <%= storage_URI %>
 ]
 <%end%>
    
 <%# Links to networks %>
-<% network_ids.each do |network_id| %>
+<% networks.each do |network,link| %>
 NIC           = [ 
-  <% "IP         = " + attributes["occi.networkinferface.address"] if attributes["occi.networkinferface.address"] ","%>
-  <% "MAC        = " + attributes["occi.networkinferface.mac"] if attributes["occi.networkinferface.mac"] ","%>
-  NETWORK_ID = <%= network_id %>
+  <% "IP         = " + link.attributes["occi.networkinferface.address"] + "," if link.attributes["occi.networkinferface.address"]%>
+  <% "MAC        = " + link.attributes["occi.networkinferface.mac"] + "," if link.attributes["occi.networkinferface.mac"]%>
+  NETWORK_ID = <%= network.backend[:id] %>
 ]
 <%end%>
 
@@ -47,7 +46,7 @@ HAIZEA=	[	start 		=	"<%= attributes["occi.reservation.start"] if attributes["occ
 			preemptible	= 	"<%= attributes["occi.reservation.preemptible"] if attributes["occi.reservation.preemptible"]%>" ]
 
 <%# Custom settings %>
-GRAPHICS      = [type="vnc"]
+GRAPHICS      = [ type="vnc" ]
 RANK          = FREECPU
 FEATURES      = [ acpi="yes" ]
 

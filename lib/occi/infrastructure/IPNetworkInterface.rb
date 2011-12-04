@@ -1,12 +1,12 @@
 ##############################################################################
 #  Copyright 2011 Service Computing group, TU Dortmund
-#
+#  
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
-#
+#  
 #      http://www.apache.org/licenses/LICENSE-2.0
-#
+#  
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,38 +15,38 @@
 ##############################################################################
 
 ##############################################################################
-# Description: OCCI Infrastructure Storage Link
+# Description: OCCI Infrastructure IPNetworking Mixin
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/core/Kind'
-require 'occi/core/Link'
+require 'occi/CategoryRegistry'
+require 'occi/core/Mixin'
 
 module OCCI
   module Infrastructure
-    class TemplateLink < OCCI::Core::Link
-
-      # Define appropriate kind
+    class IPNetworkInterface < OCCI::Core::Mixin
+      include Singleton
+      # Define appropriate mixin
       begin
-
+        # Define actions
         actions = []
-        related = [OCCI::Core::Link::KIND]
-        entity_type = self
+
+        related = []
         entities = []
 
-        term    = "templatelink"
-        scheme  = "http://schemas.ogf.org/occi/infrastructure#"
-        title   = "TemplateLink"
+        term    = "ipnetworkinterface"
+        scheme  = "http://schemas.ogf.org/occi/infrastructure/networkinterface#"
+        title   = "IP Networkinterface Mixin"
 
         attributes = OCCI::Core::Attributes.new()
-
-        KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.address',    mutable = true, mandatory = false,   unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.gateway',    mutable = true, mandatory = false,  unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.allocation', mutable = true, mandatory = false,   unique = true)
+          
+        MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
+        
+        OCCI::CategoryRegistry.register(MIXIN)
       end
-
-      def initialize(attributes, kind = OCCI::Core::TemplateLink::KIND, mixins = [])
-        super(attributes, kind, mixins)
-      end
-
     end
   end
 end

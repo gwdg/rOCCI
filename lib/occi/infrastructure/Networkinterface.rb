@@ -58,7 +58,7 @@ module OCCI
         @state_machine  = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE], :on_transition => self.method(:update_state))
         # Initialize resource state
         attributes['occi.networkinterface.state'] = state_machine.current_state.name
-        super(attributes, OCCI::Infrastructure::Networkinterface::KIND, mixins)
+        super(attributes, mixins, OCCI::Infrastructure::Networkinterface::KIND)
       end
 
       def update_state
