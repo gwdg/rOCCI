@@ -36,7 +36,15 @@ include OpenNebula
 module OCCI
   module Backend
     class OpenNebula
+ 
       attr_reader :one_client
+      
+      # The ACL level to be used when querying resource in OpenNebula:
+      # - INFO_ALL returns all resources and works only when running under the oneadmin account
+      # - INFO_GROUP returns the resources of the account + his group (= default)
+      # - INFO_USER returns only the resources of the account
+      INFO_ACL = OpenNebula::Pool::INFO_GROUP
+      
       def initialize
         OCCI::CategoryRegistry.register(OCCI::Backend::ONE::Image::MIXIN)
         OCCI::CategoryRegistry.register(OCCI::Backend::ONE::Network::MIXIN)
@@ -169,20 +177,20 @@ module OCCI
 
         # GET ALL COMPUTE INSTANCES
         def self.register_all_instances
-          backend_object_pool=VirtualMachinePool.new($backend.one_client)
-          backend_object_pool.info_all
+          backend_object_pool = VirtualMachinePool.new($backend.one_client, INFO_ACL)
+          backend_object_pool.info
           self.register_all_objects(backend_object_pool)
         end
 
         # GET ALL COMPUTE TEMPLATES
         def self.register_all_templates
-          backend_object_pool=TemplatePool.new($backend.one_client)
-          backend_object_pool.info_all
-          self.register_all_objects(backend_object_pool,template=true)
+          backend_object_pool = TemplatePool.new($backend.one_client, INFO_ACL)
+          backend_object_pool.info
+          self.register_all_objects(backend_object_pool, template = true)
         end
 
         # GET ALL COMPUTE OBJECTS
-        def self.register_all_objects(backend_object_pool,template=false)
+        def self.register_all_objects(backend_object_pool, template = false)
           occi_objects = []
           backend_object_pool.each do |backend_object|
             $log.debug("ONE compute object: #{backend_object}")
@@ -500,8 +508,8 @@ module OCCI
         # GET ALL VNETs
         def self.register_all_instances
           occi_objects = []
-          backend_object_pool=VirtualNetworkPool.new($backend.one_client)
-          backend_object_pool.info_all
+          backend_object_pool=VirtualNetworkPool.new($backend.one_client, INFO_ACL)
+          backend_object_pool.info
           backend_object_pool.each do |backend_object|
             occi_object = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
             if occi_object.nil?
@@ -646,8 +654,8 @@ module OCCI
         # GET ALL IMAGEs
         def self.register_all_instances
           occi_objects = []
-          backend_object_pool=ImagePool.new($backend.one_client)
-          backend_object_pool.info_all
+          backend_object_pool=ImagePool.new($backend.one_client, INFO_ACL)
+          backend_object_pool.info
           backend_object_pool.each do |backend_object|
             occi_object = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
             if occi_object.nil?
