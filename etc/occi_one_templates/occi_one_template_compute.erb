@@ -50,3 +50,14 @@ HAIZEA=	[	start 		=	"<%= attributes["occi.reservation.start"] if attributes["occ
 GRAPHICS      = [type="vnc"]
 RANK          = FREECPU
 FEATURES      = [ acpi="yes" ]
+
+<%# Contextualization settings %>
+CONTEXT = [
+
+<%# NFS support  %>
+<% if $config[NFS_SUPPORT] %>
+
+<% end %>
+
+]
+

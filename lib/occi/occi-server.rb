@@ -63,6 +63,14 @@ if $config['LOG_LEVEL'] != nil
   end
 end
 
+if !$config["NFS_SUPPORT"].nil? && ["true"].include?($config["NFS_SUPPORT"].downcase)
+  $log.info("Enabling NFS storage support...")
+  $config["NFS_SUPPORT"] = true
+else
+  $log.info("Disabling NFS storage support...")
+  $config["NFS_SUPPORT"] = false 
+end
+
 ##############################################################################
 # initialize backend, currently only Dummy and OpenNebula are supported
 
