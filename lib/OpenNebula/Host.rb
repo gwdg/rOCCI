@@ -14,7 +14,7 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
-require 'opennebula/Pool'
+require 'OpenNebula/Pool'
 
 module OpenNebula
     class Host < PoolElement

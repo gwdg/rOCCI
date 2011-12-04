@@ -14,16 +14,16 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
-require 'opennebula/Pool'
+require 'OpenNebula/Pool'
 
 module OpenNebula
-    class HostPool < Pool
+    class ImagePool < Pool
         #######################################################################
         # Constants and Class attribute accessors
         #######################################################################
-
-        HOST_POOL_METHODS = {
-            :info => "hostpool.info"
+        
+        IMAGE_POOL_METHODS = {
+            :info => "imagepool.info"
         }
 
         #######################################################################
@@ -31,22 +31,42 @@ module OpenNebula
         #######################################################################
         
         # +client+ a Client object that represents a XML-RPC connection
-        def initialize(client)
-            super('HOST_POOL','HOST',client)
+        # +user_id+ is to refer to a Pool with Images from that user
+        def initialize(client, user_id=-1)
+            super('IMAGE_POOL','IMAGE',client)
+
+            @user_id  = user_id
         end
 
-        # Factory Method for the Host Pool
+        # Default Factory Method for the Pools
         def factory(element_xml)
-            OpenNebula::Host.new(element_xml,@client)
+            OpenNebula::Image.new(element_xml,@client)
         end
 
         #######################################################################
-        # XML-RPC Methods for the Host Pool 
+        # XML-RPC Methods for the Image Object
         #######################################################################
 
-        # Retrieves all the Hosts in the pool.
-        def info()
-            super(HOST_POOL_METHODS[:info])
+        # Retrieves all or part of the VirtualMachines in the pool.
+        def info(*args)
+            case args.size
+                when 0
+                    info_filter(IMAGE_POOL_METHODS[:info],@user_id,-1,-1)
+                when 3
+                    info_filter(IMAGE_POOL_METHODS[:info],args[0],args[1],args[2])
+            end
+        end
+
+        def info_all()
+            return super(IMAGE_POOL_METHODS[:info])
+        end
+
+        def info_mine()
+            return super(IMAGE_POOL_METHODS[:info])
+        end
+
+        def info_group()
+            return super(IMAGE_POOL_METHODS[:info])
         end
     end
 end

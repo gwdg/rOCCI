@@ -14,39 +14,39 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
-require 'opennebula/Pool'
+require 'OpenNebula/Pool'
 
 module OpenNebula
-    class GroupPool < Pool
-        # ---------------------------------------------------------------------
+    class HostPool < Pool
+        #######################################################################
         # Constants and Class attribute accessors
-        # ---------------------------------------------------------------------
+        #######################################################################
 
-        GROUP_POOL_METHODS = {
-            :info => "grouppool.info"
+        HOST_POOL_METHODS = {
+            :info => "hostpool.info"
         }
 
-        # ---------------------------------------------------------------------
+        #######################################################################
         # Class constructor & Pool Methods
-        # ---------------------------------------------------------------------
-
+        #######################################################################
+        
         # +client+ a Client object that represents a XML-RPC connection
         def initialize(client)
-            super('GROUP_POOL','GROUP',client)
+            super('HOST_POOL','HOST',client)
         end
 
-        # Factory method to create User objects
+        # Factory Method for the Host Pool
         def factory(element_xml)
-            OpenNebula::Group.new(element_xml,@client)
+            OpenNebula::Host.new(element_xml,@client)
         end
 
-        # ---------------------------------------------------------------------
-        # XML-RPC Methods for the User Object
-        # ---------------------------------------------------------------------
+        #######################################################################
+        # XML-RPC Methods for the Host Pool 
+        #######################################################################
 
-        # Retrieves all the Groups in the pool.
+        # Retrieves all the Hosts in the pool.
         def info()
-            super(GROUP_POOL_METHODS[:info])
+            super(HOST_POOL_METHODS[:info])
         end
     end
 end
