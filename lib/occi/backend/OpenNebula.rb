@@ -54,7 +54,8 @@ module OCCI
 
       def register_existing_resources
         # get all compute objects
-        OCCI::Backend::OpenNebula::Compute.register_all_instances
+        OCCI::Backend::OpenNebula::ResourceTemplate.register
+        OCCI::Backend::OpenNebula::OSTemplate.register
         OCCI::Backend::OpenNebula::Compute.register_all_templates
         OCCI::Backend::OpenNebula::Network.register_all_instances
         OCCI::Backend::OpenNebula::Storage.register_all_instances
@@ -68,6 +69,37 @@ module OCCI
       end
 
       ########################################################################
+      # RESOURCE TEMPLATE
+
+      module ResourceTemplate
+        def self.register
+          backend_object_pool=TemplatePool.new($backend.one_client)
+          backend_object_pool.info_all
+          backend_object_pool.each do |backend_object|
+            actions = []
+            related = [ OCCI::Infrastructure::ResourceTemplate.MIXIN ]
+            entities = []
+            term    = backend_object['NAME'].downcase.chomp.gsub(/\W/,'_')
+            scheme  = "http://schemas.ogf.org/occi/infrastructure#"
+            title   = backend_object['NAME']
+            attributes = OCCI::Core::Attributes.new()
+            mixin = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
+            mixin.backend[:id] = backend_object.id
+            OCCI::CategoryRegistry.register(mixin)
+          end
+        end
+      end
+
+      ########################################################################
+      # OS TEMPLATE
+
+      module OSTemplate
+        def self.register
+          # TODO: implement
+        end
+      end
+
+      ########################################################################
       # COMPUTE class
 
       module Compute
@@ -77,48 +109,60 @@ module OCCI
           # initialize backend object as VM or VM template
           # TODO: figure out templates
           # backend_object=Template.new(Template.build_xml, $backend.one_client)
-          backend_object=VirtualMachine.new(VirtualMachine.build_xml, $backend.one_client)
+          template_mixin = @mixins.select { |m| m.related == OCCI::Infrastructure::ResourceTemplate.MIXIN }
 
-          storages = []
-          networks = []
-          external_storages = []
+          if template_mixin.nil?
 
-          if @links != nil
-            @links.each do
-              |link|
-              $log.debug(link.kind)
-              target_URI = link.attributes['occi.core.target'] if URI.parse(link.attributes['occi.core.target']).absolute?
-              target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.attributes['occi.core.target'])
-              case link.kind.term
-              when 'storagelink'
-                # TODO: incorporate mountpoint here (e.g. occi.storagelink.mountpoint )
-                if not target.nil?
-                  storages << [target, link]
-                elsif not target_URI.nil?
-                  external_storages << target_URI
+            backend_object = VirtualMachine.new(VirtualMachine.build_xml, $backend.one_client)
+
+            storages = []
+            networks = []
+            external_storages = []
+
+            if @links != nil
+              @links.each do
+                |link|
+                $log.debug(link.kind)
+                target_URI = link.attributes['occi.core.target'] if URI.parse(link.attributes['occi.core.target']).absolute?
+                target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.attributes['occi.core.target'])
+                case link.kind.term
+                when 'storagelink'
+                  # TODO: incorporate mountpoint here (e.g. occi.storagelink.mountpoint )
+                  if not target.nil?
+                    storages << [target, link]
+                  elsif not target_URI.nil?
+                    external_storages << target_URI
+                  end
+                when 'networkinterface'
+                  if not target.nil?
+                    networks << [target, link]
+                  end
+                when 'link'
+                  case target.kind.term
+                  when 'storage'
+                    storages << [target, link]
+                  when 'network'
+                    networks << [target, link]
+                  end unless target.nil?
                 end
-              when 'networkinterface'
-                if not target.nil?
-                  networks << [target, link]
-                end
-              when 'link'
-                case target.kind.term
-                when 'storage'
-                  storages << [target, link]
-                when 'network'
-                  networks << [target, link]
-                end unless target.nil?
               end
             end
+
+            @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
+            compute_template = ERB.new(File.read(@templateRaw)).result(binding)
+            $log.debug("Parsed template #{compute_template}")
+            rc = backend_object.allocate(compute_template)
+            $backend.check_rc(rc)
+            $log.debug("Return code from OpenNebula #{rc}") if rc != nil
+            @backend[:id] = backend_object.id
+          else
+            backend_template = Template.new(Template.build_xml(template_mixin.backend[:id]), $backend.one_client)
+            res = backend_template.instantiate
+            $backend.check_rc(res)
+            @backend[:id] = backend_id
+            refresh
           end
 
-          @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
-          compute_template = ERB.new(File.read(@templateRaw)).result(binding)
-          $log.debug("Parsed template #{compute_template}")
-          rc = backend_object.allocate(compute_template)
-          $backend.check_rc(rc)
-          $log.debug("Return code from OpenNebula #{rc}") if rc != nil
-          @backend[:id] = backend_object.id
           $log.debug("OpenNebula ID of virtual machine: #{@backend[:id]}")
           $log.debug("OpenNebula automatically triggers action start for Virtual Machines")
           $log.debug("Changing state to started")
@@ -330,7 +374,7 @@ module OCCI
               backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(network_id), $backend.one_client)
               backend_object.info
               target = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
-            end            
+            end
             source = occi_object
             attributes["occi.core.target"] = target.get_location
             attributes["occi.core.source"] = source.get_location

@@ -26,7 +26,6 @@ require 'occi/core/Mixin'
 module OCCI
   module Infrastructure
     class OSTemplate < OCCI::Core::Mixin
-
       # Define appropriate mixin
       begin
         # Define actions

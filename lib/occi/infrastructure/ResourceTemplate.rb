@@ -26,6 +26,12 @@ require 'occi/core/Mixin'
 module OCCI
   module Infrastructure
     class ResourceTemplate < OCCI::Core::Mixin
+      case $config["backend"]
+      when 'opennebula'
+        include OCCI::Backend::OpenNebula::ResourceTemplate
+      when 'dummy'
+        include OCCI::Backend::Dummy::ResourceTemplate
+      end if $config
 
       # Define appropriate mixin
       begin

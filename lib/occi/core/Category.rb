@@ -42,8 +42,10 @@ module OCCI
       attr_reader   :term
       attr_reader   :title
       attr_reader   :attributes
+      attr_reader   :backend
 
       def initialize(term, scheme, title, attributes)
+        @backend = {}
         @term   = term
         @scheme = scheme
         @title  = title
