@@ -24,23 +24,23 @@ require 'digest/sha1'
 require 'rexml/document'
 require 'pp'
 
-require 'opennebula/XMLUtils'
-require 'opennebula/VirtualMachine'
-require 'opennebula/VirtualMachinePool'
-require 'opennebula/VirtualNetwork'
-require 'opennebula/VirtualNetworkPool'
-require 'opennebula/Image'
-require 'opennebula/ImagePool'
-require 'opennebula/User'
-require 'opennebula/UserPool'
-require 'opennebula/Host'
-require 'opennebula/HostPool'
-require 'opennebula/Template'
-require 'opennebula/TemplatePool'
-require 'opennebula/Group'
-require 'opennebula/GroupPool'
-require 'opennebula/Acl'
-require 'opennebula/AclPool'
+require 'OpenNebula/XMLUtils'
+require 'OpenNebula/VirtualMachine'
+require 'OpenNebula/VirtualMachinePool'
+require 'OpenNebula/VirtualNetwork'
+require 'OpenNebula/VirtualNetworkPool'
+require 'OpenNebula/Image'
+require 'OpenNebula/ImagePool'
+require 'OpenNebula/User'
+require 'OpenNebula/UserPool'
+require 'OpenNebula/Host'
+require 'OpenNebula/HostPool'
+require 'OpenNebula/Template'
+require 'OpenNebula/TemplatePool'
+require 'OpenNebula/Group'
+require 'OpenNebula/GroupPool'
+require 'OpenNebula/Acl'
+require 'OpenNebula/AclPool'
 
 module OpenNebula
 
@@ -85,7 +85,7 @@ module OpenNebula
             XMLPARSER=false
         end
 
-        def initialize(secret=nil, endpoint=nil)
+        def initialize(secret=nil, endpoint=nil, hash=true)
             if secret
                 one_secret = secret
             elsif ENV["ONE_AUTH"] and !ENV["ONE_AUTH"].empty? and File.file?(ENV["ONE_AUTH"])
@@ -96,19 +96,19 @@ module OpenNebula
                 raise "ONE_AUTH file not present"
             end
 
-            if !one_secret.match(".+:.+")
-                raise "Authorization file malformed"
-            end
+            tokens = one_secret.chomp.split(':')
 
-
-            one_secret=~/^(.+?):(.+)$/
-            user=$1
-            password=$2
-
-            if password.match(/^plain:/)
-                @one_auth = "#{user}:#{password.split(':').last}"
+            if tokens.length > 2
+                @one_auth = one_secret
+            elsif tokens.length == 2
+                if hash
+                    pass = Digest::SHA1.hexdigest(tokens[1])
+                else
+                    pass = tokens[1]
+                end
+                @one_auth = "#{tokens[0]}:#{pass}"
             else
-                @one_auth = "#{user}:#{Digest::SHA1.hexdigest(password)}"
+                raise "Authorization file malformed"
             end
 
             if endpoint

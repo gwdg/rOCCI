@@ -21,7 +21,7 @@
 
 require 'rubygems'
 require 'uuidtools'
-require 'opennebula/OpenNebula'
+require 'OpenNebula/OpenNebula'
 require 'occi/CategoryRegistry'
 require 'occi/rendering/http/LocationRegistry'
 require 'occi/ActionDelegator'
@@ -29,14 +29,22 @@ require 'occi/backend/one/Image'
 require 'occi/backend/one/Network'
 require 'occi/backend/one/VirtualMachine'
 require 'occi/backend/one/VNC'
-require 'occi/mixins/Reservation'
+require 'occi/extensions/Reservation'
 
 include OpenNebula
 
 module OCCI
   module Backend
     class OpenNebula
+ 
       attr_reader :one_client
+      
+      # The ACL level to be used when querying resource in OpenNebula:
+      # - INFO_ALL returns all resources and works only when running under the oneadmin account
+      # - INFO_GROUP returns the resources of the account + his group (= default)
+      # - INFO_USER returns only the resources of the account
+      INFO_ACL = OpenNebula::Pool::INFO_GROUP
+      
       def initialize
         OCCI::CategoryRegistry.register(OCCI::Backend::ONE::Image::MIXIN)
         OCCI::CategoryRegistry.register(OCCI::Backend::ONE::Network::MIXIN)
@@ -66,6 +74,11 @@ module OCCI
           raise OCCI::BackendError, "Error message from OpenNebula: #{rc.to_str}"
           # TODO: return failed!
         end
+      end
+
+      # Generate a new occi id for resources created directly in OpenNebula using a seed id and a resource type identifer
+      def self.generate_occi_id(type_identifier, seed_id)
+        return UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE, "#{type_identifier}:#{seed_id}").to_s
       end
 
       ########################################################################
@@ -213,20 +226,20 @@ module OCCI
 
         # GET ALL COMPUTE INSTANCES
         def self.register_all_instances
-          backend_object_pool=VirtualMachinePool.new($backend.one_client)
-          backend_object_pool.info_all
+          backend_object_pool = VirtualMachinePool.new($backend.one_client, INFO_ACL)
+          backend_object_pool.info
           self.register_all_objects(backend_object_pool)
         end
 
         # GET ALL COMPUTE TEMPLATES
         def self.register_all_templates
-          backend_object_pool=TemplatePool.new($backend.one_client)
-          backend_object_pool.info_all
-          self.register_all_objects(backend_object_pool,template=true)
+          backend_object_pool = TemplatePool.new($backend.one_client, INFO_ACL)
+          backend_object_pool.info
+          self.register_all_objects(backend_object_pool, template = true)
         end
 
         # GET ALL COMPUTE OBJECTS
-        def self.register_all_objects(backend_object_pool,template=false)
+        def self.register_all_objects(backend_object_pool, template = false)
           occi_objects = []
           backend_object_pool.each do |backend_object|
             $log.debug("ONE compute object: #{backend_object}")
@@ -246,7 +259,7 @@ module OCCI
         def self.parse_backend_object(backend_object)
           if backend_object['TEMPLATE/OCCI_ID'].nil?
             raise "no backend ID found" if backend_object.id.nil?
-            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,backend_object.id.to_s).to_s
+            occi_id = OCCI::Backend::OpenNebula::generate_occi_id(OCCI::Infrastructure::Compute::KIND, backend_object.id.to_s)
           else
             occi_id = backend_object['TEMPLATE/OCCI_ID']
           end
@@ -347,7 +360,7 @@ module OCCI
             attributes["occi.core.target"] = target.get_location
             attributes["occi.core.source"] = source.get_location
             # check if link already exists
-            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,image_id.to_s).to_s
+            occi_id = OCCI::Backend::OpenNebula::generate_occi_id(OCCI::Infrastructure::StorageLink::KIND, image_id.to_s)
             storagelink_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(OCCI::Infrastructure::StorageLink::KIND)
             link = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(storagelink_location + occi_id)
             if link.nil?
@@ -379,7 +392,7 @@ module OCCI
             attributes["occi.core.target"] = target.get_location
             attributes["occi.core.source"] = source.get_location
             # check if link already exists
-            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,network_id.to_s).to_s
+            occi_id = OCCI::Backend::OpenNebula::generate_occi_id(OCCI::Infrastructure::Networkinterface::KIND, network_id.to_s)
             networkinterface_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(OCCI::Infrastructure::Networkinterface::KIND)
             link = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(networkinterface_location + occi_id)
             if link.nil?
@@ -501,7 +514,7 @@ module OCCI
         def self.parse_backend_object(backend_object)
           if backend_object['TEMPLATE/OCCI_ID'].nil?
             raise "no backend ID found" if backend_object.id.nil?
-            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,backend_object.id.to_s).to_s
+            occi_id = OCCI::Backend::OpenNebula::generate_occi_id(OCCI::Infrastructure::Network::KIND, backend_object.id.to_s)
           else
             occi_id = backend_object['TEMPLATE/OCCI_ID']
           end
@@ -520,13 +533,13 @@ module OCCI
             mixins << OCCI::Backend::ONE::Network::MIXIN
             # attributes['opennebula.network.leases'] = backend_object['TEMPLATE/LEASES']
             mixins << OCCI::Infrastructure::Ipnetworking::MIXIN
-            attributes['occi.networkinterface.allocation'] = 'static'
+            attributes['occi.network.allocation'] = 'static'
           end
           if backend_object['TEMPLATE/TYPE'].downcase == 'ranged'
             require 'occi/infrastructure/Ipnetworking'
             mixins << OCCI::Infrastructure::Ipnetworking::MIXIN
-            attributes['occi.networkinterface.allocation'] = 'dynamic'
-            attributes['occi.networkinterface.address'] = backend_object['TEMPLATE/NETWORK_ADDRESS'] + '/' + (32-(Math.log(backend_object['TEMPLATE/NETWORK_SIZE'].to_i)/Math.log(2)).ceil).to_s
+            attributes['occi.network.allocation'] = 'dynamic'
+            attributes['occi.network.address'] = backend_object['TEMPLATE/NETWORK_ADDRESS'] + '/' + (32-(Math.log(backend_object['TEMPLATE/NETWORK_SIZE'].to_i)/Math.log(2)).ceil).to_s
           end
 
           # check if object already exists
@@ -544,8 +557,8 @@ module OCCI
         # GET ALL VNETs
         def self.register_all_instances
           occi_objects = []
-          backend_object_pool=VirtualNetworkPool.new($backend.one_client)
-          backend_object_pool.info_all
+          backend_object_pool=VirtualNetworkPool.new($backend.one_client, INFO_ACL)
+          backend_object_pool.info
           backend_object_pool.each do |backend_object|
             occi_object = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
             if occi_object.nil?
@@ -648,7 +661,7 @@ module OCCI
         def self.parse_backend_object(backend_object)
           if backend_object['TEMPLATE/OCCI_ID'].nil?
             raise "no backend ID found" if backend_object.id.nil?
-            occi_id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE,backend_object.id.to_s).to_s
+            occi_id = OCCI::Backend::OpenNebula::generate_occi_id(OCCI::Infrastructure::Storage::KIND, backend_object.id.to_s)
           else
             occi_id = backend_object['TEMPLATE/OCCI_ID']
           end
@@ -658,14 +671,16 @@ module OCCI
           backend_object.info
           attributes = {}
           # parse all parameters from OpenNebula to OCCI
-          attributes['occi.core.id'] = occi_id
-          attributes['occi.core.title'] = backend_object['NAME']
+          attributes['occi.core.id']      = occi_id
+          attributes['occi.core.title']   = backend_object['NAME']
           attributes['occi.core.summary'] = backend_object['TEMPLATE/DESCRIPTION']
-          attributes['opennebula.image.type'] = backend_object['TEMPLATE/TYPE']
-          attributes['opennebula.image.public'] = backend_object['TEMPLATE/PUBLIC']
+
+          attributes['opennebula.image.type']       = backend_object['TEMPLATE/TYPE']
+          attributes['opennebula.image.public']     = backend_object['TEMPLATE/PUBLIC']
           attributes['opennebula.image.persistent'] = backend_object['TEMPLATE/PERSISTENT']
           attributes['opennebula.image.dev_prefix'] = backend_object['TEMPLATE/DEV_PREFIX']
-          attributes['opennebula.image.bus'] = backend_object['TEMPLATE/BUS']
+          attributes['opennebula.image.bus']        = backend_object['TEMPLATE/BUS']
+
           if backend_object['TEMPLATE/SIZE'] != nil
             attributes['occi.storage.size'] = backend_object['TEMPLATE/SIZE']
           end
@@ -690,8 +705,8 @@ module OCCI
         # GET ALL IMAGEs
         def self.register_all_instances
           occi_objects = []
-          backend_object_pool=ImagePool.new($backend.one_client)
-          backend_object_pool.info_all
+          backend_object_pool=ImagePool.new($backend.one_client, INFO_ACL)
+          backend_object_pool.info
           backend_object_pool.each do |backend_object|
             occi_object = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
             if occi_object.nil?

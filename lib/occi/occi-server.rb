@@ -63,6 +63,14 @@ if $config['LOG_LEVEL'] != nil
   end
 end
 
+if !$config["NFS_SUPPORT"].nil? && ["true"].include?($config["NFS_SUPPORT"].downcase)
+  $log.info("Enabling NFS storage support...")
+  $nfs_support = true
+else
+  $log.info("Disabling NFS storage support...")
+  $nfs_support = false 
+end
+
 ##############################################################################
 # initialize backend, currently only Dummy and OpenNebula are supported
 
@@ -106,7 +114,7 @@ require 'occi/infrastructure/Network'
 require 'occi/infrastructure/Networkinterface'
 require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
-require 'occi/mixins/Reservation'
+require 'occi/extensions/Reservation'
 
 # OCCI HTTP rendering
 require 'occi/rendering/http/Renderer'

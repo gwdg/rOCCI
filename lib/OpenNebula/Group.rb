@@ -14,7 +14,7 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
-require 'opennebula/Pool'
+require 'OpenNebula/Pool'
 
 module OpenNebula
     class Group < PoolElement
@@ -26,6 +26,16 @@ module OpenNebula
             :allocate   => "group.allocate",
             :delete     => "group.delete"
         }
+
+        # Flag for requesting connected user's group info
+        SELF = -1
+
+        #Default location for group ACL's
+        if ENV['ONE_LOCATION']
+            GROUP_DEFAULT = ENV['ONE_LOCATION'] + "/etc/group.default"
+        else
+            GROUP_DEFAULT = "/etc/one/group.default"
+        end
 
         # Creates a Group description with just its identifier
         # this method should be used to create plain Group objects.
@@ -51,6 +61,43 @@ module OpenNebula
             super(xml,client)
 
             @client = client
+        end
+        
+        # --------------------------------------------------------------------
+        # Group utils
+        # --------------------------------------------------------------------
+
+        # Creates ACLs for the group. The ACL rules are described in a file
+        def create_acls(filename = GROUP_DEFAULT)
+            if !File.readable?(filename)
+                return -1, "Can not read deafult ACL file for group"
+            end
+
+            msg = String.new
+            
+            File.open(filename).each_line{ |l|
+                next if l.match(/^#/)
+
+                rule  = "@#{@pe_id} #{l}"
+                parse = OpenNebula::Acl.parse_rule(rule)
+
+                if OpenNebula.is_error?(parse)
+                    return -1, "Error parsing rule #{rule}: #{parse.message}"
+                end
+
+                xml = OpenNebula::Acl.build_xml
+                acl = OpenNebula::Acl.new(xml, @client)
+
+                rc = acl.allocate(*parse)
+
+                if OpenNebula.is_error?(rc)
+                    return -1, "Error creating rule #{rule}: #{rc.message}"
+                else
+                    msg << "ACL_ID: #{acl.id}\n"
+                end
+            }
+
+            return 0, msg
         end
 
         # ---------------------------------------------------------------------
@@ -80,7 +127,11 @@ module OpenNebula
 
         # Returns whether or not the user with id 'uid' is part of this group
         def contains(uid)
-            return self["USERS/ID[.=#{uid}]"] != nil
+            # This doesn't work in ruby 1.8.5
+#            return self["USERS/ID[.=#{uid}]"] != nil
+
+            id_array = retrieve_elements('USERS/ID')
+            return id_array != nil && id_array.include?(uid.to_s)
         end
 
         # Returns an array with the numeric user ids

@@ -14,39 +14,39 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
-require 'opennebula/Pool'
+require 'OpenNebula/Pool'
 
 module OpenNebula
-    class UserPool < Pool
-        # ---------------------------------------------------------------------
-        # Constants and Class attribute accessors
-        # ---------------------------------------------------------------------
+    class AclPool < Pool
 
-        USER_POOL_METHODS = {
-            :info => "userpool.info"
+        #######################################################################
+        # Constants and Class Methods
+        #######################################################################
+        ACL_POOL_METHODS = {
+            :info       => "acl.info",
+            :addrule    => "acl.addrule",
+            :delrule    => "acl.delrule"
         }
 
-        # ---------------------------------------------------------------------
-        # Class constructor & Pool Methods
-        # ---------------------------------------------------------------------
-        
-        # +client+ a Client object that represents a XML-RPC connection
+        #######################################################################
+        # Class constructor
+        #######################################################################
         def initialize(client)
-            super('USER_POOL','USER',client)
+            super('ACL_POOL','ACL',client)
         end
 
-        # Factory method to create User objects
         def factory(element_xml)
-            OpenNebula::User.new(element_xml,@client)
+            OpenNebula::Acl.new(element_xml, @client)
         end
 
-        # ---------------------------------------------------------------------
-        # XML-RPC Methods for the User Object
-        # ---------------------------------------------------------------------
+        #######################################################################
+        # XML-RPC Methods
+        #######################################################################
 
-        # Retrieves all the Users in the pool.
+        # Retrieves the ACL Pool
         def info()
-            super(USER_POOL_METHODS[:info])
+        # Retrieves all the Acls in the pool.
+            super(ACL_POOL_METHODS[:info])
         end
     end
 end
