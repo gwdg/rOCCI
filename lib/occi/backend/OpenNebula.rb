@@ -124,7 +124,7 @@ module OCCI
           # backend_object=Template.new(Template.build_xml, $backend.one_client)
           template_mixin = @mixins.select { |m| m.related == OCCI::Infrastructure::ResourceTemplate.MIXIN }
 
-          if template_mixin.nil?
+          if template_mixin.empty?
 
             backend_object = VirtualMachine.new(VirtualMachine.build_xml, $backend.one_client)
 
