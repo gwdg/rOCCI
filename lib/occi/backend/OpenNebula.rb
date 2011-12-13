@@ -90,7 +90,7 @@ module OCCI
           backend_object_pool.info_group
           backend_object_pool.each do |backend_object|
             actions = []
-            related = [ OCCI::Infrastructure::ResourceTemplate.MIXIN ]
+            related = [ OCCI::Infrastructure::ResourceTemplate::MIXIN ]
             entities = []
             term    = backend_object['NAME'].downcase.chomp.gsub(/\W/,'_')
             scheme  = "http://schemas.ogf.org/occi/infrastructure#"
@@ -122,7 +122,7 @@ module OCCI
           # initialize backend object as VM or VM template
           # TODO: figure out templates
           # backend_object=Template.new(Template.build_xml, $backend.one_client)
-          template_mixin = @mixins.select { |m| m.related == OCCI::Infrastructure::ResourceTemplate.MIXIN }
+          template_mixin = @mixins.select { |m| m.related == OCCI::Infrastructure::ResourceTemplate::MIXIN }
 
           if template_mixin.empty?
 
