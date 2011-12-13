@@ -172,7 +172,7 @@ module OCCI
           source_uri = URI.parse(link.attributes["occi.core.source"].chomp('"').reverse.chomp('"').reverse)
           source = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(source_uri.path)
           $log.debug("Source #{source}")
-          source.links.delete(link)
+          source.links.delete(link) unless source.nil?
         end if links != nil
         kind.entities.delete(self)
       end

@@ -318,8 +318,8 @@ module OCCI
 
               # CREATE PROXY FOR VNC SERVER
               begin
-                novnc_cmd = "#{$config[:novnc_path]}/utils/launch.sh"
-                pipe = IO.popen("#{novnc_cmd} --listen #{proxy_port} --vnc #{vnc_host}:#{vnc_port}")
+                novnc_cmd = "#{$config[:novnc_path]}/utils/websockify"
+                pipe = IO.popen("#{novnc_cmd} --web #{$config[:novnc_path]} #{proxy_port} #{vnc_host}:#{vnc_port}")
 
                 if pipe
                   vnc_url = $config[:server].chomp('/') + ':' + vnc_port + '/vnc_auto.html?host=' + vnc_proxy_host + '&port=' + vnc_port
