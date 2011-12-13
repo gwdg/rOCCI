@@ -28,58 +28,9 @@ require 'occi/ActionDelegator'
 module OCCI
   module Infrastructure
     class NFSStorage < OCCI::Infrastructure::Storage
-      
-#      case $config["backend"]
-#      when 'opennebula'
-#        require 'occi/backend/OpenNebula'
-#        include OCCI::Backend::OpenNebula::Storage
-#      when 'dummy'
-#        require 'occi/backend/Dummy'
-#        include OCCI::Backend::Dummy::Storage
-#      end if $config
 
       # Define associated kind
       begin
-        # Define client initiated actions
-#        backup_attributes   = OCCI::Core::Attributes.new()
-#        offline_attributes  = OCCI::Core::Attributes.new()
-#        online_attributes   = OCCI::Core::Attributes.new()
-#        resize_attributes   = OCCI::Core::Attributes.new()
-#        resize_attributes << OCCI::Core::Attribute.new(name = 'size', mutable = false, mandatory = false, unique = true)
-#        snapshot_attributes = OCCI::Core::Attributes.new()
-
-#        ACTION_BACKUP   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "backup",    title = "Storage Action Backup",    attributes = backup_attributes)
-#       ACTION_OFFLINE  = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "offline",   title = "Storage Action Offline",   attributes = offline_attributes)
-#        ACTION_ONLINE   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "online",    title = "Storage Action Online",    attributes = online_attributes)
-#        ACTION_RESIZE   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "resize",    title = "Storage Action Resize",    attributes = resize_attributes)
-#        ACTION_SNAPSHOT = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/occi/infrastructure/storage/action#", term = "snapshot",  title = "Storage Action Snapshot",  attributes = snapshot_attributes)
-
-#        actions = [ACTION_BACKUP, ACTION_OFFLINE, ACTION_ONLINE, ACTION_RESIZE, ACTION_SNAPSHOT]
-
-#        OCCI::CategoryRegistry.register(ACTION_BACKUP.category)
-#        OCCI::CategoryRegistry.register(ACTION_OFFLINE.category)
-#        OCCI::CategoryRegistry.register(ACTION_ONLINE.category)
-#        OCCI::CategoryRegistry.register(ACTION_RESIZE.category)
-#        OCCI::CategoryRegistry.register(ACTION_SNAPSHOT.category)
-
-        # Define backend initiated actions
-
-#        ACTION_BACKEND_COMPLETE = "complete"
-#        ACTION_BACKEND_DEGRADED = "degraded"
-
-        # Define state-machine
-#        STATE_OFFLINE   = OCCI::StateMachine::State.new("offline")
-#        STATE_ONLINE    = OCCI::StateMachine::State.new("online")
-##        STATE_BACKUP    = OCCI::StateMachine::State.new("backup")
-#        STATE_SNAPSHOT  = OCCI::StateMachine::State.new("snapshot")
-#        STATE_RESIZE    = OCCI::StateMachine::State.new("resize")
-
-#        STATE_OFFLINE.add_transition(ACTION_ONLINE,             STATE_ONLINE)
-
-#        STATE_ONLINE.add_transition(ACTION_OFFLINE,             STATE_OFFLINE)
-#        STATE_ONLINE.add_transition(ACTION_BACKUP,              STATE_BACKUP)
-#        STATE_ONLINE.add_transition(ACTION_SNAPSHOT,            STATE_SNAPSHOT)
-#        STATE_ONLINE.add_transition(ACTION_RESIZE,              STATE_RESIZE)
 
         related     = [OCCI::Infrastructure::Storage::KIND]
         entity_type = self

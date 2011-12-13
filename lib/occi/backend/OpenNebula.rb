@@ -57,7 +57,7 @@ module OCCI
         $log.debug("Initializing connection with OpenNebula")
 
         # TODO: check for error!
-        @one_client = Client.new($config['one_user'] + ':' + $config['one_password'],$config['one_xmlrpc'])
+        @one_client = Client.new($config['one_user'] + ':' + $config['one_password'], $config['one_xmlrpc'])
       end
 
       def register_existing_resources
@@ -123,8 +123,6 @@ module OCCI
           # TODO: figure out templates
           # backend_object=Template.new(Template.build_xml, $backend.one_client)
           template_mixin = @mixins.select { |m| m.related == OCCI::Infrastructure::ResourceTemplate.MIXIN }
-
-	  $log.debug("*** template mixin: #{template_mixin}")
 
           if template_mixin.empty?
 
@@ -210,7 +208,7 @@ module OCCI
           $log.debug("current VM state is: #{backend_object.lcm_state_str}")
           state = case backend_object.lcm_state_str
           	when "RUNNING" then OCCI::Infrastructure::Compute::STATE_ACTIVE
-                when "PROLOG" , "BOOT" , "SAVE_STOP" , "SAVE_SUSPEND" , "SAVE_MIGRATE" , "MIGRATE" , "PROLOG_MIGRATE" , "PROLOG_RESUME" then OCCI::Infrastructure::Compute::STATE_INACTIVE
+            when "PROLOG" , "BOOT" , "SAVE_STOP" , "SAVE_SUSPEND" , "SAVE_MIGRATE" , "MIGRATE" , "PROLOG_MIGRATE" , "PROLOG_RESUME" then OCCI::Infrastructure::Compute::STATE_INACTIVE
           	when "SUSPENDED" then OCCI::Infrastructure::Compute::STATE_SUSPENDED
           	else OCCI::Infrastructure::Compute::STATE_INACTIVE
           end
