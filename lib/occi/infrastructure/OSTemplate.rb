@@ -32,7 +32,7 @@ module OCCI
         # Define actions
         actions = []
 
-        related = [ OCCI::Core::Template.MIXIN ]
+        related = []
         entities = []
 
         term    = "os_tpl"
