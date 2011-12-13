@@ -114,6 +114,8 @@ require 'occi/infrastructure/Network'
 require 'occi/infrastructure/Networkinterface'
 require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
+require 'occi/infrastructure/OSTemplate'
+require 'occi/infrastructure/ResourceTemplate'
 require 'occi/extensions/Reservation'
 
 # OCCI HTTP rendering
@@ -196,6 +198,7 @@ begin
       # Render locations ending with "/", which are not exact matches
       if location.end_with?("/")
         $log.info("Listing all resource instances below location: #{location}")
+        #TODO: fix get_resources_below_location !
         resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(location, occi_request.categories)
 
         # When no resources found, return Not Found
