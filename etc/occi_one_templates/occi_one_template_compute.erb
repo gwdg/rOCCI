@@ -1,7 +1,7 @@
 <%# Mandatory settings %>
 OCCI_ID       = <%= attributes["occi.core.id"]%>
-NAME          = <%= attributes["occi.core.title"]%>
-DESCRIPTION   = <%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>
+NAME          = "<%= attributes["occi.core.title"]%>"
+DESCRIPTION   = "<%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>"
 MEMORY        = <%= attributes["occi.compute.memory"].to_i * 1024 if attributes["occi.compute.memory"]%>
 <% if attributes["occi.compute.architecture"] == "x64" %>
 ARCHITECTURE  = x86_64
@@ -50,13 +50,16 @@ GRAPHICS      = [ type="vnc" ]
 RANK          = FREECPU
 FEATURES      = [ acpi="yes" ]
 
+
+
 <%# Contextualization settings %>
-CONTEXT = [
 
 <%# NFS support  %>
+
 <% if $nfs_suppport %>
 
-<% end %>
+CONTEXT = [
 
 ]
+<% end %>
 
