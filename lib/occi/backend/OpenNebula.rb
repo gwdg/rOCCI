@@ -87,7 +87,7 @@ module OCCI
       module ResourceTemplate
         def self.register
           backend_object_pool=TemplatePool.new($backend.one_client)
-          backend_object_pool.info_all
+          backend_object_pool.info_group
           backend_object_pool.each do |backend_object|
             actions = []
             related = [ OCCI::Infrastructure::ResourceTemplate.MIXIN ]
@@ -227,14 +227,14 @@ module OCCI
         # GET ALL COMPUTE INSTANCES
         def self.register_all_instances
           backend_object_pool = VirtualMachinePool.new($backend.one_client, INFO_ACL)
-          backend_object_pool.info
+          backend_object_pool.info_group
           self.register_all_objects(backend_object_pool)
         end
 
         # GET ALL COMPUTE TEMPLATES
         def self.register_all_templates
           backend_object_pool = TemplatePool.new($backend.one_client, INFO_ACL)
-          backend_object_pool.info
+          backend_object_pool.info_group
           self.register_all_objects(backend_object_pool, template = true)
         end
 
@@ -558,7 +558,7 @@ module OCCI
         def self.register_all_instances
           occi_objects = []
           backend_object_pool=VirtualNetworkPool.new($backend.one_client, INFO_ACL)
-          backend_object_pool.info
+          backend_object_pool.info_group
           backend_object_pool.each do |backend_object|
             occi_object = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
             if occi_object.nil?
@@ -706,7 +706,7 @@ module OCCI
         def self.register_all_instances
           occi_objects = []
           backend_object_pool=ImagePool.new($backend.one_client, INFO_ACL)
-          backend_object_pool.info
+          backend_object_pool.info_group
           backend_object_pool.each do |backend_object|
             occi_object = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
             if occi_object.nil?
