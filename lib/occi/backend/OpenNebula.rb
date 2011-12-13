@@ -124,7 +124,9 @@ module OCCI
           # backend_object=Template.new(Template.build_xml, $backend.one_client)
           template_mixin = @mixins.select { |m| m.related == OCCI::Infrastructure::ResourceTemplate.MIXIN }
 
-          if template_mixin.nil?
+	  $log.debug("*** template mixin: #{template_mixin}")
+
+          if template_mixin.empty?
 
             backend_object = VirtualMachine.new(VirtualMachine.build_xml, $backend.one_client)
 
@@ -207,9 +209,10 @@ module OCCI
           backend_object.info
           $log.debug("current VM state is: #{backend_object.lcm_state_str}")
           state = case backend_object.lcm_state_str
-          when "PROLOG" , "BOOT" , "RUNNING" , "SAVE_STOP" , "SAVE_SUSPEND" , "SAVE_MIGRATE" , "MIGRATE" , "PROLOG_MIGRATE" , "PROLOG_RESUME" then OCCI::Infrastructure::Compute::STATE_ACTIVE
-          when "SUSPENDED" then OCCI::Infrastructure::Compute::STATE_SUSPENDED
-          else OCCI::Infrastructure::Compute::STATE_INACTIVE
+          	when "RUNNING" then OCCI::Infrastructure::Compute::STATE_ACTIVE
+                when "PROLOG" , "BOOT" , "SAVE_STOP" , "SAVE_SUSPEND" , "SAVE_MIGRATE" , "MIGRATE" , "PROLOG_MIGRATE" , "PROLOG_RESUME" then OCCI::Infrastructure::Compute::STATE_INACTIVE
+          	when "SUSPENDED" then OCCI::Infrastructure::Compute::STATE_SUSPENDED
+          	else OCCI::Infrastructure::Compute::STATE_INACTIVE
           end
           @state_machine.set_state(state)
           @attributes['occi.compute.state'] = @state_machine.current_state.name
