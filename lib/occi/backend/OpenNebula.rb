@@ -64,7 +64,7 @@ module OCCI
         # get all compute objects
         OCCI::Backend::OpenNebula::ResourceTemplate.register
         OCCI::Backend::OpenNebula::OSTemplate.register
-        OCCI::Backend::OpenNebula::Compute.register_all_templates
+        OCCI::Backend::OpenNebula::Compute.register_all_instances
         OCCI::Backend::OpenNebula::Network.register_all_instances
         OCCI::Backend::OpenNebula::Storage.register_all_instances
       end
@@ -247,8 +247,7 @@ module OCCI
             if occi_object.nil?
               $log.debug("Error creating occi resource from backend")
             else
-              $log.debug(occi_object.methods)
-              $log.debug("Backend ID: #{occi_object.backend[:id]}")
+              $log.debug("Compute Backend ID: #{occi_object.backend[:id]}")
               $log.debug("OCCI compute object location: #{occi_object.get_location}")
               occi_objects << occi_object
             end
