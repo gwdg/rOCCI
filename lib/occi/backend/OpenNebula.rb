@@ -538,7 +538,12 @@ module OCCI
             require 'occi/infrastructure/Ipnetworking'
             mixins << OCCI::Infrastructure::Ipnetworking::MIXIN
             attributes['occi.network.allocation'] = 'dynamic'
-            attributes['occi.network.address'] = backend_object['TEMPLATE/NETWORK_ADDRESS'] + '/' + (32-(Math.log(backend_object['TEMPLATE/NETWORK_SIZE'].to_i)/Math.log(2)).ceil).to_s
+            if backend_object['TEMPLATE/NETWORK_SIZE'].to_i > 0
+              network_size = backend_object['TEMPLATE/NETWORK_SIZE'].to_i
+            else
+              network_size = 8*(backend_object['TEMPLATE/NETWORK_SIZE'].upcase.ord - 64)
+            end
+            attributes['occi.network.address'] = backend_object['TEMPLATE/NETWORK_ADDRESS'] + '/' + (32-(Math.log(network_size)/Math.log(2)).ceil).to_s
           end
 
           # check if object already exists
