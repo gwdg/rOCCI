@@ -1,6 +1,6 @@
 OCCI_ID       = <%= attributes["occi.core.id"]%>
-NAME          = <%= attributes['occi.core.title'] %>
-DESCRIPTION   = <%= attributes['occi.core.summary'] if attributes['occi.core.summary'] %>
+NAME          = "<%= attributes['occi.core.title'] %>"
+DESCRIPTION   = "<%= attributes['occi.core.summary'] if attributes['occi.core.summary'] %>"
 
 <% if attributes['opennebula.image.type'] %>
 TYPE          = <%= attributes['opennebula.image.type'].upcase %>

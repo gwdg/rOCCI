@@ -41,16 +41,14 @@ NIC           = [
 <%end%>
 
 <%# Haizea Reservation parameters %>
-HAIZEA=	[	start 		=	"<%= attributes["occi.reservation.start"] if attributes["occi.reservation.start"]%>",
-			duration 	= 	"<%= attributes["occi.reservation.duration"] if attributes["occi.reservation.duration"]%>",
+HAIZEA=	[	start 		=	"<%= attributes["occi.reservation.start"] 		if attributes["occi.reservation.start"]%>",
+			duration 	= 	"<%= attributes["occi.reservation.duration"] 	if attributes["occi.reservation.duration"]%>",
 			preemptible	= 	"<%= attributes["occi.reservation.preemptible"] if attributes["occi.reservation.preemptible"]%>" ]
 
 <%# Custom settings %>
 GRAPHICS      = [ type="vnc" ]
 RANK          = FREECPU
 FEATURES      = [ acpi="yes" ]
-
-
 
 <%# Contextualization settings %>
 
@@ -60,6 +58,15 @@ FEATURES      = [ acpi="yes" ]
 
 CONTEXT = [
 
+	<%
+		if $nfs_support
+			nfs_mounts.each do |mount|
+	%>
+	
+	<% "NFSMOUNT = " + mount %>
+		
+	<% end %>
+	<% end %>
 ]
 <% end %>
 

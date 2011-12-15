@@ -1,6 +1,6 @@
 OCCI_ID         = <%= attributes["occi.core.id"]%>
-NAME            = <%= attributes["occi.core.title"]%>
-DESCRIPTION     = <%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>
+NAME            = "<%= attributes["occi.core.title"]%>"
+DESCRIPTION     = "<%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>"
 VLAN_ID         = <%= attributes['occi.network.vlan'] if attributes['occi.network.vlan']%>
 BRIDGE          = virbr0
 # PUBLIC          = <%= attributes['opennebula.network.public'].upcase if attributes['opennebula.network.public']%>

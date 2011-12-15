@@ -64,7 +64,7 @@ module OCCI
         # get all compute objects
         OCCI::Backend::OpenNebula::ResourceTemplate.register
         OCCI::Backend::OpenNebula::OSTemplate.register
-        OCCI::Backend::OpenNebula::Compute.register_all_templates
+        OCCI::Backend::OpenNebula::Compute.register_all_instances
         OCCI::Backend::OpenNebula::Network.register_all_instances
         OCCI::Backend::OpenNebula::Storage.register_all_instances
       end
@@ -87,10 +87,10 @@ module OCCI
       module ResourceTemplate
         def self.register
           backend_object_pool=TemplatePool.new($backend.one_client)
-          backend_object_pool.info_all
+          backend_object_pool.info_group
           backend_object_pool.each do |backend_object|
             actions = []
-            related = [ OCCI::Infrastructure::ResourceTemplate.MIXIN ]
+            related = [ OCCI::Infrastructure::ResourceTemplate::MIXIN ]
             entities = []
             term    = backend_object['NAME'].downcase.chomp.gsub(/\W/,'_')
             scheme  = "http://schemas.ogf.org/occi/infrastructure#"
@@ -122,7 +122,7 @@ module OCCI
           # initialize backend object as VM or VM template
           # TODO: figure out templates
           # backend_object=Template.new(Template.build_xml, $backend.one_client)
-          template_mixin = @mixins.select { |m| m.related == OCCI::Infrastructure::ResourceTemplate.MIXIN }
+          template_mixin = @mixins.select { |m| m.related == OCCI::Infrastructure::ResourceTemplate::MIXIN }
 
           if template_mixin.empty?
 
@@ -228,14 +228,14 @@ module OCCI
         # GET ALL COMPUTE INSTANCES
         def self.register_all_instances
           backend_object_pool = VirtualMachinePool.new($backend.one_client, INFO_ACL)
-          backend_object_pool.info
+          backend_object_pool.info_group
           self.register_all_objects(backend_object_pool)
         end
 
         # GET ALL COMPUTE TEMPLATES
         def self.register_all_templates
           backend_object_pool = TemplatePool.new($backend.one_client, INFO_ACL)
-          backend_object_pool.info
+          backend_object_pool.info_group
           self.register_all_objects(backend_object_pool, template = true)
         end
 
@@ -248,8 +248,7 @@ module OCCI
             if occi_object.nil?
               $log.debug("Error creating occi resource from backend")
             else
-              $log.debug(occi_object.methods)
-              $log.debug("Backend ID: #{occi_object.backend[:id]}")
+              $log.debug("Compute Backend ID: #{occi_object.backend[:id]}")
               $log.debug("OCCI compute object location: #{occi_object.get_location}")
               occi_objects << occi_object
             end
@@ -320,8 +319,8 @@ module OCCI
 
               # CREATE PROXY FOR VNC SERVER
               begin
-                novnc_cmd = "#{$config[:novnc_path]}/utils/launch.sh"
-                pipe = IO.popen("#{novnc_cmd} --listen #{proxy_port} --vnc #{vnc_host}:#{vnc_port}")
+                novnc_cmd = "#{$config[:novnc_path]}/utils/websockify"
+                pipe = IO.popen("#{novnc_cmd} --web #{$config[:novnc_path]} #{proxy_port} #{vnc_host}:#{vnc_port}")
 
                 if pipe
                   vnc_url = $config[:server].chomp('/') + ':' + vnc_port + '/vnc_auto.html?host=' + vnc_proxy_host + '&port=' + vnc_port
@@ -559,7 +558,7 @@ module OCCI
         def self.register_all_instances
           occi_objects = []
           backend_object_pool=VirtualNetworkPool.new($backend.one_client, INFO_ACL)
-          backend_object_pool.info
+          backend_object_pool.info_group
           backend_object_pool.each do |backend_object|
             occi_object = OCCI::Backend::OpenNebula::Network.parse_backend_object(backend_object)
             if occi_object.nil?
@@ -707,7 +706,7 @@ module OCCI
         def self.register_all_instances
           occi_objects = []
           backend_object_pool=ImagePool.new($backend.one_client, INFO_ACL)
-          backend_object_pool.info
+          backend_object_pool.info_group
           backend_object_pool.each do |backend_object|
             occi_object = OCCI::Backend::OpenNebula::Storage.parse_backend_object(backend_object)
             if occi_object.nil?

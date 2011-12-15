@@ -25,19 +25,19 @@ require 'occi/core/Mixin'
 
 module OCCI
   module Infrastructure
-    class ResourceTemplate < OCCI::Core::Mixin
+    class OSTemplate < OCCI::Core::Mixin
 
       # Define appropriate mixin
       begin
         # Define actions
         actions = []
 
-        related = [ OCCI::Core::Template.MIXIN  ]
+        related = []
         entities = []
 
-        term    = "resource_tpl"
+        term    = "os_tpl"
         scheme  = "http://schemas.ogf.org/occi/infrastructure#"
-        title   = "Resource Template"
+        title   = "OS Template"
 
         attributes = OCCI::Core::Attributes.new()
           
