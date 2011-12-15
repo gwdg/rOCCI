@@ -27,12 +27,33 @@ require 'occi/ActionDelegator'
 
 module OCCI
   module Infrastructure
-    class NFSStorage < OCCI::Infrastructure::Storage
+    class NFSStorage < OCCI::Core::Resource
 
       # Define associated kind
       begin
 
-        related     = [OCCI::Infrastructure::Storage::KIND]
+        ACTION_OFFLINE  = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/gwdg/nfsstorage/action#", term = "offline",   title = "Storage Action Offline",   attributes = OCCI::Core::Attributes.new())
+        ACTION_ONLINE   = OCCI::Core::Action.new(scheme = "http://schemas.ogf.org/gwdg/nfsstorage/action#", term = "online",    title = "Storage Action Online",    attributes = OCCI::Core::Attributes.new())
+
+        actions = [ACTION_OFFLINE, ACTION_ONLINE]
+
+        OCCI::CategoryRegistry.register(ACTION_OFFLINE.category)
+        OCCI::CategoryRegistry.register(ACTION_ONLINE.category)
+
+        # Define backend initiated actions
+
+        ACTION_BACKEND_COMPLETE = "complete"
+        ACTION_BACKEND_DEGRADED = "degraded"
+
+        # Define state-machine
+        STATE_OFFLINE   = OCCI::StateMachine::State.new("offline")
+        STATE_ONLINE    = OCCI::StateMachine::State.new("online")
+
+        STATE_OFFLINE.add_transition(ACTION_ONLINE, STATE_ONLINE)
+
+        STATE_ONLINE.add_transition(ACTION_OFFLINE, STATE_OFFLINE)
+
+        related     = [OCCI::Core::Resource::KIND]
         entity_type = self
         entities    = []
 
@@ -44,8 +65,6 @@ module OCCI
         attributes << OCCI::Core::Attribute.new(name = 'occi.storage.size',   mutable = true,   mandatory = false, unique = true)
         attributes << OCCI::Core::Attribute.new(name = 'occi.storage.state',  mutable = false,  mandatory = true, unique = true)
 
-        actions = [ACTION_BACKUP, ACTION_OFFLINE, ACTION_ONLINE, ACTION_RESIZE, ACTION_SNAPSHOT]
-
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
         
         OCCI::CategoryRegistry.register(KIND)
@@ -53,7 +72,8 @@ module OCCI
       end
 
       def initialize(attributes, mixins=[])
-        @state_machine  = OCCI::StateMachine.new(STATE_OFFLINE, [STATE_OFFLINE, STATE_ONLINE, STATE_BACKUP, STATE_SNAPSHOT, STATE_RESIZE], :on_transition => self.method(:update_state))
+        @state_machine  = OCCI::StateMachine.new(STATE_OFFLINE, [STATE_OFFLINE, STATE_ONLINE], :on_transition => self.method(:update_state))
+
         # Initialize resource state
         attributes['occi.storage.state'] = state_machine.current_state.name
 
@@ -61,14 +81,24 @@ module OCCI
         delegator = OCCI::ActionDelegator.instance
 
         # register methods for storage actions
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_ONLINE,    self, :online)
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_OFFLINE,   self, :offline)
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_BACKUP,    self, :backup)
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_SNAPSHOT,  self, :snapshot)
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_RESIZE,    self, :resize)
+#        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_ONLINE,    self, :online)
+#        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_OFFLINE,   self, :offline)
 
-        super(attributes, OCCI::Infrastructure::NFSStorage::KIND, mixins)
+        super(attributes, mixins, OCCI::Infrastructure::NFSStorage::KIND)
       end
+      
+      def update_state
+        # Nothing to do
+      end
+      
+      def deploy
+        # Nothing to do
+      end
+
+      def refresh
+        # Nothing to do
+      end
+
     end
   end
 end

@@ -45,7 +45,7 @@ module OCCI
 
         attributes = OCCI::Core::Attributes.new()
           
-        attributes << OCCI::Core::Attribute.new(name = 'occi.storagelink.deviceid',   mutable = false,   mandatory = false,   unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.storagelink.deviceid',   mutable = false,  mandatory = false,   unique = true)
         attributes << OCCI::Core::Attribute.new(name = 'occi.storagelink.mountpoint', mutable = true,   mandatory = false,  unique = true)
         attributes << OCCI::Core::Attribute.new(name = 'occi.storagelink.state',      mutable = false,  mandatory = true,   unique = true)
             

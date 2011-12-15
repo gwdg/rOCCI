@@ -25,6 +25,7 @@ require 'occi/core/Attributes'
 module OCCI
   module Core
     class Category
+
       module Related
         def self.get_all_related(categories)
           related     = []

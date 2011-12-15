@@ -99,7 +99,9 @@ module OCCI
       end
 
       def initialize(attributes, mixins=[])
+
         @state_machine  = OCCI::StateMachine.new(STATE_OFFLINE, [STATE_OFFLINE, STATE_ONLINE, STATE_BACKUP, STATE_SNAPSHOT, STATE_RESIZE], :on_transition => self.method(:update_state))
+
         # Initialize resource state
         attributes['occi.storage.state'] = state_machine.current_state.name
 
@@ -107,11 +109,11 @@ module OCCI
         delegator = OCCI::ActionDelegator.instance
 
         # register methods for storage actions
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_ONLINE, self, :online)
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_OFFLINE, self, :offline)
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_BACKUP, self, :backup)
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_SNAPSHOT, self, :snapshot)
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_RESIZE, self, :resize)
+        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_ONLINE,    self, :online)
+        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_OFFLINE,   self, :offline)
+        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_BACKUP,    self, :backup)
+        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_SNAPSHOT,  self, :snapshot)
+        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_RESIZE,    self, :resize)
 
         super(attributes, mixins, OCCI::Infrastructure::Storage::KIND)
       end
