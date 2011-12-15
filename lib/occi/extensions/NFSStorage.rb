@@ -37,12 +37,14 @@ module OCCI
         entities    = []
 
         term    = "nfsstorage"
-        scheme  = "http://schemas.ogf.org/occi/gwdg#"
+        scheme  = "http://schemas.ogf.org/gwdg#"
         title   = "NFS Storage Resource"
 
         attributes = OCCI::Core::Attributes.new()
         attributes << OCCI::Core::Attribute.new(name = 'occi.storage.size',   mutable = true,   mandatory = false, unique = true)
         attributes << OCCI::Core::Attribute.new(name = 'occi.storage.state',  mutable = false,  mandatory = true, unique = true)
+
+        actions = [ACTION_BACKUP, ACTION_OFFLINE, ACTION_ONLINE, ACTION_RESIZE, ACTION_SNAPSHOT]
 
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
         

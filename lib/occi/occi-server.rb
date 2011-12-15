@@ -116,7 +116,10 @@ require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
 require 'occi/infrastructure/OSTemplate'
 require 'occi/infrastructure/ResourceTemplate'
+
+# OCCI extensions
 require 'occi/extensions/Reservation'
+require 'occi/extensions/NFSStorage'
 
 # OCCI HTTP rendering
 require 'occi/rendering/http/Renderer'
