@@ -101,6 +101,22 @@ class Array
   end
 end
 
+class Typhoeus::Request
+  
+  # Make it compatible with standard request object
+  def [](header)
+    return headers[header]
+  end
+  
+  def []=(header, value)
+    headers[header] = value
+  end
+  
+  def write(message)
+    # Just ignore...
+  end
+end
+
 $objects = []
 
 # Version
@@ -111,7 +127,7 @@ SUPPORTED_COMMANDS  = [:create, :retrieve, :delete, :call, :link, :test, :help]
 
 # Defaults for http request options 
 REQUEST_DEFAULTS  = { :method        => :get,
-                      :headers       => {:Accept => "text/occi"},
+                      :headers       => {:Accept => "text/occi", "Content-Type" => "text/occi"},
                       :timeout       => 10000,  # milliseconds
                       :cache_timeout => 0       # seconds
                     } 
@@ -179,10 +195,9 @@ def create_resource(kind, attributes)
 
   request = get_default_request(:method => :post)
 
-  headers = OCCI::Rendering::HTTP::Renderer.render_category_type(kind)
-  headers = OCCI::Rendering::HTTP::Renderer.merge_headers(headers, OCCI::Rendering::HTTP::Renderer.render_attributes(attributes))
-
-  request.headers.merge!(headers)
+  OCCI::Rendering::HTTP::Renderer.render_category_short(kind,   request)
+  $log.debug("*** content-type" + request['Content-Type'].to_s);
+  OCCI::Rendering::HTTP::Renderer.render_attributes(attributes, request)
 
   request.on_complete do |response|
     check_response(response)
@@ -221,12 +236,12 @@ def delete_resource(location)
 
   request.on_complete do |response|
     check_response(response)
-    if response.body == "OK"
+#    if response.body == "OK"
       $log.debug("Resource under location [#{location}] has been deleted!")
       $objects.delete(location)
-    else
-      $log.error("Could not delete resource under location [#{location}]!")
-    end
+#    else
+#      $log.error("Could not delete resource under location [#{location}]!")
+#    end
   end
 
   return request
@@ -237,10 +252,9 @@ def trigger_action(location, action, parameters = {})
 
   request = get_default_request(  :method   => :post,
                                   :location => "#{location}?action=#{action.category.term}")
-  headers = {}
-  headers = OCCI::Rendering::HTTP::Renderer.merge_headers(headers, OCCI::Rendering::HTTP::Renderer.render_category_type(action))
-  headers = OCCI::Rendering::HTTP::Renderer.merge_headers(headers, OCCI::Rendering::HTTP::Renderer.render_attributes(parameters))
-  request.headers.merge!(headers)
+
+  OCCI::Rendering::HTTP::Renderer.render_category_type(action,  request)
+  OCCI::Rendering::HTTP::Renderer.render_attributes(parameters, request)
 
   request.on_complete do |response|
     check_response(response)
@@ -285,6 +299,10 @@ end
 
 # ---------------------------------------------------------------------------------------------------------------------
 def test_default(options)
+#  queue = []
+#  queue << create_resource(OCCI::Infrastructure::Compute::KIND, options[:attributes])
+#  return queue
+
   test_compute_torture(options)
 end
 
