@@ -53,8 +53,8 @@ module OCCI
     module HTTP
       module Renderer
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_category_type(categories,response)
-          category_values =[]
+        def self.render_category_type(categories, response)
+          category_values = []
           # create category string for all categories
           Array(categories).each do |category|
             # category identifier
@@ -197,7 +197,9 @@ module OCCI
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_attributes(attributes,response)
+        def self.render_attributes(attributes, response)
+
+          return response if attributes == nil || attributes.empty?
 
           attributes_values = []
           attributes.each do |name, value|
