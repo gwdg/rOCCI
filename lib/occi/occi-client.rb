@@ -196,7 +196,6 @@ def create_resource(kind, attributes)
   request = get_default_request(:method => :post)
 
   OCCI::Rendering::HTTP::Renderer.render_category_short(kind,   request)
-  $log.debug("*** content-type" + request['Content-Type'].to_s);
   OCCI::Rendering::HTTP::Renderer.render_attributes(attributes, request)
 
   request.on_complete do |response|
