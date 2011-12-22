@@ -116,6 +116,7 @@ require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
 require 'occi/infrastructure/OSTemplate'
 require 'occi/infrastructure/ResourceTemplate'
+require 'occi/infrastructure/IPNetworkInterface'
 
 # OCCI extensions
 require 'occi/extensions/Reservation'
