@@ -133,14 +133,23 @@ module OCCI
             external_storages = []
 
             if @links != nil
-              @links.each do
-                |link|
-                $log.debug(link.kind)
+              @links.each do |link|
+                $log.debug(link. kind)
                 target_URI = link.attributes['occi.core.target'] if URI.parse(link.attributes['occi.core.target']).absolute?
                 target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.attributes['occi.core.target'])
                 case link.kind.term
                 when 'storagelink'
                   # TODO: incorporate mountpoint here (e.g. occi.storagelink.mountpoint )
+
+                  # Check for nfs mount points
+                  if $nfs_suppport
+                    nfs_mounts = []
+                    if target.kind = OCCI::Infrastructure::NFSStorage::KIND
+                      $log.debug("Adding nfs mount: " + link.attributes['occi.storagelink.mountpoint'])
+                      nfs_mounts << link.attributes['occi.storagelink.mountpoint']
+                    end 
+                  end
+                  
                   if not target.nil?
                     storages << [target, link]
                   elsif not target_URI.nil?
