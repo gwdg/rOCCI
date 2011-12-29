@@ -117,10 +117,32 @@ class Typhoeus::Request
   end
 end
 
-$objects = []
+# Basic resource abstraction
+class Resource
+
+  attr_accessor :location
+  attr_reader   :kind
+  attr_reader   :attributes
+  
+  def initialize(kind, attributes)
+    @kind         = kind
+    @attributes   = attributes
+  end
+end
+
+# Hash of resource_id -> resource_location
+$resources = {}
+
+$type_locations = {}
+
+#$resource_locations   = {}
+#$resource_kind        = {}
+#$resource_attributes  = {}
+
+#$objects = []
 
 # Version
-OCCI_CLIENT_VERSION = "0.1"
+OCCI_CLIENT_VERSION = "0.2"
 
 # available commands
 SUPPORTED_COMMANDS  = [:create, :retrieve, :delete, :call, :link, :test, :help]
@@ -155,10 +177,23 @@ def check_response(response)
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
+# Execute just one request through hydra
+def execute_request(request)
+  hydra = get_hydra
+  queue_requests(hydra, [request])
+  hydra.run
+end
+
+# ---------------------------------------------------------------------------------------------------------------------
 def dump_headers(response)
     response.headers_hash.each do |key, value|
       $log.info("#{key} = #{value}")
     end
+end
+
+# ---------------------------------------------------------------------------------------------------------------------
+def remove_quotes(string)
+  string.gsub!(/^["|']?(.*?)["|']?$/, '\1')
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -191,21 +226,97 @@ def get_categories
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
-def create_resource(kind, attributes)
+def self.render_link(link_kind, link_target_kind, link_target, link_attributes)
+
+  # Link value
+  location        = $resources[id]
+  target_location = link.attributes["occi.core.target"]
+  target_resource = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
+  if target_resource.nil?
+    target_resource_type = OCCI::Core::Link::KIND.type_identifier
+  else
+    target_resource_type = target_resource.kind.type_identifier
+  end
+  category = link_kind.type_identifier
+  attributes = link_attributes.map { |key,value| %Q{#{key}="#{value}"} unless value.empty? }.join(';').to_s
+  attributes << ";" unless attributes.empty?
+
+  link_string = %Q{<#{link_target}>;rel="#{target_resource_type}";self="#{location}";category="#{category}";#{attributes}}
+
+  response[HEADER_LINK] = link_string
+end
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Create resource with specified kind and attributes and save its location
+
+def create_resource(id, resource)
+
+  $resources[id] = resource;
 
   request = get_default_request(:method => :post)
 
-  OCCI::Rendering::HTTP::Renderer.render_category_short(kind,   request)
-  OCCI::Rendering::HTTP::Renderer.render_attributes(attributes, request)
+  OCCI::Rendering::HTTP::Renderer.render_category_short(  resource.kind,        request)
+  OCCI::Rendering::HTTP::Renderer.render_attributes(      resource.attributes,  request)
 
   request.on_complete do |response|
     check_response(response)
     $log.info("Resource of kind [#{kind}] created under location: #{response.headers_hash["Location"]}")
     resource_uri = URI.parse(response.headers_hash["Location"])
-    $objects << resource_uri.path
+    $resources[id].location = resource_uri.path
+#    $objects << resource_uri.path
   end
 
   return request
+end
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Create a kind -> location hash for resource types
+
+def build_type_to_location_hash()
+
+  $log.debug("Building type -> location hash...")
+  
+  request = get_default_request(:location => "/-/")
+
+  request.on_complete do |response|
+    categories = response.headers_hash["Category"].split(",")
+    categories.each do |category|
+      desc_elements = category.strip.split(";")
+      location = nil; scheme = nil
+      desc_elements.each do |element|
+        element.strip!
+        if /location=(.*)/ =~ element
+          location  = /location=(.*)/.match(element)[1]
+          remove_quotes(location)
+        end
+        if /scheme=(.*)/ =~ element
+          scheme    = /scheme=(.*)/.match(element)[1]
+          remove_quotes(scheme)
+        end
+      end
+
+      # Check if category string could be parsed correctly
+      term = desc_elements.first
+      if location.nil? or scheme.nil?
+        next
+      end
+
+      $log.debug("#{scheme}#{term} => #{location}")
+      $type_locations[scheme + term] = location;      
+    end
+  end
+
+  execute_request(request)
+end
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Find a resource of the given kind with the provided name and return an appropriate resource object
+
+def find_resource(kind, name)
+
+  $log.debug("Searching for resource of kind '#{kind}' with name '#{name}'...")
+  
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -228,16 +339,17 @@ def retrieve_resource(location)
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
-def delete_resource(location)
+def delete_resource(id)
 
   request = get_default_request(  :method   => :delete,
-                                  :location => location)
+                                  :location => $resources[id].location)
 
   request.on_complete do |response|
     check_response(response)
 #    if response.body == "OK"
       $log.debug("Resource under location [#{location}] has been deleted!")
-      $objects.delete(location)
+      $resources.delete(id)     
+#      $objects.delete(location)
 #    else
 #      $log.error("Could not delete resource under location [#{location}]!")
 #    end
@@ -278,22 +390,48 @@ end
 # ---------------------------------------------------------------------------------------------------------------------
 def test_compute_torture(options)
   queue = []
-  10.times  { queue << create_resource(OCCI::Infrastructure::Compute::KIND, options[:attributes]) }
+  10.times  { |id| queue << create_resource(id, Resource.new(OCCI::Infrastructure::Compute::KIND, options[:attributes])) }
   return queue
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
 def test_compute_torture_2(options)
   queue = []
-  100.times { queue << create_resource(OCCI::Infrastructure::Compute::KIND, options[:attributes]) }
+  100.times { |id| queue << create_resource(id, Resource.new(OCCI::Infrastructure::Compute::KIND, options[:attributes])) }
   return queue
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
 def test_compute_torture_3(options)
   queue = []
-  1000.times  { queue << create_resource(OCCI::Infrastructure::Compute::KIND, options[:attributes]) }
+  1000.times  { |id| queue << create_resource(id, Resouzrce.new(OCCI::Infrastructure::Compute::KIND, options[:attributes])) }
   return queue
+end
+
+# ---------------------------------------------------------------------------------------------------------------------
+def test_nfsstorage(options)
+  
+  queue = []
+
+  nfsstorage_attributes = {
+    'occi.storage.size' => "1024"
+  }
+  
+  nfsstorage = Resource.new(OCCI::Infrastructure::NFSStorage::KIND, nfsstorage_attributes);
+  
+  execute_request(create_resource("nfsstorage", nfsstorage))
+  
+  vm_attributes = {
+    'occi.compute.cores'          => "1",
+    'occi.compute.architecture'   => "",
+    'occi.compute.state'          => "",
+    'occi.compute.hostname'       => "NFSStorage TestVM",
+    'occi.compute.memory'         => "1024",
+    'occi.compute.speed'          => ""
+  }
+  
+  # FIXME
+  
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -308,7 +446,8 @@ end
 # ---------------------------------------------------------------------------------------------------------------------
 def clean_up
   queue = []
-  $objects.each { |location| queue << delete_resource(location)}
+#  $objects.each { |location| queue << delete_resource(location)}
+  $resources.each_key { |id| queue << delete_resource($resources[id])}
   return queue
 end
 
@@ -683,6 +822,8 @@ begin
   $log.debug("Command line: " + ARGV.to_s)
   $log.debug("General options: " + GENERAL_OPTIONS.to_s)
   $log.debug("Command [#{command}] options: " + COMMAND_OPTIONS.to_s)
+
+  build_type_to_location_hash
 
   # Delegate command processing
   send("process_#{command.downcase}_command", COMMAND_OPTIONS)
