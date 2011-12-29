@@ -76,9 +76,11 @@ module OCCI
         end
       end
 
-      # Generate a new occi id for resources created directly in OpenNebula using a seed id and a resource type identifer
-      def self.generate_occi_id(type_identifier, seed_id)
-        return UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE, "#{type_identifier}:#{seed_id}").to_s
+      # Generate a new occi id for resources created directly in OpenNebula using a seed id and the kind identifer
+      def self.generate_occi_id(kind, seed_id)
+        # Use strings as kind ids
+        kind = kind.type_identifier if kind.kind_of?(OCCI::Core::Kind)
+        return UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE, "#{kind}:#{seed_id}").to_s
       end
 
       ########################################################################
