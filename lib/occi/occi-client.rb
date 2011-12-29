@@ -35,6 +35,9 @@ require 'benchmark'
 # Server configuration
 require 'occi/Configuration'
 
+# ANTLR based parser
+require 'occi/rendering/http/OCCIParser'
+
 ##############################################################################
 # Initialize logger
 
@@ -58,6 +61,8 @@ require 'occi/infrastructure/Network'
 require 'occi/infrastructure/Networkinterface'
 require 'occi/infrastructure/StorageLink'
 require 'occi/infrastructure/Ipnetworking'
+
+require 'occi/extensions/NFSStorage'
 #require 'occi/infrastructure/Reservation'
 
 ##############################################################################
@@ -135,12 +140,6 @@ $resources = {}
 
 $type_locations = {}
 
-#$resource_locations   = {}
-#$resource_kind        = {}
-#$resource_attributes  = {}
-
-#$objects = []
-
 # Version
 OCCI_CLIENT_VERSION = "0.2"
 
@@ -211,7 +210,14 @@ def get_version
     $log.debug("Server version: " + response.headers_hash["Server"])
   end
   return request
-end 
+end
+ 
+# ---------------------------------------------------------------------------------------------------------------------
+# Return attribute hash (name -> value) from occi attributes string
+
+def parse_attributes(attributes_string)
+  OCCI::Parser.new(attributes_string).attributes_attr
+end
 
 # ---------------------------------------------------------------------------------------------------------------------
 def get_categories
@@ -246,7 +252,6 @@ def self.render_link(link_kind, link_target_kind, link_target, link_attributes)
   response[HEADER_LINK] = link_string
 end
 
-
 # ---------------------------------------------------------------------------------------------------------------------
 # Create resource with specified kind and attributes and save its location
 
@@ -271,7 +276,7 @@ def create_resource(id, resource)
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Create a kind -> location hash for resource types
+# Build a kind -> location hash for resource types
 
 def build_type_to_location_hash()
 
@@ -303,7 +308,7 @@ def build_type_to_location_hash()
       end
 
       $log.debug("#{scheme}#{term} => #{location}")
-      $type_locations[scheme + term] = location;      
+      $type_locations[scheme + term] = location;
     end
   end
 
@@ -315,8 +320,46 @@ end
 
 def find_resource(kind, name)
 
+  # Use strings as kind ids
+  kind = kind.type_identifier if kind.kind_of?(OCCI::Core::Kind)
+
   $log.debug("Searching for resource of kind '#{kind}' with name '#{name}'...")
+
+  $log.debug("***: " + $type_locations[kind].to_s)
+
+  request = get_default_request(:location => $type_locations[kind])
+
+  request.on_complete do |response|
+    locations = response.headers_hash["X-OCCI-Location"].split(",")
+    locations.each do |location|
+
+      request = get_default_request(:location => location)
+      request.on_complete do |response|
+        attributes = parse_attributes(response.headers_hash["X-OCCI-Attribute"])
+        if /#{name}/i =~ attributes["occi.core.title"]
+          $log.debug("=> found at: #{location}")
+          
+          # Derive resource KIND from category header
+          categories_hash_array = OCCI::Parser.new(response.headers_hash["Category"]).category_values
+          categories_hash_array.each do |kind_hash|
+            if kind.hash["class"] == "kind"
+              resource_kind = OCCI::CategoryRegistry.get_by_id(category.scheme + category.term)
+            end
+          end
+       
+          resource = Resource.new(resource_kind, attributes)
+          resource.location = location
+        end
+      end
+ 
+      execute_request(request)
+ 
+    end
+  end
   
+  execute_request(request)
+
+  return resource
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -824,9 +867,10 @@ begin
   $log.debug("Command [#{command}] options: " + COMMAND_OPTIONS.to_s)
 
   build_type_to_location_hash
+  find_resource(OCCI::Infrastructure::Network::KIND, "GWDG-Cloud")
 
   # Delegate command processing
-  send("process_#{command.downcase}_command", COMMAND_OPTIONS)
+#  send("process_#{command.downcase}_command", COMMAND_OPTIONS)
 
 #  trigger_action($objects[0], OCCI::Infrastructure::Compute::ACTION_START)
 #  $hydra.run
