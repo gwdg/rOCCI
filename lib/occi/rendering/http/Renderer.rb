@@ -52,6 +52,12 @@ module OCCI
   module Rendering
     module HTTP
       module Renderer
+
+        # ---------------------------------------------------------------------------------------------------------------------        
+        def self.is_numeric?(object)
+          true if Float(object) rescue false
+        end
+        
         # ---------------------------------------------------------------------------------------------------------------------
         def self.render_category_type(categories, response)
           category_values = []
@@ -203,7 +209,12 @@ module OCCI
 
           attributes_values = []
           attributes.each do |name, value|
-            attributes_values << %Q{#{name}=#{value}}
+            # Render strings with quotes, numerics without
+            if is_numeric?(value)
+              attributes_values << %Q{#{name}=#{value}}
+            else
+              attributes_values << %Q{#{name}="#{value}"}
+            end
           end
 
           case response['Content-Type']
