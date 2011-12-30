@@ -152,11 +152,11 @@ begin
 
   get '*' do
     begin
-      # render general OCCI response
-      tmp = OCCI::Rendering::HTTP::Renderer.render_response(response,request)
-      response = tmp
 
-      occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request,params)
+      # Init
+      OCCI::Rendering::HTTP::Renderer.prepare_response(response, request)
+      occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request, params)
+      data = {}
 
       location = request.path_info
       $log.debug("Requested location: #{location}")
@@ -164,8 +164,8 @@ begin
       # Query interface: return all supported kinds + mixins
       if location == "/-/" or location == "/.well-known/org/ogf/occi/-/"
         $log.info("Listing all kinds and mixins ...")
-        response = OCCI::Rendering::HTTP::Renderer.render_category_type(occi_request.categories,response)
-        response.status = HTTP_STATUS_CODE["OK"]
+        OCCI::Rendering::HTTP::Renderer.render_category_type(occi_request.categories, data)
+#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
@@ -185,9 +185,8 @@ begin
           $log.debug("Rendering location: #{loc}")
           locations << loc
         end
-        response = OCCI::Rendering::HTTP::Renderer.render_locations(locations,response)
-        response.status = HTTP_STATUS_CODE["OK"]
-        $log.debug(response)
+        OCCI::Rendering::HTTP::Renderer.render_locations(locations, data)
+#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
@@ -195,7 +194,8 @@ begin
       if object != nil and object.kind_of?(OCCI::Core::Entity)
         $log.info("Rendering entity [#{object.type_identifier}] for location [#{location}] ...")
         object.refresh if object.kind_of?(OCCI::Core::Resource)
-        response = OCCI::Rendering::HTTP::Renderer.render_entity(object,response)
+        OCCI::Rendering::HTTP::Renderer.render_entity(object, data)
+#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
@@ -210,12 +210,15 @@ begin
           response.status = HTTP_STATUS_CODE["Not Found"]
           break
         end
+
         locations = []
         resources.each do |resource|
           resource.refresh if resource.kind_of?(OCCI::Core::Resource)
           locations << OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(resource)
         end
-        response_header = OCCI::Rendering::HTTP::Renderer.render_locations(locations,response)
+       
+        OCCI::Rendering::HTTP::Renderer.render_locations(locations, data)        
+#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
@@ -225,9 +228,11 @@ begin
       nil
 
     rescue Exception => e
-
       $log.error(e)
       response.status = HTTP_STATUS_CODE["Bad Request"]
+
+    ensure
+      OCCI::Rendering::HTTP::Renderer.render_response(response, data)
 
     end
   end
@@ -238,12 +243,11 @@ begin
   # Create an instance appropriate to category field and optinally link an instance to another one
   post '*' do
     begin
-      # render general OCCI response
 
-      tmp = OCCI::Rendering::HTTP::Renderer.render_response(response,request)
-      response = tmp
-
-      occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request,params)
+      # Init
+      OCCI::Rendering::HTTP::Renderer.prepare_response(response, request)
+      occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request, params)
+      data = {}
 
       location = request.path_info
       $log.debug("Requested location: #{location}")
@@ -263,8 +267,9 @@ begin
         mixin = OCCI::Core::Mixin.new(occi_request.mixin.term, occi_request.mixin.scheme, occi_request.mixin.title, nil, [], related_mixin, [])
         raise OCCI::MixinCreationException, 'Cannot create mixin' if mixin.nil?
         OCCI::CategoryRegistry.register(mixin)
-        OCCI::Rendering::HTTP::LocationRegistry.register(URI.parse(occi_request.mixin.location.chomp('"').reverse.chomp('"').reverse).path,mixin)
-        $log.info("Mixin successfully created")
+        
+        OCCI::Rendering::HTTP::LocationRegistry.register(URI.parse(occi_request.mixin.location.chomp('"').reverse.chomp('"').reverse).path, mixin)
+#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
@@ -289,6 +294,8 @@ begin
           raise "No action found for action #{occi_request.action_category.type_identifier} and resource {#{resource.kind.type_identifier}" if action.nil?
           delegator.delegate_action(action, method, resource)
         end
+        
+#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
@@ -362,7 +369,8 @@ begin
 
         OCCI::Rendering::HTTP::LocationRegistry.register(resource.get_location, resource)
 
-        OCCI::Rendering::HTTP::Renderer.render_location(OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(resource),response)
+        OCCI::Rendering::HTTP::Renderer.render_location(OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(resource), data)
+#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
@@ -440,9 +448,11 @@ begin
       $log.error(e.message)
 
     rescue Exception => e
-
       $log.error(e)
-      response.status  = HTTP_STATUS_CODE["Bad Request"]
+      response.status = HTTP_STATUS_CODE["Bad Request"]
+
+    ensure
+      OCCI::Rendering::HTTP::Renderer.render_response(response, data)
 
     end
   end
@@ -452,11 +462,11 @@ begin
 
   put '*' do
     begin
-      # render general OCCI response
-      tmp = OCCI::Rendering::HTTP::Renderer.render_response(response,request)
-      response = tmp
-
-      occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request,params)
+      
+      # Init
+      OCCI::Rendering::HTTP::Renderer.prepare_response(response, request)
+      occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request, params)
+      data = {}
 
       location = request.path_info
       $log.debug("Requested location: #{location}")
@@ -569,14 +579,15 @@ begin
       response.status = HTTP_STATUS_CODE["Conflict"]
 
     rescue OCCI::MixinAlreadyExistsError => e
-
       $log.error(e.message)
       response.status  = HTTP_STATUS_CODE["Conflict"]
 
     rescue Exception => e
-
       $log.error(e)
       response.status = HTTP_STATUS_CODE["Bad Request"]
+
+    ensure
+      OCCI::Rendering::HTTP::Renderer.render_response(response, data)
 
     end
   end
@@ -586,10 +597,11 @@ begin
 
   delete '*' do
     begin
-      tmp = OCCI::Rendering::HTTP::Renderer.render_response(response,request)
-      response = tmp
-
-      occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request,params)
+      
+      # Init
+      OCCI::Rendering::HTTP::Renderer.prepare_response(response, request)
+      occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request, params)
+      data = {}
 
       location = request.path_info
       $log.debug("Requested location: #{location}")
@@ -653,9 +665,12 @@ begin
       response.status = HTTP_STATUS_CODE["Not Found"]
 
     rescue Exception => e
-
       $log.error(e)
       response.status = HTTP_STATUS_CODE["Bad Request"]
+      
+    ensure
+      OCCI::Rendering::HTTP::Renderer.render_response(response, data)
+      
     end
   end
 end
