@@ -26,6 +26,7 @@ module OCCI
   module Rendering
     module HTTP
       class OCCIRequest
+
         attr_reader :categories
         attr_reader :links
         attr_reader :attributes
@@ -34,7 +35,9 @@ module OCCI
         attr_reader :kind
         attr_reader :mixin
         attr_reader :mixins
+
         def initialize(request,params)
+
           parsed_categories = []
           @locations = []
           @links = []
