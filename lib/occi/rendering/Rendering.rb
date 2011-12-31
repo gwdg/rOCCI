@@ -21,6 +21,7 @@
 
 require 'occi/rendering/AbstractRenderer'
 require 'occi/rendering/http/TextRenderer'
+require 'occi/rendering/http/JSONRenderer'
 
 module OCCI
   module Rendering
@@ -63,9 +64,12 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------
       # Register available renderer
-      OCCI::Rendering::Rendering.register_renderer("text/occi",      OCCI::Rendering::HTTP::TextRenderer.new)
-      OCCI::Rendering::Rendering.register_renderer("text/plain",     OCCI::Rendering::HTTP::TextRenderer.new)
-      OCCI::Rendering::Rendering.register_renderer("text/uri-list",  OCCI::Rendering::HTTP::TextRenderer.new)
+      text_renderer = OCCI::Rendering::HTTP::TextRenderer.new
+      OCCI::Rendering::Rendering.register_renderer("text/occi",         text_renderer)
+      OCCI::Rendering::Rendering.register_renderer("text/plain",        text_renderer)
+      OCCI::Rendering::Rendering.register_renderer("text/uri-list",     text_renderer)
+
+      OCCI::Rendering::Rendering.register_renderer("application/json",  OCCI::Rendering::HTTP::JSONRenderer.new)
 
     end
 
