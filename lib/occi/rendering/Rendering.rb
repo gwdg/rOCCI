@@ -69,7 +69,9 @@ module OCCI
       OCCI::Rendering::Rendering.register_renderer("text/plain",        text_renderer)
       OCCI::Rendering::Rendering.register_renderer("text/uri-list",     text_renderer)
 
-      OCCI::Rendering::Rendering.register_renderer("application/json",  OCCI::Rendering::HTTP::JSONRenderer.new)
+      json_renderer = OCCI::Rendering::HTTP::JSONRenderer.new
+      OCCI::Rendering::Rendering.register_renderer("application/json",      json_renderer)
+      OCCI::Rendering::Rendering.register_renderer("application/occi+json", json_renderer)
 
     end
 

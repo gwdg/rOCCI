@@ -60,7 +60,10 @@ module OCCI
         content_type = request.env['CONTENT_TYPE']  if request.env['CONTENT_TYPE']
         content_type = request.env['HTTP_ACCEPT']   if request.env['HTTP_ACCEPT']
  
-          if content_type.include?('application/json')
+        if content_type.include?('application/occi+json')
+          response['Content-Type'] = 'application/occi+json'
+          
+        elsif content_type.include?('application/json')
           response['Content-Type'] = 'application/json'
           
         elsif content_type.include?('text/plain') || content_type.include?('text/*') || content_type.include?('*/*') || content_type == ""
@@ -77,7 +80,7 @@ module OCCI
           raise "Unsupported Media Type"
         end
 
-        response['Accept'] = "application/json,text/plain,text/occi"
+        response['Accept'] = "application/occi+json,application/json,text/plain,text/occi,text/uri-list"
         response['Server'] = "Ruby OCCI Framework/0.4 OCCI/1.1"
 
         $log.debug("Content type: #{response['Content-Type']}")
