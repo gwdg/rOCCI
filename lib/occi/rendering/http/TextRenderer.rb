@@ -231,11 +231,8 @@ module OCCI
 
           # Don't put any data in the response if there was an error
           return if response.status != OCCI::Rendering::HTTP::HTTP_OK
-
-          if response['Content-Type'].include?('application/json')
-            render_application_json_response(response)
-            
-          elsif response['Content-Type'].include?('text/plain')
+           
+          if response['Content-Type'].include?('text/plain')
             render_text_plain_response(response)
 
           elsif response['Content-Type'].include?('text/uri-list')
@@ -244,36 +241,6 @@ module OCCI
           elsif response['Content-Type'].include?('text/occi')
             render_text_occi_response(response)
           end
-        end
-
-        # ---------------------------------------------------------------------------------------------------------------------
-        def render_application_json_response(response)
-
-#          response[LOCATION]        = @data[LOCATION] if @data.has_key?(LOCATION)
-#          response[LINK]            = @data[LINK]     if @data.has_key?(LINK)
-
-          if @data.has_key?(LOCATION)
-            response.write(JSON.pretty_generate({'Location' => @data[LOCATION]}))  
-          end
-
-          if @data.has_key?(CATEGORY)
-            collection = {'Collection' => @data[CATEGORY].collect! {|category| category.to_hash}}
-            response.write(JSON.pretty_generate(collection))
-          end
-          
-          if @data.has_key?(LINK)
-            # TODO: implement JSON rendering
-            # response.write(JSON.pretty_generate({'Link' => location}))
-          end
-
-          if @data.has_key?(OCCI_ATTRIBUTE)
-            # TODO: implement JSON rendering
-          end
-
-          if @data.has_key?(OCCI_LOCATION)
-            response.write(JSON.pretty_generate(@data[OCCI_LOCATION].collect {|location| {'X-OCCI-Location: ' => location} } ) )
-          end
-
         end
         
         # ---------------------------------------------------------------------------------------------------------------------
