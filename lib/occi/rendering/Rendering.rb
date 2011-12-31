@@ -20,7 +20,7 @@
 ##############################################################################
 
 require 'occi/rendering/AbstractRenderer'
-require 'occi/rendering/http/Renderer'
+require 'occi/rendering/http/TextRenderer'
 
 module OCCI
   module Rendering
@@ -44,11 +44,7 @@ module OCCI
       # ---------------------------------------------------------------------------------------------------------------------
       # TODO: implement mission methods stuff redirection -> content
       def method_missing(method, *args, &block)
-        $log.debug("*** method missing: " + method.to_s)
-        $log.debug("*** methods: " + AbstractRenderer.public_instance_methods.inspect)
         if AbstractRenderer.public_instance_methods.include?(method.to_s)
-          $log.debug("*** calling rend...")
-#          $log.debug()
           @@renderers[@@request_content_type].send(method, *args, &block)
         else
           super
@@ -67,9 +63,9 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------
       # Register available renderer
-      OCCI::Rendering::Rendering.register_renderer("text/occi",      OCCI::Rendering::HTTP::Renderer.new)
-      OCCI::Rendering::Rendering.register_renderer("text/plain",     OCCI::Rendering::HTTP::Renderer.new)
-      OCCI::Rendering::Rendering.register_renderer("text/uri-list",  OCCI::Rendering::HTTP::Renderer.new)
+      OCCI::Rendering::Rendering.register_renderer("text/occi",      OCCI::Rendering::HTTP::TextRenderer.new)
+      OCCI::Rendering::Rendering.register_renderer("text/plain",     OCCI::Rendering::HTTP::TextRenderer.new)
+      OCCI::Rendering::Rendering.register_renderer("text/uri-list",  OCCI::Rendering::HTTP::TextRenderer.new)
 
     end
 

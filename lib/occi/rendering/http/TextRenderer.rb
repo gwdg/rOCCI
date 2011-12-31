@@ -31,7 +31,7 @@ module OCCI
   module Rendering
     module HTTP
 
-      class Renderer < OCCI::Rendering::AbstractRenderer
+      class TextRenderer < OCCI::Rendering::AbstractRenderer
 
         # ---------------------------------------------------------------------------------------------------------------------
         private
