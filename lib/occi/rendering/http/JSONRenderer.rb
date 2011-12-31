@@ -74,8 +74,8 @@ module OCCI
           hash['term']       = category.term
           hash['scheme']     = category.scheme
           hash['title']      = category.title
-          hash['attributes'] = attributes.to_hash unless attributes.to_hash.empty?
-          hash['location']   = location
+          hash['attributes'] = category.attributes.to_hash unless category.attributes.to_hash.empty?
+          hash['location']   = category.location
           
           return {'Category' => hash}
         end
@@ -88,7 +88,7 @@ module OCCI
           related = mixin.related.collect {|related|  related.type_identifier}
 
           hash['actions'] = actions.join(',') unless actions.empty?
-          hash['related'] = relted.join(',')  unless related.empty?
+          hash['related'] = related.join(',') unless related.empty?
 
           return category_to_hash(mixin)['Category'].merge!(hash)
         end
@@ -107,10 +107,24 @@ module OCCI
         def render_category_type(categories)
 
           categories = Array(categories)
-          collection = categories.collect do |category| 
-            category_to_hash(category)  if category.kind_of?(OCCI::Core::Category)
-            mixin_to_hash(category)     if category.kind_of?(OCCI::Core::Mixin)   
+          collection = []
+
+          categories.each do |category|
+
+            if category.kind_of?(OCCI::Core::Category) 
+              collection << category_to_hash(category)
+              next
+            end
+
+            if category.kind_of?(OCCI::Core::Mixin) or category.kind_of?(OCCI::Core::Kind)
+              collection << mixin_to_hash(category) 
+              next
+            end
+            
+            $log.error("Unregonized category type for category: " + category.inspect)
           end
+
+#          collection.reject! { |x| x == nil }
 
           @data.merge!({ "Category" => {'Collection' => collection} })
         end
