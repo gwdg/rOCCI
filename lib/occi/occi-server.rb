@@ -123,10 +123,12 @@ require 'occi/extensions/Reservation'
 require 'occi/extensions/NFSStorage'
 
 # OCCI HTTP rendering
-require 'occi/rendering/http/Renderer'
+require 'occi/rendering/Rendering'
+
 require 'occi/rendering/http/LocationRegistry'
 require 'occi/rendering/http/OCCIParser'
 require 'occi/rendering/http/OCCIRequest'
+require 'occi/rendering/http/HTTP'
 
 ##############################################################################
 # Configuration of HTTP Authentication
@@ -143,6 +145,9 @@ end
 $log.debug("Get existing resources from backend")
 $backend.register_existing_resources
 
+rendering = OCCI::Rendering::Rendering.new
+
+
 ##############################################################################
 # Sinatra methods for handling HTTP requests
 
@@ -154,9 +159,8 @@ begin
     begin
 
       # Init
-      OCCI::Rendering::HTTP::Renderer.prepare_response(response, request)
+      OCCI::Rendering::HTTP::prepare_response(response, request)
       occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request, params)
-      data = {}
 
       location = request.path_info
       $log.debug("Requested location: #{location}")
@@ -164,7 +168,7 @@ begin
       # Query interface: return all supported kinds + mixins
       if location == "/-/" or location == "/.well-known/org/ogf/occi/-/"
         $log.info("Listing all kinds and mixins ...")
-        OCCI::Rendering::HTTP::Renderer.render_category_type(occi_request.categories, data)
+        rendering.render_category_type(occi_request.categories)
 #        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
@@ -185,7 +189,7 @@ begin
           $log.debug("Rendering location: #{loc}")
           locations << loc
         end
-        OCCI::Rendering::HTTP::Renderer.render_locations(locations, data)
+        rendering.render_locations(locations)
 #        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
@@ -194,7 +198,7 @@ begin
       if object != nil and object.kind_of?(OCCI::Core::Entity)
         $log.info("Rendering entity [#{object.type_identifier}] for location [#{location}] ...")
         object.refresh if object.kind_of?(OCCI::Core::Resource)
-        OCCI::Rendering::HTTP::Renderer.render_entity(object, data)
+        rendering.render_entity(object)
 #        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
@@ -207,7 +211,7 @@ begin
 
         # When no resources found, return Not Found
         if resources.nil?
-          response.status = HTTP_STATUS_CODE["Not Found"]
+          response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
           break
         end
 
@@ -217,22 +221,22 @@ begin
           locations << OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(resource)
         end
        
-        OCCI::Rendering::HTTP::Renderer.render_locations(locations, data)        
+        rendering.render_locations(locations)        
 #        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
-      response.status = HTTP_STATUS_CODE["Not Found"]
+      response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
 
     rescue Exception => e
       $log.error(e)
-      response.status = HTTP_STATUS_CODE["Bad Request"]
+      response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
 
     ensure
-      OCCI::Rendering::HTTP::Renderer.render_response(response, data)
+      rendering.render_response(response)
 
     end
   end
@@ -245,9 +249,8 @@ begin
     begin
 
       # Init
-      OCCI::Rendering::HTTP::Renderer.prepare_response(response, request)
+      OCCI::Rendering::HTTP::prepare_response(response, request)
       occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request, params)
-      data = {}
 
       location = request.path_info
       $log.debug("Requested location: #{location}")
@@ -369,7 +372,7 @@ begin
 
         OCCI::Rendering::HTTP::LocationRegistry.register(resource.get_location, resource)
 
-        OCCI::Rendering::HTTP::Renderer.render_location(OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(resource), data)
+        OCCI::Rendering::HTTP::Renderer.render_location(OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(resource))
 #        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
@@ -435,24 +438,24 @@ begin
         break
       end
 
-      response.status  = HTTP_STATUS_CODE["Not Found"]
+      response.status  = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
 
     rescue OCCI::LocationAlreadyRegisteredException => e
       $log.error(e.message)
-      response.status = HTTP_STATUS_CODE["Conflict"]
+      response.status = OCCI::Rendering::HTTP::HTTP_CONFLICT
 
     rescue OCCI::MixinCreationException => e
       $log.error(e.message)
 
     rescue Exception => e
       $log.error(e)
-      response.status = HTTP_STATUS_CODE["Bad Request"]
+      response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
 
     ensure
-      OCCI::Rendering::HTTP::Renderer.render_response(response, data)
+      rendering.render_response(response)
 
     end
   end
@@ -464,9 +467,8 @@ begin
     begin
       
       # Init
-      OCCI::Rendering::HTTP::Renderer.prepare_response(response, request)
+      OCCI::Rendering::HTTP::prepare_response(response, request)
       occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request, params)
-      data = {}
 
       location = request.path_info
       $log.debug("Requested location: #{location}")
@@ -566,7 +568,7 @@ begin
         break
       end
 
-      response.status  = HTTP_STATUS_CODE["Not Found"]
+      response.status  = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
       # Create resource instance at the given location
       raise "Creating resources with method 'put' is currently not possible!"
 
@@ -576,18 +578,18 @@ begin
 
     rescue OCCI::LocationAlreadyRegisteredException => e
       $log.error(e.message)
-      response.status = HTTP_STATUS_CODE["Conflict"]
+      response.status = OCCI::Rendering::HTTP::HTTP_CONFLICT
 
     rescue OCCI::MixinAlreadyExistsError => e
       $log.error(e.message)
-      response.status  = HTTP_STATUS_CODE["Conflict"]
+      response.status = OCCI::Rendering::HTTP::HTTP_CONFLICT
 
     rescue Exception => e
       $log.error(e)
-      response.status = HTTP_STATUS_CODE["Bad Request"]
+      response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
 
     ensure
-      OCCI::Rendering::HTTP::Renderer.render_response(response, data)
+      rendering.render_response(response)
 
     end
   end
@@ -599,9 +601,8 @@ begin
     begin
       
       # Init
-      OCCI::Rendering::HTTP::Renderer.prepare_response(response, request)
+      OCCI::Rendering::HTTP::prepare_response(response, request)
       occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request, params)
-      data = {}
 
       location = request.path_info
       $log.debug("Requested location: #{location}")
@@ -653,23 +654,23 @@ begin
         break
       end
 
-      response.status = HTTP_STATUS_CODE["Not Found"]
+      response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
 
     rescue OCCI::CategoryMissingException => e
-      response.status = HTTP_STATUS_CODE["Bad Request"]
+      response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
 
     rescue OCCI::MixinNotFoundException => e
-      response.status = HTTP_STATUS_CODE["Not Found"]
+      response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
 
     rescue Exception => e
       $log.error(e)
-      response.status = HTTP_STATUS_CODE["Bad Request"]
+      response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
       
     ensure
-      OCCI::Rendering::HTTP::Renderer.render_response(response, data)
+      rendering.render_response(response)
       
     end
   end

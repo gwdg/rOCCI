@@ -23,30 +23,19 @@ require 'json'
 require 'occi/core/Action'
 require 'occi/core/Kind'
 require 'occi/core/Mixin'
+
 require 'occi/rendering/http/LocationRegistry'
-
-##############################################################################
-# HTTP Status Codes
-
-HTTP_STATUS_CODE = {"OK" => 200,
-  "Resource Created" =>201,
-  "Accepted" => 202,
-  "Bad Request" => 400,
-  "Unauthorized" => 401,
-  "Forbidden" =>403,
-  "Not Found" =>404,
-  "Method Not Allowed" => 405,
-  "Conflict" => 409,
-  "Gone" => 410,
-  "Unsupported Media Type" => 415,
-  "Internal Server Error" => 500,
-  "Not Implemented" => 501,
-  "Service Unavailable" => 503}
+require 'occi/rendering/AbstractRenderer'
 
 module OCCI
   module Rendering
     module HTTP
-      module Renderer
+
+      class Renderer < OCCI::Rendering::AbstractRenderer
+
+        # ---------------------------------------------------------------------------------------------------------------------
+        private
+        # ---------------------------------------------------------------------------------------------------------------------
 
         CATEGORY        = "Category"
         LINK            = "Link"
@@ -55,12 +44,36 @@ module OCCI
         OCCI_LOCATION   = "X-OCCI-Location"
 
         # ---------------------------------------------------------------------------------------------------------------------        
-        def self.is_numeric?(object)
+        def is_numeric?(object)
           true if Float(object) rescue false
         end
-        
+
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_category_type(categories, data)
+        def merge_data(data, data_to_add)
+
+          data.merge!(data_to_add) { |data, value_old, value_to_add|
+            if !value_old.kind_of? Array
+              value_old = [value_old]
+            end
+            if !value_to_add.kind_of? Array
+              value_to_add = [value_to_add]
+            end
+            value_old + value_to_add
+          }
+        end
+
+        # ---------------------------------------------------------------------------------------------------------------------        
+        public
+        # ---------------------------------------------------------------------------------------------------------------------
+
+        # ---------------------------------------------------------------------------------------------------------------------
+        def prepare_renderer()
+          # Re-initialize header array
+          @data = {}
+        end
+     
+        # ---------------------------------------------------------------------------------------------------------------------
+        def render_category_type(categories)
 
           category_values = []
 
@@ -101,11 +114,11 @@ module OCCI
             category_values << category_string
           end
  
-          merge_data(data, { CATEGORY => category_values }) 
+          merge_data(@data, { CATEGORY => category_values }) 
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_category_short(categories, data)
+        def render_category_short(categories)
           
           category_values = []
 
@@ -116,17 +129,17 @@ module OCCI
             category_values << category_string
           end
  
-          merge_data(data, { CATEGORY => category_values })
+          merge_data(@data, { CATEGORY => category_values })
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
         # render single location if a new resource has been created (e.g. use Location instead of X-OCCI-Location)
-        def self.render_location(location, data)
-          merge_data(data, { LOCATION => location })
+        def render_location(location)
+          merge_data(@data, { LOCATION => location })
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_link_reference(link, data)
+        def render_link_reference(link)
 
           # Link value
           location        = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(link)
@@ -143,11 +156,11 @@ module OCCI
 
           link_string = %Q{<#{target_location}>;rel="#{target_resource_type}";self="#{location}";category="#{category}";#{attributes}}
  
-          merge_data(data, { LINK => link_string })
+          merge_data(@data, { LINK => link_string })
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_action_reference(action, resource, data)
+        def render_action_reference(action, resource)
 
           resource_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(resource)
           action_location   = resource_location + "?action=" + action.category.term
@@ -155,11 +168,11 @@ module OCCI
 
           link_value = %Q{<#{action_location}>;rel="#{action_type}"}
 
-          merge_data(data, { LINK => link_value })
+          merge_data(@data, { LINK => link_value })
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_attributes(attributes, data)
+        def render_attributes(attributes)
 
           return if attributes == nil || attributes.empty?
 
@@ -173,213 +186,148 @@ module OCCI
             end
           end
 
-          merge_data(data, { OCCI_ATTRIBUTE => attributes_values })
+          merge_data(@data, { OCCI_ATTRIBUTE => attributes_values })
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_locations(locations, data)
+        def render_locations(locations)
 
           locations_values = []
           locations.each do |location|
             locations_values << $config["server"].chomp('/') + ':' + $config["port"] + location unless location.nil?
           end
  
-          merge_data(data, { OCCI_LOCATION => locations_values })
+          merge_data(@data, { OCCI_LOCATION => locations_values })
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.merge_data(data, data_to_add)
-
-          data.merge!(data_to_add) { |data, value_old, value_to_add|
-            if !value_old.kind_of? Array
-              value_old = [value_old]
-            end
-            if !value_to_add.kind_of? Array
-              value_to_add = [value_to_add]
-            end
-            value_old + value_to_add
-          }
-        end
-
-        # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_entity(entity, data)
+        def render_entity(entity)
 
           # render kind of entity
-          render_category_short(entity.kind, data)
+          render_category_short(entity.kind)
 
           # render mixins of entity
           entity.mixins.each do |mixin|
-            render_category_type(mixin, data)
+            render_category_type(mixin)
           end
 
           # Render attributes
-          render_attributes(entity.attributes, data)
+          render_attributes(entity.attributes)
 
           # Render link references
           entity.links.each do |link|
-            render_link_reference(link, data)
+            render_link_reference(link)
           end if entity.kind_of?(OCCI::Core::Resource)
 
           # Render action references
           # TODO: only render currently applicable actions
           entity.kind.actions.each do |action|
-            render_action_reference(action, entity, data)
+            render_action_reference(action, entity)
           end
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        # rendering general parameters
-        # responeAttributes: Hash object
-        # respone: response object of Sinatra
-        # return: text/plain and text/uri: response.body
-        # return: text/occi: response[key] head
-
-        def self.prepare_response(response, request)
-
-          $log.info("#################### Information on the client ####################")
-          $log.info("Client IP Adress: #{request.env['REMOTE_ADDR']}")
-          $log.info("Client User Agent: #{request.env['HTTP_USER_AGENT']}")
-          $log.info("###################################################################")
-
-          # determine content type from request content type or reques accept, fallback to text/plain
-          content_type = ""
-          content_type = request.env['CONTENT_TYPE']  if request.env['CONTENT_TYPE']
-          content_type = request.env['HTTP_ACCEPT']   if request.env['HTTP_ACCEPT']
- 
-          if content_type.include?('application/json')
-            response['Content-Type'] = 'application/json'
-            
-          elsif content_type.include?('text/plain') || content_type.include?('text/*') || content_type.include?('*/*') || content_type == ""
-            response['Content-Type'] = 'text/plain'
-
-          elsif content_type.include?('text/uri-list')
-            response['Content-Type'] = 'text/uri-list'
-
-          elsif content_type.include?('text/occi')
-            response['Content-Type'] = 'text/occi'
-
-          else
-            response.status = HTTP_STATUS_CODE["Unsupported Media Type"]
-            raise "Unsupported Media Type"
-          end
-
-          response['Accept'] = "application/json,text/plain,text/occi"
-          response['Server'] = "Ruby OCCI Framework/0.4 OCCI/1.1"
-
-          $log.debug("Content type: #{response['Content-Type']}")
-          $log.debug("Accept type: #{response['Accept']}")
-
-          # content type independend parameters
-          $log.debug("Server: #{response['Server']}")
-
-          # Set default status
-          response.status = HTTP_STATUS_CODE["OK"]
-
-#          return response
-        end
-
-        # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_response(response, data)
+        def render_response(response)
 
           # Don't put any data in the response if there was an error
-          return if response.status != HTTP_STATUS_CODE["OK"]
+          return if response.status != OCCI::Rendering::HTTP::HTTP_OK
 
           if response['Content-Type'].include?('application/json')
-            render_application_json_response(response, data)
+            render_application_json_response(response)
             
           elsif response['Content-Type'].include?('text/plain')
-            render_text_plain_response(response, data)
+            render_text_plain_response(response)
 
           elsif response['Content-Type'].include?('text/uri-list')
-            render_text_uri_list_response(response, data)
+            render_text_uri_list_response(response)
 
           elsif response['Content-Type'].include?('text/occi')
-            render_text_occi_response(response, data)
+            render_text_occi_response(response)
           end
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_application_json_response(response, data)
+        def render_application_json_response(response)
 
-#          response[LOCATION]        = data[LOCATION] if data.has_key?(LOCATION)
-#          response[LINK]            = data[LINK]     if data.has_key?(LINK)
+#          response[LOCATION]        = @data[LOCATION] if @data.has_key?(LOCATION)
+#          response[LINK]            = @data[LINK]     if @data.has_key?(LINK)
 
-          if data.has_key?(LOCATION)
-            response.write(JSON.pretty_generate({'Location' => data[LOCATION]}))  
+          if @data.has_key?(LOCATION)
+            response.write(JSON.pretty_generate({'Location' => @data[LOCATION]}))  
           end
 
-          if data.has_key?(CATEGORY)
-            collection = {'Collection' => data[CATEGORY].collect! {|category| category.to_hash}}
+          if @data.has_key?(CATEGORY)
+            collection = {'Collection' => @data[CATEGORY].collect! {|category| category.to_hash}}
             response.write(JSON.pretty_generate(collection))
           end
           
-          if data.has_key?(LINK)
+          if @data.has_key?(LINK)
             # TODO: implement JSON rendering
             # response.write(JSON.pretty_generate({'Link' => location}))
           end
 
-          if data.has_key?(OCCI_ATTRIBUTE)
+          if @data.has_key?(OCCI_ATTRIBUTE)
             # TODO: implement JSON rendering
           end
 
-          if data.has_key?(OCCI_LOCATION)
-            response.write(JSON.pretty_generate(data[OCCI_LOCATION].collect {|location| {'X-OCCI-Location: ' => location} } ) )
+          if @data.has_key?(OCCI_LOCATION)
+            response.write(JSON.pretty_generate(@data[OCCI_LOCATION].collect {|location| {'X-OCCI-Location: ' => location} } ) )
           end
 
         end
         
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_text_plain_response(response, data)
+        def render_text_plain_response(response)
 
-#          response[LOCATION]        = data[LOCATION] if data.has_key?(LOCATION)
-#          response[LINK]            = data[LINK]     if data.has_key?(LINK)
+#          response[LOCATION]        = @data[LOCATION] if @data.has_key?(LOCATION)
+#          response[LINK]            = @data[LINK]     if @data.has_key?(LINK)
           
-          response.write('Location : ' + data[LOCATION]) if data.has_key?(LOCATION)
+          response.write('Location : ' + @data[LOCATION]) if @data.has_key?(LOCATION)
 
-          if data.has_key?(CATEGORY)
-            data[CATEGORY].each do |category|
+          if @data.has_key?(CATEGORY)
+            @data[CATEGORY].each do |category|
               response.write(CATEGORY + ': ' + category + "\n")
             end
           end
 
-          if data.has_key?(LINK)
+          if @data.has_key?(LINK)
             response.write('Link: ' + link_string + "\n")
           end
 
-          if data.has_key?(OCCI_ATTRIBUTE)
+          if @data.has_key?(OCCI_ATTRIBUTE)
             attributes_values.each do |attribute|
               response.write('X-OCCI-Attribute: ' + attribute + "\n")
             end
           end
 
-          if data.has_key?(OCCI_LOCATION)
-            response.write(data[OCCI_LOCATION].collect {|location| 'X-OCCI-Location: ' + location}.join("\n"))
+          if @data.has_key?(OCCI_LOCATION)
+            response.write(@data[OCCI_LOCATION].collect {|location| 'X-OCCI-Location: ' + location}.join("\n"))
           end
        
         end
         
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_text_occi_response(response, data)
+        def render_text_occi_response(response)
 
-          response[LOCATION]          = data[LOCATION]                  if data.has_key?(LOCATION)
-          response[CATEGORY]   = data[CATEGORY].join(',')               if data.has_key?(CATEGORY)
-          response[LINK]              = data[LINK]                      if data.has_key?(LINK)
-          response['X-OCCI-Attribute']= data[OCCI_ATTRIBUTE].join(',')  if data.has_key?(OCCI_ATTRIBUTE)
-          response['X-OCCI-Location'] = data[OCCI_LOCATION].join(', ')  if data.has_key?(OCCI_LOCATION)
+          response[LOCATION]          = @data[LOCATION]                   if @data.has_key?(LOCATION)
+          response[CATEGORY]          = @data[CATEGORY].join(',')         if @data.has_key?(CATEGORY)
+          response[LINK]              = @data[LINK]                       if @data.has_key?(LINK)
+          response['X-OCCI-Attribute']= @data[OCCI_ATTRIBUTE].join(',')   if @data.has_key?(OCCI_ATTRIBUTE)
+          response['X-OCCI-Location'] = @data[OCCI_LOCATION].join(', ')   if @data.has_key?(OCCI_LOCATION)
  
           response.write('OK') 
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.render_text_uri_list_response(response, data)
+        def render_text_uri_list_response(response)
 
-          if data.has_key?(OCCI_LOCATION)
-            response.write(data[OCCI_LOCATION].collect {|location| location}.join("\n"))
+          if @data.has_key?(OCCI_LOCATION)
+            response.write(@data[OCCI_LOCATION].collect {|location| location}.join("\n"))
           end
-
         end
 
       end
+      
     end
   end
 end
