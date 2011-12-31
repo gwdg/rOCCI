@@ -51,7 +51,7 @@ $log = Logger.new(STDOUT)
 require 'occi/CategoryRegistry'
 
 # OCCI HTTP rendering
-require 'occi/rendering/http/Renderer'
+require 'occi/rendering/Rendering'
 require 'occi/rendering/http/LocationRegistry'
 
 # OCCI Infrastructure classes
@@ -126,16 +126,33 @@ end
 class Resource
 
   attr_accessor :location
+
   attr_reader   :kind
   attr_reader   :attributes
+  attr_reader   :links
   
-  def initialize(kind, attributes)
+  def initialize(kind, attributes, links = [])
     @kind         = kind
     @attributes   = attributes
+    @links        = links
   end
 end
 
-# Hash of resource_id -> resource_location
+class Link
+  
+  attr_reader :kind
+  attr_reader :attributes
+  attr_reader :target
+  
+  def initialize(kind, attributes, target)
+    @kind         = kind
+    @attributes   = attributes
+    @target       = target
+  end  
+end
+
+
+# resource_id -> resource hash
 $resources = {}
 
 $type_locations = {}
@@ -152,6 +169,10 @@ REQUEST_DEFAULTS  = { :method        => :get,
                       :timeout       => 10000,  # milliseconds
                       :cache_timeout => 0       # seconds
                     } 
+
+# Used for rendering of requests
+$rendering = OCCI::Rendering::Rendering.new()
+OCCI::Rendering::Rendering.prepare_renderer("text/occi")
 
 # ---------------------------------------------------------------------------------------------------------------------
 def check_response(response)
@@ -196,8 +217,15 @@ def remove_quotes(string)
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
+# Construct request object using absolute or relative paths and also allowing for parameter override
+
 def get_default_request(params = {})
-  url       = %<#{GENERAL_OPTIONS[:host]}:#{GENERAL_OPTIONS[:port]}#{params[:location] || "/"}>
+  if params.has_key?(:absolute)
+    url = params[:absolute]
+  else
+    url = %<#{GENERAL_OPTIONS[:host]}:#{GENERAL_OPTIONS[:port]}#{params[:relative] || "/"}>
+  end
+  $log.debug("*** request url: " + url.to_s)
   request   = Typhoeus::Request.new(url, REQUEST_DEFAULTS.merge(params))
   return request  
 end
@@ -221,7 +249,7 @@ end
 
 # ---------------------------------------------------------------------------------------------------------------------
 def get_categories
-  request = get_default_request(:location => "/-/")
+  request = get_default_request(:relative => "/-/")
   request.on_complete do |response|
     check_response(response)
     response.headers_hash.each do |key, value|
@@ -232,24 +260,14 @@ def get_categories
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
-def self.render_link(link_kind, link_target_kind, link_target, link_attributes)
+def self.render_resource_attached_link(link)
 
-  # Link value
-  location        = $resources[id]
-  target_location = link.attributes["occi.core.target"]
-  target_resource = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
-  if target_resource.nil?
-    target_resource_type = OCCI::Core::Link::KIND.type_identifier
-  else
-    target_resource_type = target_resource.kind.type_identifier
-  end
-  category = link_kind.type_identifier
-  attributes = link_attributes.map { |key,value| %Q{#{key}="#{value}"} unless value.empty? }.join(';').to_s
+  attributes = link.attributes.map { |key, value| %Q{#{key}="#{value}"} unless value.empty? }.join(';').to_s
   attributes << ";" unless attributes.empty?
 
-  link_string = %Q{<#{link_target}>;rel="#{target_resource_type}";self="#{location}";category="#{category}";#{attributes}}
+  link_string = %Q{<#{link.target.location}>;rel="#{link.target.kind.type_identifier}";category="#{link.kind.type_identifier}";#{attributes}}
 
-  response[HEADER_LINK] = link_string
+  return link_string
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -261,15 +279,28 @@ def create_resource(id, resource)
 
   request = get_default_request(:method => :post)
 
-  OCCI::Rendering::HTTP::Renderer.render_category_short(  resource.kind,        request)
-  OCCI::Rendering::HTTP::Renderer.render_attributes(      resource.attributes,  request)
+  $rendering.prepare_renderer();
+  $rendering.render_category_short( resource.kind)
+  $rendering.render_attributes(     resource.attributes)
+ 
+  data = $rendering.data
+  
+  request["Category"]         = data[OCCI::Rendering::HTTP::TextRenderer::CATEGORY].join(',')
+  request["X-OCCI-Attribute"] = data[OCCI::Rendering::HTTP::TextRenderer::OCCI_ATTRIBUTE].join(',')
+  
+#  $rendering.render_response(request)
+
+  # Add attached links
+  unless resource.links.empty?
+    link_header = resource.links.collect { |link| render_link(link) }
+    request["Link"] = link_header
+  end
 
   request.on_complete do |response|
     check_response(response)
     $log.info("Resource of kind [#{kind}] created under location: #{response.headers_hash["Location"]}")
     resource_uri = URI.parse(response.headers_hash["Location"])
     $resources[id].location = resource_uri.path
-#    $objects << resource_uri.path
   end
 
   return request
@@ -282,7 +313,7 @@ def build_type_to_location_hash()
 
   $log.debug("Building type -> location hash...")
   
-  request = get_default_request(:location => "/-/")
+  request = get_default_request(:relative => "/-/")
 
   request.on_complete do |response|
     categories = response.headers_hash["Category"].split(",")
@@ -325,34 +356,37 @@ def find_resource(kind, name)
 
   $log.debug("Searching for resource of kind '#{kind}' with name '#{name}'...")
 
-  $log.debug("***: " + $type_locations[kind].to_s)
-
-  request = get_default_request(:location => $type_locations[kind])
+  resource  = nil
+  request   = get_default_request(:absolute => $type_locations[kind])
 
   request.on_complete do |response|
+
     locations = response.headers_hash["X-OCCI-Location"].split(",")
     locations.each do |location|
 
-      request = get_default_request(:location => location)
-      request.on_complete do |response|
+      sub_request = get_default_request(:absolute => location)
+      sub_request.on_complete do |response|
+
         attributes = parse_attributes(response.headers_hash["X-OCCI-Attribute"])
+        
         if /#{name}/i =~ attributes["occi.core.title"]
-          $log.debug("=> found at: #{location}")
           
           # Derive resource KIND from category header
+          resource_kind = nil
           categories_hash_array = OCCI::Parser.new(response.headers_hash["Category"]).category_values
           categories_hash_array.each do |kind_hash|
-            if kind.hash["class"] == "kind"
-              resource_kind = OCCI::CategoryRegistry.get_by_id(category.scheme + category.term)
+            if kind_hash.clazz == "kind"
+              resource_kind = OCCI::CategoryRegistry.get_by_id(kind_hash.scheme + kind_hash.term)
             end
           end
        
           resource = Resource.new(resource_kind, attributes)
+          $log.debug("=> found at: " + location.to_s)
           resource.location = location
         end
       end
  
-      execute_request(request)
+      execute_request(sub_request)
  
     end
   end
@@ -365,8 +399,7 @@ end
 # ---------------------------------------------------------------------------------------------------------------------
 def retrieve_resource(location)
 
-  request = get_default_request(  :method   => :get,
-                                  :location => location)
+  request = get_default_request(:relative => location)
 
   request.on_complete do |response|
     check_response(response)
@@ -385,7 +418,7 @@ end
 def delete_resource(id)
 
   request = get_default_request(  :method   => :delete,
-                                  :location => $resources[id].location)
+                                  :relative => $resources[id].location)
 
   request.on_complete do |response|
     check_response(response)
@@ -405,7 +438,7 @@ end
 def trigger_action(location, action, parameters = {})
 
   request = get_default_request(  :method   => :post,
-                                  :location => "#{location}?action=#{action.category.term}")
+                                  :relative => "#{location}?action=#{action.category.term}")
 
   OCCI::Rendering::HTTP::Renderer.render_category_type(action,  request)
   OCCI::Rendering::HTTP::Renderer.render_attributes(parameters, request)
@@ -456,15 +489,38 @@ def test_nfsstorage(options)
   
   queue = []
 
+  # Create nfsstorage resource
+  
   nfsstorage_attributes = {
     'occi.storage.size' => "1024"
   }
   
-  nfsstorage = Resource.new(OCCI::Infrastructure::NFSStorage::KIND, nfsstorage_attributes);
-  
+  nfsstorage = Resource.new(OCCI::Infrastructure::NFSStorage::KIND, nfsstorage_attributes);  
   execute_request(create_resource("nfsstorage", nfsstorage))
   
-  vm_attributes = {
+  # Find correct network resource
+  
+  network = find_resource(OCCI::Infrastructure::Network::KIND, "GWDG-Cloud")
+  $resources["network"] = network
+  
+  # Create links
+
+  storage_link_attributes = {
+    'occi.storagelink.deviceid'     => "nfs",
+    'occi.storagelink.mountpoint'   => "134.76.9.66:/nfs_test",
+    'occi.storagelink.state'        => "active"
+  }
+  
+  storage_link = Link.new(OCCI::Infrastructure::StorageLink::KIND, storage_link_attributes)
+  
+  network_link_attributes = {
+  }
+  
+  network_link = Link.new(OCCI::Core::Link::KIND, network_link_attributes)
+  
+  # Create compute resource linking both
+  
+  compute_attributes = {
     'occi.compute.cores'          => "1",
     'occi.compute.architecture'   => "",
     'occi.compute.state'          => "",
@@ -472,9 +528,12 @@ def test_nfsstorage(options)
     'occi.compute.memory'         => "1024",
     'occi.compute.speed'          => ""
   }
-  
+
+  compute_resource = Resource.new(OCCI::Infrastructure::Compute::KIND, compute_attributes, [storage_link, network_link]);
+  execute_request(create_resource("compute", compute))
+    
   # FIXME
-  
+
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -483,7 +542,9 @@ def test_default(options)
 #  queue << create_resource(OCCI::Infrastructure::Compute::KIND, options[:attributes])
 #  return queue
 
-  test_compute_torture(options)
+#  test_compute_torture(options)
+
+  test_nfsstorage(options)
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -609,14 +670,14 @@ end
 # ---------------------------------------------------------------------------------------------------------------------
 def process_retrieve_command(options)
   hydra = get_hydra
-  queue_requests(hydra, [retrieve_resource(options[:location])])
+  queue_requests(hydra, [retrieve_resource(options[:relative])])
   hydra.run
 end
 
 # ---------------------------------------------------------------------------------------------------------------------
 def process_delete_command(options)
   hydra = get_hydra
-  queue_requests(hydra, [delete_resource(options[:location])])
+  queue_requests(hydra, [delete_resource(options[:relative])])
   hydra.run
 end
 
@@ -627,7 +688,7 @@ def process_call_command(options)
   action = OCCI::Infrastructure::Compute::ACTION_START
 
   hydra = get_hydra
-  queue_requests(hydra, [trigger_action(options[:location], action, options[:attributes])])
+  queue_requests(hydra, [trigger_action(options[:relative], action, options[:attributes])])
   hydra.run
 end
 
@@ -648,13 +709,13 @@ begin
                         
   CREATE_OPTIONS  =   { :kind             => "compute",           # Kind of resource to create
                         :attributes       => {},                  # Attributes
-                        :location         => nil                  # Location where resource should be created
+                        :relative         => nil                  # Location where resource should be created
                       }
   
-  RETRIEVE_OPTIONS =  { :location         => "/-/"                # List object(s) under the given location
+  RETRIEVE_OPTIONS =  { :relative         => "/-/"                # List object(s) under the given location
                       }
   
-  CALL_OPTIONS    =   { :location         => nil,                 # Resource on which to trigger the action
+  CALL_OPTIONS    =   { :relative         => nil,                 # Resource on which to trigger the action
                         :action           => nil,                 # Term / name of the action
                         :attributes       => {}                   # Parameters of the action
                       }
@@ -662,7 +723,7 @@ begin
   LINK_OPTIONS    =   {
                       }
   
-  DELETE_OPTIONS  =   { :location         => nil                  # Delete object(s) under the given location
+  DELETE_OPTIONS  =   { :relative         => nil                  # Delete object(s) under the given location
                       }
   
   TEST_OPTIONS    =   { :tests            => ["default"],         # Predefined tests to run
@@ -763,7 +824,7 @@ begin
     end
 
     opts.on( '-l', '--location location', 'Location where the resourse should be created' ) do |location|
-      CREATE_OPTIONS[:location] = location
+      CREATE_OPTIONS[:relative] = location
     end    
   end
 
@@ -773,7 +834,7 @@ begin
   RETRIEVE_COMMAND_PARSER = OptionParser.new do |opts|
 
     opts.on( '-l', '--location location', 'Location where the resourse should be created' ) do |location|
-      RETRIEVE_OPTIONS[:location] = location
+      RETRIEVE_OPTIONS[:relative] = location
     end    
   end
 
@@ -783,14 +844,9 @@ begin
   DELETE_COMMAND_PARSER = OptionParser.new do |opts|
 
     opts.on( '-l', '--location location', 'Location of the resourse to be deleted' ) do |location|
-      DELETE_OPTIONS[:location] = location
+      DELETE_OPTIONS[:relative] = location
     end    
   end
-
-#  CALL_OPTIONS    =   { :location         => nil,                 # Resource on which to trigger the action
-#                        :action           => nil,                 # Term / name of the action
-#                        :attributes       => {}                   # Parameters of the action
-#                      }
 
   # ---------------------------------------------------------------------------------------------------------------------
   # Parse "call" command specific options!
@@ -798,7 +854,7 @@ begin
   CALL_COMMAND_PARSER = OptionParser.new do |opts|
 
     opts.on( '-l', '--location STRING', 'Location of the resource on which the action should be called' ) do |location|
-      CALL_OPTIONS[:location] = location
+      CALL_OPTIONS[:relative] = location
     end
     
     opts.on( '-a', '--action STRING', 'OCCI Category string (scheme + term) specifying the action' ) do |action|
@@ -867,10 +923,9 @@ begin
   $log.debug("Command [#{command}] options: " + COMMAND_OPTIONS.to_s)
 
   build_type_to_location_hash
-  find_resource(OCCI::Infrastructure::Network::KIND, "GWDG-Cloud")
 
   # Delegate command processing
-#  send("process_#{command.downcase}_command", COMMAND_OPTIONS)
+  send("process_#{command.downcase}_command", COMMAND_OPTIONS)
 
 #  trigger_action($objects[0], OCCI::Infrastructure::Compute::ACTION_START)
 #  $hydra.run
