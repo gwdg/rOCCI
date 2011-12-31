@@ -169,7 +169,6 @@ begin
       if location == "/-/" or location == "/.well-known/org/ogf/occi/-/"
         $log.info("Listing all kinds and mixins ...")
         rendering.render_category_type(occi_request.categories)
-#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
@@ -190,7 +189,6 @@ begin
           locations << loc
         end
         rendering.render_locations(locations)
-#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
@@ -199,7 +197,6 @@ begin
         $log.info("Rendering entity [#{object.type_identifier}] for location [#{location}] ...")
         object.refresh if object.kind_of?(OCCI::Core::Resource)
         rendering.render_entity(object)
-#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
@@ -222,7 +219,6 @@ begin
         end
        
         rendering.render_locations(locations)        
-#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
@@ -272,7 +268,6 @@ begin
         OCCI::CategoryRegistry.register(mixin)
         
         OCCI::Rendering::HTTP::LocationRegistry.register(URI.parse(occi_request.mixin.location.chomp('"').reverse.chomp('"').reverse).path, mixin)
-#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
@@ -298,7 +293,6 @@ begin
           delegator.delegate_action(action, method, resource)
         end
         
-#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
         break
       end
 
@@ -372,8 +366,7 @@ begin
 
         OCCI::Rendering::HTTP::LocationRegistry.register(resource.get_location, resource)
 
-        OCCI::Rendering::HTTP::Renderer.render_location(OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(resource))
-#        OCCI::Rendering::HTTP::Renderer.render_response(response, data)
+        rendering.render_location(OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(resource))
         break
       end
 
