@@ -37,16 +37,7 @@ module OCCI
         @related  = (related != nil ? related : [])
         @entities = (entities != nil ? entities : [])
       end
-      
-      def to_hash
-        hash = {}
-        actions = @actions.collect {|action| action.category.type_identifier }
-        hash['actions'] = actions.join(',') unless actions.empty?
-        rel = @related.collect {|related| related.type_identifier}
-        hash['related'] = rel.join(',') unless rel.empty?
-        super['Category'].merge!(hash)
-      end
-      
+            
       def class_string
         return 'mixin'
       end

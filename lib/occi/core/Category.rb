@@ -66,15 +66,6 @@ module OCCI
         return 'action'
       end
       
-      def to_hash
-        hash = {}
-        hash['term'] = @term
-        hash['scheme'] = @scheme
-        hash['title'] = @title
-        hash['attributes'] = attributes.to_hash unless attributes.to_hash.empty?
-        hash['location'] = location
-        {'Category' => hash}
-      end
     end
   end
 end

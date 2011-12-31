@@ -42,14 +42,6 @@ module OCCI
         end
         return string.strip()
       end
-      
-      def to_hash
-        hash = {}
-        self.each do |key,value|
-          hash[key] = value.to_hash
-        end
-        return hash
-      end
 
     end
   end
