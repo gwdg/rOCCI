@@ -258,17 +258,17 @@ module OCCI
 
           if @data.has_key?(CATEGORY)
             @data[CATEGORY].each do |category|
-              response.write(CATEGORY + ': ' + category + "\n")
+              response.write(CATEGORY + ': ' + category.to_s + "\n")
             end
           end
 
           if @data.has_key?(LINK)
-            response.write('Link: ' + link_string + "\n")
+            response.write('Link: ' + @data[LINK].to_s + "\n")
           end
 
           if @data.has_key?(OCCI_ATTRIBUTE)
-            attributes_values.each do |attribute|
-              response.write('X-OCCI-Attribute: ' + attribute + "\n")
+            @data[OCCI_ATTRIBUTE].each do |attribute|
+              response.write('X-OCCI-Attribute: ' + attribute.to_s + "\n")
             end
           end
 
