@@ -226,7 +226,11 @@ def get_default_request(params = {})
     url = %<#{GENERAL_OPTIONS[:host]}:#{GENERAL_OPTIONS[:port]}#{params[:relative] || "/"}>
   end
   $log.debug("*** request url: " + url.to_s)
-  request   = Typhoeus::Request.new(url, REQUEST_DEFAULTS.merge(params))
+  request         = Typhoeus::Request.new(url, REQUEST_DEFAULTS.clone.merge(params))
+
+  # Explicitly clone the headers hash so that it is not reused between requests  
+  request.headers = REQUEST_DEFAULTS[:headers].clone
+
   return request  
 end
 
@@ -298,7 +302,7 @@ def create_resource(id, resource)
 
   request.on_complete do |response|
     check_response(response)
-    $log.info("Resource of kind [#{kind}] created under location: #{response.headers_hash["Location"]}")
+    $log.info("Resource of kind [#{resource.kind}] created under location: #{response.headers_hash["Location"]}")
     resource_uri = URI.parse(response.headers_hash["Location"])
     $resources[id].location = resource_uri.path
   end
@@ -361,6 +365,7 @@ def find_resource(kind, name)
 
   request.on_complete do |response|
 
+    $log.debug("*** header: " + response.headers_hash.inspect)
     locations = response.headers_hash["X-OCCI-Location"].split(",")
     locations.each do |location|
 
