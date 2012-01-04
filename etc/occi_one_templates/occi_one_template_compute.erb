@@ -3,30 +3,36 @@ OCCI_ID       = <%= attributes["occi.core.id"]%>
 NAME          = "<%= attributes["occi.core.title"]%>"
 DESCRIPTION   = "<%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>"
 MEMORY        = <%= attributes["occi.compute.memory"].to_i * 1024 if attributes["occi.compute.memory"]%>
-<% if attributes["occi.compute.architecture"] == "x64" %>
-ARCHITECTURE  = x86_64
-<% else %>
-ARCHITECTURE  = i686
-<% end %>
 CPU           = <%= attributes["occi.compute.cores"] if attributes["occi.compute.cores"]%>
 VCPU          = <%= attributes["opennebula.vm.vcpu"] if attributes["opennebula.vm.vcpu"]%>
 
 <%# KVM specific settings %>
-<% if attributes["opennebula.vm.boot"] %>
-BOOT          = <%= attributes["opennebula.vm.boot"] if attributes["opennebula.vm.boot"]%>
-<% else %>
-BOOT          = hd
-<% end %>
+RAW = [TYPE = kvm]
+OS = [
+	<% if attributes["occi.compute.architecture"] == "x64" %>
+	ARCH = x86_64,
+	<% else %>
+	ARCH = i686,
+	<% end %>
+
+	<% if attributes["opennebula.vm.boot"] %>
+	BOOT          = <%= attributes["opennebula.vm.boot"] if attributes["opennebula.vm.boot"]%>
+	<% else %>
+	BOOT          = hd
+	<% end %>
+]
 
 <%# Links to images %>
 <% storages.each do |storage,link| %>
-DISK          = [ IMAGE_ID = "<%= storage.backend[:id] %>"]
+DISK          = [ 
+	IMAGE_ID 	= "<%= storage.backend[:id] %>"
+]
 <%end%>
 
 <%# Links to external storage %>
 <% external_storages.each do |storage_URI| %>
 DISK = [
-  TYPE          = "OS",
+  TYPE      	= "OS",
   SOURCE        = <%= storage_URI %>
 ]
 <%end%>
@@ -34,8 +40,8 @@ DISK = [
 <%# Links to networks %>
 <% networks.each do |network,link| %>
 NIC           = [ 
-  <% "IP         = " + link.attributes["occi.networkinferface.address"] + "," if link.attributes["occi.networkinferface.address"]%>
-  <% "MAC        = " + link.attributes["occi.networkinferface.mac"] + "," if link.attributes["occi.networkinferface.mac"]%>
+  <% "IP         = " + link.attributes["occi.networkinferface.address"] + "," 	if link.attributes["occi.networkinferface.address"]%>
+  <% "MAC        = " + link.attributes["occi.networkinferface.mac"] + "," 		if link.attributes["occi.networkinferface.mac"]%>
   NETWORK_ID = <%= network.backend[:id] %>
 ]
 <%end%>
@@ -46,27 +52,21 @@ HAIZEA=	[	start 		=	"<%= attributes["occi.reservation.start"] 		if attributes["o
 			preemptible	= 	"<%= attributes["occi.reservation.preemptible"] if attributes["occi.reservation.preemptible"]%>" ]
 
 <%# Custom settings %>
-GRAPHICS      = [ type="vnc" ]
-RANK          = FREECPU
-FEATURES      = [ acpi="yes" ]
+GRAPHICS   	= [ 
+	TYPE	= vnc,
+  	LISTEN	= 0.0.0.0
+]
+FEATURES	= [ acpi="yes" ]
+RANK = FREECPU
 
 <%# Contextualization settings %>
 
 <%# NFS support  %>
 
-<% if $nfs_suppport %>
-
+<% if $nfs_support %>
 CONTEXT = [
-
-	<%
-		if $nfs_support
-			nfs_mounts.each do |mount|
-	%>
-	
-	<% "NFSMOUNT = " + mount %>
-		
-	<% end %>
+	<% if $nfs_support and not @nfs_mounts.empty? %>
+	NFSMOUNTS = <%= @nfs_mounts %>
 	<% end %>
 ]
 <% end %>
-
