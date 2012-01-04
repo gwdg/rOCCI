@@ -301,6 +301,7 @@ def create_resource(id, resource)
   end
 
   request.on_complete do |response|
+    $log.debug("Request sent: " + response.request.inspect)
     check_response(response)
     $log.info("Resource of kind [#{resource.kind}] created under location: #{response.headers_hash["Location"]}")
     resource_uri = URI.parse(response.headers_hash["Location"])
@@ -497,32 +498,45 @@ def test_nfsstorage(options)
   
   queue = []
 
-  # Create nfsstorage resource
-  nfsstorage_attributes = {
+  # Create nfsstorage resource(s)
+  nfsstorage1_attributes = {
     'occi.storage.size' => "1024"
   }
-  nfsstorage = Resource.new(OCCI::Infrastructure::NFSStorage::KIND, nfsstorage_attributes)
-  execute_request(create_resource("nfsstorage", nfsstorage))
-  
+  nfsstorage1 = Resource.new(OCCI::Infrastructure::NFSStorage::KIND, nfsstorage1_attributes)
+  execute_request(create_resource("nfsstorage1", nfsstorage1))
+
+  nfsstorage2_attributes = {
+    'occi.storage.size' => "1024"
+  }
+  nfsstorage2 = Resource.new(OCCI::Infrastructure::NFSStorage::KIND, nfsstorage2_attributes)
+  execute_request(create_resource("nfsstorage2", nfsstorage2))
+
   # Find correct network resource
   network = find_resource(OCCI::Infrastructure::Network::KIND, "GWDG-Cloud")
   $resources["network"] = network
   
   # Find correct base image
-  image = find_resource(OCCI::Infrastructure::Storage::KIND, "OCCI ubuntu")
+  image = find_resource(OCCI::Infrastructure::Storage::KIND, "OCCI Ubuntu")
   $resources["image"] = image
   
   # Create links
 
   # Base image storage link
 
-  # NFS storage link
-  nfsstorage_link_attributes = {
+  # NFS storage link(s)
+  nfsstorage1_link_attributes = {
     'occi.storagelink.deviceid'     => "nfs",
-    'occi.storagelink.mountpoint'   => "134.76.9.66:/nfs_test",
+    'occi.storagelink.mountpoint'   => "134.76.9.66:/srv/cloud/nfs-exports/test1",
     'occi.storagelink.state'        => "active"
   }
-  nfsstorage_link = Link.new(OCCI::Infrastructure::StorageLink::KIND, nfsstorage_link_attributes, nfsstorage)
+  nfsstorage1_link = Link.new(OCCI::Infrastructure::StorageLink::KIND, nfsstorage1_link_attributes, nfsstorage1)
+
+  nfsstorage2_link_attributes = {
+    'occi.storagelink.deviceid'     => "nfs",
+    'occi.storagelink.mountpoint'   => "134.76.9.66:/srv/cloud/nfs-exports/test2",
+    'occi.storagelink.state'        => "active"
+  }
+  nfsstorage2_link = Link.new(OCCI::Infrastructure::StorageLink::KIND, nfsstorage2_link_attributes, nfsstorage2)
 
   # Image storage link
   image_link_attributes = {}
@@ -545,7 +559,7 @@ def test_nfsstorage(options)
     'occi.compute.speed'          => ""
   }
 
-  compute = Resource.new(OCCI::Infrastructure::Compute::KIND, compute_attributes, [nfsstorage_link, image_link, network_link]);
+  compute = Resource.new(OCCI::Infrastructure::Compute::KIND, compute_attributes, [nfsstorage1_link, nfsstorage2_link, image_link, network_link]);
   execute_request(create_resource("compute", compute))
 
 end

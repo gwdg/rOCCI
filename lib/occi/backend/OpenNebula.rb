@@ -145,7 +145,6 @@ module OCCI
                 case link.kind.term
                 when 'storagelink'
                   # TODO: incorporate mountpoint here (e.g. occi.storagelink.mountpoint )
-                  $log.debug("*** link: " + link.kind.term)
                   # Check for nfs mount points
                   
                   if $nfs_support
@@ -179,8 +178,7 @@ module OCCI
             end
 
             if $nfs_support
-              $log.debug("*** nfs_mounts: " + nfs_mounts.inspect)
-              @nfs_mounts = %|"#{nfs_mounts.join(",")}"|
+              @nfs_mounts = %|"#{nfs_mounts.join(", ")}"|
             end
 
             @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
