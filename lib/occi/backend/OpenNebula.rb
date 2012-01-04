@@ -133,23 +133,27 @@ module OCCI
             storages = []
             networks = []
             external_storages = []
+            nfs_mounts = [] if $nfs_support
+
 
             if @links != nil
               @links.each do |link|
-                $log.debug(link. kind)
+                $log.debug("Processing link: #{link.kind.type_identifier}, attributes: #{link.attributes.inspect}")
                 target_URI = link.attributes['occi.core.target'] if URI.parse(link.attributes['occi.core.target']).absolute?
                 target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.attributes['occi.core.target'])
+                
                 case link.kind.term
                 when 'storagelink'
                   # TODO: incorporate mountpoint here (e.g. occi.storagelink.mountpoint )
-
+                  $log.debug("*** link: " + link.kind.term)
                   # Check for nfs mount points
-                  if $nfs_suppport
-                    nfs_mounts = []
-                    if target.kind = OCCI::Infrastructure::NFSStorage::KIND
+                  
+                  if $nfs_support
+                    if target.kind == OCCI::Infrastructure::NFSStorage::KIND
                       $log.debug("Adding nfs mount: " + link.attributes['occi.storagelink.mountpoint'])
                       nfs_mounts << link.attributes['occi.storagelink.mountpoint']
-                    end 
+                      next
+                    end
                   end
                   
                   if not target.nil?
@@ -157,10 +161,12 @@ module OCCI
                   elsif not target_URI.nil?
                     external_storages << target_URI
                   end
+
                 when 'networkinterface'
                   if not target.nil?
                     networks << [target, link]
                   end
+
                 when 'link'
                   case target.kind.term
                   when 'storage'
@@ -170,6 +176,11 @@ module OCCI
                   end unless target.nil?
                 end
               end
+            end
+
+            if $nfs_support
+              $log.debug("*** nfs_mounts: " + nfs_mounts.inspect)
+              @nfs_mounts = %|"#{nfs_mounts.join(",")}"|
             end
 
             @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
