@@ -10,10 +10,10 @@ TYPE          	= OS
 TYPE          	= DATABLOCK
 <% end %>
 
-#PUBLIC			= <%= attributes['opennebula.image.public'].upcase if attributes['opennebula.image.public'] %>
-#PERSISTENT    	= <%= attributes['opennebula.image.persistent'].upcase if attributes['opennebula.image.persistent'] %>
-DEV_PREFIX    	= <%= attributes['opennebula.image.dev_prefix'].downcase if attributes['opennebula.image.dev_prefix'] %>
-BUS           	= <%= attributes['opennebula.image.bus'].downcase if attributes['opennebula.image.bus'] %>
+#PUBLIC			= <%= attributes['opennebula.image.public'].upcase 			if attributes['opennebula.image.public'] %>
+#PERSISTENT    	= <%= attributes['opennebula.image.persistent'].upcase 		if attributes['opennebula.image.persistent'] %>
+DEV_PREFIX    	= <%= attributes['opennebula.image.dev_prefix'].downcase 	if attributes['opennebula.image.dev_prefix'] %>
+BUS           	= <%= attributes['opennebula.image.bus'].downcase 			if attributes['opennebula.image.bus'] %>
 
 PATH          	= <%= $image_path %>
 
