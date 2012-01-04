@@ -223,10 +223,10 @@ def get_default_request(params = {})
   if params.has_key?(:absolute)
     url = params[:absolute]
   else
-    url = %<#{GENERAL_OPTIONS[:host]}:#{GENERAL_OPTIONS[:port]}#{params[:relative] || "/"}>
+    url = %<#{$url_host_part}#{params[:relative] || "/"}>
   end
-  $log.debug("*** request url: " + url.to_s)
-  request         = Typhoeus::Request.new(url, REQUEST_DEFAULTS.clone.merge(params))
+  $log.debug("Request url: " + url.to_s)
+  request = Typhoeus::Request.new(url, REQUEST_DEFAULTS.clone.merge(params))
 
   # Explicitly clone the headers hash so that it is not reused between requests  
   request.headers = REQUEST_DEFAULTS[:headers].clone
@@ -296,8 +296,8 @@ def create_resource(id, resource)
 
   # Add attached links
   unless resource.links.empty?
-    link_header = resource.links.collect { |link| render_link(link) }
-    request["Link"] = link_header
+    rendered_links = resource.links.collect { |link| render_resource_attached_link(link) }
+    request["Link"] = rendered_links.join(',')
   end
 
   request.on_complete do |response|
@@ -369,12 +369,14 @@ def find_resource(kind, name)
     locations = response.headers_hash["X-OCCI-Location"].split(",")
     locations.each do |location|
 
+      location.strip!
       sub_request = get_default_request(:absolute => location)
       sub_request.on_complete do |response|
 
         attributes = parse_attributes(response.headers_hash["X-OCCI-Attribute"])
+        $log.debug("'#{name}' vs '#{attributes["occi.core.title"]}'")
         
-        if /#{name}/i =~ attributes["occi.core.title"]
+        if /#{name}/i =~ remove_quotes(attributes["occi.core.title"])
           
           # Derive resource KIND from category header
           resource_kind = nil
@@ -387,6 +389,7 @@ def find_resource(kind, name)
        
           resource = Resource.new(resource_kind, attributes)
           $log.debug("=> found at: " + location.to_s)
+          location.slice!($url_host_part)
           resource.location = location
         end
       end
@@ -495,49 +498,55 @@ def test_nfsstorage(options)
   queue = []
 
   # Create nfsstorage resource
-  
   nfsstorage_attributes = {
     'occi.storage.size' => "1024"
   }
-  
-  nfsstorage = Resource.new(OCCI::Infrastructure::NFSStorage::KIND, nfsstorage_attributes);  
+  nfsstorage = Resource.new(OCCI::Infrastructure::NFSStorage::KIND, nfsstorage_attributes)
   execute_request(create_resource("nfsstorage", nfsstorage))
   
   # Find correct network resource
-  
   network = find_resource(OCCI::Infrastructure::Network::KIND, "GWDG-Cloud")
   $resources["network"] = network
   
+  # Find correct base image
+  image = find_resource(OCCI::Infrastructure::Storage::KIND, "OCCI ubuntu")
+  $resources["image"] = image
+  
   # Create links
 
-  storage_link_attributes = {
+  # Base image storage link
+
+  # NFS storage link
+  nfsstorage_link_attributes = {
     'occi.storagelink.deviceid'     => "nfs",
     'occi.storagelink.mountpoint'   => "134.76.9.66:/nfs_test",
     'occi.storagelink.state'        => "active"
   }
-  
-  storage_link = Link.new(OCCI::Infrastructure::StorageLink::KIND, storage_link_attributes)
-  
+  nfsstorage_link = Link.new(OCCI::Infrastructure::StorageLink::KIND, nfsstorage_link_attributes, nfsstorage)
+
+  # Image storage link
+  image_link_attributes = {}
+  image_link = Link.new(OCCI::Infrastructure::StorageLink::KIND, image_link_attributes, image)
+
+  # Network link
   network_link_attributes = {
   }
-  
-  network_link = Link.new(OCCI::Core::Link::KIND, network_link_attributes)
+  network_link = Link.new(OCCI::Core::Link::KIND, network_link_attributes, network)
   
   # Create compute resource linking both
   
   compute_attributes = {
-    'occi.compute.cores'          => "1",
-    'occi.compute.architecture'   => "",
+    'occi.core.title'             => "NFSStorage TestVM",
+    'occi.compute.cores'          => "0.01",
+    'occi.compute.architecture'   => "x64",
     'occi.compute.state'          => "",
-    'occi.compute.hostname'       => "NFSStorage TestVM",
-    'occi.compute.memory'         => "1024",
+    'occi.compute.hostname'       => "",
+    'occi.compute.memory'         => "1",
     'occi.compute.speed'          => ""
   }
 
-  compute_resource = Resource.new(OCCI::Infrastructure::Compute::KIND, compute_attributes, [storage_link, network_link]);
+  compute = Resource.new(OCCI::Infrastructure::Compute::KIND, compute_attributes, [nfsstorage_link, image_link, network_link]);
   execute_request(create_resource("compute", compute))
-    
-  # FIXME
 
 end
 
@@ -556,7 +565,7 @@ end
 def clean_up
   queue = []
 #  $objects.each { |location| queue << delete_resource(location)}
-  $resources.each_key { |id| queue << delete_resource($resources[id])}
+  $resources.each_key { |id| queue << delete_resource(id)}
   return queue
 end
 
@@ -622,11 +631,11 @@ def process_test_command(options)
       queue_test_requests_time  = Benchmark.measure("Queuing requests for test:") {  queue_requests(hydra, send(test, options)) }
       run_test_requests_time    = Benchmark.measure("Running requests for test:") {  hydra.run }
 
-      if options[:cleanup]
-        $log.info("Cleaning up...")
-        queue_cleanup_requests_time  = Benchmark.measure("Queuing requests for cleanup:") { queue_requests(hydra, clean_up) }
-        run_cleanup_requests_time    = Benchmark.measure("Running requests for cleanup:") { hydra.run }
-      end
+#      if options[:cleanup]
+#        $log.info("Cleaning up...")
+#        queue_cleanup_requests_time  = Benchmark.measure("Queuing requests for cleanup:") { queue_requests(hydra, clean_up) }
+#        run_cleanup_requests_time    = Benchmark.measure("Running requests for cleanup:") { hydra.run }
+#      end
 
       $log.info("Time:")
       $log.info(queue_test_requests_time.to_a.to_s)
@@ -758,8 +767,8 @@ begin
       GENERAL_OPTIONS[:port] = port
     end
     
-    opts.on( '-C', '--content-type MIME_TYPE', Integer, 'Content-Type and Accept for requests' ) do |conent_type|
-      GENERAL_OPTIONS[:content_type] = conent_type
+    opts.on( '-C', '--content-type MIME_TYPE', Integer, 'Content-Type and Accept for requests' ) do |content_type|
+      GENERAL_OPTIONS[:content_type] = content_type
     end
 
     opts.on( '-t', '--timeout NUM', Integer, 'Timeout for http requests in milliseconds' ) do |timeout|
@@ -922,6 +931,8 @@ begin
 #  if ARGV.length >= 1
 #    options[:command] = ARGV.shift
 #  end
+
+  $url_host_part = %<#{GENERAL_OPTIONS[:host]}:#{GENERAL_OPTIONS[:port]}>
 
   $log.debug("Command line: " + ARGV.to_s)
   $log.debug("General options: " + GENERAL_OPTIONS.to_s)
