@@ -291,18 +291,18 @@ module OCCI
           attributes = {}
           backend_object.info
           # parse all parameters from OpenNebula to OCCI
-          attributes['occi.core.id'] = occi_id
-          attributes['occi.core.title'] = backend_object['NAME']
-          attributes['occi.core.summary'] = backend_object['TEMPLATE/DESCRIPTION']
-          attributes['occi.compute.cores'] = backend_object['TEMPLATE/CPU']
+          attributes['occi.core.id']        = occi_id
+          attributes['occi.core.title']     = backend_object['NAME']
+          attributes['occi.core.summary']   = backend_object['TEMPLATE/DESCRIPTION']
+          attributes['occi.compute.cores']  = backend_object['TEMPLATE/VCPU']
           if backend_object['TEMPLATE/ARCHITECTURE'] == "x86_64"
             attributes['occi.compute.architecture'] = "x64"
           else
             attributes['occi.compute.architecture'] = "x86"
           end
           attributes['occi.compute.memory'] = backend_object['TEMPLATE/MEMORY']
-          attributes['opennebula.vm.vcpu'] = backend_object['TEMPLATE/VCPU']
-          attributes['opennebula.vm.boot'] = backend_object['TEMPLATE/BOOT']
+          attributes['opennebula.vm.cpu_reservation'] = backend_object['TEMPLATE/CPU']
+          attributes['opennebula.vm.boot']  = backend_object['TEMPLATE/BOOT']
 
           # check if object already exists
           occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/compute/' +  occi_id)

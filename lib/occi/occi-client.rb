@@ -553,7 +553,7 @@ def test_nfsstorage(options)
   
   compute_attributes = {
     'occi.core.title'             => "NFSStorage TestVM",
-    'occi.compute.cores'          => "0.01",
+    'occi.compute.cores'          => "1",
     'occi.compute.architecture'   => "x64",
     'occi.compute.state'          => "",
     'occi.compute.hostname'       => "",

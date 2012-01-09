@@ -3,8 +3,13 @@ OCCI_ID       = <%= attributes["occi.core.id"]%>
 NAME          = "<%= attributes["occi.core.title"]%>"
 DESCRIPTION   = "<%= attributes['occi.core.summary'] 				if attributes['occi.core.summary']%>"
 MEMORY        = <%= attributes["occi.compute.memory"].to_i * 1024	if attributes["occi.compute.memory"]%>
-CPU           = <%= attributes["occi.compute.cores"] 				if attributes["occi.compute.cores"]%>
-VCPU          = <%= attributes["opennebula.vm.vcpu"] 				if attributes["opennebula.vm.vcpu"]%>
+VCPU          = <%= attributes["occi.compute.cores"] 				if attributes["occi.compute.cores"]%>
+
+<% if attributes["opennebula.vm.cpu_reservation"] %>
+CPU        	  = <%= attributes["opennebula.vm.cpu_reservation"] %>
+<% else %>
+CPU           = 0.01
+<% end %>
 
 <%# KVM specific settings %>
 RAW = [TYPE = kvm]
