@@ -1,10 +1,10 @@
 <%# Mandatory settings %>
 OCCI_ID       = <%= attributes["occi.core.id"]%>
 NAME          = "<%= attributes["occi.core.title"]%>"
-DESCRIPTION   = "<%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>"
-MEMORY        = <%= attributes["occi.compute.memory"].to_i * 1024 if attributes["occi.compute.memory"]%>
-CPU           = <%= attributes["occi.compute.cores"] if attributes["occi.compute.cores"]%>
-VCPU          = <%= attributes["opennebula.vm.vcpu"] if attributes["opennebula.vm.vcpu"]%>
+DESCRIPTION   = "<%= attributes['occi.core.summary'] 				if attributes['occi.core.summary']%>"
+MEMORY        = <%= attributes["occi.compute.memory"].to_i * 1024	if attributes["occi.compute.memory"]%>
+CPU           = <%= attributes["occi.compute.cores"] 				if attributes["occi.compute.cores"]%>
+VCPU          = <%= attributes["opennebula.vm.vcpu"] 				if attributes["opennebula.vm.vcpu"]%>
 
 <%# KVM specific settings %>
 RAW = [TYPE = kvm]
@@ -65,8 +65,21 @@ RANK = FREECPU
 
 <% if $nfs_support %>
 CONTEXT = [
-	<% if $nfs_support and not @nfs_mounts.empty? %>
-	NFSMOUNTS = <%= @nfs_mounts %>
-	<% end %>
+	<% 
+		if $nfs_support and not @nfs_mounts.empty?
+			i = 1
+			@nfs_mounts.each do |mount|
+	%>
+	
+	<%= 		"NFS#{i}_EXPORT = #{mount[0]}," %>
+	<%= 		"NFS#{i}_MOUNT  = #{mount[1]}," %>
+	
+	<%
+			i += 1
+			end
+	%>
+	<%= 		"NFSMOUNTS  = #{@nfs_mounts.length}" %>
+			
+	<% 	end %>
 ]
 <% end %>

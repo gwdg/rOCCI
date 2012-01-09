@@ -500,13 +500,15 @@ def test_nfsstorage(options)
 
   # Create nfsstorage resource(s)
   nfsstorage1_attributes = {
-    'occi.storage.size' => "1024"
+    'occi.storage.size'   => "1024",
+    'occi.storage.export' => "134.76.9.66:/srv/cloud/nfs-exports/test1"
   }
   nfsstorage1 = Resource.new(OCCI::Infrastructure::NFSStorage::KIND, nfsstorage1_attributes)
   execute_request(create_resource("nfsstorage1", nfsstorage1))
 
   nfsstorage2_attributes = {
-    'occi.storage.size' => "1024"
+    'occi.storage.size' => "1024",
+    'occi.storage.export' => "134.76.9.66:/srv/cloud/nfs-exports/test2"
   }
   nfsstorage2 = Resource.new(OCCI::Infrastructure::NFSStorage::KIND, nfsstorage2_attributes)
   execute_request(create_resource("nfsstorage2", nfsstorage2))
@@ -526,14 +528,14 @@ def test_nfsstorage(options)
   # NFS storage link(s)
   nfsstorage1_link_attributes = {
     'occi.storagelink.deviceid'     => "nfs",
-    'occi.storagelink.mountpoint'   => "134.76.9.66:/srv/cloud/nfs-exports/test1",
+    'occi.storagelink.mountpoint'   => "/data/test1",
     'occi.storagelink.state'        => "active"
   }
   nfsstorage1_link = Link.new(OCCI::Infrastructure::StorageLink::KIND, nfsstorage1_link_attributes, nfsstorage1)
 
   nfsstorage2_link_attributes = {
     'occi.storagelink.deviceid'     => "nfs",
-    'occi.storagelink.mountpoint'   => "134.76.9.66:/srv/cloud/nfs-exports/test2",
+    'occi.storagelink.mountpoint'   => "/data/test2",
     'occi.storagelink.state'        => "active"
   }
   nfsstorage2_link = Link.new(OCCI::Infrastructure::StorageLink::KIND, nfsstorage2_link_attributes, nfsstorage2)

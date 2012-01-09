@@ -130,10 +130,10 @@ module OCCI
 
             backend_object = VirtualMachine.new(VirtualMachine.build_xml, $backend.one_client)
 
-            storages = []
-            networks = []
+            storages          = []
+            networks          = []
             external_storages = []
-            nfs_mounts = [] if $nfs_support
+            @nfs_mounts       = [] if $nfs_support
 
 
             if @links != nil
@@ -145,12 +145,13 @@ module OCCI
                 case link.kind.term
                 when 'storagelink'
                   # TODO: incorporate mountpoint here (e.g. occi.storagelink.mountpoint )
-                  # Check for nfs mount points
-                  
+                  # Check for nfs mount points                  
                   if $nfs_support
                     if target.kind == OCCI::Infrastructure::NFSStorage::KIND
-                      $log.debug("Adding nfs mount: " + link.attributes['occi.storagelink.mountpoint'])
-                      nfs_mounts << link.attributes['occi.storagelink.mountpoint']
+                      # Keep track of nfs-export -> mount-point tuples
+                      $log.debug("Adding nfs mount: #{target.attributes["occi.storage.export"]} -> #{link.attributes['occi.storagelink.mountpoint']}")
+                      @nfs_mounts << [target.attributes['occi.storage.export'], link.attributes['occi.storagelink.mountpoint']]
+#                      nfs_mounts << mount
                       next
                     end
                   end
@@ -177,9 +178,9 @@ module OCCI
               end
             end
 
-            if $nfs_support
-              @nfs_mounts = %|"#{nfs_mounts.join(", ")}"|
-            end
+#            if $nfs_support
+#              @nfs_mounts = %|"#{nfs_mounts.join(", ")}"|
+#            end
 
             @templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
             compute_template = ERB.new(File.read(@templateRaw)).result(binding)
