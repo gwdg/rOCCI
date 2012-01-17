@@ -146,10 +146,6 @@ module OCCI
 
         $log.debug("Mixins in entity #{@mixins}")
       end
-      
-      def finalize
-        # to be implemented in backend
-      end
 
       # ---------------------------------------------------------------------------------------------------------------------
       def delete
