@@ -171,7 +171,9 @@ REQUEST_DEFAULTS  = { :method        => :get,
                     } 
 
 # Used for rendering of requests
+# FIXME
 $rendering = OCCI::Rendering::Rendering.new()
+# FIXME
 OCCI::Rendering::Rendering.prepare_renderer("text/occi")
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -283,6 +285,7 @@ def create_resource(id, resource)
 
   request = get_default_request(:method => :post)
 
+  # FIXME
   $rendering.prepare_renderer();
   $rendering.render_category_short( resource.kind)
   $rendering.render_attributes(     resource.attributes)
@@ -291,8 +294,6 @@ def create_resource(id, resource)
   
   request["Category"]         = data[OCCI::Rendering::HTTP::TextRenderer::CATEGORY].join(',')
   request["X-OCCI-Attribute"] = data[OCCI::Rendering::HTTP::TextRenderer::OCCI_ATTRIBUTE].join(',')
-  
-#  $rendering.render_response(request)
 
   # Add attached links
   unless resource.links.empty?
