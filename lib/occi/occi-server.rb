@@ -74,19 +74,48 @@ end
 ##############################################################################
 # initialize backend, currently only Dummy and OpenNebula are supported
 
-begin
-  $backend = case $config["backend"]
-  when "opennebula"
-    require 'occi/backend/OpenNebula'
-    OCCI::Backend::OpenNebula.new()
-  when "dummy" then
-    require 'occi/backend/Dummy'
-    OCCI::Backend::Dummy.new()
-  else raise "Backend '" + $config["backend"] + "' not found"
+#begin
+#  $backend = case $config["backend"]
+#  when "opennebula"
+#    require 'occi/backend/OpenNebula'
+#    OCCI::Backend::OpenNebula.new()
+#  when "dummy" then
+#    require 'occi/backend/Dummy'
+#    OCCI::Backend::Dummy.new()
+#  else raise "Backend '" + $config["backend"] + "' not found"
+#  end
+#rescue RuntimeError => e
+#  $log.fatal "#{e}: #{e.backtrace}"
+#  exit 1
+#end
+
+def initialize_backend(request)
+
+  auth =  Rack::Auth::Basic::Request.new(request.env)
+  
+  if auth.provided? && auth.basic? && auth.credentials
+    user, password = auth.credentials
+  else
+    user, password = [$config['username'], $config['password']]
   end
-rescue RuntimeError => e
-  $log.fatal "#{e}: #{e.backtrace}"
-  exit 1
+
+  begin
+    backend = case $config["backend"]
+               when "opennebula"
+                 require 'occi/backend/OpenNebula'
+                 OCCI::Backend::OpenNebula.new(user, password)
+               when "dummy" then
+                 require 'occi/backend/Dummy'
+                 OCCI::Backend::Dummy.new()
+               else raise "Backend '" + $config["backend"] + "' not found"
+             end
+
+    return backend
+
+  rescue RuntimeError => e
+    $log.fatal "#{e}: #{e.backtrace}"
+    exit 1
+  end  
 end
 
 ##############################################################################
@@ -159,6 +188,7 @@ begin
     begin
 
       # Init
+      backend = initialize_backend(request)
       OCCI::Rendering::HTTP::prepare_response(response, request)
       occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request, params)
 
@@ -245,6 +275,7 @@ begin
     begin
 
       # Init
+      backend = initialize_backend(request)
       OCCI::Rendering::HTTP::prepare_response(response, request)
       occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request, params)
 
@@ -460,6 +491,7 @@ begin
     begin
       
       # Init
+      backend = initialize_backend(request)
       OCCI::Rendering::HTTP::prepare_response(response, request)
       occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request, params)
 
@@ -594,6 +626,7 @@ begin
     begin
       
       # Init
+      backend = initialize_backend(request)
       OCCI::Rendering::HTTP::prepare_response(response, request)
       occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(request, params)
 
