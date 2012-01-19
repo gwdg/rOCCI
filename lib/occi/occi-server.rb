@@ -171,6 +171,7 @@ end
 ##############################################################################
 # Get existing resources from backend
 
+# FIXME
 $log.debug("Get existing resources from backend")
 $backend.register_existing_resources
 
@@ -391,7 +392,7 @@ begin
           OCCI::Rendering::HTTP::LocationRegistry.register(occi_link.get_location, occi_link)
         end
 
-        resource.deploy
+        resource.deploy(backend)
 
         $log.debug('Location:' + resource.get_location)
 

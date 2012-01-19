@@ -35,9 +35,76 @@ include OpenNebula
 
 module OCCI
   module Backend
+
+    # ---------------------------------------------------------------------------------------------------------------------
+    OPERATION_DEPLOY        = :deploy
+    OPERATION_UPDATE_STATE  = :update_state
+    OPERATION_REFRESH       = :refresh
+    OPERATION_FINALIZE      = :finalize
+
+    # ---------------------------------------------------------------------------------------------------------------------
+    class Manager
+    
+      # Register available backends
+      register_backend(OCCI::Backend::OpenNebula,   OCCI::Backend::OpenNebula::OPERATIONS)
+    
+      # ---------------------------------------------------------------------------------------------------------------------
+      def self.register_backend(backend_class, operations)
+        
+        # Get ident of backend = class name downcased
+#        backend_ident = Object.const_get(backend_class).name.downcase
+
+        backend_ident = backend_class.name.downcase
+
+        @@backends_classes[backend_ident]     = backend_class
+        @@backends_operations[backend_ident]  = operations
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------
+      def self.signal_resource(backend, operation, resource)
+
+        resource_type = resource.kind.type_identifier
+        backend_ident = backend.class.name.downcase
+        
+        raise OCCI::BackendError, "Unknown backend: '#{backend_ident}'"                                             unless @@backends_classes.has_key?(backend_ident)
+        
+        operations = @@backends_operations[backend_ident]
+        
+        raise OCCI::BackendError, "Resource type '#{resource_type}' not supported!"                                 unless operations.has_key?(resource_type)
+        raise OCCI::BackendError, "Operation '#{operation}' not supported on resource category '#{resource_type}'!" unless operations[resource_type].has_key?(operation)
+        
+        # Delegate
+        backend.send(operations[resource_type][operation], resource)
+      end
+    end
     
     # ---------------------------------------------------------------------------------------------------------------------
     class OpenNebula
+      
+      # Supported operations
+       
+      OPERATIONS = {}
+      
+      OPERATIONS["http://schemas.ogf.org/occi/infrastructure#compute"] = {
+        :deploy         => :compute_deploy,
+        :update_state   => :compute_update_state,
+        :refresh        => :compute_refresh,
+        :finalize       => :compute_finalize
+      }
+
+      OPERATIONS["http://schemas.ogf.org/occi/infrastructure#network"] = {
+        :deploy         => :network_deploy,
+        :update_state   => :network_update_state,
+        :refresh        => :network_refresh,
+        :finalize       => :network_finalize
+      }
+
+      OPERATIONS["http://schemas.ogf.org/occi/infrastructure#storage"] = {
+        :deploy         => :storage_deploy,
+        :update_state   => :storage_update_state,
+        :refresh        => :storage_refresh,
+        :finalize       => :storage_finalize
+      }
        
       begin
         OCCI::CategoryRegistry.register(OCCI::Backend::ONE::Image::MIXIN)
