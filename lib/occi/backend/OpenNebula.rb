@@ -121,7 +121,7 @@ module OCCI
       end
 
       # ---------------------------------------------------------------------------------------------------------------------
-      # Generate a new occi id for resources created directly in OpenNebula using a seed id and the kind identifer
+      # Generate a new occi id for resources created directly in OpenNebula using a seed id and the kind identifier
       def self.generate_occi_id(kind, seed_id)
         # Use strings as kind ids
         kind = kind.type_identifier if kind.kind_of?(OCCI::Core::Kind)
@@ -211,7 +211,7 @@ module OCCI
         end
 
         occi_object.backend[:id] = backend_object.id
-        occi_object = self.parse_links(occi_object, backend_object)
+        occi_object = self.compute_parse_links(occi_object, backend_object)
         $log.info("OCCI compute object created/updated")
         return occi_object
       end
@@ -229,7 +229,7 @@ module OCCI
           end
           if target == nil
             backend_object = Image.new(Image.build_xml(image_id), @one_client)
-            backend_object.info
+#            backend_object.info
             target = self.storage_parse_backend_object(backend_object)
           end
           source = occi_object
@@ -345,7 +345,7 @@ module OCCI
 
         attributes = {}
         mixins = []
-        backend_object.info
+#        backend_object.info
         attributes = {}
         # parse all parameters from OpenNebula to OCCI
         attributes['occi.core.id']      = occi_id
@@ -410,8 +410,8 @@ module OCCI
         resource_template_register()
         os_template_register()
         compute_register_all_instances()
-        Network_register_all_instances()
-        Storage_register_all_instances()
+        network_register_all_instances()
+        storage_register_all_instances()
       end
 
       # ---------------------------------------------------------------------------------------------------------------------     
@@ -532,7 +532,7 @@ module OCCI
 
         backend_object.info
 
-        occi_object = self.compute_parse_backend_object(backend_object)
+        occi_object = OCCI::Backend::OpenNebula.compute_parse_backend_object(backend_object)
         if occi_object.nil?
           $log.debug("Problems refreshing backend object")
         else
@@ -687,7 +687,7 @@ module OCCI
 
         backend_object.info
 
-        occi_object = self.network_parse_backend_object(backend_object)
+        occi_object = OCCI::Backend::OpenNebula.network_parse_backend_object(backend_object)
 
         if occi_object.nil? then
           $log.warn("Problem refreshing network with backend id #{network.backend[:id]}")
@@ -724,7 +724,7 @@ module OCCI
         backend_object_pool=VirtualNetworkPool.new(@one_client, INFO_ACL)
         backend_object_pool.info_group
         backend_object_pool.each do |backend_object|
-          occi_object = self.network_parse_backend_object(backend_object)
+          occi_object = OCCI::Backend::OpenNebula.network_parse_backend_object(backend_object)
           if occi_object.nil?
             $log.debug("Error creating network from backend")
           else
@@ -817,7 +817,7 @@ module OCCI
 
         backend_object.info
 
-        occi_object = self.storage_parse_backend_object(backend_object)
+        occi_object = OCCI::Backend::OpenNebula.storage_parse_backend_object(backend_object)
 
         if occi_object.nil? then
           $log.warn("Problem refreshing storage with backend id #{storage.backend[:id]}")
@@ -838,7 +838,7 @@ module OCCI
         backend_object_pool=ImagePool.new(@one_client, INFO_ACL)
         backend_object_pool.info_group
         backend_object_pool.each do |backend_object|
-          occi_object = self.storage_parse_backend_object(backend_object)
+          occi_object = OCCI::Backend::OpenNebula.storage_parse_backend_object(backend_object)
           if occi_object.nil?
             $log.debug("Error creating storage from backend")
           else
@@ -929,7 +929,7 @@ module OCCI
         raise OCCI::BackendError, "Operation '#{operation}' not supported on resource category '#{resource_type}'!" unless operations[resource_type].has_key?(operation)
         
         # Delegate
-        if operation_parameters.is_nil?
+        if operation_parameters.nil?
           # Generic resource operation
           backend.send(operations[resource_type][operation], resource)
         else
