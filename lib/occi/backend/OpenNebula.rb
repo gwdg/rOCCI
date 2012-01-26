@@ -25,10 +25,13 @@ require 'OpenNebula/OpenNebula'
 require 'occi/CategoryRegistry'
 require 'occi/rendering/http/LocationRegistry'
 require 'occi/ActionDelegator'
-require 'occi/backend/one/Image'
-require 'occi/backend/one/Network'
-require 'occi/backend/one/VirtualMachine'
-require 'occi/backend/one/VNC'
+
+# OpenNebula based mixins
+require 'occi/extensions/one/Image'
+require 'occi/extensions/one/Network'
+require 'occi/extensions/one/VirtualMachine'
+require 'occi/extensions/one/VNC'
+
 require 'occi/extensions/Reservation'
 
 include OpenNebula
