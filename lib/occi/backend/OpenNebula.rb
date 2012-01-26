@@ -51,75 +51,6 @@ module OCCI
 #    ACTION_SUSPEND          = :suspend
 
     # ---------------------------------------------------------------------------------------------------------------------
-    class Manager
-    
-      # Register available backends
-      register_backend(OCCI::Backend::OpenNebula,   OCCI::Backend::OpenNebula::OPERATIONS)
-    
-      # ---------------------------------------------------------------------------------------------------------------------
-      def self.register_backend(backend_class, operations)
-        
-        # Get ident of backend = class name downcased
-#        backend_ident = Object.const_get(backend_class).name.downcase
-
-        backend_ident = backend_class.name.downcase
-
-        @@backends_classes[backend_ident]     = backend_class
-        @@backends_operations[backend_ident]  = operations
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      def self.signal_resource(backend, operation, resource, operation_parameters = nil)
-
-        resource_type = resource.kind.type_identifier
-        backend_ident = backend.class.name.downcase
-        
-        raise OCCI::BackendError, "Unknown backend: '#{backend_ident}'"                                             unless @@backends_classes.has_key?(backend_ident)
-        
-        operations = @@backends_operations[backend_ident]
-        
-        raise OCCI::BackendError, "Resource type '#{resource_type}' not supported!"                                 unless operations.has_key?(resource_type)
-        raise OCCI::BackendError, "Operation '#{operation}' not supported on resource category '#{resource_type}'!" unless operations[resource_type].has_key?(operation)
-        
-        # Delegate
-        if operation_parameters.is_nil?
-          # Generic resource operation
-          backend.send(operations[resource_type][operation], resource)
-        else
-          # Action related operation, we need to pass on the action parameters
-          backend.send(operations[resource_type][operation], resource, operation_parameters)
-        end
-
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      def self.delegate_action(backend, action, parameters, resource)
-  
-        $log.debug("Delegating invocation of action [#{action}] on resource [#{resource}] with parameters [#{parameters}] to backend...")
-  
-        # Verify
-        state_machine = resource.state_machine
-        raise "Action [#{action}] not valid for current state [#{state_machine.current_state}] of resource [#{resource}]!" if !state_machine.check_transition(action)
-        
-        # Use action term as ident
-        operation = action.term.to_s
-
-        begin
-          # TODO: define some convention for result handling!
-          signal_resource(backend, operation, resource, parameters)
-
-          state_machine.transition(action)
-          signal_resource(backend, OCCI::Backend::RESOURCE_UPDATE_STATE)
-
-        rescue OCCI::BackendError
-          $log.error("Action invocation failed!")
-          raise
-        end   
-      end
-
-    end
-
-    # ---------------------------------------------------------------------------------------------------------------------
     class OpenNebula
       
       # Supported operations
@@ -476,15 +407,15 @@ module OCCI
       # ---------------------------------------------------------------------------------------------------------------------     
       def register_existing_resources
         # get all compute objects
-        OCCI::Backend::OpenNebula::ResourceTemplate.register
-        OCCI::Backend::OpenNebula::OSTemplate.register
-        OCCI::Backend::OpenNebula::Compute.register_all_instances
-        OCCI::Backend::OpenNebula::Network.register_all_instances
-        OCCI::Backend::OpenNebula::Storage.register_all_instances
+        resource_template_register()
+        os_template_register()
+        compute_register_all_instances()
+        Network_register_all_instances()
+        Storage_register_all_instances()
       end
 
       # ---------------------------------------------------------------------------------------------------------------------     
-      def self.resource_template_register
+      def resource_template_register
         backend_object_pool=TemplatePool.new(@one_client)
         backend_object_pool.info_group
         backend_object_pool.each do |backend_object|
@@ -502,7 +433,7 @@ module OCCI
       end
 
       # ---------------------------------------------------------------------------------------------------------------------     
-      def self.os_template_register
+      def os_template_register
         # TODO: implement
       end
 
@@ -643,27 +574,27 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------     
       # GET ALL COMPUTE INSTANCES
-      def self.compute_register_all_instances
+      def compute_register_all_instances
         backend_object_pool = VirtualMachinePool.new(@one_client, INFO_ACL)
         backend_object_pool.info_group
-        self.register_all_objects(backend_object_pool)
+        compute_register_all_objects(backend_object_pool)
       end
 
       # ---------------------------------------------------------------------------------------------------------------------     
       # GET ALL COMPUTE TEMPLATES
-      def self.compute_register_all_templates
+      def compute_register_all_templates
         backend_object_pool = TemplatePool.new(@one_client, INFO_ACL)
         backend_object_pool.info_group
-        self.register_all_objects(backend_object_pool, template = true)
+        compute_register_all_objects(backend_object_pool, template = true)
       end
 
       # ---------------------------------------------------------------------------------------------------------------------     
       # GET ALL COMPUTE OBJECTS
-      def self.compute_register_all_objects(backend_object_pool, template = false)
+      def compute_register_all_objects(backend_object_pool, template = false)
         occi_objects = []
         backend_object_pool.each do |backend_object|
           $log.debug("ONE compute object: #{backend_object}")
-          occi_object = self.compute_parse_backend_object(backend_object)
+          occi_object = OCCI::Backend::OpenNebula.compute_parse_backend_object(backend_object)
           if occi_object.nil?
             $log.debug("Error creating occi resource from backend")
           else
@@ -788,7 +719,7 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------     
       # GET ALL VNETs
-      def self.network_register_all_instances
+      def network_register_all_instances
         occi_objects = []
         backend_object_pool=VirtualNetworkPool.new(@one_client, INFO_ACL)
         backend_object_pool.info_group
@@ -827,31 +758,13 @@ module OCCI
         check_rc(rc)
       end
 
-      # ---------------------------------------------------------------------------------------------------------------------     
-      def self.network_register_all_instances
-        occi_objects = []
-        backend_object_pool=ImagePool.new(@one_client, INFO_ACL)
-        backend_object_pool.info_group
-        backend_object_pool.each do |backend_object|
-          occi_object = self.network_parse_backend_object(backend_object)
-          if occi_object.nil?
-            $log.debug("Error creating storage from backend")
-          else
-            occi_object.backend[:id] = backend_object.id
-            $log.debug("Backend ID: #{occi_object.backend[:id]}")
-            occi_objects << occi_object
-          end
-        end
-        return occi_objects
-      end
-
       ########################################################################
       # Storage class
 
       TEMPLATESTORAGERAWFILE = 'occi_one_template_storage.erb'
  
-       # ---------------------------------------------------------------------------------------------------------------------     
-     # CREATE STORAGE
+      # ---------------------------------------------------------------------------------------------------------------------     
+      # CREATE STORAGE
       def storage_deploy(storage)
         
         backend_object = Image.new(Image.build_xml, @one_client)
@@ -920,6 +833,25 @@ module OCCI
       end
 
       # ---------------------------------------------------------------------------------------------------------------------     
+      def storage_register_all_instances
+        occi_objects = []
+        backend_object_pool=ImagePool.new(@one_client, INFO_ACL)
+        backend_object_pool.info_group
+        backend_object_pool.each do |backend_object|
+          occi_object = self.storage_parse_backend_object(backend_object)
+          if occi_object.nil?
+            $log.debug("Error creating storage from backend")
+          else
+            occi_object.backend[:id] = backend_object.id
+            $log.debug("Backend ID: #{occi_object.backend[:id]}")
+            occi_objects << occi_object
+          end
+        end
+        return occi_objects
+      end
+
+
+      # ---------------------------------------------------------------------------------------------------------------------     
       def storage_action_dummy(storage, parameters)       
       end
 
@@ -958,5 +890,84 @@ module OCCI
       end
 
     end
+    
+    
+    # ---------------------------------------------------------------------------------------------------------------------
+    class Manager
+              
+      private
+      
+      @@backends_classes    = {}
+      @@backends_operations = {}
+      
+      public
+   
+   
+      # ---------------------------------------------------------------------------------------------------------------------
+      def self.register_backend(backend_class, operations)
+        
+        # Get ident of backend = class name downcased
+#        backend_ident = Object.const_get(backend_class).name.downcase
+
+        backend_ident = backend_class.name.downcase
+
+        @@backends_classes[backend_ident]     = backend_class
+        @@backends_operations[backend_ident]  = operations
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------
+      def self.signal_resource(backend, operation, resource, operation_parameters = nil)
+
+        resource_type = resource.kind.type_identifier
+        backend_ident = backend.class.name.downcase
+        
+        raise OCCI::BackendError, "Unknown backend: '#{backend_ident}'"                                             unless @@backends_classes.has_key?(backend_ident)
+        
+        operations = @@backends_operations[backend_ident]
+        
+        raise OCCI::BackendError, "Resource type '#{resource_type}' not supported!"                                 unless operations.has_key?(resource_type)
+        raise OCCI::BackendError, "Operation '#{operation}' not supported on resource category '#{resource_type}'!" unless operations[resource_type].has_key?(operation)
+        
+        # Delegate
+        if operation_parameters.is_nil?
+          # Generic resource operation
+          backend.send(operations[resource_type][operation], resource)
+        else
+          # Action related operation, we need to pass on the action parameters
+          backend.send(operations[resource_type][operation], resource, operation_parameters)
+        end
+
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------
+      def self.delegate_action(backend, action, parameters, resource)
+  
+        $log.debug("Delegating invocation of action [#{action}] on resource [#{resource}] with parameters [#{parameters}] to backend...")
+  
+        # Verify
+        state_machine = resource.state_machine
+        raise "Action [#{action}] not valid for current state [#{state_machine.current_state}] of resource [#{resource}]!" if !state_machine.check_transition(action)
+        
+        # Use action term as ident
+        operation = action.term.to_s
+
+        begin
+          # TODO: define some convention for result handling!
+          signal_resource(backend, operation, resource, parameters)
+
+          state_machine.transition(action)
+          signal_resource(backend, OCCI::Backend::RESOURCE_UPDATE_STATE)
+
+        rescue OCCI::BackendError
+          $log.error("Action invocation failed!")
+          raise
+        end   
+      end
+
+      # Register available backends
+      register_backend(OCCI::Backend::OpenNebula,   OCCI::Backend::OpenNebula::OPERATIONS)
+
+    end
+        
   end
 end
