@@ -23,27 +23,18 @@ require 'occi/CategoryRegistry'
 require 'occi/core/Kind'
 require 'occi/core/Resource'
 require 'occi/StateMachine'
-require 'occi/ActionDelegator'
+#require 'occi/ActionDelegator'
 
 module OCCI
   module Infrastructure
-    class Storage < OCCI::Core::Resource
-      case $config["backend"]
-      when 'opennebula'
-        require 'occi/backend/OpenNebula'
-        include OCCI::Backend::OpenNebula::Storage
-      when 'dummy'
-        require 'occi/backend/Dummy'
-        include OCCI::Backend::Dummy::Storage
-      end if $config
 
-      # Define associated kind
+    class Storage < OCCI::Core::Resource
       begin
         # Define client initiated actions
-        backup_attributes = OCCI::Core::Attributes.new()
-        offline_attributes = OCCI::Core::Attributes.new()
-        online_attributes = OCCI::Core::Attributes.new()
-        resize_attributes = OCCI::Core::Attributes.new()
+        backup_attributes   = OCCI::Core::Attributes.new()
+        offline_attributes  = OCCI::Core::Attributes.new()
+        online_attributes   = OCCI::Core::Attributes.new()
+        resize_attributes   = OCCI::Core::Attributes.new()
         resize_attributes << OCCI::Core::Attribute.new(name = 'size', mutable = false, mandatory = false, unique = true)
         snapshot_attributes = OCCI::Core::Attributes.new()
 
@@ -73,12 +64,12 @@ module OCCI
         STATE_SNAPSHOT  = OCCI::StateMachine::State.new("snapshot")
         STATE_RESIZE    = OCCI::StateMachine::State.new("resize")
 
-        STATE_OFFLINE.add_transition(ACTION_ONLINE,             STATE_ONLINE)
+        STATE_OFFLINE.add_transition(ACTION_ONLINE,   STATE_ONLINE)
 
-        STATE_ONLINE.add_transition(ACTION_OFFLINE,             STATE_OFFLINE)
-        STATE_ONLINE.add_transition(ACTION_BACKUP,              STATE_BACKUP)
-        STATE_ONLINE.add_transition(ACTION_SNAPSHOT,            STATE_SNAPSHOT)
-        STATE_ONLINE.add_transition(ACTION_RESIZE,              STATE_RESIZE)
+        STATE_ONLINE.add_transition(ACTION_OFFLINE,   STATE_OFFLINE)
+        STATE_ONLINE.add_transition(ACTION_BACKUP,    STATE_BACKUP)
+        STATE_ONLINE.add_transition(ACTION_SNAPSHOT,  STATE_SNAPSHOT)
+        STATE_ONLINE.add_transition(ACTION_RESIZE,    STATE_RESIZE)
 
         related     = [OCCI::Core::Resource::KIND]
         entity_type = self
@@ -106,17 +97,18 @@ module OCCI
         attributes['occi.storage.state'] = state_machine.current_state.name
 
         # create action delegator
-        delegator = OCCI::ActionDelegator.instance
+#        delegator = OCCI::ActionDelegator.instance
 
         # register methods for storage actions
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_ONLINE,    self, :online)
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_OFFLINE,   self, :offline)
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_BACKUP,    self, :backup)
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_SNAPSHOT,  self, :snapshot)
-        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_RESIZE,    self, :resize)
+#        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_ONLINE,    self, :online)
+#        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_OFFLINE,   self, :offline)
+#        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_BACKUP,    self, :backup)
+#        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_SNAPSHOT,  self, :snapshot)
+#        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_RESIZE,    self, :resize)
 
         super(attributes, mixins, OCCI::Infrastructure::Storage::KIND)
       end
     end
+
   end
 end

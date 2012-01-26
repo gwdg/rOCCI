@@ -22,21 +22,12 @@
 require 'occi/CategoryRegistry'
 require 'occi/core/Kind'
 require 'occi/StateMachine'
-require 'occi/ActionDelegator'
+#require 'occi/ActionDelegator'
 
 module OCCI
   module Infrastructure
-    class Network < OCCI::Core::Resource    
-      case $config["backend"]
-      when 'opennebula'
-        require 'occi/backend/OpenNebula'
-        include OCCI::Backend::OpenNebula::Network
-      when 'dummy'
-        require 'occi/backend/Dummy'
-        include OCCI::Backend::Dummy::Network
-      end if $config
 
-      # Define associated kind
+    class Network < OCCI::Core::Resource
       begin
         # Define actions
         down_attributes = OCCI::Core::Attributes.new()
@@ -94,5 +85,6 @@ module OCCI
         super(attributes, mixins, OCCI::Infrastructure::Network::KIND)
       end
     end
+
   end
 end

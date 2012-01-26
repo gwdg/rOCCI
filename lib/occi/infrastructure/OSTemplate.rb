@@ -19,15 +19,12 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'singleton'
-
 require 'occi/core/Mixin'
 
 module OCCI
   module Infrastructure
-    class OSTemplate < OCCI::Core::Mixin
 
-      # Define appropriate mixin
+    class OSTemplate < OCCI::Core::Mixin
       begin
         # Define actions
         actions = []
@@ -45,5 +42,6 @@ module OCCI
         OCCI::CategoryRegistry.register(MIXIN)
       end
     end
+
   end
 end

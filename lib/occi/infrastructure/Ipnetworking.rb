@@ -24,9 +24,8 @@ require 'occi/core/Mixin'
 
 module OCCI
   module Infrastructure
+
     class Ipnetworking < OCCI::Core::Mixin
-      include Singleton
-      # Define appropriate mixin
       begin
         # Define actions
         actions = []
@@ -48,5 +47,6 @@ module OCCI
         OCCI::CategoryRegistry.register(MIXIN)
       end
     end
+
   end
 end

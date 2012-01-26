@@ -25,19 +25,18 @@ require 'occi/core/Link'
 
 module OCCI
   module Infrastructure
-    class StorageLink < OCCI::Core::Link
 
-      # Define appropriate kind
+    class StorageLink < OCCI::Core::Link
       begin
 
         # Define state-machine
         STATE_INACTIVE  = OCCI::StateMachine::State.new("inactive")
         STATE_ACTIVE    = OCCI::StateMachine::State.new("active")
 
-        actions = []
-        related = [OCCI::Core::Link::KIND]
+        actions     = []
+        related     = [OCCI::Core::Link::KIND]
         entity_type = self
-        entities = []
+        entities    = []
 
         term    = "storagelink"
         scheme  = "http://schemas.ogf.org/occi/infrastructure#"

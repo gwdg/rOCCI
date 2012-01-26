@@ -24,20 +24,12 @@ require 'occi/core/Action'
 require 'occi/core/Kind'
 require 'occi/core/Resource'
 require 'occi/StateMachine'
-require 'occi/ActionDelegator'
+#require 'occi/ActionDelegator'
 
 module OCCI
   module Infrastructure    
-    class Compute < OCCI::Core::Resource
-      
-      case $config["backend"]
-      when 'opennebula'
-        include OCCI::Backend::OpenNebula::Compute
-      when 'dummy'
-        include OCCI::Backend::Dummy::Compute
-      end if $config
 
-      # Define associated kind
+    class Compute < OCCI::Core::Resource
       begin
         # Define actions
         restart_attributes = OCCI::Core::Attributes.new()
@@ -124,5 +116,6 @@ module OCCI
         super(attributes ,mixins, OCCI::Infrastructure::Compute::KIND)
       end
     end
+
   end
 end

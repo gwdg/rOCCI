@@ -25,9 +25,8 @@ require 'occi/core/Link'
 
 module OCCI
   module Infrastructure
-    class Networkinterface < OCCI::Core::Link
 
-      # Define appropriate kind
+    class Networkinterface < OCCI::Core::Link
       begin
 
         # Define state-machine
@@ -68,5 +67,6 @@ module OCCI
 #      end
 
     end
+
   end
 end

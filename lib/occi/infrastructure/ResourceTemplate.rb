@@ -19,21 +19,17 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'singleton'
-
 require 'occi/core/Mixin'
 
 module OCCI
   module Infrastructure
-    class ResourceTemplate < OCCI::Core::Mixin
 
-      # Define appropriate mixin
+    class ResourceTemplate < OCCI::Core::Mixin
       begin
         # Define actions
-        actions = []
-
-        related = []
-        entities = []
+        actions   = []
+        related   = []
+        entities  = []
 
         term    = "resource_tpl"
         scheme  = "http://schemas.ogf.org/occi/infrastructure#"
@@ -45,5 +41,6 @@ module OCCI
         OCCI::CategoryRegistry.register(MIXIN)
       end
     end
+
   end
 end
