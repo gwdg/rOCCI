@@ -98,10 +98,12 @@ def initialize_backend(request)
   if auth.provided? && auth.basic? && auth.credentials
     user, password = auth.credentials
   else
-    user, password = [$config['username'], $config['password']]
+    user, password = [$config['one_user'], $config['one_password']]
+    $log.debug("No basic auth data provided: using defaults from config (user = '#{user}')")
   end
 
   begin
+        $log.debug("**** bla *** ")
     backend = case $config["backend"]
                when "opennebula"
                  require 'occi/backend/OpenNebula'
@@ -114,8 +116,8 @@ def initialize_backend(request)
 
     # Initialize resources only once
     # FIXME: need better way to do resource init / refresh! (maybe async thread or somesuch)
-    if $resources_initalized == false
-      $log.debug("Get existing resources from backend")
+    unless $resources_initalized
+      $log.debug("Loading existing resources from backend...")
       backend.register_existing_resources
       register_existing_resources = true
     end
@@ -123,8 +125,7 @@ def initialize_backend(request)
     return backend
 
   rescue RuntimeError => e
-    $log.fatal "#{e}: #{e.backtrace}"
-    exit 1
+    $log.error(e)
   end  
 end
 
