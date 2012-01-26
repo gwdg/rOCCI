@@ -71,24 +71,6 @@ else
   $nfs_support = false 
 end
 
-##############################################################################
-# initialize backend, currently only Dummy and OpenNebula are supported
-
-#begin
-#  $backend = case $config["backend"]
-#  when "opennebula"
-#    require 'occi/backend/OpenNebula'
-#    OCCI::Backend::OpenNebula.new()
-#  when "dummy" then
-#    require 'occi/backend/Dummy'
-#    OCCI::Backend::Dummy.new()
-#  else raise "Backend '" + $config["backend"] + "' not found"
-#  end
-#rescue RuntimeError => e
-#  $log.fatal "#{e}: #{e.backtrace}"
-#  exit 1
-#end
-
 $resources_initialized = false;
 
 def initialize_backend(request)
@@ -103,7 +85,6 @@ def initialize_backend(request)
   end
 
   begin
-        $log.debug("**** bla *** ")
     backend = case $config["backend"]
                when "opennebula"
                  require 'occi/backend/OpenNebula'
