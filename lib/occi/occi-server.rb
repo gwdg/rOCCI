@@ -226,7 +226,7 @@ begin
       # Render exact matches referring to an entity
       if object != nil and object.kind_of?(OCCI::Core::Entity)
         $log.info("Rendering entity [#{object.type_identifier}] for location [#{location}] ...")
-        object.refresh if object.kind_of?(OCCI::Core::Resource)
+        OCCI::Backend::Manager.signal_resource(backend, OCCI::Backend::RESOURCE_REFRESH, object) if object.kind_of?(OCCI::Core::Resource)
         rendering.render_entity(object)
         break
       end
@@ -245,7 +245,7 @@ begin
 
         locations = []
         resources.each do |resource|
-          resource.refresh if resource.kind_of?(OCCI::Core::Resource)
+          OCCI::Backend::Manager.signal_resource(backend, OCCI::Backend::RESOURCE_REFRESH, resource) if resource.kind_of?(OCCI::Core::Resource)
           locations << OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(resource)
         end
        
@@ -316,13 +316,13 @@ begin
         resources.each do |resource|
           # TODO: check why networkinterface is showing up under /compute/
           next unless resource.kind_of?(OCCI::Core::Resource)
-          resource.refresh if resource.kind_of?(OCCI::Core::Resource)
+          OCCI::Backend::Manager.signal_resource(backend, OCCI::Backend::RESOURCE_REFRESH, resource) if resource.kind_of?(OCCI::Core::Resource)
           action = nil
           resource.kind.actions.each do |existing_action|
             action = existing_action if existing_action.category == occi_request.action_category
           end
           raise "No action found for action #{occi_request.action_category.type_identifier} and resource {#{resource.kind.type_identifier}" if action.nil?
-          delegator.delegate_action(action, method, resource)
+          delegator.delegate_action(backend, action, method, resource)
         end
         
         break
@@ -392,7 +392,7 @@ begin
           OCCI::Rendering::HTTP::LocationRegistry.register(occi_link.get_location, occi_link)
         end
 
-        resource.deploy(backend)
+        OCCI::Backend::Manager.signal_resource(backend, OCCI::Backend::RESOURCE_DEPLOY, resource)
 
         $log.debug('Location:' + resource.get_location)
 
@@ -427,8 +427,8 @@ begin
 
         # Update / add attributes
         entities.each do |entity|
-          # refresh information from backend for entities of type resource
-          entity.refresh if entity.kind_of?(OCCI::Core::Resource)
+          # Refresh information from backend for entities of type resource
+          OCCI::Backend::Manager.signal_resource(backend, OCCI::Backend::RESOURCE_REFRESH, entity) if entity.kind_of?(OCCI::Core::Resource)
           $log.debug("Adding the following attribute to mixin: #{occi_request.attributes}")
           entity.attributes.merge!(occi_request.attributes)
         end unless occi_request.attributes.empty?
@@ -546,7 +546,7 @@ begin
 
         # full update of attributes
         entities.each do |entity|
-          # refresh information from backend for entities of type resource
+          # Refresh information from backend for entities of type resource
           # TODO: full update
           entity.attributes.merge!(occi_request.attributes)
           # TODO: update entity in backend
@@ -641,6 +641,7 @@ begin
         occi_request.mixins.each do |mixin|
           $log.info("Deleting mixin #{mixin.type_identifier}")
           mixin.entities.each do |entity|
+            # FIXME!
             entity.delete(mixin)
           end
           OCCI::CategoryRegistry.unregister(mixin)
@@ -675,6 +676,7 @@ begin
       if not entities.nil?
         entities.each do |entity|
           location = entity.get_location
+          OCCI::Backend::Manager.signal_resource(backend, OCCI::Backend::RESOURCE_DELETE, entity)
           entity.delete
           OCCI::Rendering::HTTP::LocationRegistry.unregister(location)
         end

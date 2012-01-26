@@ -107,18 +107,19 @@ module OCCI
       end
 
       def initialize(attributes, mixins = [])
-        @state_machine  = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE, STATE_SUSPENDED], :on_transition => self.method(:update_state))
+        @state_machine  = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE, STATE_SUSPENDED])
+
         # Initialize resource state
         attributes['occi.compute.state'] = state_machine.current_state.name
 
-        # create action delegator
-        delegator = OCCI::ActionDelegator.instance
+ #       # create action delegator
+ #       delegator = OCCI::ActionDelegator.instance
 
         # register methods for compute actions
-        delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_START, self, :start)
-        delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_STOP,  self, :stop)
-        delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_RESTART, self, :restart)
-        delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_SUSPEND, self, :suspend)
+ #       delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_START, self, :start)
+ #       delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_STOP,  self, :stop)
+ #       delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_RESTART, self, :restart)
+ #       delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_SUSPEND, self, :suspend)
 
         super(attributes ,mixins, OCCI::Infrastructure::Compute::KIND)
       end

@@ -92,11 +92,13 @@ module OCCI
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
+    # Return backend method symbol to handle transition or nil if not defined
     def transition(action)
       raise "Transition for action [#{action}] not supported in current state: #{@current_state}" if !check_transition(action)
       @current_state = @current_state.get_target_state(action)
       # Invoke event callback if defined
-      @options[:on_transition].call if @options.has_key?(:on_transition)
+      return @options[:on_transition] if @options.has_key?(:on_transition)
+      return nil
     end
 
     # ---------------------------------------------------------------------------------------------------------------------

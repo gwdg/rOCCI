@@ -42,14 +42,14 @@ module OCCI
           title   = "OpenNebula Image Mixin"
 
           attributes = OCCI::Core::Attributes.new()
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.type', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.public', mutable = true, mandatory = false, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.type',       mutable = true, mandatory = false, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.public',     mutable = true, mandatory = false, unique = true)
           attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.persistent', mutable = true, mandatory = false, unique = true)
           attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.dev_prefix', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.bus', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.path', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.source', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.fstype', mutable = true, mandatory = false, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.bus',        mutable = true, mandatory = false, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.path',       mutable = true, mandatory = false, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.source',     mutable = true, mandatory = false, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.image.fstype',     mutable = true, mandatory = false, unique = true)
 
           MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
         end

@@ -78,16 +78,18 @@ module OCCI
       end
 
       def initialize(attributes, mixins=[])
-        @state_machine  = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE], :on_transition => self.method(:update_state))
+
+        @state_machine  = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE])
+
         # Initialize resource state
         attributes['occi.network.state'] = state_machine.current_state.name
 
         # create action delegator
-        delegator = OCCI::ActionDelegator.instance
+#        delegator = OCCI::ActionDelegator.instance
 
         # register methods for network actions
-        delegator.register_method_for_action(OCCI::Infrastructure::Network::ACTION_UP, self, :up)
-        delegator.register_method_for_action(OCCI::Infrastructure::Network::ACTION_DOWN, self, :down)
+#        delegator.register_method_for_action(OCCI::Infrastructure::Network::ACTION_UP, self, :up)
+#        delegator.register_method_for_action(OCCI::Infrastructure::Network::ACTION_DOWN, self, :down)
 
         super(attributes, mixins, OCCI::Infrastructure::Network::KIND)
       end

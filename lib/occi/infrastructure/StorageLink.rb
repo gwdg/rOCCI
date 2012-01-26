@@ -55,15 +55,17 @@ module OCCI
       end
 
       def initialize(attributes, mixins = [])
-        @state_machine = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE], :on_transition => self.method(:update_state))
+
+        @state_machine = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE])
+
         # Initialize resource state
         attributes['occi.storagelink.state'] = state_machine.current_state.name
         super(attributes, mixins, OCCI::Infrastructure::StorageLink::KIND)
       end
 
-      def update_state
-        @attributes['occi.storagelink.state'] = state_machine.current_state.name
-      end
+#      def update_state
+#        @attributes['occi.storagelink.state'] = state_machine.current_state.name
+#      end
 
     end
   end

@@ -37,10 +37,15 @@ module OCCI
   module Backend
 
     # ---------------------------------------------------------------------------------------------------------------------
-    OPERATION_DEPLOY        = :deploy
-    OPERATION_UPDATE_STATE  = :update_state
-    OPERATION_REFRESH       = :refresh
-    OPERATION_FINALIZE      = :finalize
+    RESOURCE_DEPLOY         = :deploy
+    RESOURCE_UPDATE_STATE   = :update_state
+    RESOURCE_REFRESH        = :refresh
+    RESOURCE_DELETE         = :delete
+
+#    ACTION_START            = :start
+#    ACTION_STOP             = :stop
+#    ACTION_RESTART          = :restart
+#    ACTION_SUSPEND          = :suspend
 
     # ---------------------------------------------------------------------------------------------------------------------
     class Manager
@@ -61,7 +66,7 @@ module OCCI
       end
 
       # ---------------------------------------------------------------------------------------------------------------------
-      def self.signal_resource(backend, operation, resource)
+      def self.signal_resource(backend, operation, resource, operation_parameters = nil)
 
         resource_type = resource.kind.type_identifier
         backend_ident = backend.class.name.downcase
@@ -74,10 +79,43 @@ module OCCI
         raise OCCI::BackendError, "Operation '#{operation}' not supported on resource category '#{resource_type}'!" unless operations[resource_type].has_key?(operation)
         
         # Delegate
-        backend.send(operations[resource_type][operation], resource)
+        if operation_parameters.is_nil?
+          # Generic resource operation
+          backend.send(operations[resource_type][operation], resource)
+        else
+          # Action related operation, we need to pass on the action parameters
+          backend.send(operations[resource_type][operation], resource, operation_parameters)
+        end
+
       end
+
+      # ---------------------------------------------------------------------------------------------------------------------
+      def self.delegate_action(backend, action, parameters, resource)
+  
+        $log.debug("Delegating invocation of action [#{action}] on resource [#{resource}] with parameters [#{parameters}] to backend...")
+  
+        # Verify
+        state_machine = resource.state_machine
+        raise "Action [#{action}] not valid for current state [#{state_machine.current_state}] of resource [#{resource}]!" if !state_machine.check_transition(action)
+        
+        # Use action term as ident
+        operation = action.term.to_s
+
+        begin
+          # TODO: define some convention for result handling!
+          signal_resource(backend, operation, resource, parameters)
+
+          state_machine.transition(action)
+          signal_resource(backend, OCCI::Backend::RESOURCE_UPDATE_STATE)
+
+        rescue OCCI::BackendError
+          $log.error("Action invocation failed!")
+          raise
+        end   
+      end
+
     end
-    
+
     # ---------------------------------------------------------------------------------------------------------------------
     class OpenNebula
       
@@ -86,24 +124,47 @@ module OCCI
       OPERATIONS = {}
       
       OPERATIONS["http://schemas.ogf.org/occi/infrastructure#compute"] = {
+        
+        # Generic resource operations
         :deploy         => :compute_deploy,
         :update_state   => :compute_update_state,
         :refresh        => :compute_refresh,
-        :finalize       => :compute_finalize
+        :delete         => :compute_delete,
+        
+        # Compute specific resource operations
+        :start          => :compute_start,
+        :stop           => :compute_stop,
+        :restart        => :compute_restart,
+        :suspend        => :compute_suspend        
       }
 
       OPERATIONS["http://schemas.ogf.org/occi/infrastructure#network"] = {
+        
+        # Generic resource operations
         :deploy         => :network_deploy,
         :update_state   => :network_update_state,
         :refresh        => :network_refresh,
-        :finalize       => :network_finalize
+        :delete         => :network_delete,
+        
+        # Network specific resource operations
+        :up             => :network_up,
+        :down           => :network_down
       }
 
       OPERATIONS["http://schemas.ogf.org/occi/infrastructure#storage"] = {
+
+        # Generic resource operations
         :deploy         => :storage_deploy,
         :update_state   => :storage_update_state,
         :refresh        => :storage_refresh,
-        :finalize       => :storage_finalize
+        :delete         => :storage_delete,
+   
+        # Network specific resource operations
+        :online         => :storage_online,
+        :offline        => :storage_offline,
+        :backup         => :storage_backup,
+        :snapshot       => :storage_snapshot,
+        :resize         => :storage_resize
       }
        
       begin
@@ -568,7 +629,7 @@ module OCCI
       end
 
       # ---------------------------------------------------------------------------------------------------------------------     
-      def compute_finalize(compute)
+      def compute_delete(compute)
         backend_object=VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
 
         rc = backend_object.finalize
@@ -610,8 +671,11 @@ module OCCI
         end
       end
 
-
       # COMPUTE ACTIONS
+
+      # ---------------------------------------------------------------------------------------------------------------------     
+      def compute_action_dummy(compute, parameters)       
+      end
 
       # ---------------------------------------------------------------------------------------------------------------------     
       # COMPUTE Action start
@@ -713,7 +777,7 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------     
       # DELETE VNET
-      def network_finalize(network)
+      def network_delete(network)
         backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(network.backend[:id]), @one_client)
         rc = backend_object.delete
         check_rc(rc)
@@ -739,6 +803,10 @@ module OCCI
       end
 
       # ---------------------------------------------------------------------------------------------------------------------     
+      def network_action_dummy(network, parameters)       
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------     
       # Action up
       def network_up(network, parameters)
         backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(network.backend[:id]), @one_client)
@@ -757,7 +825,6 @@ module OCCI
       end
 
       # ---------------------------------------------------------------------------------------------------------------------     
-      # GET ALL IMAGEs
       def self.network_register_all_instances
         occi_objects = []
         backend_object_pool=ImagePool.new(@one_client, INFO_ACL)
@@ -773,40 +840,6 @@ module OCCI
           end
         end
         return occi_objects
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------     
-      # Action online
-      def network_online(network, parameters)
-        backend_object = Image.new(Image.build_xml(network.backend[:id]), @one_client)
-        rc = backend_object.enable
-        check_rc(rc)
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------     
-      # Action offline
-      def network_offline(network, parameters)
-        backend_object = Image.new(Image.build_xml(network.backend[:id]), @one_client)
-        rc = backend_object.disable
-        check_rc(rc)
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------     
-      # Action backup
-      def network_backup(network, parameters)
-        $log.debug("not yet implemented")
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------     
-      # Action snapshot
-      def network_snapshot(network, parameters)
-        $log.debug("not yet implemented")
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------     
-      # Action resize
-      def network_resize(network, parameters)
-        $log.debug("not yet implemented")
       end
 
       ########################################################################
@@ -855,7 +888,7 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------     
       # DELETE STORAGE / IMAGE
-      def storage_finalize(storage)
+      def storage_delete(storage)
         backend_object = Image.new(Image.build_xml(storage.backend[:id]), @one_client)
         rc = backend_object.delete
         check_rc(rc)
@@ -881,6 +914,44 @@ module OCCI
           # update state
           storage_update_state(storage)
         end
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------     
+      def storage_action_dummy(storage, parameters)       
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------     
+      # Action online
+      def storage_online(network, parameters)
+        backend_object = Image.new(Image.build_xml(network.backend[:id]), @one_client)
+        rc = backend_object.enable
+        check_rc(rc)
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------     
+      # Action offline
+      def storage_offline(network, parameters)
+        backend_object = Image.new(Image.build_xml(network.backend[:id]), @one_client)
+        rc = backend_object.disable
+        check_rc(rc)
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------     
+      # Action backup
+      def storage_backup(network, parameters)
+        $log.debug("not yet implemented")
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------     
+      # Action snapshot
+      def storage_snapshot(network, parameters)
+        $log.debug("not yet implemented")
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------     
+      # Action resize
+      def storage_resize(network, parameters)
+        $log.debug("not yet implemented")
       end
 
     end

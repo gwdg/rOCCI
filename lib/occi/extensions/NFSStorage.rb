@@ -73,13 +73,14 @@ module OCCI
       end
 
       def initialize(attributes, mixins=[])
-        @state_machine  = OCCI::StateMachine.new(STATE_OFFLINE, [STATE_OFFLINE, STATE_ONLINE], :on_transition => self.method(:update_state))
+
+        @state_machine  = OCCI::StateMachine.new(STATE_OFFLINE, [STATE_OFFLINE, STATE_ONLINE])
 
         # Initialize resource state
         attributes['occi.storage.state'] = state_machine.current_state.name
 
         # create action delegator
-        delegator = OCCI::ActionDelegator.instance
+#        delegator = OCCI::ActionDelegator.instance
 
         # register methods for storage actions
 #        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_ONLINE,    self, :online)
@@ -88,17 +89,17 @@ module OCCI
         super(attributes, mixins, OCCI::Infrastructure::NFSStorage::KIND)
       end
       
-      def update_state
-        # Nothing to do
-      end
+#      def update_state
+#        # Nothing to do
+#      end
       
-      def deploy
-        # Nothing to do
-      end
+#      def deploy
+#        # Nothing to do
+#      end
 
-      def refresh
-        # Nothing to do
-      end
+#      def refresh
+#        # Nothing to do
+#      end
 
     end
   end

@@ -42,7 +42,7 @@ module OCCI
           title   = "OpenNebula VNC Mixin"
 
           attributes = OCCI::Core::Attributes.new()
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.vnc', mutable = true, mandatory = false, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.vnc',     mutable = true, mandatory = false, unique = true)
           attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.web_vnc', mutable = true, mandatory = false, unique = true)
       
           MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)

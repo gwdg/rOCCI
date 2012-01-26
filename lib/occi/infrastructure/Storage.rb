@@ -100,7 +100,7 @@ module OCCI
 
       def initialize(attributes, mixins=[])
 
-        @state_machine  = OCCI::StateMachine.new(STATE_OFFLINE, [STATE_OFFLINE, STATE_ONLINE, STATE_BACKUP, STATE_SNAPSHOT, STATE_RESIZE], :on_transition => self.method(:update_state))
+        @state_machine  = OCCI::StateMachine.new(STATE_OFFLINE, [STATE_OFFLINE, STATE_ONLINE, STATE_BACKUP, STATE_SNAPSHOT, STATE_RESIZE])
 
         # Initialize resource state
         attributes['occi.storage.state'] = state_machine.current_state.name

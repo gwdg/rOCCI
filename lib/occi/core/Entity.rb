@@ -149,12 +149,11 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------
       def delete
-        # finalize resource in backend
-        finalize
         
         self.mixins.each do |mixin|
           mixin.entities.delete(self)
         end
+
         # remove all links from this entity and from all linked entities
         links = @links.clone unless @links.nil?
         links.each do |link|
