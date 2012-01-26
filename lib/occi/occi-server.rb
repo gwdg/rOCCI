@@ -89,6 +89,8 @@ end
 #  exit 1
 #end
 
+$resources_initialized = false;
+
 def initialize_backend(request)
 
   auth =  Rack::Auth::Basic::Request.new(request.env)
@@ -109,6 +111,14 @@ def initialize_backend(request)
                  OCCI::Backend::Dummy.new()
                else raise "Backend '" + $config["backend"] + "' not found"
              end
+
+    # Initialize resources only once
+    # FIXME: need better way to do resource init / refresh! (maybe async thread or somesuch)
+    if $resources_initalized == false
+      $log.debug("Get existing resources from backend")
+      backend.register_existing_resources
+      register_existing_resources = true
+    end
 
     return backend
 
@@ -168,15 +178,7 @@ if $config['username'] != nil and $config['password'] != nil
   end
 end
 
-##############################################################################
-# Get existing resources from backend
-
-# FIXME
-$log.debug("Get existing resources from backend")
-$backend.register_existing_resources
-
 rendering = OCCI::Rendering::Rendering.new
-
 
 ##############################################################################
 # Sinatra methods for handling HTTP requests
