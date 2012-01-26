@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and        #
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
+
 
 module OpenNebula
 
@@ -30,11 +31,9 @@ module OpenNebula
         REXML_FORMATTERS=false
     end
 
-    ###########################################################################
     # The XMLElement class provides an abstraction of the underlying
     # XML parser engine. It provides XML-related methods for the Pool and
     # PoolElement classes
-    ###########################################################################
     class XMLElement
 
         # xml:: _opaque xml object_ an xml object as returned by build_xml
@@ -202,7 +201,7 @@ module OpenNebula
             template_like_str('TEMPLATE', indent)
         end
 
-        def template_like_str(root_element, indent=true)
+        def template_like_str(root_element, indent=true, xpath_exp=nil)
             if NOKOGIRI
                 xml_template=@xml.xpath(root_element).to_s
                 rexml=REXML::Document.new(xml_template).root
@@ -218,7 +217,7 @@ module OpenNebula
                 ind_tab=' '
             end
 
-            str=rexml.collect {|n|
+            str=rexml.elements.collect(xpath_exp) {|n|
                 if n.class==REXML::Element
                     str_line=""
                     if n.has_elements?
@@ -310,10 +309,8 @@ module OpenNebula
         end
     end
 
-    ###########################################################################
     # The XMLUtilsPool module provides an abstraction of the underlying
     # XML parser engine. It provides XML-related methods for the Pools
-    ###########################################################################
     class XMLPool < XMLElement
 
         def initialize(xml=nil)

@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -14,6 +14,7 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
+
 require 'OpenNebula/Pool'
 
 module OpenNebula
@@ -22,6 +23,7 @@ module OpenNebula
         # Constants and Class attribute accessors
         #######################################################################
 
+
         HOST_POOL_METHODS = {
             :info => "hostpool.info"
         }
@@ -29,7 +31,8 @@ module OpenNebula
         #######################################################################
         # Class constructor & Pool Methods
         #######################################################################
-        
+
+
         # +client+ a Client object that represents a XML-RPC connection
         def initialize(client)
             super('HOST_POOL','HOST',client)

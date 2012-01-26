@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -14,13 +14,16 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
+
 require 'OpenNebula/Pool'
 
 module OpenNebula
     class Template < PoolElement
-        # ---------------------------------------------------------------------
+        #######################################################################
         # Constants and Class Methods
-        # ---------------------------------------------------------------------
+        #######################################################################
+
+
         TEMPLATE_METHODS = {
             :allocate    => "template.allocate",
             :instantiate => "template.instantiate",
@@ -28,7 +31,8 @@ module OpenNebula
             :update      => "template.update",
             :publish     => "template.publish",
             :delete      => "template.delete",
-            :chown       => "template.chown"
+            :chown       => "template.chown",
+            :chmod       => "template.chmod"
         }
 
         # Creates a Template description with just its identifier
@@ -48,18 +52,16 @@ module OpenNebula
             XMLElement.build_xml(obj_xml,'VMTEMPLATE')
         end
 
-        # ---------------------------------------------------------------------
         # Class constructor
-        # ---------------------------------------------------------------------
         def initialize(xml, client)
             super(xml,client)
 
             @client = client
         end
 
-        # ---------------------------------------------------------------------
+        #######################################################################
         # XML-RPC Methods for the Template Object
-        # ---------------------------------------------------------------------
+        #######################################################################
 
         # Retrieves the information of the given Template.
         def info()
@@ -118,9 +120,29 @@ module OpenNebula
             super(TEMPLATE_METHODS[:chown], uid, gid)
         end
 
-        # ---------------------------------------------------------------------
+        # Changes the Template permissions.
+        #
+        # @param octet [String] Permissions octed , e.g. 640
+        # @return [nil, OpenNebula::Error] nil in case of success, Error
+        #   otherwise
+        def chmod_octet(octet)
+            super(TEMPLATE_METHODS[:chmod], octet)
+        end
+
+        # Changes the Template permissions.
+        # Each [Integer] argument must be 1 to allow, 0 deny, -1 do not change
+        #
+        # @return [nil, OpenNebula::Error] nil in case of success, Error
+        #   otherwise
+        def chmod(owner_u, owner_m, owner_a, group_u, group_m, group_a, other_u,
+                other_m, other_a)
+            super(TEMPLATE_METHODS[:chmod], owner_u, owner_m, owner_a, group_u,
+                group_m, group_a, other_u, other_m, other_a)
+        end
+
+        #######################################################################
         # Helpers to get Template information
-        # ---------------------------------------------------------------------
+        #######################################################################
 
         # Returns the group identifier
         # [return] _Integer_ the element's group ID
@@ -132,15 +154,20 @@ module OpenNebula
             self['UID'].to_i
         end
 
+        def public?
+            if self['PERMISSIONS/GROUP_U'] == "1" || self['PERMISSIONS/OTHER_U'] == "1"
+                true
+            else
+                false
+            end
+        end
+
     private
 
         def set_publish(published)
-            return Error.new('ID not defined') if !@pe_id
+            group_u = published ? 1 : 0
 
-            rc = @client.call(TEMPLATE_METHODS[:publish], @pe_id, published)
-            rc = nil if !OpenNebula.is_error?(rc)
-
-            return rc
+            chmod(-1, -1, -1, group_u, -1, -1, -1, -1, -1)
         end
     end
 end

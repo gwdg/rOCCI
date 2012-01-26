@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -14,22 +14,41 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
+
 require 'OpenNebula/Pool'
 
 module OpenNebula
     class User < PoolElement
-        # ---------------------------------------------------------------------
+        #######################################################################
         # Constants and Class Methods
-        # ---------------------------------------------------------------------
+        #######################################################################
+
         USER_METHODS = {
             :info     => "user.info",
             :allocate => "user.allocate",
             :delete   => "user.delete",
             :passwd   => "user.passwd",
-            :chgrp    => "user.chgrp"
+            :chgrp    => "user.chgrp",
+            :update   => "user.update",
+            :chauth   => "user.chauth"
         }
 
-        SELF = -1
+        SELF      = -1
+
+        # Driver name for default core authentication
+        CORE_AUTH = "core"
+
+        # Driver name for default core authentication
+        CIPHER_AUTH = "server_cipher"
+
+        # Driver name for ssh authentication
+        SSH_AUTH  = "ssh"
+
+        # Driver name for x509 authentication
+        X509_AUTH = "x509"
+
+        # Driver name for x509 proxy authentication
+        X509_PROXY_AUTH = "x509_proxy"
 
         # Creates a User description with just its identifier
         # this method should be used to create plain User objects.
@@ -48,18 +67,16 @@ module OpenNebula
             XMLElement.build_xml(user_xml, 'USER')
         end
 
-        # ---------------------------------------------------------------------
         # Class constructor
-        # ---------------------------------------------------------------------
         def initialize(xml, client)
             super(xml,client)
 
             @client = client
         end
 
-        # ---------------------------------------------------------------------
+        #######################################################################
         # XML-RPC Methods for the User Object
-        # ---------------------------------------------------------------------
+        #######################################################################
 
         # Retrieves the information of the given User.
         def info()
@@ -71,8 +88,15 @@ module OpenNebula
         # +username+ Name of the new user.
         #
         # +password+ Password for the new user
-        def allocate(username, password)
-            super(USER_METHODS[:allocate], username, password)
+        def allocate(username, password, driver=CORE_AUTH)
+            super(USER_METHODS[:allocate], username, password, driver)
+        end
+
+        # Replaces the template contents
+        #
+        # +new_template+ New template contents
+        def update(new_template)
+            super(USER_METHODS[:update], new_template)
         end
 
         # Deletes the User
@@ -104,9 +128,25 @@ module OpenNebula
             return rc
         end
 
-        # ---------------------------------------------------------------------
+        # Changes the auth driver and the password of the given User
+        #
+        # @param auth [String] the new auth driver
+        # @param password [String] the new password. If it is an empty string,
+        #   the user password is not changed
+        # @return [nil, OpenNebula::Error] nil in case of success, Error
+        #   otherwise
+        def chauth(auth, password="")
+            return Error.new('ID not defined') if !@pe_id
+
+            rc = @client.call(USER_METHODS[:chauth],@pe_id, auth, password)
+            rc = nil if !OpenNebula.is_error?(rc)
+
+            return rc
+        end
+
+        #######################################################################
         # Helpers to get User information
-        # ---------------------------------------------------------------------
+        #######################################################################
 
         # Returns the group identifier
         # [return] _Integer_ the element's group ID

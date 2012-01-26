@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -14,10 +14,11 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
+
 module OpenNebula
+
     # The Pool class represents a generic OpenNebula Pool in XML format
     # and provides the basic functionality to handle the Pool elements
-    
     class Pool < XMLPool
         include Enumerable
 
@@ -32,7 +33,6 @@ module OpenNebula
             @element_name = element.upcase
 
             @client = client
-            @hash   = nil
         end
 
         # Default Factory Method for the Pools. The factory method returns an
@@ -47,7 +47,7 @@ module OpenNebula
         #######################################################################
         # Common XML-RPC Methods for all the Pool Types
         #######################################################################
-        
+
         #Gets the pool without any filter. Host, Group and User Pools
         # xml_method:: _String_ the name of the XML-RPC method
         def info(xml_method)
@@ -65,7 +65,7 @@ module OpenNebula
         def info_group(xml_method)
             return xmlrpc_info(xml_method,INFO_GROUP,-1,-1)
         end
-    
+
         def info_filter(xml_method, who, start_id, end_id)
             return xmlrpc_info(xml_method,who, start_id, end_id)
         end
@@ -119,7 +119,6 @@ module OpenNebula
         def initialize(node, client)
             @xml    = node
             @client = client
-            @hash   = nil
 
             if self['ID']
                 @pe_id = self['ID'].to_i
@@ -208,6 +207,47 @@ module OpenNebula
             return Error.new('ID not defined') if !@pe_id
 
             rc = @client.call(xml_method,@pe_id, uid, gid)
+            rc = nil if !OpenNebula.is_error?(rc)
+
+            return rc
+        end
+
+        # Calls to the corresponding chmod method to modify
+        # the object's permission bits
+        #
+        # @param xml_method [String] the name of the XML-RPC method
+        # @param octet [String] Permissions octed , e.g. 640
+        # @return [nil, OpenNebula::Error] nil in case of success, Error
+        #   otherwise
+        def chmod_octet(xml_method, octet)
+            owner_u = octet[0..0].to_i & 4 != 0 ? 1 : 0
+            owner_m = octet[0..0].to_i & 2 != 0 ? 1 : 0
+            owner_a = octet[0..0].to_i & 1 != 0 ? 1 : 0
+            group_u = octet[1..1].to_i & 4 != 0 ? 1 : 0
+            group_m = octet[1..1].to_i & 2 != 0 ? 1 : 0
+            group_a = octet[1..1].to_i & 1 != 0 ? 1 : 0
+            other_u = octet[2..2].to_i & 4 != 0 ? 1 : 0
+            other_m = octet[2..2].to_i & 2 != 0 ? 1 : 0
+            other_a = octet[2..2].to_i & 1 != 0 ? 1 : 0
+
+            chmod(owner_u, owner_m, owner_a, group_u, group_m, group_a, other_u,
+                other_m, other_a)
+        end
+
+        # Calls to the corresponding chmod method to modify
+        # the object's permission bits
+        # Each [Integer] parameter must be 1 to allow, 0 deny, -1 do not change
+        #
+        # @param xml_method [String] the name of the XML-RPC method
+        # @return [nil, OpenNebula::Error] nil in case of success, Error
+        #   otherwise
+        def chmod(xml_method, owner_u, owner_m, owner_a, group_u, group_m, group_a, other_u,
+                other_m, other_a)
+            return Error.new('ID not defined') if !@pe_id
+
+            rc = @client.call(xml_method, @pe_id, owner_u, owner_m,
+                            owner_a, group_u, group_m, group_a, other_u,
+                            other_m, other_a)
             rc = nil if !OpenNebula.is_error?(rc)
 
             return rc

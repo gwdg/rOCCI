@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -14,23 +14,27 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
+
 require 'OpenNebula/Pool'
 require 'fileutils'
 
 module OpenNebula
     class Image < PoolElement
-        # ---------------------------------------------------------------------
+        #######################################################################
         # Constants and Class Methods
-        # ---------------------------------------------------------------------
+        #######################################################################
+
+
         IMAGE_METHODS = {
             :info        => "image.info",
             :allocate    => "image.allocate",
             :update      => "image.update",
             :enable      => "image.enable",
-            :publish     => "image.publish",
             :persistent  => "image.persistent",
             :delete      => "image.delete",
-            :chown       => "image.chown"
+            :chown       => "image.chown",
+            :chmod       => "image.chmod",
+            :chtype      => "image.chtype"
         }
 
         IMAGE_STATES=%w{INIT READY USED DISABLED LOCKED ERROR}
@@ -118,7 +122,7 @@ module OpenNebula
         def unpublish
             set_publish(false)
         end
-        
+
         # Makes the Image persistent
         def persistent
             set_persistent(true)
@@ -140,6 +144,39 @@ module OpenNebula
         # [return] nil in case of success or an Error object
         def chown(uid, gid)
             super(IMAGE_METHODS[:chown], uid, gid)
+        end
+
+        # Changes the Image permissions.
+        #
+        # @param octet [String] Permissions octed , e.g. 640
+        # @return [nil, OpenNebula::Error] nil in case of success, Error
+        #   otherwise
+        def chmod_octet(octet)
+            super(IMAGE_METHODS[:chmod], octet)
+        end
+
+        # Changes the Image permissions.
+        # Each [Integer] argument must be 1 to allow, 0 deny, -1 do not change
+        #
+        # @return [nil, OpenNebula::Error] nil in case of success, Error
+        #   otherwise
+        def chmod(owner_u, owner_m, owner_a, group_u, group_m, group_a, other_u,
+                other_m, other_a)
+            super(IMAGE_METHODS[:chmod], owner_u, owner_m, owner_a, group_u,
+                group_m, group_a, other_u, other_m, other_a)
+        end
+
+        # Changes the Image type
+        # @param type [String] new Image type
+        # @return [nil, OpenNebula::Error] nil in case of success, Error
+        #   otherwise
+        def chtype(type)
+            return Error.new('ID not defined') if !@pe_id
+
+            rc = @client.call(IMAGE_METHODS[:chtype], @pe_id, type)
+            rc = nil if !OpenNebula.is_error?(rc)
+
+            return rc
         end
 
         #######################################################################
@@ -182,6 +219,14 @@ module OpenNebula
             self['GID'].to_i
         end
 
+        def public?
+            if self['PERMISSIONS/GROUP_U'] == "1" || self['PERMISSIONS/OTHER_U'] == "1"
+                true
+            else
+                false
+            end
+        end
+
     private
 
         def set_enabled(enabled)
@@ -194,12 +239,9 @@ module OpenNebula
         end
 
         def set_publish(published)
-            return Error.new('ID not defined') if !@pe_id
+            group_u = published ? 1 : 0
 
-            rc = @client.call(IMAGE_METHODS[:publish], @pe_id, published)
-            rc = nil if !OpenNebula.is_error?(rc)
-
-            return rc
+            chmod(-1, -1, -1, group_u, -1, -1, -1, -1, -1)
         end
         
         def set_persistent(persistence)

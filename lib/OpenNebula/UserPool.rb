@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -14,22 +14,23 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
+
 require 'OpenNebula/Pool'
 
 module OpenNebula
     class UserPool < Pool
-        # ---------------------------------------------------------------------
+        #######################################################################
         # Constants and Class attribute accessors
-        # ---------------------------------------------------------------------
+        #######################################################################
 
         USER_POOL_METHODS = {
             :info => "userpool.info"
         }
 
-        # ---------------------------------------------------------------------
+        #######################################################################
         # Class constructor & Pool Methods
-        # ---------------------------------------------------------------------
-        
+        #######################################################################
+
         # +client+ a Client object that represents a XML-RPC connection
         def initialize(client)
             super('USER_POOL','USER',client)
@@ -40,9 +41,9 @@ module OpenNebula
             OpenNebula::User.new(element_xml,@client)
         end
 
-        # ---------------------------------------------------------------------
+        #######################################################################
         # XML-RPC Methods for the User Object
-        # ---------------------------------------------------------------------
+        #######################################################################
 
         # Retrieves all the Users in the pool.
         def info()

@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -14,21 +14,23 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
+
 require 'OpenNebula/Pool'
 
 module OpenNebula
     class TemplatePool < Pool
-        # ---------------------------------------------------------------------
+        #######################################################################
         # Constants and Class attribute accessors
-        # ---------------------------------------------------------------------
+        #######################################################################
+
 
         TEMPLATE_POOL_METHODS = {
             :info => "templatepool.info"
         }
 
-        # ---------------------------------------------------------------------
+        #######################################################################
         # Class constructor & Pool Methods
-        # ---------------------------------------------------------------------
+        #######################################################################
 
         # +client+ a Client object that represents an XML-RPC connection
         # +user_id+ used to refer to a Pool with Templates from that user
@@ -43,9 +45,10 @@ module OpenNebula
             OpenNebula::Template.new(element_xml,@client)
         end
 
-        # ---------------------------------------------------------------------
+        #######################################################################
         # XML-RPC Methods for the Template Object
-        # ---------------------------------------------------------------------
+        #######################################################################
+
         # Retrieves all or part of the VirtualMachines in the pool.
         def info(*args)
             case args.size

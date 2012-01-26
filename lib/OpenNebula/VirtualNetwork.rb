@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -14,13 +14,16 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
+
 require 'OpenNebula/Pool'
 
 module OpenNebula
     class VirtualNetwork < PoolElement
-        # ---------------------------------------------------------------------
+        #######################################################################
         # Constants and Class Methods
-        # ---------------------------------------------------------------------
+        #######################################################################
+
+
         VN_METHODS = {
             :info       => "vn.info",
             :allocate   => "vn.allocate",
@@ -28,7 +31,11 @@ module OpenNebula
             :delete     => "vn.delete",
             :addleases  => "vn.addleases",
             :rmleases   => "vn.rmleases",
-            :chown      => "vn.chown"
+            :chown      => "vn.chown",
+            :chmod      => "vn.chmod",
+            :update     => "vn.update",
+            :hold       => "vn.hold",
+            :release    => "vn.release"
         }
 
         VN_TYPES=%w{RANGED FIXED}
@@ -58,8 +65,6 @@ module OpenNebula
         # Class constructor
         def initialize(xml, client)
             super(xml,client)
-
-            @client = client
         end
 
         #######################################################################
@@ -77,7 +82,14 @@ module OpenNebula
         def allocate(description)
             super(VN_METHODS[:allocate],description)
         end
-        
+
+        # Replaces the template contents
+        #
+        # +new_template+ New template contents
+        def update(new_template)
+            super(VN_METHODS[:update], new_template)
+        end
+
         # Publishes the VirtualNetwork, to be used by other users
         def publish
             set_publish(true)
@@ -119,6 +131,32 @@ module OpenNebula
             return rc
         end
 
+        # Holds a virtual network Lease as used
+        # @param ip [String] IP to hold
+        def hold(ip)
+            return Error.new('ID not defined') if !@pe_id
+
+            lease_template = "LEASES = [ IP = #{ip} ]"
+
+            rc = @client.call(VN_METHODS[:hold], @pe_id, lease_template)
+            rc = nil if !OpenNebula.is_error?(rc)
+
+            return rc
+        end
+
+        # Releases a virtual network Lease on hold
+        # @param ip [String] IP to release
+        def release(ip)
+            return Error.new('ID not defined') if !@pe_id
+
+            lease_template = "LEASES = [ IP = #{ip} ]"
+
+            rc = @client.call(VN_METHODS[:release], @pe_id, lease_template)
+            rc = nil if !OpenNebula.is_error?(rc)
+
+            return rc
+        end
+
         # Changes the owner/group
         # uid:: _Integer_ the new owner id. Set to -1 to leave the current one
         # gid:: _Integer_ the new group id. Set to -1 to leave the current one
@@ -127,9 +165,29 @@ module OpenNebula
             super(VN_METHODS[:chown], uid, gid)
         end
 
-        # ---------------------------------------------------------------------
+        # Changes the virtual network permissions.
+        #
+        # @param octet [String] Permissions octed , e.g. 640
+        # @return [nil, OpenNebula::Error] nil in case of success, Error
+        #   otherwise
+        def chmod_octet(octet)
+            super(VN_METHODS[:chmod], octet)
+        end
+
+        # Changes the virtual network permissions.
+        # Each [Integer] argument must be 1 to allow, 0 deny, -1 do not change
+        #
+        # @return [nil, OpenNebula::Error] nil in case of success, Error
+        #   otherwise
+        def chmod(owner_u, owner_m, owner_a, group_u, group_m, group_a, other_u,
+                other_m, other_a)
+            super(VN_METHODS[:chmod], owner_u, owner_m, owner_a, group_u,
+                group_m, group_a, other_u, other_m, other_a)
+        end
+
+        #######################################################################
         # Helpers to get VirtualNetwork information
-        # ---------------------------------------------------------------------
+        #######################################################################
 
         # Returns the group identifier
         # [return] _Integer_ the element's group ID
@@ -152,14 +210,19 @@ module OpenNebula
             SHORT_VN_TYPES[type_str]
         end
 
+        def public?
+            if self['PERMISSIONS/GROUP_U'] == "1" || self['PERMISSIONS/OTHER_U'] == "1"
+                true
+            else
+                false
+            end
+        end
+
     private
         def set_publish(published)
-            return Error.new('ID not defined') if !@pe_id
+            group_u = published ? 1 : 0
 
-            rc = @client.call(VN_METHODS[:publish], @pe_id, published)
-            rc = nil if !OpenNebula.is_error?(rc)
-
-            return rc
+            chmod(-1, -1, -1, group_u, -1, -1, -1, -1, -1)
         end
 
     end

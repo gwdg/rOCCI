@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -14,6 +14,7 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
+
 require 'OpenNebula/Pool'
 
 module OpenNebula
@@ -21,6 +22,8 @@ module OpenNebula
         #######################################################################
         # Constants and Class Methods
         #######################################################################
+
+
         VM_METHODS = {
             :info     => "vm.info",
             :allocate => "vm.allocate",
@@ -28,7 +31,8 @@ module OpenNebula
             :migrate  => "vm.migrate",
             :deploy   => "vm.deploy",
             :savedisk => "vm.savedisk",
-            :chown    => "vm.chown"
+            :chown    => "vm.chown",
+            :chmod    => "vm.chmod",
         }
 
         VM_STATE=%w{INIT PENDING HOLD ACTIVE STOPPED SUSPENDED DONE FAILED}
@@ -101,14 +105,9 @@ module OpenNebula
             reason_str
         end
 
-        #######################################################################
         # Class constructor
-        #######################################################################
         def initialize(xml, client)
             super(xml,client)
-
-            @element_name = "VM"
-            @client       = client
         end
 
         #######################################################################
@@ -143,6 +142,11 @@ module OpenNebula
         # Shutdowns an already deployed VM
         def shutdown
             action('shutdown')
+        end
+
+        # Shutdowns an already deployed VM
+        def reboot
+            action('reboot')
         end
 
         # Cancels a running VM
@@ -216,13 +220,19 @@ module OpenNebula
         # @param disk_id [Integer] ID of the disk to be saved
         # @param image_name [String] Name for the new image where the
         #   disk will be saved
+        # @param image_type [String] Type of the new image. Set to empty string
+        #   to use the default type
         #
         # @return [Integer, OpenNebula::Error] the new Image ID in case of
         #   success, error otherwise
-        def save_as(disk_id, image_name)
+        def save_as(disk_id, image_name, image_type="")
             return Error.new('ID not defined') if !@pe_id
 
-            rc = @client.call(VM_METHODS[:savedisk], @pe_id, disk_id, image_name)
+            rc = @client.call(VM_METHODS[:savedisk],
+                              @pe_id,
+                              disk_id,
+                              image_name,
+                              image_type)
 
             return rc
         end
@@ -233,6 +243,26 @@ module OpenNebula
         # [return] nil in case of success or an Error object
         def chown(uid, gid)
             super(VM_METHODS[:chown], uid, gid)
+        end
+
+        # Changes the permissions.
+        #
+        # @param octet [String] Permissions octed , e.g. 640
+        # @return [nil, OpenNebula::Error] nil in case of success, Error
+        #   otherwise
+        def chmod_octet(octet)
+            super(VM_METHODS[:chmod], octet)
+        end
+
+        # Changes the permissions.
+        # Each [Integer] argument must be 1 to allow, 0 deny, -1 do not change
+        #
+        # @return [nil, OpenNebula::Error] nil in case of success, Error
+        #   otherwise
+        def chmod(owner_u, owner_m, owner_a, group_u, group_m, group_a, other_u,
+                other_m, other_a)
+            super(VM_METHODS[:chmod], owner_u, owner_m, owner_a, group_u,
+                group_m, group_a, other_u, other_m, other_a)
         end
 
         #######################################################################

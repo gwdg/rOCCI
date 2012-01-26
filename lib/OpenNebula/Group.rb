@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -14,13 +14,16 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
+
 require 'OpenNebula/Pool'
 
 module OpenNebula
     class Group < PoolElement
-        # ---------------------------------------------------------------------
+        #######################################################################
         # Constants and Class Methods
-        # ---------------------------------------------------------------------
+        #######################################################################
+
+
         GROUP_METHODS = {
             :info       => "group.info",
             :allocate   => "group.allocate",
@@ -54,18 +57,14 @@ module OpenNebula
             XMLElement.build_xml(group_xml,'GROUP')
         end
 
-        # ---------------------------------------------------------------------
         # Class constructor
-        # ---------------------------------------------------------------------
         def initialize(xml, client)
             super(xml,client)
-
-            @client = client
         end
-        
-        # --------------------------------------------------------------------
+
+        #######################################################################
         # Group utils
-        # --------------------------------------------------------------------
+        #######################################################################
 
         # Creates ACLs for the group. The ACL rules are described in a file
         def create_acls(filename = GROUP_DEFAULT)
@@ -74,7 +73,7 @@ module OpenNebula
             end
 
             msg = String.new
-            
+
             File.open(filename).each_line{ |l|
                 next if l.match(/^#/)
 
@@ -100,9 +99,9 @@ module OpenNebula
             return 0, msg
         end
 
-        # ---------------------------------------------------------------------
+        #######################################################################
         # XML-RPC Methods for the Group Object
-        # ---------------------------------------------------------------------
+        #######################################################################
 
         # Retrieves the information of the given Group.
         def info()
@@ -127,8 +126,8 @@ module OpenNebula
 
         # Returns whether or not the user with id 'uid' is part of this group
         def contains(uid)
-            # This doesn't work in ruby 1.8.5
-#            return self["USERS/ID[.=#{uid}]"] != nil
+            #This doesn't work in ruby 1.8.5
+            #return self["USERS/ID[.=#{uid}]"] != nil
 
             id_array = retrieve_elements('USERS/ID')
             return id_array != nil && id_array.include?(uid.to_s)

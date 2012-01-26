@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------- #
-# Copyright 2002-2011, OpenNebula Project Leads (OpenNebula.org)             #
+# Copyright 2002-2012, OpenNebula Project Leads (OpenNebula.org)             #
 #                                                                            #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may    #
 # not use this file except in compliance with the License. You may obtain    #
@@ -14,6 +14,7 @@
 # limitations under the License.                                             #
 #--------------------------------------------------------------------------- #
 
+
 require 'OpenNebula/Pool'
 
 module OpenNebula
@@ -21,6 +22,8 @@ module OpenNebula
         #######################################################################
         # Constants and Class Methods
         #######################################################################
+
+
         HOST_METHODS = {
             :info     => "host.info",
             :allocate => "host.allocate",
@@ -56,9 +59,7 @@ module OpenNebula
             XMLElement.build_xml(host_xml, 'HOST')
         end
 
-        #######################################################################
         # Class constructor
-        #######################################################################
         def initialize(xml, client)
             super(xml,client)
 
@@ -77,15 +78,15 @@ module OpenNebula
 
         # Allocates a new Host in OpenNebula
         #
-        # +hostname+ A string containing the name of the new Host.
+        # @param hostname [String] Name of the new Host.
+        # @param im [String] Name of the im_driver
+        # @param vmm [String] Name of the vmm_driver
+        # @param tm [String] Name of the tm_driver
         #
-        # +im+ A string containing the name of the im_driver
-        #
-        # +vmm+ A string containing the name of the vmm_driver
-        #
-        # +tm+ A string containing the name of the tm_driver
-        def allocate(hostname,im,vmm,tm)
-            super(HOST_METHODS[:allocate],hostname,im,vmm,tm)
+        # @return [Integer, OpenNebula::Error] the new VM ID in case of
+        #   success, error otherwise
+        def allocate(hostname,im,vmm,vnm,tm)
+            super(HOST_METHODS[:allocate],hostname,im,vmm,vnm,tm)
         end
 
         # Deletes the Host
