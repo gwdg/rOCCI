@@ -29,7 +29,7 @@ require 'occi/StateMachine'
 module OCCI
   module Infrastructure    
 
-    class Compute < OCCI::Core::Resource
+    class Compute < OCCI::Core::Resource      
       begin
         # Define actions
         restart_attributes = OCCI::Core::Attributes.new()
@@ -100,6 +100,9 @@ module OCCI
 
       def initialize(attributes, mixins = [])
         @state_machine  = OCCI::StateMachine.new(STATE_INACTIVE, [STATE_INACTIVE, STATE_ACTIVE, STATE_SUSPENDED])
+        
+        # FIXME
+        @nfs_mounts     = []
 
         # Initialize resource state
         attributes['occi.compute.state'] = state_machine.current_state.name
@@ -115,6 +118,7 @@ module OCCI
 
         super(attributes ,mixins, OCCI::Infrastructure::Compute::KIND)
       end
+            
     end
 
   end

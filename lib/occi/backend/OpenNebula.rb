@@ -100,7 +100,16 @@ module OCCI
         :snapshot       => :storage_snapshot,
         :resize         => :storage_resize
       }
-       
+
+      OPERATIONS["http://schemas.ogf.org/gwdg#nfsstorage"] = {
+
+        # Generic resource operations
+        :deploy         => nil,
+        :update_state   => nil,
+        :refresh        => nil,
+        :delete         => nil,   
+      }
+
       begin
         OCCI::CategoryRegistry.register(OCCI::Backend::ONE::Image::MIXIN)
         OCCI::CategoryRegistry.register(OCCI::Backend::ONE::Network::MIXIN)
@@ -443,6 +452,27 @@ module OCCI
       TEMPLATECOMPUTERAWFILE = 'occi_one_template_compute.erb'
 
       # ---------------------------------------------------------------------------------------------------------------------     
+      class ComputeERB
+        
+        @compute          = []
+        @networks         = []
+        @storage          = []
+        @external_storage = []
+        @nfs_mounts       = [] 
+        
+        attr_accessor :compute
+        attr_accessor :networks
+        attr_accessor :storage
+        attr_accessor :nfs_mounts
+        attr_accessor :external_storage 
+                
+        # Support templating of member data.
+        def get_binding
+          binding
+        end
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------     
       def compute_deploy(compute)
         # initialize backend object as VM or VM template
         # TODO: figure out templates
@@ -452,13 +482,15 @@ module OCCI
         if template_mixin.empty?
   
           backend_object = VirtualMachine.new(VirtualMachine.build_xml, @one_client)
+
+          compute_erb = ComputeERB.new
   
-          storages                = []
-          networks                = []
-          external_storages       = []
-          compute.nfs_mounts      = [] if $nfs_support
-  
-  
+          compute_erb.compute           = compute
+          compute_erb.storage           = []
+          compute_erb.networks          = []
+          compute_erb.external_storage  = []
+          compute_erb.nfs_mounts        = []
+   
           if compute.links != nil
             compute.links.each do |link|
               $log.debug("Processing link: #{link.kind.type_identifier}, attributes: #{link.attributes.inspect}")
@@ -473,40 +505,36 @@ module OCCI
                   if target.kind == OCCI::Infrastructure::NFSStorage::KIND
                     # Keep track of nfs-export -> mount-point tuples
                     $log.debug("Adding nfs mount: #{target.attributes["occi.storage.export"]} -> #{link.attributes['occi.storagelink.mountpoint']}")
-                    @nfs_mounts << [target.attributes['occi.storage.export'], link.attributes['occi.storagelink.mountpoint']]
-  #                      nfs_mounts << mount
+                    compute_erb.nfs_mounts << [target.attributes['occi.storage.export'], link.attributes['occi.storagelink.mountpoint']]
                     next
                   end
                 end
                 
                 if not target.nil?
-                  storages << [target, link]
+                  compute_erb.storage << [target, link]
                 elsif not target_URI.nil?
-                  external_storages << target_URI
+                  compute_erb.external_storage << target_URI
                 end
   
               when 'networkinterface'
                 if not target.nil?
-                  networks << [target, link]
+                  compute_erb.networks << [target, link]
                 end
   
               when 'link'
                 case target.kind.term
                 when 'storage'
-                  storages << [target, link]
+                  compute_erb.storage << [target, link]
                 when 'network'
-                  networks << [target, link]
+                  compute_erb.networks << [target, link]
                 end unless target.nil?
               end
             end
           end
-  
-  #            if $nfs_support
-  #              @nfs_mounts = %|"#{nfs_mounts.join(", ")}"|
-  #            end
-  
-          compute.templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
-          compute_template = ERB.new(File.read(compute.templateRaw)).result(binding)
+
+          template_raw = $config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
+          compute_template = ERB.new(File.read(template_raw)).result(compute_erb.get_binding)
+
           $log.debug("Parsed template #{compute_template}")
           rc = backend_object.allocate(compute_template)
           check_rc(rc)
@@ -929,6 +957,12 @@ module OCCI
         raise OCCI::BackendError, "Operation '#{operation}' not supported on resource category '#{resource_type}'!" unless operations[resource_type].has_key?(operation)
         
         # Delegate
+        
+        if operations[resource_type][operation].nil?
+          $log.debug("No backend method configured => doing nothing...")
+          return
+        end
+        
         if operation_parameters.nil?
           # Generic resource operation
           backend.send(operations[resource_type][operation], resource)
