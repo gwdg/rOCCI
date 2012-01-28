@@ -718,7 +718,7 @@ module OCCI
         network_erb.network = network
         
         template_raw = $config["TEMPLATE_LOCATION"] + TEMPLATENETWORKRAWFILE
-        template = ERB.new(File.read(template_raw)).result(network_erb.binding)
+        template = ERB.new(File.read(template_raw)).result(network_erb.get_binding)
 
         $log.debug("Parsed template #{template}")
         rc = backend_object.allocate(template)
@@ -810,11 +810,27 @@ module OCCI
 
       TEMPLATESTORAGERAWFILE = 'occi_one_template_storage.erb'
  
+       # ---------------------------------------------------------------------------------------------------------------------     
+      class StorageERB
+        
+        @storage  = []
+        
+        attr_accessor :storage
+                
+        # Support templating of member data.
+        def get_binding
+          binding
+        end
+      end
+ 
       # ---------------------------------------------------------------------------------------------------------------------     
       # CREATE STORAGE
       def storage_deploy(storage)
         
         backend_object = Image.new(Image.build_xml, @one_client)
+
+        storage_erb         = StorageERB.new
+        storage_erb.storage = storage
 
         storagelink = nil
 
@@ -828,8 +844,10 @@ module OCCI
 
         # check creation of images
         raise "No image or storagelink provided" if $image_path == ""
-        storage.templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
-        template = ERB.new(File.read(storage.templateRaw)).result(binding)
+
+        template_raw = $config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
+        template = ERB.new(File.read(template_raw)).result(storage_erb.get_binding)
+
         $log.debug("Parsed template #{template}")
         rc = backend_object.allocate(template)
         check_rc(rc)

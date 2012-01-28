@@ -1,30 +1,30 @@
-OCCI_ID			= <%= attributes["occi.core.id"]%>
-NAME          	= "<%= attributes['occi.core.title'] %>"
-DESCRIPTION   	= "<%= attributes['occi.core.summary'] if attributes['occi.core.summary'] %>"
+OCCI_ID			= <%= storage.attributes["occi.core.id"]%>
+NAME          	= "<%= storage.attributes['occi.core.title'] %>"
+DESCRIPTION   	= "<%= storage.attributes['occi.core.summary'] if storage.attributes['occi.core.summary'] %>"
 
-<% if attributes['opennebula.image.type'] %>
-TYPE          	= <%= attributes['opennebula.image.type'].upcase %>
+<% if storage.attributes['opennebula.image.type'] %>
+TYPE          	= <%= storage.attributes['opennebula.image.type'].upcase %>
 <% elsif $image_path != '' %>
 TYPE          	= OS
-<% elsif attributes['occi.storage.size'] %>
+<% elsif storage.attributes['occi.storage.size'] %>
 TYPE          	= DATABLOCK
 <% end %>
 
-#PUBLIC			= <%= attributes['opennebula.image.public'].upcase 			if attributes['opennebula.image.public'] %>
-#PERSISTENT    	= <%= attributes['opennebula.image.persistent'].upcase 		if attributes['opennebula.image.persistent'] %>
-DEV_PREFIX    	= <%= attributes['opennebula.image.dev_prefix'].downcase 	if attributes['opennebula.image.dev_prefix'] %>
-BUS           	= <%= attributes['opennebula.image.bus'].downcase 			if attributes['opennebula.image.bus'] %>
+#PUBLIC			= <%= storage.attributes['opennebula.image.public'].upcase 			if storage.attributes['opennebula.image.public'] %>
+#PERSISTENT    	= <%= storage.attributes['opennebula.image.persistent'].upcase 		if storage.attributes['opennebula.image.persistent'] %>
+DEV_PREFIX    	= <%= storage.attributes['opennebula.image.dev_prefix'].downcase 	if storage.attributes['opennebula.image.dev_prefix'] %>
+BUS           	= <%= storage.attributes['opennebula.image.bus'].downcase 			if storage.attributes['opennebula.image.bus'] %>
 
 PATH          	= <%= $image_path %>
 
-<% if attributes['occi.storage.size'] %>
-SIZE          	= <%= attributes['occi.storage.size'] %>
+<% if storage.attributes['occi.storage.size'] %>
+SIZE          	= <%= storage.attributes['occi.storage.size'] %>
 <% else %>
 SIZE          	= <%= File.size($image_path) if File.exists?($image_path)%>
 <% end %>
 
-<% if attributes['opennebula.image.fstype'] %>
-FSTYPE        	= <%= attributes['occi.storage.fstype'] %>
+<% if storage.attributes['opennebula.image.fstype'] %>
+FSTYPE        	= <%= storage.attributes['occi.storage.fstype'] %>
 <% elsif $image_path == '' %>
 FSTYPE        	= ext3
 <% end %>
