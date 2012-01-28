@@ -696,11 +696,30 @@ module OCCI
       TEMPLATENETWORKRAWFILE = 'occi_one_template_network.erb'
 
       # ---------------------------------------------------------------------------------------------------------------------     
+      class NetworkERB
+        
+        @network          = []
+        
+        attr_accessor :network
+                
+        # Support templating of member data.
+        def get_binding
+          binding
+        end
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------     
       # CREATE VNET
       def network_deploy(network)
+
         backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(), @one_client)
-        network.templateRaw = $config["TEMPLATE_LOCATION"] + TEMPLATENETWORKRAWFILE
-        template = ERB.new(File.read(network.templateRaw)).result(binding)
+        
+        network_erb         = NetworkERB.new        
+        network_erb.network = network
+        
+        template_raw = $config["TEMPLATE_LOCATION"] + TEMPLATENETWORKRAWFILE
+        template = ERB.new(File.read(template_raw)).result(network_erb.binding)
+
         $log.debug("Parsed template #{template}")
         rc = backend_object.allocate(template)
         check_rc(rc)

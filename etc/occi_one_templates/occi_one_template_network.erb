@@ -1,19 +1,19 @@
-OCCI_ID         = <%= attributes["occi.core.id"]%>
-NAME            = "<%= attributes["occi.core.title"]%>"
-DESCRIPTION     = "<%= attributes['occi.core.summary'] if attributes['occi.core.summary']%>"
-VLAN_ID         = <%= attributes['occi.network.vlan'] if attributes['occi.network.vlan']%>
+OCCI_ID         = <%= network.attributes["occi.core.id"]%>
+NAME            = "<%= network.attributes["occi.core.title"]%>"
+DESCRIPTION     = "<%= network.attributes['occi.core.summary']		if network.attributes['occi.core.summary']%>"
+VLAN_ID         = <%= network.attributes['occi.network.vlan'] 		if network.attributes['occi.network.vlan']%>
 BRIDGE          = virbr0
-# PUBLIC          = <%= attributes['opennebula.network.public'].upcase if attributes['opennebula.network.public']%>
+# PUBLIC          = <%= network.attributes['opennebula.network.public'].upcase if network.attributes['opennebula.network.public']%>
 
-<% if attributes['occi.network.allocation'] == 'static' %>
+<% if network.attributes['occi.network.allocation'] == 'static' %>
 TYPE            = FIXED
 <% else %>
 TYPE            = RANGED
 <% end %>
 
-NETWORK_ADDRESS = <%= attributes['occi.network.address'].sub('"','').split('/')[0] if attributes['occi.network.address']%>
-NETWORK_SIZE    = <%= 2**(32-attributes['occi.network.address'].sub('"','').split('/')[1].to_i)  if attributes['occi.network.address']%>
+NETWORK_ADDRESS = <%= network.attributes['occi.network.address'].sub('"','').split('/')[0] 					if network.attributes['occi.network.address']%>
+NETWORK_SIZE    = <%= 2**(32-network.attributes['occi.network.address'].sub('"','').split('/')[1].to_i)  	if network.attributes['occi.network.address']%>
 
-<% attributes['opennebula.network.leases'].each do |lease| %>
+<% network.attributes['opennebula.network.leases'].each do |lease| %>
 LEASES          = [ <%= lease %> ]
-<% end if attributes['opennebula.network.leases'] %>
+<% end if network.attributes['opennebula.network.leases'] %>
