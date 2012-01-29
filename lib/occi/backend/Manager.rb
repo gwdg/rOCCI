@@ -27,7 +27,6 @@ require 'occi/backend/opennebula/OpenNebula'
 #require 'OpenNebula/OpenNebula'
 #require 'occi/CategoryRegistry'
 #require 'occi/rendering/http/LocationRegistry'
-#require 'occi/ActionDelegator'
 
 # OpenNebula backend
 #require 'occi/backend/opennebula/Compute'
@@ -136,7 +135,8 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------
       # Register available backends
-      register_backend(OCCI::Backend::OpenNebula::OpenNebula,   OCCI::Backend::OpenNebula::OpenNebula::OPERATIONS)
+      register_backend(OCCI::Backend::OpenNebula::OpenNebula, OCCI::Backend::OpenNebula::OpenNebula::OPERATIONS)
+      register_backend(OCCI::Backend::Dummy,                  OCCI::Backend::Dummy::OPERATIONS)
 
     end
 

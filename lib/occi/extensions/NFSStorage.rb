@@ -23,7 +23,6 @@ require 'occi/CategoryRegistry'
 require 'occi/core/Kind'
 require 'occi/core/Resource'
 require 'occi/StateMachine'
-require 'occi/ActionDelegator'
 
 module OCCI
   module Infrastructure
@@ -78,13 +77,6 @@ module OCCI
 
         # Initialize resource state
         attributes['occi.storage.state'] = state_machine.current_state.name
-
-        # create action delegator
-#        delegator = OCCI::ActionDelegator.instance
-
-        # register methods for storage actions
-#        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_ONLINE,    self, :online)
-#        delegator.register_method_for_action(OCCI::Infrastructure::Storage::ACTION_OFFLINE,   self, :offline)
 
         super(attributes, mixins, OCCI::Infrastructure::NFSStorage::KIND)
       end

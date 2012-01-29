@@ -73,6 +73,7 @@ end
 
 $resources_initialized = false;
 
+# ---------------------------------------------------------------------------------------------------------------------
 def initialize_backend(request)
 
   auth =  Rack::Auth::Basic::Request.new(request.env)
@@ -166,7 +167,8 @@ rendering = OCCI::Rendering::Rendering.new
 # Sinatra methods for handling HTTP requests
 
 begin
-  ############################################################################
+
+  # ---------------------------------------------------------------------------------------------------------------------
   # GET request
 
   get '*' do
@@ -252,7 +254,7 @@ begin
     end
   end
 
-  ############################################################################
+  # ---------------------------------------------------------------------------------------------------------------------
   # POST request
 
   # Create an instance appropriate to category field and optinally link an instance to another one
@@ -296,7 +298,6 @@ begin
         raise "No entities corresponding to location [#{location}] could be found!" if resources.nil?
 
         $log.debug("Action [#{occi_request.action_category.type_identifier}] to be triggered on [#{resources.length}] entities:")
-        delegator = OCCI::ActionDelegator.instance
         resources.each do |resource|
           # TODO: check why networkinterface is showing up under /compute/
           next unless resource.kind_of?(OCCI::Core::Resource)
@@ -306,7 +307,8 @@ begin
             action = existing_action if existing_action.category == occi_request.action_category
           end
           raise "No action found for action #{occi_request.action_category.type_identifier} and resource {#{resource.kind.type_identifier}" if action.nil?
-          delegator.delegate_action(backend, action, method, resource)
+          # FIXME:  method == params?
+          OCCI::Backend::Manager.delegate_action(backend, action, parameters, resource)
         end
         
         break
@@ -469,7 +471,7 @@ begin
     end
   end
 
-  ############################################################################
+  # ---------------------------------------------------------------------------------------------------------------------
   # PUT request
 
   put '*' do
@@ -604,7 +606,7 @@ begin
     end
   end
 
-  ############################################################################
+  # ---------------------------------------------------------------------------------------------------------------------
   # DELETE request
 
   delete '*' do

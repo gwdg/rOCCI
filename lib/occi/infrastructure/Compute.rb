@@ -24,7 +24,6 @@ require 'occi/core/Action'
 require 'occi/core/Kind'
 require 'occi/core/Resource'
 require 'occi/StateMachine'
-#require 'occi/ActionDelegator'
 
 module OCCI
   module Infrastructure    
@@ -106,15 +105,6 @@ module OCCI
 
         # Initialize resource state
         attributes['occi.compute.state'] = state_machine.current_state.name
-
- #       # create action delegator
- #       delegator = OCCI::ActionDelegator.instance
-
-        # register methods for compute actions
- #       delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_START, self, :start)
- #       delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_STOP,  self, :stop)
- #       delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_RESTART, self, :restart)
- #       delegator.register_method_for_action(OCCI::Infrastructure::Compute::ACTION_SUSPEND, self, :suspend)
 
         super(attributes ,mixins, OCCI::Infrastructure::Compute::KIND)
       end

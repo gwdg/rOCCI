@@ -22,7 +22,6 @@
 require 'occi/CategoryRegistry'
 require 'occi/core/Kind'
 require 'occi/StateMachine'
-#require 'occi/ActionDelegator'
 
 module OCCI
   module Infrastructure
@@ -74,13 +73,6 @@ module OCCI
 
         # Initialize resource state
         attributes['occi.network.state'] = state_machine.current_state.name
-
-        # create action delegator
-#        delegator = OCCI::ActionDelegator.instance
-
-        # register methods for network actions
-#        delegator.register_method_for_action(OCCI::Infrastructure::Network::ACTION_UP, self, :up)
-#        delegator.register_method_for_action(OCCI::Infrastructure::Network::ACTION_DOWN, self, :down)
 
         super(attributes, mixins, OCCI::Infrastructure::Network::KIND)
       end
