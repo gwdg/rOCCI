@@ -167,10 +167,9 @@ module OCCI
             end
             if target.nil?
               backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(network_id), @one_client)
-  #            pool = VirtualNetworkPool(@one_client)
-  #            pool.info(INFO_ACL, network_id, network_id)
-         
-              
+#              pool = VirtualNetworkPool(@one_client)
+#              pool.info(INFO_ACL, network_id, network_id)
+            
               backend_object.info
               target = self.network_parse_backend_object(backend_object)
             end
