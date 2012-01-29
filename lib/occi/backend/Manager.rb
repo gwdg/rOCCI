@@ -136,7 +136,7 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------
       # Register available backends
-      register_backend(OCCI::Backend::OpenNebula,   OCCI::Backend::OpenNebula::OPERATIONS)
+      register_backend(OCCI::Backend::OpenNebula::OpenNebula,   OCCI::Backend::OpenNebula::OpenNebula::OPERATIONS)
 
     end
 
