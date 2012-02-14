@@ -264,7 +264,7 @@ module OCCI
           end
 
           if @data.has_key?(LINK)
-            response.write('Link: ' + @data[LINK].to_s + "\n")
+            response.write('Link: ' + @data[LINK].join(',') + "\n")
           end
 
           if @data.has_key?(OCCI_ATTRIBUTE)
