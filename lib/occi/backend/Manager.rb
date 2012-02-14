@@ -90,7 +90,7 @@ module OCCI
         operations = @@backends_operations[backend_ident]
         
         raise OCCI::BackendError, "Resource type '#{resource_type}' not supported!"                                 unless operations.has_key?(resource_type)
-        raise OCCI::BackendError, "Operation '#{operation}' not supported on resource category '#{resource_type}'!" unless operations[resource_type].has_key?(operation)
+        raise OCCI::BackendError, "Operation '#{operation}' not supported on resource category '#{resource_type}'!" unless operations[resource_type].has_key?(operation.to_sym)
         
         # Delegate
         
@@ -126,7 +126,7 @@ module OCCI
           signal_resource(backend, operation, resource, parameters)
 
           state_machine.transition(action)
-          signal_resource(backend, OCCI::Backend::RESOURCE_UPDATE_STATE)
+          signal_resource(backend, OCCI::Backend::RESOURCE_UPDATE_STATE,resource)
 
         rescue OCCI::BackendError
           $log.error("Action invocation failed!")
