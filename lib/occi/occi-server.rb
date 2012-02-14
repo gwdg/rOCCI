@@ -38,7 +38,11 @@ require 'occi/Configuration'
 # Initialize logger
 
 $stdout.sync = true
+class Logger; alias_method :write, :<<; end
 $log = Logger.new(STDOUT)
+
+# dump all requests to log
+use Rack::CommonLogger, $log
 
 ##############################################################################
 # Read configuration file and set loglevel
@@ -664,7 +668,8 @@ begin
       if not entities.nil?
         entities.each do |entity|
           location = entity.get_location
-          OCCI::Backend::Manager.signal_resource(backend, OCCI::Backend::RESOURCE_DELETE, entity)
+          OCCI::Backend::Manager.signal_resource(backend, OCCI::Backend::RESOURCE_DELETE, entity) if entity.kind_of? OCCI::Core::Resource
+          # TODO: delete links in backend!
           entity.delete
           OCCI::Rendering::HTTP::LocationRegistry.unregister(location)
         end
