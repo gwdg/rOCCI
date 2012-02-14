@@ -630,8 +630,7 @@ begin
         occi_request.mixins.each do |mixin|
           $log.info("Deleting mixin #{mixin.type_identifier}")
           mixin.entities.each do |entity|
-            # FIXME!
-            entity.delete(mixin)
+            entity.mixins.delete(mixin)
           end
           OCCI::CategoryRegistry.unregister(mixin)
           OCCI::Rendering::HTTP::LocationRegistry.unregister(OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(mixin))
