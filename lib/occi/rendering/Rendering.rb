@@ -45,7 +45,7 @@ module OCCI
       # ---------------------------------------------------------------------------------------------------------------------
       # TODO: implement mission methods stuff redirection -> content
       def method_missing(method, *args, &block)
-        if AbstractRenderer.public_instance_methods.include?(method.to_s)
+        if AbstractRenderer.public_instance_methods.respond_to?(method)
           @@renderers[@@request_content_type].send(method, *args, &block)
         else
           super
