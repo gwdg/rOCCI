@@ -36,6 +36,7 @@ module OCCI
        
         # ---------------------------------------------------------------------------------------------------------------------     
         def self.storage_parse_backend_object(backend_object)
+
           if backend_object['TEMPLATE/OCCI_ID'].nil?
             raise "no backend ID found" if backend_object.id.nil?
             occi_id = self.generate_occi_id(OCCI::Infrastructure::Storage::KIND, backend_object.id.to_s)
@@ -70,7 +71,7 @@ module OCCI
           # check if object already exists
           occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/storage/' +  occi_id)
           if occi_object.nil?
-            occi_object = OCCI::Infrastructure::Storage.new(attributes,mixins)
+            occi_object = OCCI::Infrastructure::Storage.new(attributes, mixins)
             occi_object.backend[:id] = backend_object.id
             OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
           else

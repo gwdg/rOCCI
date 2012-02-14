@@ -88,8 +88,8 @@ def initialize_backend(request)
   begin
     backend = case $config["backend"]
                when "opennebula"
-                 require 'occi/backend/OpenNebula'
-                 OCCI::Backend::OpenNebula.new(user, password)
+                 require 'occi/backend/opennebula/OpenNebula'
+                 OCCI::Backend::OpenNebula::OpenNebula.new(user, password)
                when "dummy" then
                  require 'occi/backend/Dummy'
                  OCCI::Backend::Dummy.new()
@@ -146,11 +146,13 @@ require 'occi/extensions/NFSStorage'
 
 # OCCI HTTP rendering
 require 'occi/rendering/Rendering'
-
 require 'occi/rendering/http/LocationRegistry'
 require 'occi/rendering/http/OCCIParser'
 require 'occi/rendering/http/OCCIRequest'
 require 'occi/rendering/http/HTTP'
+
+# Backend support
+require 'occi/backend/Manager'
 
 ##############################################################################
 # Configuration of HTTP Authentication
@@ -308,6 +310,7 @@ begin
           end
           raise "No action found for action #{occi_request.action_category.type_identifier} and resource {#{resource.kind.type_identifier}" if action.nil?
           # FIXME:  method == params?
+          parameters = nil
           OCCI::Backend::Manager.delegate_action(backend, action, parameters, resource)
         end
         

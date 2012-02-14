@@ -19,6 +19,8 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'occi/backend/Manager'
+
 module OCCI
   module Backend
 
@@ -77,10 +79,10 @@ module OCCI
       OPERATIONS["http://schemas.ogf.org/gwdg#nfsstorage"] = {
 
         # Generic resource operations
-        :deploy         => nil,
-        :update_state   => nil,
-        :refresh        => nil,
-        :delete         => nil,   
+        :deploy         => :resource_deploy,
+        :update_state   => :resource_update_state,
+        :refresh        => :resource_refresh,
+        :delete         => :resource_delete,
       }  
       
       # ---------------------------------------------------------------------------------------------------------------------     

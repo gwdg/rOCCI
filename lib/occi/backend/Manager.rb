@@ -22,6 +22,7 @@
 require 'rubygems'
 
 require 'occi/backend/opennebula/OpenNebula'
+require 'occi/backend/Dummy'
 
 #require 'uuidtools'
 #require 'OpenNebula/OpenNebula'
@@ -118,7 +119,7 @@ module OCCI
         raise "Action [#{action}] not valid for current state [#{state_machine.current_state}] of resource [#{resource}]!" if !state_machine.check_transition(action)
         
         # Use action term as ident
-        operation = action.term.to_s
+        operation = action.category.term.to_s
 
         begin
           # TODO: define some convention for result handling!
