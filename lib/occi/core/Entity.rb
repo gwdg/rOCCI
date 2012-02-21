@@ -38,6 +38,8 @@ module OCCI
       attr_reader   :kind
       attr_reader   :state_machine
 
+      attr_reader   :backend
+
       # Define appropriate kind
       begin
         actions     = []
