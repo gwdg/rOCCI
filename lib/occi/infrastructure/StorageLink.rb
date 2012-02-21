@@ -44,9 +44,9 @@ module OCCI
 
         attributes = OCCI::Core::Attributes.new()
           
-        attributes << OCCI::Core::Attribute.new(name = 'occi.storagelink.deviceid',   mutable = false,  mandatory = false,   unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.storagelink.mountpoint', mutable = true,   mandatory = false,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.storagelink.state',      mutable = false,  mandatory = true,   unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.storagelink.deviceid',   mutable = false,  required = false,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.storagelink.mountpoint', mutable = true,   required = false,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.storagelink.state',      mutable = false,  required = true,  type = "string", range = "", default = "")
             
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
         OCCI::CategoryRegistry.register(KIND)

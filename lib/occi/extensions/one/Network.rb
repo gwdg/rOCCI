@@ -40,8 +40,8 @@ module OCCI
           title   = "OpenNebula Virtual Network Mixin"
 
           attributes = OCCI::Core::Attributes.new()
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.public', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.leases', mutable = true, mandatory = false, unique = false)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.public', mutable = true, required = false,  type = "string", range = "", default = "")
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.network.leases', mutable = true, required = false,  type = "string", range = "", default = "")
           
           MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
         end

@@ -47,9 +47,9 @@ module OCCI
         title = "Reservation"
 
         attributes = OCCI::Core::Attributes.new()
-        attributes << OCCI::Core::Attribute.new(name = 'occi.reservation.start',        mutable = false, mandatory = true,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.reservation.duration',     mutable = false, mandatory = true,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.reservation.preemptible',  mutable = false, mandatory = true,  unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.reservation.start',        mutable = false, required = true,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.reservation.duration',     mutable = false, required = true,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.reservation.preemptible',  mutable = false, required = false,  type = "string", range = "", default = "")
 
         MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
       end

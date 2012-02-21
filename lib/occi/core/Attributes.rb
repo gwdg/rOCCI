@@ -29,8 +29,7 @@ module OCCI
 
       def check(attributes)
         values.each do |attribute|
-          raise "Mandatory attribute #{attribute.name} not provided" if attribute.mandatory && !attributes.has_key?(attribute.name)
-          raise "Unique attribute #{attribute.name} supplied multiple times" if attribute.unique && attributes.kind_of?(Array)
+          raise "Mandatory attribute #{attribute.name} not provided" if attribute.required && !attributes.has_key?(attribute.name)
         end
       end
 

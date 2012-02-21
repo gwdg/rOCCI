@@ -57,9 +57,9 @@ module OCCI
         title   = "Network Resource"
 
         attributes = OCCI::Core::Attributes.new()
-        attributes << OCCI::Core::Attribute.new(name = 'occi.network.vlan',   mutable = true,   mandatory = false,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.network.label',  mutable = true,   mandatory = false,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.network.state',  mutable = false,  mandatory = true,   unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.network.vlan',   mutable = true,   required = false,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.network.label',  mutable = true,   required = false,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.network.state',  mutable = false,  required = true,  type = "string", range = "", default = "")
 
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
         

@@ -28,8 +28,6 @@ module OCCI
     class Resource < Entity
 
       attr_reader   :links
-      
-      attr_reader   :template
 
       begin
         actions     = []
@@ -42,8 +40,7 @@ module OCCI
         title   = "Resource"
 
         attributes = OCCI::Core::Attributes.new()
-        attributes << OCCI::Core::Attribute.new(name = 'occi.core.summary', mutable = true, mandatory = false, unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'links',             mutable = true, mandatory = false, unique = false)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.core.summary', mutable = true, required = false,  type = "string", range = "", default = "")
 
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
         OCCI::CategoryRegistry.register(KIND)
@@ -54,18 +51,6 @@ module OCCI
         @links = []
         @template = false
         super(attributes, mixins, kind)
-      end
-
-      def make_template()
-        @template = true
-        related_mixin = OCCI::Infrastructure::ResourceTemplate::MIXIN if @links == []
-        related_mixin = OCCI::Infrastructure::OSTemplate::MIXIN if @links != []
-        term = attributes['occi.core.title'].gsub(/[^0-9A-Za-z]/, '_' + '_tpl')
-        scheme = $config['server'] + '/templates/' + KIND.term
-        title = attributes['occi.core.title']
-        template_mixin = OCCI::Core::Mixin.new(term, scheme, title, nil, [], related_mixin, [])
-        template_mixin.template_location = get_location
-        $categoryRegistry.register_mixin(mixin)
       end
 
     end

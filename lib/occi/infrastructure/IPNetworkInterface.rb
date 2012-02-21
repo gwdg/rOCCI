@@ -38,9 +38,9 @@ module OCCI
         title   = "IP Networkinterface Mixin"
 
         attributes = OCCI::Core::Attributes.new()
-        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.address',    mutable = true, mandatory = false,   unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.gateway',    mutable = true, mandatory = false,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.allocation', mutable = true, mandatory = false,   unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.address',    mutable = true, required = false,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.gateway',    mutable = true, required = false,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.allocation', mutable = true, required = false,  type = "string", range = "", default = "")
           
         MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
         
