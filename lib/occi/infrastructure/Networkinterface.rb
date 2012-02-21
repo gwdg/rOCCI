@@ -43,9 +43,9 @@ module OCCI
         title   = "Networkinterface"
 
         attributes = OCCI::Core::Attributes.new()
-        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.interface', mutable = false,  mandatory = false, unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.mac',       mutable = true,   mandatory = false, unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.state',     mutable = false,  mandatory = false, unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.interface', mutable = false,  required = false,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.mac',       mutable = true,   required = false,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.networkinterface.state',     mutable = false,  required = false,  type = "string", range = "", default = "")
 
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
         

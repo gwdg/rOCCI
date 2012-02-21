@@ -37,8 +37,6 @@ module OCCI
       attr_reader   :mixins
       attr_reader   :kind
       attr_reader   :state_machine
-      
-      attr_reader   :backend
 
       # Define appropriate kind
       begin
@@ -52,8 +50,8 @@ module OCCI
         title   = "Entity"
 
         attributes = OCCI::Core::Attributes.new()
-        attributes << OCCI::Core::Attribute.new(name = 'occi.core.id',    mutable = false,  mandatory = true,   unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.core.title', mutable = true,   mandatory = false,  unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.core.id',    mutable = false,  required = true,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.core.title', mutable = true,   required = false, type = "string", range = "", default = "")
 
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
         OCCI::CategoryRegistry.register(KIND)
@@ -109,10 +107,14 @@ module OCCI
         
         # Make sure all mandatory attributes are set
         attribute_definitions.each do |name, attribute|
-          if attribute.mandatory
-            raise "Mandatory attribute [#{name}] not set!" unless new_attributes.has_key?(name) && new_attributes[name] != nil
+          if attribute.required
+            raise "Required attribute [#{name}] not set!" unless new_attributes.has_key?(name) && new_attributes[name] != nil
           end
         end
+
+        # TODO: Check attribute range
+
+        # TODO: Set attribute defaults if nothing set until now
       end
 
       # ---------------------------------------------------------------------------------------------------------------------
@@ -126,13 +128,12 @@ module OCCI
 
         # Make sure UUID is UNIQUE for every entity
         # TODO: occi.core.id should not be set by user but may be set by backend during startup
-        $log.debug("OCCI ID: #{attributes['occi.core.id']}")
+        $log.debug("Creating #{kind.term} with OCCI ID: #{attributes['occi.core.id']}")
         attributes['occi.core.id']    = UUIDTools::UUID.timestamp_create.to_s if attributes['occi.core.id'] == nil || attributes['occi.core.id'] == ""
         attributes['occi.core.title'] = "" if attributes['occi.core.title'] == nil
 
         @mixins     = mixins
         @kind       = kind
-#        @kind_type  = "http://schemas.ogf.org/occi/core#entity"
 
         # Must be called AFTER kind + mixins are set
         check_attributes(attributes)

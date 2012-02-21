@@ -84,12 +84,12 @@ module OCCI
         title   = "Compute Resource"
 
         attributes = OCCI::Core::Attributes.new()
-        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.cores',        mutable = true,   mandatory = false,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.architecture', mutable = true,   mandatory = false,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.state',        mutable = false,  mandatory = true,   unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.hostname',     mutable = true,   mandatory = false,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.memory',       mutable = true,   mandatory = false,  unique = true)
-        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.speed',        mutable = true,   mandatory = false,  unique = true)
+        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.cores',        mutable = true,   required = false,  type = "integer", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.architecture', mutable = true,   required = false,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.state',        mutable = false,  required = true,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.hostname',     mutable = true,   required = false,  type = "string", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.memory',       mutable = true,   required = false,  type = "integer", range = "", default = "")
+        attributes << OCCI::Core::Attribute.new(name = 'occi.compute.speed',        mutable = true,   required = false,  type = "float", range = "", default = "")
 
         KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
         

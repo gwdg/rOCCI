@@ -42,9 +42,9 @@ module OCCI
           title   = "OpenNebula Virtual Machine Mixin"
 
           attributes = OCCI::Core::Attributes.new()
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.cpu_reservation', mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.boot',            mutable = true, mandatory = false, unique = true)
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.vnc_url',         mutable = true, mandatory = false, unique = true)
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.cpu_reservation', mutable = true, required = false,  type = "string", range = "", default = "")
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.boot',            mutable = true, required = false,  type = "string", range = "", default = "")
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.vnc_url',         mutable = true, required = false,  type = "string", range = "", default = "")
       
           MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
         end
