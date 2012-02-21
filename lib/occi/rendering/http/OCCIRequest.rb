@@ -73,7 +73,7 @@ module OCCI
           
           $log.debug("HTTP Request Headers: ")
           request.env.each do |k,v|
-            $log.debug(k + ":" + v) if k.include?('HTTP')
+            $log.debug(k.to_s + ":" + v.to_s) if k.include?('HTTP')
           end
           $log.debug(request.POST)
           request.POST.values.each do |body|
