@@ -71,6 +71,31 @@ module OCCI
             occi_object.backend[:id] = backend_object.id
             OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
           else
+
+            # ALI start            
+            id= backend_object.id
+            $log.debug("--- Monitoring start backend id : #{id}")
+            watch_client = OneWatchClient::VmWatchClient.new 
+            monitoring_resources = [ :cpu_usage,
+                                     :mem_usage,
+                                     :net_rx, 
+                                     :net_tx                                     
+                                   ]                       
+            vm_monitoring = watch_client.resource_monitoring(id.to_i,monitoring_resources)
+            occi_object.mixins.each do |mixin|
+#             attributes['cpu'] = vm_monitoring[:monitoring][:cpu_usage][4][1] if mixin.term == "rxtot"  
+#             attributes['memory'] = vm_monitoring[:monitoring][:mem_usage][4][1] if mixin.term == "memory"
+#             attributes['net_rx'] = vm_monitoring[:monitoring][:net_rx][4][1] if mixin.term == "net_rx"
+#             attributes['net_tx'] = vm_monitoring[:monitoring][:net_tx][4][1] if mixin.term == "net_tx"
+#             attributes['net_tx'] = vm_monitoring[:monitoring][:net_tx][4][1] if mixin.term == "net_tx"
+              attributes['cpu']     = vm_monitoring[:monitoring][:cpu_usage].join(',')  if mixin.term == "rxtot"  
+              attributes['memory']  = vm_monitoring[:monitoring][:mem_usage].join(',')  if mixin.term == "memory"
+              attributes['net_rx']  = vm_monitoring[:monitoring][:net_rx].join(',')     if mixin.term == "net_rx"
+              attributes['net_tx']  = vm_monitoring[:monitoring][:net_tx].join(',')     if mixin.term == "net_tx"
+              attributes['net_tx']  = (vm_monitoring[:monitoring][:net_tx]).join(',')   if mixin.term == "net_tx"
+            end
+            # ALI end
+            
             occi_object.attributes.merge!(attributes)
           end
   
@@ -193,7 +218,20 @@ module OCCI
   
           return occi_object
         end
-      
+
+        # ---------------------------------------------------------------------------------------------------------------------
+        # ALI: Monitoring  
+        def monitor(parameter)
+          backend_object = VirtualMachine.new(VirtualMachine.build_xml(@backend[:id]), $backend.one_client)
+          backend_object.info
+          occi_object = OCCI::Backend::OpenNebula::Compute.parse_backend_object(backend_object)
+          monitoring_resources = [ :cpu] if parameter == "cpu"                                         
+          monitoring_resources = [ :memory] if parameter == "memory"                                        
+          monitoring_resources = [ :net_rx] if parameter == "net_rx"                                        
+          monitoring_resources = [:net_tx] if parameter == "net_tx"
+          occi_object.attributes["compute.cpu.value"]= watch_client.resource_monitoring(occi_object.backend[:id],monitoring_resources)
+        end    
+     
         # ---------------------------------------------------------------------------------------------------------------------
         public
         # ---------------------------------------------------------------------------------------------------------------------
