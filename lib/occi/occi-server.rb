@@ -27,6 +27,7 @@ require 'rubygems'
 require 'sinatra'
 require "sinatra/reloader" if development?
 require "sinatra/multi_route"
+require 'sinatra/cross_origin'
 require 'logger'
 
 # Ruby standard library
@@ -177,6 +178,9 @@ end
 class OCCIServer < Sinatra::Application
 
   register Sinatra::MultiRoute
+  register Sinatra::CrossOrigin
+
+  enable cross_origin
 
   # ---------------------------------------------------------------------------------------------------------------------
   # GET request
