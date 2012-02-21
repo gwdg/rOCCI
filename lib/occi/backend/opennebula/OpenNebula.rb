@@ -46,17 +46,18 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------
       class OpenNebula
-        
-        include Compute
-        include Network
-        include Storage
-        
+
         # The ACL level to be used when querying resource in OpenNebula:
         # - INFO_ALL returns all resources and works only when running under the oneadmin account
         # - INFO_GROUP returns the resources of the account + his group (= default)
         # - INFO_MINE returns only the resources of the account
         INFO_ACL = OpenNebula::Pool::INFO_GROUP
-   
+
+        include Compute
+        include Network
+        include Storage
+        
+
         # Operation mappings
          
         OPERATIONS = {}
@@ -124,7 +125,7 @@ module OCCI
         end
   
         # ---------------------------------------------------------------------------------------------------------------------       
-        private
+#        private
         # ---------------------------------------------------------------------------------------------------------------------
   
         # ---------------------------------------------------------------------------------------------------------------------      
@@ -137,7 +138,7 @@ module OCCI
   
         # ---------------------------------------------------------------------------------------------------------------------
         # Generate a new occi id for resources created directly in OpenNebula using a seed id and the kind identifier
-        def self.generate_occi_id(kind, seed_id)
+        def generate_occi_id(kind, seed_id)
           # Use strings as kind ids
           kind = kind.type_identifier if kind.kind_of?(OCCI::Core::Kind)
           return UUIDTools::UUID.sha1_create(UUIDTools::UUID_DNS_NAMESPACE, "#{kind}:#{seed_id}").to_s

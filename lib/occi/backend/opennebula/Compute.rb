@@ -31,12 +31,16 @@ module OCCI
         TEMPLATECOMPUTERAWFILE = 'occi_one_template_compute.erb'
       
         # ---------------------------------------------------------------------------------------------------------------------       
-        private
+#        private
         # ---------------------------------------------------------------------------------------------------------------------
 
         # ---------------------------------------------------------------------------------------------------------------------     
         # PARSE OPENNEBULA COMPUTE OBJECT
-        def self.compute_parse_backend_object(backend_object)
+        def compute_parse_backend_object(backend_object)
+
+          backend_object.info
+#          $log.debug("*** compute object: " + backend_object.to_xml)
+
           if backend_object['TEMPLATE/OCCI_ID'].nil?
             raise "no backend ID found" if backend_object.id.nil?
             occi_id = self.generate_occi_id(OCCI::Infrastructure::Compute::KIND, backend_object.id.to_s)
@@ -73,27 +77,22 @@ module OCCI
           else
 
             # ALI start            
-            id= backend_object.id
-            $log.debug("--- Monitoring start backend id : #{id}")
-            watch_client = OneWatchClient::VmWatchClient.new 
-            monitoring_resources = [ :cpu_usage,
-                                     :mem_usage,
-                                     :net_rx, 
-                                     :net_tx                                     
-                                   ]                       
-            vm_monitoring = watch_client.resource_monitoring(id.to_i,monitoring_resources)
-            occi_object.mixins.each do |mixin|
-#             attributes['cpu'] = vm_monitoring[:monitoring][:cpu_usage][4][1] if mixin.term == "rxtot"  
-#             attributes['memory'] = vm_monitoring[:monitoring][:mem_usage][4][1] if mixin.term == "memory"
-#             attributes['net_rx'] = vm_monitoring[:monitoring][:net_rx][4][1] if mixin.term == "net_rx"
-#             attributes['net_tx'] = vm_monitoring[:monitoring][:net_tx][4][1] if mixin.term == "net_tx"
-#             attributes['net_tx'] = vm_monitoring[:monitoring][:net_tx][4][1] if mixin.term == "net_tx"
-              attributes['cpu']     = vm_monitoring[:monitoring][:cpu_usage].join(',')  if mixin.term == "rxtot"  
-              attributes['memory']  = vm_monitoring[:monitoring][:mem_usage].join(',')  if mixin.term == "memory"
-              attributes['net_rx']  = vm_monitoring[:monitoring][:net_rx].join(',')     if mixin.term == "net_rx"
-              attributes['net_tx']  = vm_monitoring[:monitoring][:net_tx].join(',')     if mixin.term == "net_tx"
-              attributes['net_tx']  = (vm_monitoring[:monitoring][:net_tx]).join(',')   if mixin.term == "net_tx"
-            end
+#            id= backend_object.id
+#            $log.debug("--- Monitoring start backend id : #{id}")
+#            watch_client = OneWatchClient::VmWatchClient.new
+#            monitoring_resources = [ :cpu_usage,
+#                                    :mem_usage,
+#                                    :net_rx,
+#                                    :net_tx
+#                                   ]
+#            vm_monitoring = watch_client.resource_monitoring(id.to_i,monitoring_resources)
+#            occi_object.mixins.each do |mixin|
+#              attributes['cpu']     = vm_monitoring[:monitoring][:cpu_usage].join(',')  if mixin.term == "rxtot"
+#              attributes['memory']  = vm_monitoring[:monitoring][:mem_usage].join(',')  if mixin.term == "memory"
+#              attributes['net_rx']  = vm_monitoring[:monitoring][:net_rx].join(',')     if mixin.term == "net_rx"
+#              attributes['net_tx']  = vm_monitoring[:monitoring][:net_tx].join(',')     if mixin.term == "net_tx"
+#              attributes['net_tx']  = (vm_monitoring[:monitoring][:net_tx]).join(',')   if mixin.term == "net_tx"
+#            end
             # ALI end
             
             occi_object.attributes.merge!(attributes)
@@ -149,7 +148,7 @@ module OCCI
   
         # ---------------------------------------------------------------------------------------------------------------------     
         # PARSE OPENNEBULA DEPENDENCIES TO E.G. STORAGE AND NETWORK LINKS
-        def self.compute_parse_links(occi_object, backend_object)
+        def compute_parse_links(occi_object, backend_object)
           # create links for all storage instances
           backend_object['TEMPLATE/DISK/IMAGE_ID'].each do |image_id|
             attributes = {}
@@ -221,16 +220,16 @@ module OCCI
 
         # ---------------------------------------------------------------------------------------------------------------------
         # ALI: Monitoring  
-        def monitor(parameter)
-          backend_object = VirtualMachine.new(VirtualMachine.build_xml(@backend[:id]), $backend.one_client)
-          backend_object.info
-          occi_object = OCCI::Backend::OpenNebula::Compute.parse_backend_object(backend_object)
-          monitoring_resources = [ :cpu] if parameter == "cpu"                                         
-          monitoring_resources = [ :memory] if parameter == "memory"                                        
-          monitoring_resources = [ :net_rx] if parameter == "net_rx"                                        
-          monitoring_resources = [:net_tx] if parameter == "net_tx"
-          occi_object.attributes["compute.cpu.value"]= watch_client.resource_monitoring(occi_object.backend[:id],monitoring_resources)
-        end    
+#        def monitor(parameter)
+#          backend_object = VirtualMachine.new(VirtualMachine.build_xml(@backend[:id]), $backend.one_client)
+#          backend_object.info
+#          occi_object = parse_backend_object(backend_object)
+#          monitoring_resources = [ :cpu] if parameter == "cpu"
+#          monitoring_resources = [ :memory] if parameter == "memory"
+#          monitoring_resources = [ :net_rx] if parameter == "net_rx"
+#          monitoring_resources = [:net_tx] if parameter == "net_tx"
+#          occi_object.attributes["compute.cpu.value"]= watch_client.resource_monitoring(occi_object.backend[:id],monitoring_resources)
+#        end
      
         # ---------------------------------------------------------------------------------------------------------------------
         public
@@ -324,7 +323,7 @@ module OCCI
   
   #        backend_object.info
   
-          occi_object = OCCI::Backend::OpenNebula.compute_parse_backend_object(backend_object)
+          occi_object = compute_parse_backend_object(backend_object)
           if occi_object.nil?
             $log.debug("Problems refreshing backend object")
           else
@@ -369,7 +368,7 @@ module OCCI
         def compute_register_all_instances
           backend_object_pool = VirtualMachinePool.new(@one_client)
   #        backend_object_pool.info
-          backend_object_pool.info(INFO_ACL, -1, -1, OpenNebula::VirtualMachinePool::INFO_ALL_VM)
+          backend_object_pool.info(OCCI::Backend::OpenNebula::OpenNebula::INFO_ACL, -1, -1, OpenNebula::VirtualMachinePool::INFO_NOT_DONE)
           compute_register_all_objects(backend_object_pool)
         end
   
@@ -387,7 +386,7 @@ module OCCI
           occi_objects = []
           backend_object_pool.each do |backend_object|
             $log.debug("ONE compute object: #{backend_object}")
-            occi_object = OCCI::Backend::OpenNebula.compute_parse_backend_object(backend_object)
+            occi_object = compute_parse_backend_object(backend_object)
             if occi_object.nil?
               $log.debug("Error creating occi resource from backend")
             else

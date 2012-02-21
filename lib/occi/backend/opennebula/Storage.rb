@@ -31,11 +31,11 @@ module OCCI
         TEMPLATESTORAGERAWFILE = 'occi_one_template_storage.erb'
         
         # ---------------------------------------------------------------------------------------------------------------------       
-        private
+#        private
         # ---------------------------------------------------------------------------------------------------------------------
        
         # ---------------------------------------------------------------------------------------------------------------------     
-        def self.storage_parse_backend_object(backend_object)
+        def storage_parse_backend_object(backend_object)
 
           if backend_object['TEMPLATE/OCCI_ID'].nil?
             raise "no backend ID found" if backend_object.id.nil?
@@ -140,7 +140,7 @@ module OCCI
   
   #        backend_object.info
   
-          occi_object = OCCI::Backend::OpenNebula.storage_parse_backend_object(backend_object)
+          occi_object = storage_parse_backend_object(backend_object)
   
           if occi_object.nil? then
             $log.warn("Problem refreshing storage with backend id #{storage.backend[:id]}")
@@ -158,10 +158,10 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         def storage_register_all_instances
           occi_objects = []
-          backend_object_pool=ImagePool.new(@one_client, INFO_ACL)
+          backend_object_pool=ImagePool.new(@one_client, OCCI::Backend::OpenNebula::OpenNebula::INFO_ACL)
           backend_object_pool.info
           backend_object_pool.each do |backend_object|
-            occi_object = OCCI::Backend::OpenNebula.storage_parse_backend_object(backend_object)
+            occi_object = storage_parse_backend_object(backend_object)
             if occi_object.nil?
               $log.debug("Error creating storage from backend")
             else

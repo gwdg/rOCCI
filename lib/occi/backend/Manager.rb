@@ -126,7 +126,7 @@ module OCCI
           signal_resource(backend, operation, resource, parameters)
 
           state_machine.transition(action)
-          signal_resource(backend, OCCI::Backend::RESOURCE_UPDATE_STATE)
+          signal_resource(backend, OCCI::Backend::RESOURCE_UPDATE_STATE,resource)
 
         rescue OCCI::BackendError
           $log.error("Action invocation failed!")
