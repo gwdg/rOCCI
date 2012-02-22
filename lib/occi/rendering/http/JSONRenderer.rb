@@ -47,12 +47,10 @@ module OCCI
           
           hash = {}
           hash['mutable']   = attribute.mutable
-          hash['required']  = attribute.mandatory
-          hash['unique']    = attribute.unique
+          hash['required']  = attribute.required
           hash['type']      = attribute.type
+          hash['range']     = attribute.range
           hash['default']   = attribute.default
-          hash['min']       = attribute.min
-          hash['max']       = attribute.max
 
           return hash
         end
@@ -102,36 +100,12 @@ module OCCI
           # Re-initialize header array
           @data = {}
         end
-     
-        # ---------------------------------------------------------------------------------------------------------------------
-        def render_category_type(categories)
-
-          categories = Array(categories)
-          collection = []
-
-          categories.each do |category|
-
-            if category.kind_of?(OCCI::Core::Category) 
-              collection << category_to_hash(category)
-              next
-            end
-
-            if category.kind_of?(OCCI::Core::Mixin) or category.kind_of?(OCCI::Core::Kind)
-              collection << mixin_to_hash(category) 
-              next
-            end
-            
-            $log.error("Unregonized category type for category: " + category.inspect)
-          end
-
-#          collection.reject! { |x| x == nil }
-
-          @data.merge!({ "Category" => {'Collection' => collection} })
-        end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def render_category_short(categories)
-          render_category_type(categories)          
+        def render_category_short(category)
+          hash = {}
+          hash['term']       = category.term
+          hash['scheme']     = category.scheme
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -152,10 +126,7 @@ module OCCI
 
         # ---------------------------------------------------------------------------------------------------------------------
         def render_attributes(attributes)
-
-          return if attributes == nil || attributes.empty?
-
-          # TODO
+          return attributes
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -173,15 +144,16 @@ module OCCI
         def render_entity(entity)
 
           # render kind of entity
-          render_category_short(entity.kind)
+          @data.merge!({ :kind => render_category_short(entity.kind)  })
 
-          # render mixins of entity
+          mixins = Array.new()
           entity.mixins.each do |mixin|
-            render_category_type(mixin)
+            mixins << render_category_short(mixin)
           end
+          @data.merge!({:mixins => entity.mixins.collect{|mixin| render_category_short(mixin) } } )
 
           # Render attributes
-          render_attributes(entity.attributes)
+          @data.merge!({:attributes => render_attributes(entity.attributes) })
 
           # Render link references
           entity.links.each do |link|
