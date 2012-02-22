@@ -213,15 +213,21 @@ class OCCIServer < Sinatra::Application
         $log.info("Listing all entities for kind/mixin #{object.type_identifier} ...")
         locations = []
         object.entities.each do |entity|
-          # skip entity if kind is not in requested categories
+          # filter entities by requested categories
           next unless @occi_request.categories.include?(entity.kind) or (@occi_request.categories & entity.mixins) == @occi_request.categories
-          # skip entity if it doesn't contain requested attributes
+          # filter entities by requested attributes
           next unless (entity.attributes.keys & @occi_request.attributes.keys) == @occi_request.attributes.keys
           loc = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
+          # fix for JSON rendering
+          $log.debug(@response['CONTENT-TYPE'])
+          @rendering.render_entity(entity) if @response['CONTENT-TYPE'].include?('json')
           $log.debug("Rendering location: #{loc}")
           locations << loc
         end
+
         @rendering.render_locations(locations)
+
+
         break
       end
 
@@ -249,6 +255,7 @@ class OCCIServer < Sinatra::Application
         resources.each do |resource|
           OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_REFRESH, resource) if resource.kind_of?(OCCI::Core::Resource)
           locations << OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(resource)
+          @rendering.render_entity(resource) if @response['CONTENT-TYPE'].include?('json')
         end
        
         @rendering.render_locations(locations)
