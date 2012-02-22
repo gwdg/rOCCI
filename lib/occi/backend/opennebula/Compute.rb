@@ -150,15 +150,16 @@ module OCCI
         # PARSE OPENNEBULA DEPENDENCIES TO E.G. STORAGE AND NETWORK LINKS
         def compute_parse_links(occi_object, backend_object)
           # create links for all storage instances
-          backend_object['TEMPLATE/DISK/IMAGE_ID'].each do |image_id|
+
+          backend_object.each('TEMPLATE/DISK') do |disk|
             attributes = {}
             target = nil
-            $log.debug("Storage Backend ID: #{image_id}")
+            $log.debug("Storage Backend ID: #{disk['IMAGE_ID']}")
             OCCI::Infrastructure::Storage::KIND.entities.each do |storage|
-              target = storage if storage.backend[:id].to_i == image_id.to_i
+              target = storage if storage.backend[:id].to_i == disk['IMAGE_ID'].to_i
             end
             if target == nil
-              backend_object = Image.new(Image.build_xml(image_id), @one_client)
+              backend_object = Image.new(Image.build_xml(disk['IMAGE_ID']), @one_client)
   #            backend_object.info
               target = self.storage_parse_backend_object(backend_object)
             end
@@ -166,7 +167,7 @@ module OCCI
             attributes["occi.core.target"] = target.get_location
             attributes["occi.core.source"] = source.get_location
             # check if link already exists
-            occi_id = self.generate_occi_id(OCCI::Infrastructure::StorageLink::KIND, image_id.to_s)
+            occi_id = self.generate_occi_id(OCCI::Infrastructure::StorageLink::KIND, disk['IMAGE_ID'].to_s)
             storagelink_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(OCCI::Infrastructure::StorageLink::KIND)
             link = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(storagelink_location + occi_id)
             if link.nil?
@@ -178,22 +179,22 @@ module OCCI
             source.links.push(link).uniq!
             target.links.push(link).uniq!
             $log.debug("Link successfully created")
-          end if backend_object['TEMPLATE/DISK/IMAGE_ID']
+          end
   
           #create links for all network instances
-          backend_object['TEMPLATE/NIC/NETWORK_ID'].each do |network_id|
+          backend_object.each('TEMPLATE/NIC') do |nic|
             attributes = {}
-            $log.debug("Network Backend ID: #{network_id}")
+            $log.debug("Network Backend ID: #{nic['NETWORK_ID']}")
             target = nil
             OCCI::Infrastructure::Network::KIND.entities.each do |network|
-              target = network if network.backend[:id].to_i == network_id.to_i
+              target = network if network.backend[:id].to_i == nic['NETWORK_ID'].to_i
               $log.debug(target.kind.term) if target != nil
             end
             if target.nil?
-              backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(network_id), @one_client)
+              backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(nic['NETWORK_ID']), @one_client)
 #              pool = VirtualNetworkPool(@one_client)
-#              pool.info(INFO_ACL, network_id, network_id)
-            
+#              pool.info(INFO_ACL, nic['NETWORK_ID'], nic['NETWORK_ID'])
+
               backend_object.info
               target = self.network_parse_backend_object(backend_object)
             end
@@ -201,7 +202,7 @@ module OCCI
             attributes["occi.core.target"] = target.get_location
             attributes["occi.core.source"] = source.get_location
             # check if link already exists
-            occi_id = self.generate_occi_id(OCCI::Infrastructure::Networkinterface::KIND, network_id.to_s)
+            occi_id = self.generate_occi_id(OCCI::Infrastructure::Networkinterface::KIND, nic['NETWORK_ID'].to_s)
             networkinterface_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(OCCI::Infrastructure::Networkinterface::KIND)
             link = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(networkinterface_location + occi_id)
             if link.nil?
@@ -213,7 +214,7 @@ module OCCI
             source.links.push(link).uniq!
             target.links.push(link).uniq!
             $log.debug("Link successfully created")
-          end if backend_object['TEMPLATE/NIC/NETWORK_ID']
+          end
   
           return occi_object
         end
