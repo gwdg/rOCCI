@@ -46,7 +46,7 @@ module OCCI
   
           attributes = {}
           mixins = []
-  #        backend_object.info
+          backend_object.info
           attributes = {}
           # parse all parameters from OpenNebula to OCCI
           attributes['occi.core.id']      = occi_id
@@ -117,7 +117,7 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         def storage_update_state(storage)
           backend_object = Image.new(Image.build_xml(storage.backend[:id]), @one_client)
-  #        backend_object.info
+          backend_object.info
           $log.debug("current Image state is: #{backend_object.state_str}")
           state = case backend_object.state_str
                     when "READY" , "USED" , "LOCKED" then OCCI::Infrastructure::Storage::STATE_ONLINE

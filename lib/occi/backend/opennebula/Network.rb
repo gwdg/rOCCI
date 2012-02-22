@@ -45,7 +45,7 @@ module OCCI
   
           attributes = {}
           mixins = []
-  #        backend_object.info
+          backend_object.info
           attributes = {}
           # parse all parameters from OpenNebula to OCCI
           attributes['occi.core.id'] = occi_id

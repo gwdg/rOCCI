@@ -52,7 +52,6 @@ module OCCI
           mixins << OCCI::Backend::ONE::VirtualMachine::MIXIN
   
           attributes = {}
-  #        backend_object.info
           # parse all parameters from OpenNebula to OCCI
           attributes['occi.core.id']        = occi_id
           attributes['occi.core.title']     = backend_object['NAME']
@@ -160,7 +159,7 @@ module OCCI
             end
             if target == nil
               backend_object = Image.new(Image.build_xml(disk['IMAGE_ID']), @one_client)
-  #            backend_object.info
+              backend_object.info
               target = self.storage_parse_backend_object(backend_object)
             end
             source = occi_object
@@ -322,7 +321,7 @@ module OCCI
           $log.debug("Refreshing compute object with backend ID: #{compute.backend[:id]}")
           backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
   
-  #        backend_object.info
+          backend_object.info
   
           occi_object = compute_parse_backend_object(backend_object)
           if occi_object.nil?
@@ -342,7 +341,7 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------     
         def compute_update_state(compute)
           backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
-  #        backend_object.info
+          backend_object.info
           $log.debug("current VM state is: #{backend_object.lcm_state_str}")
           state = case backend_object.lcm_state_str
             when "RUNNING" then OCCI::Infrastructure::Compute::STATE_ACTIVE
@@ -368,7 +367,6 @@ module OCCI
         # GET ALL COMPUTE INSTANCES
         def compute_register_all_instances
           backend_object_pool = VirtualMachinePool.new(@one_client)
-  #        backend_object_pool.info
           backend_object_pool.info(OCCI::Backend::OpenNebula::OpenNebula::INFO_ACL, -1, -1, OpenNebula::VirtualMachinePool::INFO_NOT_DONE)
           compute_register_all_objects(backend_object_pool)
         end
