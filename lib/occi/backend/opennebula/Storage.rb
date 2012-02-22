@@ -138,7 +138,7 @@ module OCCI
         def storage_refresh(storage)
           backend_object = Image.new(Image.build_xml(storage.backend[:id]), @one_client)
   
-  #        backend_object.info
+          backend_object.info
   
           occi_object = storage_parse_backend_object(backend_object)
   
