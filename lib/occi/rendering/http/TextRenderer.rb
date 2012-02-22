@@ -220,8 +220,7 @@ module OCCI
           end if entity.kind_of?(OCCI::Core::Resource)
 
           # Render action references
-          # TODO: only render currently applicable actions
-          entity.kind.actions.each do |action|
+          entity.actions.each do |action|
             render_action_reference(action, entity)
           end
         end
