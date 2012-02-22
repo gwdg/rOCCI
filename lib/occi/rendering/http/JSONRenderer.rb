@@ -106,6 +106,7 @@ module OCCI
           hash = {}
           hash['term']       = category.term
           hash['scheme']     = category.scheme
+          return hash
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -116,12 +117,24 @@ module OCCI
 
         # ---------------------------------------------------------------------------------------------------------------------
         def render_link_reference(link)
-          # TODO
+          hash = {}
+          hash['title'] = link.attributes['occi.core.title']
+          hash['target'] = link.attributes['occi.core.target']
+          target_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.attributes['occi.core.target'])
+          hash['target_type'] = target_object.type_identifier
+          hash['location'] = link.get_location
+          hash['type'] = link.type_identifier
+          hash['attributes'] = render_attributes(link.attributes)
+          return hash
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
         def render_action_reference(action, resource)
-          # TODO
+          hash = {}
+          hash['title'] = action.category.title
+          hash['uri'] = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(resource) + '?action=' + action.category.term
+          hash['type'] = action.category.type_identifier
+          return hash
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -131,40 +144,28 @@ module OCCI
 
         # ---------------------------------------------------------------------------------------------------------------------
         def render_locations(locations)
-
-          locations = Array(locations)
-          collection = locations.collect do |location|
-            {'X-OCCI-Location: ' => $config["server"].chomp('/') + ':' + $config["port"] + location}
-          end
- 
-          @data.merge!({ "Locations" => { "Collection" => collection} })
+          # JSON does not render locations anymore. text/uri-list should be used to get locations
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
         def render_entity(entity)
 
+          entity_rendering = {}
           # render kind of entity
-          @data.merge!({ :kind => render_category_short(entity.kind)  })
+          entity_rendering.merge!({ :kind => render_category_short(entity.kind)  } )
 
-          mixins = Array.new()
-          entity.mixins.each do |mixin|
-            mixins << render_category_short(mixin)
-          end
-          @data.merge!({:mixins => entity.mixins.collect{|mixin| render_category_short(mixin) } } )
+          entity_rendering.merge!({:mixins => entity.mixins.collect{|mixin| render_category_short(mixin) } } )
+
+          entity_rendering.merge!({:actions => entity.actions.collect{|action| render_action_reference(action,entity) } } )
 
           # Render attributes
-          @data.merge!({:attributes => render_attributes(entity.attributes) })
+          entity_rendering.merge!({:attributes => render_attributes(entity.attributes) } )
 
-          # Render link references
-          entity.links.each do |link|
-            render_link_reference(link)
-          end if entity.kind_of?(OCCI::Core::Resource)
+          entity_rendering.merge!({:links => entity.links.collect{|link| render_link_reference(link) } } ) if entity.kind_of?(OCCI::Core::Resource)
 
-          # Render action references
-          # TODO: only render currently applicable actions
-          entity.kind.actions.each do |action|
-            render_action_reference(action, entity)
-          end
+          entity_rendering.merge!({:location => entity.get_location } )
+
+          @data['collection'] = [entity_rendering]  + @data['collection'].to_a
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
