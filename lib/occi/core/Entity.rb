@@ -180,6 +180,10 @@ module OCCI
         location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(kind) + attributes['occi.core.id']
       end
 
+      def actions
+        kind.actions.select{|action| state_machine.check_transition(action) }
+      end
+
       # ---------------------------------------------------------------------------------------------------------------------
       def type_identifier
         self.kind.type_identifier
