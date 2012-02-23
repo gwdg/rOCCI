@@ -72,9 +72,11 @@ module OCCI
           hash['term']       = category.term
           hash['scheme']     = category.scheme
           hash['title']      = category.title
-          hash['attributes'] = category.attributes.to_hash unless category.attributes.to_hash.empty?
+          hash['related']    = category.related.first.type_identifier unless category.related.empty? if category.respond_to?(:related)
           hash['location']   = category.location
-          
+          hash['attributes'] = category.attributes.to_hash unless category.attributes.to_hash.empty?
+          hash['actions'] = category.actions.collect{|action| render_action_reference(action,category)} if category.respond_to?(:actions)
+
           return hash
         end
 
@@ -98,12 +100,12 @@ module OCCI
             end
 
             if category.kind_of?(OCCI::Core::Mixin)
-              @data[:mixins] = [category_to_hash(category)] + @data[:categories].to_a
+              @data[:mixins] = [category_to_hash(category)] + @data[:mixins].to_a
               next
             end
 
             if category.kind_of?(OCCI::Core::Kind)
-              @data[:kinds] = [category_to_hash(category)] + @data[:categories].to_a
+              @data[:kinds] = [category_to_hash(category)] + @data[:kinds].to_a
               next
             end
           end
@@ -137,10 +139,10 @@ module OCCI
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def render_action_reference(action, resource)
+        def render_action_reference(action, object)
           hash = {}
           hash['title'] = action.category.title
-          hash['uri'] = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(resource) + '?action=' + action.category.term
+          hash['uri'] = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(object) + '?action=' + action.category.term
           hash['type'] = action.category.type_identifier
           return hash
         end
