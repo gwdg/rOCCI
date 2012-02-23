@@ -75,20 +75,7 @@ module OCCI
           hash['attributes'] = category.attributes.to_hash unless category.attributes.to_hash.empty?
           hash['location']   = category.location
           
-          return {'Category' => hash}
-        end
-
-        # ---------------------------------------------------------------------------------------------------------------------
-        def mixin_to_hash(mixin)
-
-          hash = {}
-          actions = mixin.actions.collect {|action|   action.category.type_identifier }
-          related = mixin.related.collect {|related|  related.type_identifier}
-
-          hash['actions'] = actions.join(',') unless actions.empty?
-          hash['related'] = related.join(',') unless related.empty?
-
-          return category_to_hash(mixin)['Category'].merge!(hash)
+          return hash
         end
 
         # ---------------------------------------------------------------------------------------------------------------------        
@@ -99,6 +86,27 @@ module OCCI
         def prepare_renderer()
           # Re-initialize header array
           @data = {}
+        end
+
+        # ---------------------------------------------------------------------------------------------------------------------
+        def render_category_type(categories)
+
+          categories.each do |category|
+            if category.instance_of?(OCCI::Core::Category)
+              @data[:categories] = [category_to_hash(category)] + @data[:categories].to_a
+              next
+            end
+
+            if category.kind_of?(OCCI::Core::Mixin)
+              @data[:mixins] = [category_to_hash(category)] + @data[:categories].to_a
+              next
+            end
+
+            if category.kind_of?(OCCI::Core::Kind)
+              @data[:kinds] = [category_to_hash(category)] + @data[:categories].to_a
+              next
+            end
+          end
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
