@@ -42,20 +42,6 @@ module OCCI
           true if Float(object) rescue false
         end
 
-        # ---------------------------------------------------------------------------------------------------------------------
-        def merge_data(data, data_to_add)
-
-          data.merge!(data_to_add) { |data, value_old, value_to_add|
-            if !value_old.kind_of? Array
-              value_old = [value_old]
-            end
-            if !value_to_add.kind_of? Array
-              value_to_add = [value_to_add]
-            end
-            value_old + value_to_add
-          }
-        end
-
         # ---------------------------------------------------------------------------------------------------------------------        
         public
         # ---------------------------------------------------------------------------------------------------------------------
@@ -113,8 +99,8 @@ module OCCI
             category_string += %Q{actions="#{actions.strip}";} if actions != ""
             category_values << category_string
           end
- 
-          merge_data(@data, { CATEGORY => category_values }) 
+
+          @data[CATEGORY] = category_values + @data[CATEGORY].to_a
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -128,14 +114,14 @@ module OCCI
             category_string = %Q{#{category.term}; scheme="#{category.scheme}"; class="#{category.class_string}";}
             category_values << category_string
           end
- 
-          merge_data(@data, { CATEGORY => category_values })
+
+          @data[CATEGORY] = category_values + @data[CATEGORY].to_a
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
         # render single location if a new resource has been created (e.g. use Location instead of X-OCCI-Location)
         def render_location(location)
-          merge_data(@data, { LOCATION => location })
+          @data[LOCATION] = [location] + @data[LOCATION].to_a
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -155,8 +141,8 @@ module OCCI
           attributes << ";" unless attributes.empty?
 
           link_string = %Q{<#{target_location}>;rel="#{target_resource_type}";self="#{location}";category="#{category}";#{attributes}}
- 
-          merge_data(@data, { LINK => link_string })
+
+          @data[LINK] = [link_string] + @data[LINK].to_a
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -168,7 +154,7 @@ module OCCI
 
           link_value = %Q{<#{action_location}>;rel="#{action_type}"}
 
-          merge_data(@data, { LINK => link_value })
+          @data[LINK] = [link_value] + @data[LINK].to_a
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -186,7 +172,7 @@ module OCCI
             end
           end
 
-          merge_data(@data, { OCCI_ATTRIBUTE => attributes_values })
+          @data[OCCI_ATTRIBUTE] = attributes_values + @data[OCCI_ATTRIBUTE].to_a
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -196,8 +182,8 @@ module OCCI
           locations.each do |location|
             locations_values << $config["server"].chomp('/') + ':' + $config["port"] + location unless location.nil?
           end
- 
-          merge_data(@data, { OCCI_LOCATION => locations_values })
+
+          @data[OCCI_LOCATION] = locations_values + @data[OCCI_LOCATION].to_a
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -254,26 +240,22 @@ module OCCI
 #          response[LINK]            = @data[LINK]     if @data.has_key?(LINK)
 
           # FIXME: check if "Location: " has to be prepended          
-          response.write('Location : ' + @data[LOCATION]) if @data.has_key?(LOCATION)
+          response.write('Location : ' + @data[LOCATION].join  + "\n") if @data.has_key?(LOCATION)
 
           if @data.has_key?(CATEGORY)
-            @data[CATEGORY].each do |category|
-              response.write(CATEGORY + ': ' + category.to_s + "\n")
-            end
+            response.write(@data[CATEGORY].collect {|category| 'Category: ' + category}.join("\n") + "\n")
           end
 
           if @data.has_key?(LINK)
-            response.write('Link: ' + @data[LINK].join(',') + "\n")
+            response.write(@data[LINK].collect {|link| 'Link: ' + link}.join("\n")  + "\n")
           end
 
           if @data.has_key?(OCCI_ATTRIBUTE)
-            @data[OCCI_ATTRIBUTE].each do |attribute|
-              response.write('X-OCCI-Attribute: ' + attribute.to_s + "\n")
-            end
+            response.write(@data[OCCI_ATTRIBUTE].collect {|attribute| 'X-OCCI-Attribute: ' + attribute}.join("\n") + "\n")
           end
 
           if @data.has_key?(OCCI_LOCATION)
-            response.write(@data[OCCI_LOCATION].collect {|location| 'X-OCCI-Location: ' + location}.join("\n"))
+            response.write(@data[OCCI_LOCATION].collect {|location| 'X-OCCI-Location: ' + location}.join("\n") + "\n")
           end
        
         end
@@ -281,10 +263,10 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         def render_text_occi_response(response)
 
-          response[LOCATION]          = @data[LOCATION]                   if @data.has_key?(LOCATION)
-          response[CATEGORY]          = @data[CATEGORY].join(',')         if @data.has_key?(CATEGORY)
-          response[LINK]              = @data[LINK]                       if @data.has_key?(LINK)
-          response['X-OCCI-Attribute']= @data[OCCI_ATTRIBUTE].join(',')   if @data.has_key?(OCCI_ATTRIBUTE)
+          response[LOCATION]          = @data[LOCATION].join(', ')         if @data.has_key?(LOCATION)
+          response[CATEGORY]          = @data[CATEGORY].join(', ')         if @data.has_key?(CATEGORY)
+          response[LINK]              = @data[LINK].join(', ')             if @data.has_key?(LINK)
+          response['X-OCCI-Attribute']= @data[OCCI_ATTRIBUTE].join(', ')   if @data.has_key?(OCCI_ATTRIBUTE)
           response['X-OCCI-Location'] = @data[OCCI_LOCATION].join(', ')   if @data.has_key?(OCCI_LOCATION)
  
           response.write('OK') 
