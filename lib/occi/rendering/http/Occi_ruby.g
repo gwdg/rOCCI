@@ -68,7 +68,7 @@ category returns [categories]:
     @init { $category_list = Array.new; }
 
     :   cv1 = category_value      { $category_list << $cv1.data }
-        (';,' cv2 = category_value { $category_list << $cv2.data })* ';' ;
+        (',' cv2 = category_value { $category_list << $cv2.data })*;
 
 	category_value returns [data]
 
@@ -126,7 +126,7 @@ link returns [links]:
 	 @init { $link_list = Array.new; }
 
 	 :   lv1 = link_value      { $link_list << $lv1.data }
-	     (';,' lv2 = link_value { $link_list << $lv2.data })*;
+	     (',' lv2 = link_value { $link_list << $lv2.data })*;
 
 	link_value returns [data]
 	
@@ -143,7 +143,6 @@ link returns [links]:
 
 	/* this value can be passed on to the rel uri rule in Location for validation with the '<' and '>' stripped */
     target_attr:           '<' ( TARGET_VALUE { $link_value::link['target'] = $TARGET_VALUE.text } | URL { $link_value::link['target'] = $URL.text } ) '>';
-
 
     related_attr:          ';' 'rel'         '=' QUOTED_VALUE
                          { $link_value::link['related'] = remove_quotes $QUOTED_VALUE.text };
@@ -168,7 +167,7 @@ link returns [links]:
     scope { data }
     @init { $attributes_attr::data = Hash.new }
 
-    :                    attribute_kv_attr ((';'|',') attribute_kv_attr)*
+    :                    attribute_kv_attr (',' attribute_kv_attr)*
                          { $attributes = $attributes_attr::data } ;
 
   /* e.g. com.example.drive0.interface="ide0" */

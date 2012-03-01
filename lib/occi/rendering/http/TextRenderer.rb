@@ -67,28 +67,30 @@ module OCCI
           Array(categories).each do |category|
 
             # category identifier
-            category_string = %Q{#{category.term}; scheme="#{category.scheme}"; class="#{category.class_string}";}
+            category_string = category.term
+            category_string += %Q{; scheme="#{category.scheme}"}
+            category_string += %Q{; class="#{category.class_string}"}
 
             # category title
-            category_string += %Q{title="#{category.title}";} if category.title
+            category_string += %Q{; title="#{category.title}"} if category.title
 
             # related kinds
             related_value = ""
             category.related.each do |related|
               related_value += related.type_identifier
             end if defined? category.related
-            category_string += %Q{rel="#{related_value.strip}";} if related_value != ""
+            category_string += %Q{; rel="#{related_value.strip}"} if related_value != ""
 
             # category location
             location = OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(category)
-            category_string += %Q{location=#{location.strip};} if defined? location.strip
+            category_string += %Q{; location=#{location.strip}} if defined? location.strip
 
             # attributes
             attributes = ""
             category.attributes.keys.each do |attribute|
               attributes += "#{attribute} "
             end if defined? category.attributes
-            category_string += %Q{attributes="#{attributes.strip}";} if attributes != ""
+            category_string += %Q{; attributes="#{attributes.strip}"} if attributes != ""
 
             # actions
             actions = ""
@@ -96,7 +98,7 @@ module OCCI
               actions += action.category.scheme + action.category.term + " "
             end if defined? category.actions
 
-            category_string += %Q{actions="#{actions.strip}";} if actions != ""
+            category_string += %Q{; actions="#{actions.strip}"} if actions != ""
             category_values << category_string
           end
 
@@ -111,7 +113,9 @@ module OCCI
           # create category string for all categories
           Array(categories).each do |category|
             # category identifier
-            category_string = %Q{#{category.term}; scheme="#{category.scheme}"; class="#{category.class_string}";}
+            category_string = %Q{#{category.term}}
+            category_string += %Q{; scheme="#{category.scheme}"}
+            category_string += %Q{; class="#{category.class_string}"}
             category_values << category_string
           end
 
@@ -138,9 +142,12 @@ module OCCI
           end
           category = link.kind.type_identifier
           attributes = link.attributes.map { |key,value| %Q{#{key}="#{value}"} unless value.empty? }.join(';').to_s
-          attributes << ";" unless attributes.empty?
 
-          link_string = %Q{<#{target_location}>;rel="#{target_resource_type}";self="#{location}";category="#{category}";#{attributes}}
+          link_string = %Q{<#{target_location}>}
+          link_string += %Q{; rel="#{target_resource_type}"}
+          link_string += %Q{; self="#{location}"}
+          link_string += %Q{; category="#{category}"}
+          link_string += %Q{; #{attributes}}
 
           @data[LINK] = [link_string] + @data[LINK].to_a
         end
@@ -152,7 +159,8 @@ module OCCI
           action_location   = resource_location + "?action=" + action.category.term
           action_type       = action.category.type_identifier
 
-          link_value = %Q{<#{action_location}>;rel="#{action_type}"}
+          link_value = %Q{<#{action_location}>}
+          link_value += %Q{; rel="#{action_type}"}
 
           @data[LINK] = [link_value] + @data[LINK].to_a
         end
