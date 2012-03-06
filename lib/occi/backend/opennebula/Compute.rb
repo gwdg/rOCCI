@@ -308,7 +308,7 @@ module OCCI
             res = backend_template.instantiate
             check_rc(res)
             compute.backend[:id] = backend_id
-            refresh_compute(compute)
+            compute_refresh(compute)
           end
     
           $log.debug("OpenNebula ID of virtual machine: #{compute.backend[:id]}")
