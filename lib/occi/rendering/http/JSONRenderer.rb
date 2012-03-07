@@ -113,10 +113,7 @@ module OCCI
 
         # ---------------------------------------------------------------------------------------------------------------------
         def render_category_short(category)
-          hash = {}
-          hash['term']       = category.term
-          hash['scheme']     = category.scheme
-          return hash
+          return category.type_identifier
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -149,7 +146,17 @@ module OCCI
 
         # ---------------------------------------------------------------------------------------------------------------------
         def render_attributes(attributes)
-          return attributes
+          attribute_hash = {}
+          attributes.each_key do |name|
+            child = attributes[name]
+            hash = {}
+            name.split('.').reverse_each do |path|
+              hash = {path => child}
+              child = hash
+            end
+            attribute_hash.merge!(hash)
+          end
+          return attribute_hash
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -164,18 +171,22 @@ module OCCI
           # render kind of entity
           entity_rendering.merge!({ :kind => render_category_short(entity.kind)  } )
 
-          entity_rendering.merge!({:mixins => entity.mixins.collect{|mixin| render_category_short(mixin) } } )
+          entity_rendering.merge!({:mixins => entity.mixins.collect{|mixin| render_category_short(mixin) } } )  unless entity.mixins.empty?
 
-          entity_rendering.merge!({:actions => entity.actions.collect{|action| render_action_reference(action,entity) } } )
+          entity_rendering.merge!({:actions => entity.actions.collect{|action| render_action_reference(action,entity) } } ) unless entity.actions.empty?
 
           # Render attributes
-          entity_rendering.merge!({:attributes => render_attributes(entity.attributes) } )
+          entity_rendering.merge!(render_attributes(entity.attributes)) unless entity.attributes.empty?
 
-          entity_rendering.merge!({:links => entity.links.collect{|link| render_link_reference(link) } } ) if entity.kind_of?(OCCI::Core::Resource)
+          entity_rendering.merge!({:links => entity.links.collect{|link| render_link_reference(link) } } ) if entity.kind_of?(OCCI::Core::Resource) unless entity.links.empty?
 
           entity_rendering.merge!({:location => entity.get_location } )
 
-          @data['collection'] = [entity_rendering]  + @data['collection'].to_a
+          if @data.empty?
+            @data = entity_rendering
+          else
+            @data = [entity_rendering]  | [@data].flatten
+          end
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
