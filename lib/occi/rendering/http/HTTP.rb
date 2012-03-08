@@ -81,7 +81,7 @@ module OCCI
         end
 
         response['Accept'] = "application/occi+json,application/json,text/plain,text/occi,text/uri-list"
-        response['Server'] = "Ruby OCCI Framework/0.4 OCCI/1.1"
+        response['Server'] = "rOCCI/#{VERSION_NUMBER} OCCI/1.1"
 
         $log.debug("Content type: #{response['Content-Type']}")
         $log.debug("Accept type: #{response['Accept']}")
