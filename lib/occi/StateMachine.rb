@@ -114,7 +114,7 @@ module OCCI
 
     # ---------------------------------------------------------------------------------------------------------------------
     def to_s() 
-      $log.debug("Current state: " + @current_state)
+      $log.debug("Current state: " + @current_state.name)
     end
   end
 end
