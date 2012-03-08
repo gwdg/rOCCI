@@ -22,7 +22,6 @@
 require 'occi/core/Category'
 require 'occi/core/Entity'
 require 'occi/core/Resource'
-require 'tree'
 
 module OCCI
   module Rendering
