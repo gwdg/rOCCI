@@ -634,11 +634,8 @@ class OCCIServer < Sinatra::Application
       # Determine set of resources to be deleted
       object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(@location)
 
-      if object.kind_of? OCCI::Core::Entity
-        entities = [OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(@location)]
-      else
-        entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(@location,@occi_request.categories)
-      end
+
+       entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(@location,@occi_request.categories) if object.kind_of? OCCI::Core::Entity or @location == '/'
 
       unless entities.nil?
         entities.each do |entity|
@@ -655,6 +652,10 @@ class OCCIServer < Sinatra::Application
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
+
+    rescue OCCI::LocationNotRegisteredException => e
+      $log.error(e.message)
+      response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
 
     rescue OCCI::CategoryMissingException => e
       response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST

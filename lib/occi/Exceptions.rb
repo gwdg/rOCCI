@@ -34,6 +34,8 @@ module OCCI
   class OCCI::MixinCreationException < RuntimeError; end
     
   class OCCI::LocationAlreadyRegisteredException < RuntimeError; end
+
+  class LocationNotRegisteredException < RuntimeError; end
     
   # Tried to create an already existing mixin
   class BackendError < RuntimeError; end

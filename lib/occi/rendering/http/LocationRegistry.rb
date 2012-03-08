@@ -22,51 +22,21 @@
 require 'occi/core/Category'
 require 'occi/core/Entity'
 require 'occi/core/Resource'
+require 'tree'
 
 module OCCI
   module Rendering
     module HTTP
       module LocationRegistry
-        
+
         # ---------------------------------------------------------------------------------------------------------------------
         private
         # ---------------------------------------------------------------------------------------------------------------------
 
-        HASH_SUFFIX = "_/hash/"
-        # ---------------------------------------------------------------------------------------------------------------------
-        def self.get_context(contexts)
-          return @@context_root if contexts.length <= 1
-          current_context = @@context_root
-          contexts[0..-2].each do |context|
-            $log.debug("Searching context: " + context)
-            if current_context.has_key?(context + HASH_SUFFIX)
-              # Matching context already exists => search there
-              current_context = current_context[context + HASH_SUFFIX]
-              next
-            end
-            # Create new context and continue there
-            current_context[context + HASH_SUFFIX] = {}
-            current_context = current_context[context + HASH_SUFFIX]
-          end
-          return current_context
-        end
-
-        # ---------------------------------------------------------------------------------------------------------------------
-        def self.dump_context(context, padding)
-          context.each {|key, value|
-            if context[key].kind_of?(Hash)
-              $log.debug("#{padding} context: #{key}")
-              self.dump_context(context[key], padding + "   ")
-              next
-            end
-            $log.debug("#{padding} location: #{key} : object: #{value}")
-          }
-        end
-
         # ---------------------------------------------------------------------------------------------------------------------
         def self.generate_key(object)
           return object.type_identifier if object.kind_of? OCCI::Core::Category
-          return object.attributes["occi.core.id"]  if object.kind_of? OCCI::Core::Entity
+          return object.attributes["occi.core.id"] if object.kind_of? OCCI::Core::Entity
           raise "Unsupported object type: #{object.class}"
         end
 
@@ -74,41 +44,53 @@ module OCCI
         public
         # ---------------------------------------------------------------------------------------------------------------------
 
-        # Hash based representation of http namespace
-        @@context_root = {}
-
-        # Object -> location map
-        @@locations    = {}
-
-        # Location -> object map
-        @@objects      = {}
+        # Tree like representation of http namespace
+        @@registry = {}
+        # Hash mapping resource keys to locations (for lookup of locations)
+        @@locations = {}
 
         # ---------------------------------------------------------------------------------------------------------------------
         def self.register(location, object)
 
-          raise OCCI::LocationAlreadyRegisteredException, "Location [#{@@locations[generate_key(object)]}] already registered for object [#{object}]"  if @@locations[generate_key(object)] != nil
-          raise OCCI::LocationAlreadyRegisteredException, "Object [#{@@objects[location]}] already registered for location [#{location}]"              if @@objects[location] != nil
-          raise "Only absolute paths (starting with '/') are supported: location provided: [#{location}])"  unless location.start_with?("/")
+          raise OCCI::LocationAlreadyRegisteredException, "Location [#{@@locations[generate_key(object)]}] already registered for object [#{object}]" if @@locations[generate_key(object)] != nil
+          #raise OCCI::LocationAlreadyRegisteredException, "Object [#{@@objects[location]}] already registered for location [#{location}]"              if @@objects[location] != nil
+          raise "Only absolute paths (starting with '/') are supported: location provided: [#{location}])" unless location.start_with?("/")
 
-          location_elements = location[1..-1].split('/')
-          context = get_context(location_elements)
-          context[location_elements[-1]] = object
+          @@locations[generate_key(object)] = location
 
-          @@locations[generate_key(object)]  = location
-          @@objects[location]                = object
+          @@registry[location] = {:children => [], :object => nil} if @@registry[location].nil?
+          @@registry[location][:object] = object
+          child = [ @@registry[location] ]
+          $log.debug("### location before #{location}")
+          until location == '/'
+            location = location[0..location.rindex('/',-2)]
+            $log.debug("### location after #{location}")
+            @@registry[location] = {:children => [], :object => nil} if @@registry[location].nil?
+            @@registry[location][:children] = child | @@registry[location][:children]
+            child = [ @@registry[location] ]
+          end
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
         def self.unregister(location)
+          raise OCCI::LocationNotRegisteredException if @@registry[location].nil?
 
-          raise "Location [#{location}] not registered to any object" if @@objects[location] == nil
+          @@locations.delete(generate_key(@@registry[location][:object]))
 
-          location_elements = location.split('/')
-          context = get_context(location_elements[1..-1])
-          context.delete(location_elements[-1])
+          child = @@registry[location]
+          @@registry.delete(location)
 
-          @@locations.delete(generate_key(@@objects[location]))
-          @@objects.delete(location)
+          until location == '/'
+            location = location[0..location.rindex('/',-2)]
+            @@registry[location][:children].delete(child)
+            if @@registry[location][:children].empty? and @@registry[location][:object].nil?
+              child = @@registry[location]
+              @@registry.delete(location)
+            else
+              break
+            end
+          end
+
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -124,38 +106,26 @@ module OCCI
 
         # ---------------------------------------------------------------------------------------------------------------------
         def self.get_object_by_location(location)
-          return @@objects[location]
-        end
-
-        # ---------------------------------------------------------------------------------------------------------------------
-        def self.get_context_for_location(location)
-          return get_context(location.split('/').delete_if {|x| x.empty?})
+          return @@registry[location][:object] unless @@registry[location].nil?
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
         def self.get_resources_below_location(location, categories)
-          context_elements_list = get_context_for_location(location).values
-          resources = []
-          begin
-            context_element = context_elements_list.shift
-            return nil if context_element.nil?
-            if context_element.kind_of? Hash
-              context_elements_list += context_element.values
-              next
-            end
-            # Only resources must be returned
-            resources << context_element if context_element.kind_of?(OCCI::Core::Entity) \
-            && categories.include?(context_element.kind)
-          end until context_elements_list.empty?
-          # Test if there is an object directly under the requested location
-          entity = get_object_by_location(location)
-          resources << entity if entity != nil && entity.kind_of?(OCCI::Core::Entity)
-          return resources
-        end
 
-        # ---------------------------------------------------------------------------------------------------------------------
-        def self.dump_contexts()
-          dump_context(@@context_root, "* ")
+          resources = []
+          elements = []
+
+          elements << @@registry[location] unless @@registry[location].nil?
+          until elements.empty?
+            element = elements.pop
+            unless element[:object].nil?
+              resource = element[:object]
+              resources << resource if resource.kind_of?(OCCI::Core::Entity) and categories.include?(resource.kind)
+            end
+            elements = element[:children] | elements
+          end
+
+          return resources
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
