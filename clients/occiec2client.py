@@ -20,9 +20,11 @@ import tornado.httpclient
 
 # for path checks...
 import os.path
+import os
 
 # conf where the last deployed compute instance is written to
-_conf_path = os.path.expanduser("~.occiec2client.conf")
+_home = home = os.getenv('USERPROFILE') or os.getenv('HOME')
+_conf_path = _home + "/.occiec2client.conf"
 
 class HTTPRequest(tornado.httpclient.HTTPRequest):
 	""" HTTPRequest with some defaults set. """
@@ -44,7 +46,7 @@ class HTTPRequest(tornado.httpclient.HTTPRequest):
 		command = "curl -v -X"
 		command += " %s" % self.method
 		for name in self.headers:
-			if name in ["Accept", "User-Agent"]:
+			if name in ["Accept", "User-Agent", "Expect", "Pragma"]:
 				continue
 			command += " --header '%s: %s'" % (name, self.headers[name])
 		command += " %s" % self.url
@@ -280,7 +282,7 @@ def compute_restart(args):
 		_http_exit(ex.code)
 		
 def compute_query(args):
-	""" Restart a compute instance. """
+	""" Query a compute instance. """
 	# get the compute location.
 	compute_location = args.location
 	if compute_location == None:
@@ -299,7 +301,7 @@ def compute_query(args):
 	                      method="GET",
 	                      headers=headers,
 	                      body=None)
-
+	                      
 	print request.create_curl_command()
 
 	try:
