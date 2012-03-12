@@ -22,6 +22,7 @@
 require 'rubygems'
 
 require 'occi/backend/opennebula/OpenNebula'
+require 'occi/backend/ec2/EC2'
 require 'occi/backend/Dummy'
 
 #require 'uuidtools'
@@ -137,6 +138,7 @@ module OCCI
       # ---------------------------------------------------------------------------------------------------------------------
       # Register available backends
       register_backend(OCCI::Backend::OpenNebula::OpenNebula, OCCI::Backend::OpenNebula::OpenNebula::OPERATIONS)
+      register_backend(OCCI::Backend::EC2::EC2,               OCCI::Backend::EC2::EC2::OPERATIONS)
       register_backend(OCCI::Backend::Dummy,                  OCCI::Backend::Dummy::OPERATIONS)
 
     end

@@ -97,11 +97,18 @@ def initialize_backend(request)
                when "opennebula"
                  require 'occi/backend/opennebula/OpenNebula'
                  OCCI::Backend::OpenNebula::OpenNebula.new(user, password)
+               when "ec2"
+                 require 'occi/backend/ec2/EC2'
+                 OCCI::Backend::EC2::EC2.new(user, password)
                when "dummy" then
                  require 'occi/backend/Dummy'
                  OCCI::Backend::Dummy.new()
                else raise "Backend '" + $config["backend"] + "' not found"
              end
+             
+    if $config["backend"] == "ec2"
+      backend.register_templates()
+    end
 
     # Initialize resources only once
     # FIXME: need better way to do resource init / refresh! (maybe async thread or somesuch)
@@ -150,6 +157,7 @@ require 'occi/infrastructure/IPNetworkInterface'
 # OCCI extensions
 require 'occi/extensions/Reservation'
 require 'occi/extensions/NFSStorage'
+require 'occi/extensions/ConsoleLink'
 
 # OCCI HTTP rendering
 require 'occi/rendering/Rendering'

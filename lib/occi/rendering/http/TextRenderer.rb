@@ -248,7 +248,7 @@ module OCCI
 #          response[LINK]            = @data[LINK]     if @data.has_key?(LINK)
 
           # FIXME: check if "Location: " has to be prepended          
-          response.write('Location : ' + @data[LOCATION].join  + "\n") if @data.has_key?(LOCATION)
+          response.write(@data[LOCATION].join  + "\n") if @data.has_key?(LOCATION)
 
           if @data.has_key?(CATEGORY)
             response.write(@data[CATEGORY].collect {|category| 'Category: ' + category}.join("\n") + "\n")
