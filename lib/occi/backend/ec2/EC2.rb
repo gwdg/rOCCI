@@ -95,30 +95,30 @@ module OCCI
         OPERATIONS["http://schemas.ogf.org/occi/infrastructure#network"] = {
         
           # Generic resource operations
-          :deploy         => :resource_deploy,
-          :update_state   => :resource_update_state,
-          :refresh        => :resource_refresh,
-          :delete         => :resource_delete,
+          :deploy         => nil,
+          :update_state   => nil,
+          :refresh        => nil,
+          :delete         => nil,
         
           # Network specific resource operations
-          :up             => :action_dummy,
-          :down           => :action_dummy
+          :up             => nil,
+          :down           => nil
         }
 
         OPERATIONS["http://schemas.ogf.org/occi/infrastructure#storage"] = {
 
           # Generic resource operations
-          :deploy         => :resource_deploy,
-          :update_state   => :resource_update_state,
-          :refresh        => :resource_refresh,
-          :delete         => :resource_delete,
+          :deploy         => nil,
+          :update_state   => nil,
+          :refresh        => nil,
+          :delete         => nil,
    
           # Network specific resource operations
-          :online         => :action_dummy,
-          :offline        => :action_dummy,
-          :backup         => :action_dummy,
-          :snapshot       => :action_dummy,
-          :resize         => :action_dummy
+          :online         => nil,
+          :offline        => nil,
+          :backup         => nil,
+          :snapshot       => nil,
+          :resize         => nil
         }
 
         OPERATIONS["http://schemas.ogf.org/gwdg#nfsstorage"] = {
@@ -127,7 +127,7 @@ module OCCI
           :deploy         => nil,
           :update_state   => nil,
           :refresh        => nil,
-          :delete         => nil,   
+          :delete         => nil
         }
         
         # ---------------------------------------------------------------------------------------------------------------------
