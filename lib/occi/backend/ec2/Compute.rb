@@ -34,8 +34,7 @@ module OCCI
         
         def get_backend_instance(compute)
           # get the ec2 interface
-          ec2 = AWS::EC2.new
-          ec2 = ec2.regions["eu-west-1"]
+          ec2 = OCCI::Backend::EC2.get_ec2_backend()
           
           # get the ec2 backend instance
           backend_instance = ec2.instances[compute.backend[:id]]
@@ -56,8 +55,7 @@ module OCCI
         end
         
         def key_pair_exists(key_name)
-          ec2 = AWS::EC2.new
-          ec2 = ec2.regions["eu-west-1"]
+          ec2 = OCCI::Backend::EC2.get_ec2_backend()
           
           ec2.key_pairs.each do |key|
             if key.name == "default_occi_key"
@@ -90,8 +88,7 @@ module OCCI
           end
 
           # get the ec2 interface
-          ec2 = AWS::EC2.new
-          ec2 = ec2.regions["eu-west-1"]
+          ec2 = OCCI::Backend::EC2.get_ec2_backend()
           
           # create an instance
           if key_pair_exists("default_occi_key")

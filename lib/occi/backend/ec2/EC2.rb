@@ -66,6 +66,13 @@ module OCCI
         elastic_network.state_machine.set_state(OCCI::Infrastructure::Network::STATE_ACTIVE)
         elastic_network.attributes['occi.network.state'] = "active"
       end
+      
+      public
+      
+      def self.get_ec2_backend
+        ec2 = AWS::EC2.new
+        return ec2.regions[$config["avail_zone"]]
+      end
             
       class EC2
 
@@ -158,8 +165,7 @@ module OCCI
           
           ## import image templates
           # get the ec2 interface
-          ec2 = AWS::EC2.new
-          ec2 = ec2.regions["eu-west-1"]
+          ec2 = OCCI::Backend::EC2.get_ec2_backend()
           # register each image
           ec2.images.each do |image|
             term = image.id
