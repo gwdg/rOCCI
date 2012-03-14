@@ -55,16 +55,6 @@ module OCCI
         OCCI::Rendering::HTTP::LocationRegistry.register("/network/ec2_public_network", public_network)
         public_network.state_machine.set_state(OCCI::Infrastructure::Network::STATE_ACTIVE)
         public_network.attributes['occi.network.state'] = "active"
-        
-        # Create elastic network
-        attributes = OCCI::Core::Attributes.new()
-        attributes['occi.core.title'] = "ec2_elastic_network"
-        attributes['occi.core.summary'] = "This network contains elastic ip links to all EC2 compute instances."
-        mixins = []
-        elastic_network = OCCI::Infrastructure::Network.new(attributes, mixins)
-        OCCI::Rendering::HTTP::LocationRegistry.register("/network/ec2_elastic_network", elastic_network)
-        elastic_network.state_machine.set_state(OCCI::Infrastructure::Network::STATE_ACTIVE)
-        elastic_network.attributes['occi.network.state'] = "active"
       end
       
       public
