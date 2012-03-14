@@ -112,6 +112,8 @@ module OCCI
           attributes["occi.core.target"] = "/network/ec2_private_network"
           mixins = []
           private_networkinterface = OCCI::Infrastructure::Networkinterface.new(attributes, mixins)
+          # save the id of the compute backend instance in the network link for future identification
+          private_networkinterface.backend[:backend_id] = backend_instance.id
           compute.links << private_networkinterface
           private_network.links << private_networkinterface
           OCCI::Rendering::HTTP::LocationRegistry.register(private_networkinterface.get_location, private_networkinterface)
@@ -125,6 +127,8 @@ module OCCI
           attributes["occi.core.target"] = "/network/ec2_public_network"
           mixins = []
           public_networkinterface = OCCI::Infrastructure::Networkinterface.new(attributes, mixins)
+          # save the id of the compute backend instance in the network link for future identification
+          public_networkinterface.backend[:backend_id] = backend_instance.id
           compute.links << public_networkinterface
           public_network.links << public_networkinterface
           OCCI::Rendering::HTTP::LocationRegistry.register(public_networkinterface.get_location, public_networkinterface)
@@ -179,6 +183,9 @@ module OCCI
             attributes['occi.core.source'] = compute.get_location
             mixins = []
             console_link = OCCI::Infrastructure::ConsoleLink.new(attributes, mixins)
+            # save the id of the compute backend instance in the network link for future identification
+            console_link.backend[:backend_id] = backend_instance.id
+            # link and register
             location = console_link.get_location
             compute.links << console_link
             OCCI::Rendering::HTTP::LocationRegistry.register(location, console_link)
@@ -212,13 +219,20 @@ module OCCI
           
           if backend_instance.nil?
             $log.debug("Problems refreshing compute instance: An instance with the EC2 ID #{compute.backend[:id]} could not be found.")
-          else
-            # terminate the instance
-            backend_instance.terminate()
-            $log.debug("Deleted EC2 Compute instance with EC2 ID #{compute.backend[:id]}")
+            return
           end
-          
-          # TODO delete networklinks
+          # terminate the instance
+          backend_instance.terminate()
+            
+          # delete networklinks to the private and public network and the ConsoleLink
+          compute.links.each do |link|
+            if link.backend[:backend_id] == backend_instance.id
+              location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(link)
+              $log.debug("Deleting link to #{location}")
+              OCCI::Rendering::HTTP::LocationRegistry.unregister(location)
+            end
+          end
+          $log.debug("Deleted EC2 Compute instance with EC2 ID #{compute.backend[:id]}")
         end
   
         # ---------------------------------------------------------------------------------------------------------------------
