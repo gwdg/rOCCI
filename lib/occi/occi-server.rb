@@ -639,10 +639,13 @@ class OCCIServer < Sinatra::Application
         break
       end
 
+<<<<<<< HEAD
       # Determine set of resources to be deleted
       object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(@location)
 
 
+=======
+>>>>>>> b64cc0f2e6ecd03c9c99b628f95592ee030bf4ef
        entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(@location,@occi_request.categories)
 
       unless entities.nil?
