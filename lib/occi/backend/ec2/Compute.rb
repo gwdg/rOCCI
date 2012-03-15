@@ -34,7 +34,7 @@ module OCCI
         
         def get_backend_instance(compute)
           # get the ec2 interface
-          ec2 = OCCI::Backend::EC2.get_ec2_backend()
+          ec2 = OCCI::Backend::EC2.get_ec2_interface()
           
           # get the ec2 backend instance
           backend_instance = ec2.instances[compute.backend[:id]]
@@ -55,7 +55,7 @@ module OCCI
         end
         
         def key_pair_exists(key_name)
-          ec2 = OCCI::Backend::EC2.get_ec2_backend()
+          ec2 = OCCI::Backend::EC2.get_ec2_interface()
           
           ec2.key_pairs.each do |key|
             if key.name == "default_occi_key"
@@ -88,7 +88,7 @@ module OCCI
           end
 
           # get the ec2 interface
-          ec2 = OCCI::Backend::EC2.get_ec2_backend()
+          ec2 = OCCI::Backend::EC2.get_ec2_interface()
           
           # create an instance
           if key_pair_exists("default_occi_key")
@@ -114,6 +114,7 @@ module OCCI
           private_networkinterface = OCCI::Infrastructure::Networkinterface.new(attributes, mixins)
           # save the id of the compute backend instance in the network link for future identification
           private_networkinterface.backend[:backend_id] = backend_instance.id
+          private_networkinterface.backend[:network] = "private"
           compute.links << private_networkinterface
           private_network.links << private_networkinterface
           OCCI::Rendering::HTTP::LocationRegistry.register(private_networkinterface.get_location, private_networkinterface)
@@ -129,6 +130,7 @@ module OCCI
           public_networkinterface = OCCI::Infrastructure::Networkinterface.new(attributes, mixins)
           # save the id of the compute backend instance in the network link for future identification
           public_networkinterface.backend[:backend_id] = backend_instance.id
+          public_networkinterface.backend[:network] = "public"
           compute.links << public_networkinterface
           public_network.links << public_networkinterface
           OCCI::Rendering::HTTP::LocationRegistry.register(public_networkinterface.get_location, public_networkinterface)
@@ -147,27 +149,32 @@ module OCCI
           if backend_instance.nil?
             $log.debug("Problems refreshing compute instance: An instance with the EC2 ID #{compute.backend[:id]} could not be found.")
             return
-          else
-            # update the state
-            compute_update_state(compute)
-            $log.debug("Refreshed EC2 compute object with backend ID: #{compute.backend[:id]}")
           end
+           
+          # update the state
+          compute_update_state(compute)
+          $log.debug("Refreshed EC2 compute object with backend ID: #{compute.backend[:id]}")
           
           # setting the architecture
           compute.attributes["occi.compute.architecture"] = backend_instance.architecture.to_s
           compute.attributes["ec2.compute.platform"] = backend_instance.platform
           compute.attributes["ec2.compute.kernel_id"] = backend_instance.kernel_id
           
-          # update public ip
-          if backend_instance.ip_address != nil
-            public_network = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location("/network/ec2_public_network")
-            public_network.attributes["occi.networkinterface.interface"] = backend_instance.ip_address
-          end
-          
-          # update private ip
-          if backend_instance.private_ip_address != nil
-            private_network = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location("/network/ec2_private_network")
-            private_network.attributes["occi.networkinterface.interface"] = backend_instance.private_ip_address
+          # update public and private ip
+          compute.links.each do |link|
+            if link.kind.term == "networkinterface" and link.backend[:backend_id] == backend_instance.id
+              if link.backend[:network] == "public" and backend_instance.ip_address != nil
+                link.attributes["occi.networkinterface.interface"] = backend_instance.ip_address
+                state = OCCI::Infrastructure::Networkinterface::STATE_ACTIVE
+                link.state_machine.set_state(state)
+                link.attributes['occi.networkinterface.state'] = "active"
+              elsif link.backend[:network] == "private" and backend_instance.private_ip_address != nil
+                link.attributes["occi.networkinterface.interface"] = backend_instance.private_ip_address
+                state = OCCI::Infrastructure::Networkinterface::STATE_ACTIVE
+                link.state_machine.set_state(state)
+                link.attributes['occi.networkinterface.state'] = "active"
+              end
+            end
           end
           
           # create the console link if not already existent and if in state active
@@ -175,11 +182,7 @@ module OCCI
             # create a ConsoleLink
             $log.debug("Creating a ConsoleLink to the EC2 Compute instance.")
             attributes = OCCI::Core::Attributes.new()
-            if backend_instance.public_dns_name != nil
-              attributes['occi.core.target'] = "ssh://" + backend_instance.public_dns_name
-            else
-              attributes['occi.core.target'] = "loading"
-            end
+            attributes['occi.core.target'] = "ssh://" + backend_instance.public_dns_name
             attributes['occi.core.source'] = compute.get_location
             mixins = []
             console_link = OCCI::Infrastructure::ConsoleLink.new(attributes, mixins)

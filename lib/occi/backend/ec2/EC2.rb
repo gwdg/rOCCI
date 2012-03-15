@@ -59,7 +59,7 @@ module OCCI
       
       public
       
-      def self.get_ec2_backend
+      def self.get_ec2_interface
         ec2 = AWS::EC2.new
         return ec2.regions[$config["avail_zone"]]
       end
@@ -86,7 +86,7 @@ module OCCI
           :start          => :compute_start,
           :stop           => :compute_stop,
           :restart        => :compute_restart,
-          :suspend        => :compute_suspend        
+          :suspend        => nil        
         }
 
         OPERATIONS["http://schemas.ogf.org/occi/infrastructure#network"] = {
@@ -155,7 +155,7 @@ module OCCI
           
           ## import image templates
           # get the ec2 interface
-          ec2 = OCCI::Backend::EC2.get_ec2_backend()
+          ec2 = OCCI::Backend::EC2.get_ec2_interface()
           # register each image
           ec2.images.each do |image|
             term = image.id
