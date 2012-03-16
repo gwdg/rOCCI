@@ -110,11 +110,13 @@ module OCCI
           attributes["occi.networkinterface.interface"] = ""
           attributes["occi.core.source"] = compute.get_location
           attributes["occi.core.target"] = "/network/ec2_private_network"
-          mixins = []
+          ipnetwork = OCCI::CategoryRegistry.get_by_id("http://schemas.ogf.org/occi/infrastructure/networkinterface#ipnetworkinterface")
+          ipnetwork.backend[:network] = "private"
+          mixins = [ipnetwork]
           private_networkinterface = OCCI::Infrastructure::Networkinterface.new(attributes, mixins)
           # save the id of the compute backend instance in the network link for future identification
           private_networkinterface.backend[:backend_id] = backend_instance.id
-          private_networkinterface.backend[:network] = "private"
+          private_networkinterface.backend[:network] = "ec2_private_network"
           compute.links << private_networkinterface
           private_network.links << private_networkinterface
           OCCI::Rendering::HTTP::LocationRegistry.register(private_networkinterface.get_location, private_networkinterface)
@@ -126,7 +128,9 @@ module OCCI
           attributes["occi.networkinterface.interface"] = ""
           attributes["occi.core.source"] = compute.get_location
           attributes["occi.core.target"] = "/network/ec2_public_network"
-          mixins = []
+          ipnetwork = OCCI::CategoryRegistry.get_by_id("http://schemas.ogf.org/occi/infrastructure/networkinterface#ipnetworkinterface")
+          ipnetwork.backend[:network] = "ec2_public_network"
+          mixins = [ipnetwork]
           public_networkinterface = OCCI::Infrastructure::Networkinterface.new(attributes, mixins)
           # save the id of the compute backend instance in the network link for future identification
           public_networkinterface.backend[:backend_id] = backend_instance.id
@@ -164,15 +168,23 @@ module OCCI
           compute.links.each do |link|
             if link.kind.term == "networkinterface" and link.backend[:backend_id] == backend_instance.id
               if link.backend[:network] == "public" and backend_instance.ip_address != nil
-                link.attributes["occi.networkinterface.interface"] = backend_instance.ip_address
-                state = OCCI::Infrastructure::Networkinterface::STATE_ACTIVE
-                link.state_machine.set_state(state)
-                link.attributes['occi.networkinterface.state'] = "active"
+                link.mixins.each do |mixin|
+                  if mixin.backend[:network] == "ec2_public_network"
+                    link.attributes["occi.networkinterface.address"] = backend_instance.ip_address
+                    state = OCCI::Infrastructure::Networkinterface::STATE_ACTIVE
+                    link.state_machine.set_state(state)
+                    link.attributes['occi.networkinterface.state'] = "active"
+                  end
+                end
               elsif link.backend[:network] == "private" and backend_instance.private_ip_address != nil
-                link.attributes["occi.networkinterface.interface"] = backend_instance.private_ip_address
-                state = OCCI::Infrastructure::Networkinterface::STATE_ACTIVE
-                link.state_machine.set_state(state)
-                link.attributes['occi.networkinterface.state'] = "active"
+                link.mixins.each do |mixin|
+                  if mixin.backend[:network] == "ec2_private_network"
+                    link.attributes["occi.networkinterface.address"] = backend_instance.private_ip_address
+                    state = OCCI::Infrastructure::Networkinterface::STATE_ACTIVE
+                    link.state_machine.set_state(state)
+                    link.attributes['occi.networkinterface.state'] = "active"
+                  end
+                end
               end
             end
           end
