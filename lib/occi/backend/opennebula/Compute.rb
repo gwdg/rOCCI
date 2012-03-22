@@ -210,6 +210,8 @@ module OCCI
               link = OCCI::Infrastructure::Networkinterface.new(attributes)
               OCCI::Rendering::HTTP::LocationRegistry.register(link.get_location, link)
             end
+            link.attributes['occi.networkinterface.address'] = nic['IP'] unless nic['IP'].nil?
+            link.attributes['occi.networkinterface.mac'] = nic['MAC'] unless nic['MAC'].nil?
             source.links.push(link).uniq!
             target.links.push(link).uniq!
             $log.debug("Link successfully created")
