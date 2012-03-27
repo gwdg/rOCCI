@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 #
-# Occi.g
+# OCCI.g
 # --
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
-# Input grammar file: Occi.g
-# Generated at: 2012-03-21 18:34:24
+# Input grammar file: OCCI.g
+# Generated at: 2012-03-26 23:16:02
 # 
 
 # ~~~> start load path setup
@@ -57,7 +57,7 @@ end
 # <~~~ end load path setup
 
 
-module Occi
+module OCCI
   # TokenData defines all of the token type integer values
   # as constants, which will be included in all 
   # ANTLR-generated recognizers.
@@ -81,12 +81,12 @@ module Occi
 
 
   class Lexer < ANTLR3::Lexer
-    @grammar_home = Occi
+    @grammar_home = OCCI
     include TokenData
 
     
     begin
-      generated_using( "Occi.g", "3.2.1-SNAPSHOT Jul 31, 2010 19:34:52", "1.8.11" )
+      generated_using( "OCCI.g", "3.2.1-SNAPSHOT Jul 31, 2010 19:34:52", "1.8.11" )
     rescue NoMethodError => error
       # ignore
     end
@@ -115,7 +115,7 @@ module Occi
     
     # - - - - - - - - - - - lexer rules - - - - - - - - - - - -
     # lexer rule t__9! (T__9)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__9!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 1 )
@@ -139,7 +139,7 @@ module Occi
     end
 
     # lexer rule t__10! (T__10)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__10!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 2 )
@@ -163,7 +163,7 @@ module Occi
     end
 
     # lexer rule t__11! (T__11)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__11!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 3 )
@@ -187,7 +187,7 @@ module Occi
     end
 
     # lexer rule t__12! (T__12)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__12!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 4 )
@@ -211,7 +211,7 @@ module Occi
     end
 
     # lexer rule t__13! (T__13)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__13!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 5 )
@@ -235,7 +235,7 @@ module Occi
     end
 
     # lexer rule t__14! (T__14)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__14!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 6 )
@@ -259,7 +259,7 @@ module Occi
     end
 
     # lexer rule t__15! (T__15)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__15!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 7 )
@@ -283,7 +283,7 @@ module Occi
     end
 
     # lexer rule t__16! (T__16)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__16!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 8 )
@@ -307,7 +307,7 @@ module Occi
     end
 
     # lexer rule t__17! (T__17)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__17!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 9 )
@@ -331,7 +331,7 @@ module Occi
     end
 
     # lexer rule t__18! (T__18)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__18!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 10 )
@@ -355,7 +355,7 @@ module Occi
     end
 
     # lexer rule t__19! (T__19)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__19!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 11 )
@@ -379,7 +379,7 @@ module Occi
     end
 
     # lexer rule t__20! (T__20)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__20!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 12 )
@@ -403,7 +403,7 @@ module Occi
     end
 
     # lexer rule t__21! (T__21)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__21!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 13 )
@@ -427,7 +427,7 @@ module Occi
     end
 
     # lexer rule t__22! (T__22)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__22!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 14 )
@@ -451,7 +451,7 @@ module Occi
     end
 
     # lexer rule t__23! (T__23)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__23!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 15 )
@@ -475,7 +475,7 @@ module Occi
     end
 
     # lexer rule t__24! (T__24)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__24!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 16 )
@@ -499,7 +499,7 @@ module Occi
     end
 
     # lexer rule t__25! (T__25)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__25!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 17 )
@@ -523,7 +523,7 @@ module Occi
     end
 
     # lexer rule t__26! (T__26)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__26!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 18 )
@@ -547,7 +547,7 @@ module Occi
     end
 
     # lexer rule t__27! (T__27)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__27!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 19 )
@@ -571,7 +571,7 @@ module Occi
     end
 
     # lexer rule t__28! (T__28)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__28!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 20 )
@@ -595,7 +595,7 @@ module Occi
     end
 
     # lexer rule t__29! (T__29)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__29!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 21 )
@@ -619,7 +619,7 @@ module Occi
     end
 
     # lexer rule t__30! (T__30)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__30!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 22 )
@@ -643,7 +643,7 @@ module Occi
     end
 
     # lexer rule t__31! (T__31)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__31!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 23 )
@@ -667,7 +667,7 @@ module Occi
     end
 
     # lexer rule t__32! (T__32)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__32!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 24 )
@@ -691,7 +691,7 @@ module Occi
     end
 
     # lexer rule t__33! (T__33)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__33!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 25 )
@@ -715,7 +715,7 @@ module Occi
     end
 
     # lexer rule t__34! (T__34)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__34!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 26 )
@@ -739,7 +739,7 @@ module Occi
     end
 
     # lexer rule t__35! (T__35)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__35!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 27 )
@@ -763,7 +763,7 @@ module Occi
     end
 
     # lexer rule t__36! (T__36)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__36!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 28 )
@@ -787,7 +787,7 @@ module Occi
     end
 
     # lexer rule t__37! (T__37)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__37!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 29 )
@@ -811,7 +811,7 @@ module Occi
     end
 
     # lexer rule t__38! (T__38)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__38!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 30 )
@@ -835,7 +835,7 @@ module Occi
     end
 
     # lexer rule t__39! (T__39)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__39!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 31 )
@@ -859,7 +859,7 @@ module Occi
     end
 
     # lexer rule t__40! (T__40)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__40!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 32 )
@@ -883,7 +883,7 @@ module Occi
     end
 
     # lexer rule t__41! (T__41)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__41!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 33 )
@@ -907,7 +907,7 @@ module Occi
     end
 
     # lexer rule t__42! (T__42)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__42!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 34 )
@@ -931,7 +931,7 @@ module Occi
     end
 
     # lexer rule t__43! (T__43)
-    # (in Occi.g)
+    # (in OCCI.g)
     def t__43!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 35 )
@@ -955,7 +955,7 @@ module Occi
     end
 
     # lexer rule loalpha! (LOALPHA)
-    # (in Occi.g)
+    # (in OCCI.g)
     def loalpha!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 36 )
@@ -965,8 +965,8 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 148:11: ( 'a' .. 'z' )+
-      # at file 148:11: ( 'a' .. 'z' )+
+      # at line 161:11: ( 'a' .. 'z' )+
+      # at file 161:11: ( 'a' .. 'z' )+
       match_count_1 = 0
       while true
         alt_1 = 2
@@ -978,7 +978,7 @@ module Occi
         end
         case alt_1
         when 1
-          # at line 148:12: 'a' .. 'z'
+          # at line 161:12: 'a' .. 'z'
           match_range( 0x61, 0x7a )
 
         else
@@ -1003,7 +1003,7 @@ module Occi
     end
 
     # lexer rule upalpha! (UPALPHA)
-    # (in Occi.g)
+    # (in OCCI.g)
     def upalpha!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 37 )
@@ -1013,8 +1013,8 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 149:11: ( 'A' .. 'Z' )+
-      # at file 149:11: ( 'A' .. 'Z' )+
+      # at line 162:11: ( 'A' .. 'Z' )+
+      # at file 162:11: ( 'A' .. 'Z' )+
       match_count_2 = 0
       while true
         alt_2 = 2
@@ -1026,7 +1026,7 @@ module Occi
         end
         case alt_2
         when 1
-          # at line 149:12: 'A' .. 'Z'
+          # at line 162:12: 'A' .. 'Z'
           match_range( 0x41, 0x5a )
 
         else
@@ -1051,7 +1051,7 @@ module Occi
     end
 
     # lexer rule digit! (DIGIT)
-    # (in Occi.g)
+    # (in OCCI.g)
     def digit!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 38 )
@@ -1061,8 +1061,8 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 150:11: ( '0' .. '9' )+
-      # at file 150:11: ( '0' .. '9' )+
+      # at line 163:11: ( '0' .. '9' )+
+      # at file 163:11: ( '0' .. '9' )+
       match_count_3 = 0
       while true
         alt_3 = 2
@@ -1074,7 +1074,7 @@ module Occi
         end
         case alt_3
         when 1
-          # at line 150:12: '0' .. '9'
+          # at line 163:12: '0' .. '9'
           match_range( 0x30, 0x39 )
 
         else
@@ -1099,7 +1099,7 @@ module Occi
     end
 
     # lexer rule ws! (WS)
-    # (in Occi.g)
+    # (in OCCI.g)
     def ws!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 39 )
@@ -1109,8 +1109,8 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 151:11: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
-      # at file 151:11: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
+      # at line 164:11: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
+      # at file 164:11: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
       match_count_4 = 0
       while true
         alt_4 = 2
@@ -1155,7 +1155,7 @@ module Occi
     end
 
     # lexer rule esc! (ESC)
-    # (in Occi.g)
+    # (in OCCI.g)
     def esc!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 40 )
@@ -1165,7 +1165,7 @@ module Occi
 
       
       # - - - - main rule block - - - -
-      # at line 152:11: '\\\\' ( '\"' | '\\'' )
+      # at line 165:11: '\\\\' ( '\"' | '\\'' )
       match( 0x5c )
       if @input.peek(1) == 0x22 || @input.peek(1) == 0x27
         @input.consume

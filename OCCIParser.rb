@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 #
-# Occi.g
+# OCCI.g
 # --
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
-# Input grammar file: Occi.g
-# Generated at: 2012-03-21 18:34:24
+# Input grammar file: OCCI.g
+# Generated at: 2012-03-26 23:16:02
 # 
 
 # ~~~> start load path setup
@@ -56,8 +56,18 @@ rescue LoadError
 end
 # <~~~ end load path setup
 
+# - - - - - - begin action @parser::header - - - - - -
+# OCCI.g
 
-module Occi
+ 
+	require 'uri' 
+	require 'Hashie'
+	ATTRIBUTE = { :mutable => true, :required => false, :type => { :string => {} }, :default => '' }
+
+# - - - - - - end action @parser::header - - - - - - -
+
+
+module OCCI
   # TokenData defines all of the token type integer values
   # as constants, which will be included in all 
   # ANTLR-generated recognizers.
@@ -95,7 +105,7 @@ module Occi
 
 
   class Parser < ANTLR3::Parser
-    @grammar_home = Occi
+    @grammar_home = OCCI
 
     RULE_METHODS = [ :category, :category_value, :category_term, :category_scheme, 
                      :category_class, :category_title, :category_rel, :category_location, 
@@ -111,7 +121,7 @@ module Occi
     include TokenData
 
     begin
-      generated_using( "Occi.g", "3.2.1-SNAPSHOT Jul 31, 2010 19:34:52", "1.8.11" )
+      generated_using( "OCCI.g", "3.2.1-SNAPSHOT Jul 31, 2010 19:34:52", "1.8.11" )
     rescue NoMethodError => error
       # ignore
     end
@@ -126,26 +136,24 @@ module Occi
     # 
     # parser rule category
     # 
-    # (in Occi.g)
-    # 44:1: category returns [hash] : 'Category' ':' category_value ;
+    # (in OCCI.g)
+    # 52:1: category returns [mash] : 'Category' ':' category_value ;
     # 
     def category
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 1 )
-      hash = nil
+      mash = nil
       category_value1 = nil
-      # - - - - @init action - - - -
-      hash = Hash.new
 
       begin
-        # at line 46:2: 'Category' ':' category_value
-        match( T__9, TOKENS_FOLLOWING_T__9_IN_category_38 )
-        match( T__10, TOKENS_FOLLOWING_T__10_IN_category_40 )
-        @state.following.push( TOKENS_FOLLOWING_category_value_IN_category_42 )
+        # at line 53:4: 'Category' ':' category_value
+        match( T__9, TOKENS_FOLLOWING_T__9_IN_category_42 )
+        match( T__10, TOKENS_FOLLOWING_T__10_IN_category_44 )
+        @state.following.push( TOKENS_FOLLOWING_category_value_IN_category_46 )
         category_value1 = category_value
         @state.following.pop
         # --> action
-         hash = category_value1 
+         mash = category_value1 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -158,52 +166,43 @@ module Occi
 
       end
       
-      return hash
+      return mash
     end
 
 
     # 
     # parser rule category_value
     # 
-    # (in Occi.g)
-    # 47:3: category_value returns [hash] : category_term category_scheme category_class ( category_title )? ( category_rel )? ( category_location )? ( category_attributes )? ( category_actions )? ( ';' )? ;
+    # (in OCCI.g)
+    # 54:3: category_value returns [mash] : category_term category_scheme category_class ( category_title )? ( category_rel )? ( category_location )? ( category_attributes )? ( category_actions )? ( ';' )? ;
     # 
     def category_value
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 2 )
-      hash = nil
-      category_term2 = nil
-      category_scheme3 = nil
-      category_class4 = nil
+      mash = nil
+      category_class2 = nil
+      category_term3 = nil
+      category_scheme4 = nil
       category_title5 = nil
       category_rel6 = nil
       category_location7 = nil
       category_attributes8 = nil
       category_actions9 = nil
       # - - - - @init action - - - -
-       hash = Hash.new 
+       mash = Hashie::Mash.new( {:kinds=>[],:mixins=>[],:actions=>[] } ) 
 
       begin
-        # at line 49:15: category_term category_scheme category_class ( category_title )? ( category_rel )? ( category_location )? ( category_attributes )? ( category_actions )? ( ';' )?
-        @state.following.push( TOKENS_FOLLOWING_category_term_IN_category_value_74 )
-        category_term2 = category_term
+        # at line 56:15: category_term category_scheme category_class ( category_title )? ( category_rel )? ( category_location )? ( category_attributes )? ( category_actions )? ( ';' )?
+        @state.following.push( TOKENS_FOLLOWING_category_term_IN_category_value_78 )
+        category_term3 = category_term
         @state.following.pop
-        # --> action
-         hash[:term] = category_term2 
-        # <-- action
-        @state.following.push( TOKENS_FOLLOWING_category_scheme_IN_category_value_92 )
-        category_scheme3 = category_scheme
+        @state.following.push( TOKENS_FOLLOWING_category_scheme_IN_category_value_80 )
+        category_scheme4 = category_scheme
         @state.following.pop
-        # --> action
-         hash[:scheme] = category_scheme3 
-        # <-- action
-        @state.following.push( TOKENS_FOLLOWING_category_class_IN_category_value_110 )
-        category_class4 = category_class
+        @state.following.push( TOKENS_FOLLOWING_category_class_IN_category_value_82 )
+        category_class2 = category_class
         @state.following.pop
-        # --> action
-         hash[:class] = category_class4 
-        # <-- action
-        # at line 52:15: ( category_title )?
+        # at line 56:60: ( category_title )?
         alt_1 = 2
         look_1_0 = @input.peek( 1 )
 
@@ -222,16 +221,13 @@ module Occi
         end
         case alt_1
         when 1
-          # at line 52:15: category_title
-          @state.following.push( TOKENS_FOLLOWING_category_title_IN_category_value_128 )
+          # at line 56:60: category_title
+          @state.following.push( TOKENS_FOLLOWING_category_title_IN_category_value_84 )
           category_title5 = category_title
           @state.following.pop
 
         end
-        # --> action
-         hash[:title] = category_title5 
-        # <-- action
-        # at line 53:15: ( category_rel )?
+        # at line 56:76: ( category_rel )?
         alt_2 = 2
         look_2_0 = @input.peek( 1 )
 
@@ -250,16 +246,13 @@ module Occi
         end
         case alt_2
         when 1
-          # at line 53:15: category_rel
-          @state.following.push( TOKENS_FOLLOWING_category_rel_IN_category_value_147 )
+          # at line 56:76: category_rel
+          @state.following.push( TOKENS_FOLLOWING_category_rel_IN_category_value_87 )
           category_rel6 = category_rel
           @state.following.pop
 
         end
-        # --> action
-         hash[:rel] = category_rel6 
-        # <-- action
-        # at line 54:15: ( category_location )?
+        # at line 56:90: ( category_location )?
         alt_3 = 2
         look_3_0 = @input.peek( 1 )
 
@@ -278,16 +271,13 @@ module Occi
         end
         case alt_3
         when 1
-          # at line 54:15: category_location
-          @state.following.push( TOKENS_FOLLOWING_category_location_IN_category_value_166 )
+          # at line 56:90: category_location
+          @state.following.push( TOKENS_FOLLOWING_category_location_IN_category_value_90 )
           category_location7 = category_location
           @state.following.pop
 
         end
-        # --> action
-         hash[:location] = category_location7 
-        # <-- action
-        # at line 55:15: ( category_attributes )?
+        # at line 56:109: ( category_attributes )?
         alt_4 = 2
         look_4_0 = @input.peek( 1 )
 
@@ -306,16 +296,13 @@ module Occi
         end
         case alt_4
         when 1
-          # at line 55:15: category_attributes
-          @state.following.push( TOKENS_FOLLOWING_category_attributes_IN_category_value_185 )
+          # at line 56:109: category_attributes
+          @state.following.push( TOKENS_FOLLOWING_category_attributes_IN_category_value_93 )
           category_attributes8 = category_attributes
           @state.following.pop
 
         end
-        # --> action
-         hash[:attributes] = category_attributes8 
-        # <-- action
-        # at line 56:15: ( category_actions )?
+        # at line 56:130: ( category_actions )?
         alt_5 = 2
         look_5_0 = @input.peek( 1 )
 
@@ -328,16 +315,13 @@ module Occi
         end
         case alt_5
         when 1
-          # at line 56:15: category_actions
-          @state.following.push( TOKENS_FOLLOWING_category_actions_IN_category_value_204 )
+          # at line 56:130: category_actions
+          @state.following.push( TOKENS_FOLLOWING_category_actions_IN_category_value_96 )
           category_actions9 = category_actions
           @state.following.pop
 
         end
-        # --> action
-         hash[:actions] = category_actions9 
-        # <-- action
-        # at line 57:15: ( ';' )?
+        # at line 56:148: ( ';' )?
         alt_6 = 2
         look_6_0 = @input.peek( 1 )
 
@@ -346,10 +330,24 @@ module Occi
         end
         case alt_6
         when 1
-          # at line 57:15: ';'
-          match( T__11, TOKENS_FOLLOWING_T__11_IN_category_value_223 )
+          # at line 56:148: ';'
+          match( T__11, TOKENS_FOLLOWING_T__11_IN_category_value_99 )
 
         end
+        # --> action
+         type = category_class2
+        	               cat = Hashie::Mash.new
+        	               cat.term 		= category_term3
+        	               cat.scheme 		= category_scheme4
+        	               cat.type_identifier	= cat.scheme + cat.term
+        	               cat.title		= category_title5
+        	               cat.related		= category_rel6
+        	               cat.location		= category_location7
+        	               cat.attributes		= category_attributes8
+        	               cat.actions		= category_actions9
+        	               mash[(type+'s').to_sym] 	<< cat
+        	             
+        # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
         report_error(re)
@@ -361,25 +359,25 @@ module Occi
 
       end
       
-      return hash
+      return mash
     end
 
 
     # 
     # parser rule category_term
     # 
-    # (in Occi.g)
-    # 59:3: category_term returns [term_value] : ( WS )? term ;
+    # (in OCCI.g)
+    # 69:3: category_term returns [value] : ( WS )? term ;
     # 
     def category_term
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 3 )
-      term_value = nil
+      value = nil
       term10 = nil
 
       begin
-        # at line 59:42: ( WS )? term
-        # at line 59:42: ( WS )?
+        # at line 69:37: ( WS )? term
+        # at line 69:37: ( WS )?
         alt_7 = 2
         look_7_0 = @input.peek( 1 )
 
@@ -388,15 +386,15 @@ module Occi
         end
         case alt_7
         when 1
-          # at line 59:42: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_category_term_254 )
+          # at line 69:37: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_category_term_131 )
 
         end
-        @state.following.push( TOKENS_FOLLOWING_term_IN_category_term_257 )
+        @state.following.push( TOKENS_FOLLOWING_term_IN_category_term_134 )
         term10 = term
         @state.following.pop
         # --> action
-         term_value = ( term10 && @input.to_s( term10.start, term10.stop ) ) 
+         value = ( term10 && @input.to_s( term10.start, term10.stop ) ) 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -409,26 +407,26 @@ module Occi
 
       end
       
-      return term_value
+      return value
     end
 
 
     # 
     # parser rule category_scheme
     # 
-    # (in Occi.g)
-    # 61:3: category_scheme returns [scheme_value] : ';' ( WS )? 'scheme' '=' '\"' scheme '\"' ;
+    # (in OCCI.g)
+    # 71:3: category_scheme returns [value] : ';' ( WS )? 'scheme' '=' '\"' scheme '\"' ;
     # 
     def category_scheme
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 4 )
-      scheme_value = nil
+      value = nil
       scheme11 = nil
 
       begin
-        # at line 61:45: ';' ( WS )? 'scheme' '=' '\"' scheme '\"'
-        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_scheme_287 )
-        # at line 61:49: ( WS )?
+        # at line 71:37: ';' ( WS )? 'scheme' '=' '\"' scheme '\"'
+        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_scheme_160 )
+        # at line 71:41: ( WS )?
         alt_8 = 2
         look_8_0 = @input.peek( 1 )
 
@@ -437,19 +435,19 @@ module Occi
         end
         case alt_8
         when 1
-          # at line 61:49: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_category_scheme_289 )
+          # at line 71:41: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_category_scheme_162 )
 
         end
-        match( T__12, TOKENS_FOLLOWING_T__12_IN_category_scheme_292 )
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_scheme_294 )
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_scheme_296 )
-        @state.following.push( TOKENS_FOLLOWING_scheme_IN_category_scheme_298 )
+        match( T__12, TOKENS_FOLLOWING_T__12_IN_category_scheme_165 )
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_scheme_167 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_scheme_169 )
+        @state.following.push( TOKENS_FOLLOWING_scheme_IN_category_scheme_171 )
         scheme11 = scheme
         @state.following.pop
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_scheme_300 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_scheme_173 )
         # --> action
-         scheme_value = ( scheme11 && @input.to_s( scheme11.start, scheme11.stop ) ) 
+         value = ( scheme11 && @input.to_s( scheme11.start, scheme11.stop ) ) 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -462,26 +460,26 @@ module Occi
 
       end
       
-      return scheme_value
+      return value
     end
 
 
     # 
     # parser rule category_class
     # 
-    # (in Occi.g)
-    # 63:3: category_class returns [class_value] : ';' ( WS )? 'class' '=' '\"' class_type '\"' ;
+    # (in OCCI.g)
+    # 73:3: category_class returns [value] : ';' ( WS )? 'class' '=' '\"' class_type '\"' ;
     # 
     def category_class
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 5 )
-      class_value = nil
+      value = nil
       class_type12 = nil
 
       begin
-        # at line 63:43: ';' ( WS )? 'class' '=' '\"' class_type '\"'
-        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_class_330 )
-        # at line 63:47: ( WS )?
+        # at line 73:37: ';' ( WS )? 'class' '=' '\"' class_type '\"'
+        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_class_202 )
+        # at line 73:41: ( WS )?
         alt_9 = 2
         look_9_0 = @input.peek( 1 )
 
@@ -490,19 +488,19 @@ module Occi
         end
         case alt_9
         when 1
-          # at line 63:47: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_category_class_332 )
+          # at line 73:41: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_category_class_204 )
 
         end
-        match( T__15, TOKENS_FOLLOWING_T__15_IN_category_class_335 )
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_class_337 )
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_class_339 )
-        @state.following.push( TOKENS_FOLLOWING_class_type_IN_category_class_341 )
+        match( T__15, TOKENS_FOLLOWING_T__15_IN_category_class_207 )
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_class_209 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_class_211 )
+        @state.following.push( TOKENS_FOLLOWING_class_type_IN_category_class_213 )
         class_type12 = class_type
         @state.following.pop
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_class_343 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_class_215 )
         # --> action
-         class_value = ( class_type12 && @input.to_s( class_type12.start, class_type12.stop ) ) 
+         value = ( class_type12 && @input.to_s( class_type12.start, class_type12.stop ) ) 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -515,26 +513,26 @@ module Occi
 
       end
       
-      return class_value
+      return value
     end
 
 
     # 
     # parser rule category_title
     # 
-    # (in Occi.g)
-    # 65:3: category_title returns [title_value] : ';' ( WS )? 'title' '=' '\"' title '\"' ;
+    # (in OCCI.g)
+    # 75:3: category_title returns [value] : ';' ( WS )? 'title' '=' '\"' title '\"' ;
     # 
     def category_title
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 6 )
-      title_value = nil
+      value = nil
       title13 = nil
 
       begin
-        # at line 65:43: ';' ( WS )? 'title' '=' '\"' title '\"'
-        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_title_370 )
-        # at line 65:47: ( WS )?
+        # at line 75:37: ';' ( WS )? 'title' '=' '\"' title '\"'
+        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_title_240 )
+        # at line 75:41: ( WS )?
         alt_10 = 2
         look_10_0 = @input.peek( 1 )
 
@@ -543,19 +541,19 @@ module Occi
         end
         case alt_10
         when 1
-          # at line 65:47: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_category_title_372 )
+          # at line 75:41: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_category_title_242 )
 
         end
-        match( T__16, TOKENS_FOLLOWING_T__16_IN_category_title_375 )
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_title_377 )
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_title_379 )
-        @state.following.push( TOKENS_FOLLOWING_title_IN_category_title_381 )
+        match( T__16, TOKENS_FOLLOWING_T__16_IN_category_title_245 )
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_title_247 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_title_249 )
+        @state.following.push( TOKENS_FOLLOWING_title_IN_category_title_251 )
         title13 = title
         @state.following.pop
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_title_383 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_title_253 )
         # --> action
-         title_value = ( title13 && @input.to_s( title13.start, title13.stop ) ) 
+         value = ( title13 && @input.to_s( title13.start, title13.stop ) ) 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -568,26 +566,26 @@ module Occi
 
       end
       
-      return title_value
+      return value
     end
 
 
     # 
     # parser rule category_rel
     # 
-    # (in Occi.g)
-    # 67:3: category_rel returns [rel_value] : ';' ( WS )? 'rel' '=' '\"' rel '\"' ;
+    # (in OCCI.g)
+    # 77:3: category_rel returns [value] : ';' ( WS )? 'rel' '=' '\"' rel '\"' ;
     # 
     def category_rel
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 7 )
-      rel_value = nil
+      value = nil
       rel14 = nil
 
       begin
-        # at line 67:39: ';' ( WS )? 'rel' '=' '\"' rel '\"'
-        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_rel_411 )
-        # at line 67:43: ( WS )?
+        # at line 77:35: ';' ( WS )? 'rel' '=' '\"' rel '\"'
+        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_rel_280 )
+        # at line 77:39: ( WS )?
         alt_11 = 2
         look_11_0 = @input.peek( 1 )
 
@@ -596,19 +594,19 @@ module Occi
         end
         case alt_11
         when 1
-          # at line 67:43: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_category_rel_413 )
+          # at line 77:39: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_category_rel_282 )
 
         end
-        match( T__17, TOKENS_FOLLOWING_T__17_IN_category_rel_416 )
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_rel_418 )
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_rel_420 )
-        @state.following.push( TOKENS_FOLLOWING_rel_IN_category_rel_422 )
+        match( T__17, TOKENS_FOLLOWING_T__17_IN_category_rel_285 )
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_rel_287 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_rel_289 )
+        @state.following.push( TOKENS_FOLLOWING_rel_IN_category_rel_291 )
         rel14 = rel
         @state.following.pop
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_rel_424 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_rel_293 )
         # --> action
-         rel_value = ( rel14 && @input.to_s( rel14.start, rel14.stop ) ) 
+         value = ( rel14 && @input.to_s( rel14.start, rel14.stop ) ) 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -621,26 +619,26 @@ module Occi
 
       end
       
-      return rel_value
+      return value
     end
 
 
     # 
     # parser rule category_location
     # 
-    # (in Occi.g)
-    # 69:3: category_location returns [location_value] : ';' ( WS )? 'location' '=' '\"' location '\"' ;
+    # (in OCCI.g)
+    # 79:3: category_location returns [value] : ';' ( WS )? 'location' '=' '\"' location '\"' ;
     # 
     def category_location
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 8 )
-      location_value = nil
+      value = nil
       location15 = nil
 
       begin
-        # at line 69:48: ';' ( WS )? 'location' '=' '\"' location '\"'
-        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_location_450 )
-        # at line 69:52: ( WS )?
+        # at line 79:39: ';' ( WS )? 'location' '=' '\"' location '\"'
+        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_location_318 )
+        # at line 79:43: ( WS )?
         alt_12 = 2
         look_12_0 = @input.peek( 1 )
 
@@ -649,19 +647,19 @@ module Occi
         end
         case alt_12
         when 1
-          # at line 69:52: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_category_location_452 )
+          # at line 79:43: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_category_location_320 )
 
         end
-        match( T__18, TOKENS_FOLLOWING_T__18_IN_category_location_455 )
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_location_457 )
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_location_459 )
-        @state.following.push( TOKENS_FOLLOWING_location_IN_category_location_461 )
+        match( T__18, TOKENS_FOLLOWING_T__18_IN_category_location_323 )
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_location_325 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_location_327 )
+        @state.following.push( TOKENS_FOLLOWING_location_IN_category_location_329 )
         location15 = location
         @state.following.pop
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_location_463 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_location_331 )
         # --> action
-         location_value = ( location15 && @input.to_s( location15.start, location15.stop ) ) 
+         value = ( location15 && @input.to_s( location15.start, location15.stop ) ) 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -674,29 +672,29 @@ module Occi
 
       end
       
-      return location_value
+      return value
     end
 
 
     # 
     # parser rule category_attributes
     # 
-    # (in Occi.g)
-    # 71:3: category_attributes returns [attributes_value] : ';' ( WS )? 'attributes' '=' '\"' attr= attribute_name ( ( WS )? next_attr= attribute_name )* '\"' ;
+    # (in OCCI.g)
+    # 81:3: category_attributes returns [mash] : ';' ( WS )? 'attributes' '=' '\"' attr= attribute_name ( ( WS )? next_attr= attribute_name )* '\"' ;
     # 
     def category_attributes
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 9 )
-      attributes_value = nil
+      mash = nil
       attr = nil
       next_attr = nil
       # - - - - @init action - - - -
-      attributes_value = Array.new
+      mash = Hashie::Mash.new
 
       begin
-        # at line 72:11: ';' ( WS )? 'attributes' '=' '\"' attr= attribute_name ( ( WS )? next_attr= attribute_name )* '\"'
-        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_attributes_503 )
-        # at line 72:15: ( WS )?
+        # at line 82:10: ';' ( WS )? 'attributes' '=' '\"' attr= attribute_name ( ( WS )? next_attr= attribute_name )* '\"'
+        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_attributes_370 )
+        # at line 82:14: ( WS )?
         alt_13 = 2
         look_13_0 = @input.peek( 1 )
 
@@ -705,20 +703,20 @@ module Occi
         end
         case alt_13
         when 1
-          # at line 72:15: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_category_attributes_505 )
+          # at line 82:14: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_category_attributes_372 )
 
         end
-        match( T__19, TOKENS_FOLLOWING_T__19_IN_category_attributes_508 )
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_attributes_510 )
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_attributes_512 )
-        @state.following.push( TOKENS_FOLLOWING_attribute_name_IN_category_attributes_516 )
+        match( T__19, TOKENS_FOLLOWING_T__19_IN_category_attributes_375 )
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_attributes_377 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_attributes_379 )
+        @state.following.push( TOKENS_FOLLOWING_attribute_name_IN_category_attributes_383 )
         attr = attribute_name
         @state.following.pop
         # --> action
-         attributes_value << ( attr && @input.to_s( attr.start, attr.stop ) ) 
+         mash.merge!(attr) 
         # <-- action
-        # at line 73:11: ( ( WS )? next_attr= attribute_name )*
+        # at line 83:10: ( ( WS )? next_attr= attribute_name )*
         while true # decision 15
           alt_15 = 2
           look_15_0 = @input.peek( 1 )
@@ -729,8 +727,8 @@ module Occi
           end
           case alt_15
           when 1
-            # at line 73:13: ( WS )? next_attr= attribute_name
-            # at line 73:13: ( WS )?
+            # at line 83:12: ( WS )? next_attr= attribute_name
+            # at line 83:12: ( WS )?
             alt_14 = 2
             look_14_0 = @input.peek( 1 )
 
@@ -739,22 +737,22 @@ module Occi
             end
             case alt_14
             when 1
-              # at line 73:13: WS
-              match( WS, TOKENS_FOLLOWING_WS_IN_category_attributes_533 )
+              # at line 83:12: WS
+              match( WS, TOKENS_FOLLOWING_WS_IN_category_attributes_399 )
 
             end
-            @state.following.push( TOKENS_FOLLOWING_attribute_name_IN_category_attributes_538 )
+            @state.following.push( TOKENS_FOLLOWING_attribute_name_IN_category_attributes_404 )
             next_attr = attribute_name
             @state.following.pop
             # --> action
-             attributes_value << ( next_attr && @input.to_s( next_attr.start, next_attr.stop ) ) 
+             mash.merge!(next_attr) 
             # <-- action
 
           else
             break # out of loop for decision 15
           end
         end # loop for decision 15
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_attributes_546 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_attributes_412 )
 
       rescue ANTLR3::Error::RecognitionError => re
         report_error(re)
@@ -766,29 +764,29 @@ module Occi
 
       end
       
-      return attributes_value
+      return mash
     end
 
 
     # 
     # parser rule category_actions
     # 
-    # (in Occi.g)
-    # 74:3: category_actions returns [actions_value] : ';' ( WS )? 'actions' '=' '\"' act= action_location ( ( WS )? next_act= action_location )* '\"' ;
+    # (in OCCI.g)
+    # 84:3: category_actions returns [array] : ';' ( WS )? 'actions' '=' '\"' act= action_location ( ( WS )? next_act= action_location )* '\"' ;
     # 
     def category_actions
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 10 )
-      actions_value = nil
+      array = nil
       act = nil
       next_act = nil
       # - - - - @init action - - - -
-      actions_value = Array.new
+      array = Array.new
 
       begin
-        # at line 75:11: ';' ( WS )? 'actions' '=' '\"' act= action_location ( ( WS )? next_act= action_location )* '\"'
-        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_actions_577 )
-        # at line 75:15: ( WS )?
+        # at line 85:10: ';' ( WS )? 'actions' '=' '\"' act= action_location ( ( WS )? next_act= action_location )* '\"'
+        match( T__11, TOKENS_FOLLOWING_T__11_IN_category_actions_442 )
+        # at line 85:14: ( WS )?
         alt_16 = 2
         look_16_0 = @input.peek( 1 )
 
@@ -797,20 +795,20 @@ module Occi
         end
         case alt_16
         when 1
-          # at line 75:15: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_category_actions_579 )
+          # at line 85:14: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_category_actions_444 )
 
         end
-        match( T__20, TOKENS_FOLLOWING_T__20_IN_category_actions_582 )
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_actions_584 )
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_actions_586 )
-        @state.following.push( TOKENS_FOLLOWING_action_location_IN_category_actions_590 )
+        match( T__20, TOKENS_FOLLOWING_T__20_IN_category_actions_447 )
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_category_actions_449 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_actions_451 )
+        @state.following.push( TOKENS_FOLLOWING_action_location_IN_category_actions_455 )
         act = action_location
         @state.following.pop
         # --> action
-         actions_value << ( act && @input.to_s( act.start, act.stop ) ) 
+         array << ( act && @input.to_s( act.start, act.stop ) ) 
         # <-- action
-        # at line 76:11: ( ( WS )? next_act= action_location )*
+        # at line 86:10: ( ( WS )? next_act= action_location )*
         while true # decision 18
           alt_18 = 2
           look_18_0 = @input.peek( 1 )
@@ -821,8 +819,8 @@ module Occi
           end
           case alt_18
           when 1
-            # at line 76:13: ( WS )? next_act= action_location
-            # at line 76:13: ( WS )?
+            # at line 86:12: ( WS )? next_act= action_location
+            # at line 86:12: ( WS )?
             alt_17 = 2
             look_17_0 = @input.peek( 1 )
 
@@ -831,22 +829,22 @@ module Occi
             end
             case alt_17
             when 1
-              # at line 76:13: WS
-              match( WS, TOKENS_FOLLOWING_WS_IN_category_actions_607 )
+              # at line 86:12: WS
+              match( WS, TOKENS_FOLLOWING_WS_IN_category_actions_471 )
 
             end
-            @state.following.push( TOKENS_FOLLOWING_action_location_IN_category_actions_612 )
+            @state.following.push( TOKENS_FOLLOWING_action_location_IN_category_actions_476 )
             next_act = action_location
             @state.following.pop
             # --> action
-             actions_value << ( next_act && @input.to_s( next_act.start, next_act.stop ) ) 
+             array << ( next_act && @input.to_s( next_act.start, next_act.stop ) ) 
             # <-- action
 
           else
             break # out of loop for decision 18
           end
         end # loop for decision 18
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_actions_619 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_category_actions_483 )
 
       rescue ANTLR3::Error::RecognitionError => re
         report_error(re)
@@ -858,33 +856,33 @@ module Occi
 
       end
       
-      return actions_value
+      return array
     end
 
 
     # 
     # parser rule link
     # 
-    # (in Occi.g)
-    # 87:1: link returns [hash] : 'Link' ':' link_value ;
+    # (in OCCI.g)
+    # 97:1: link returns [mash] : 'Link' ':' link_value ;
     # 
     def link
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 11 )
-      hash = nil
+      mash = nil
       link_value16 = nil
       # - - - - @init action - - - -
-      hash = Hash.new
+      mash = Hashie::Mash.new
 
       begin
-        # at line 89:4: 'Link' ':' link_value
-        match( T__21, TOKENS_FOLLOWING_T__21_IN_link_641 )
-        match( T__10, TOKENS_FOLLOWING_T__10_IN_link_643 )
-        @state.following.push( TOKENS_FOLLOWING_link_value_IN_link_645 )
+        # at line 99:4: 'Link' ':' link_value
+        match( T__21, TOKENS_FOLLOWING_T__21_IN_link_505 )
+        match( T__10, TOKENS_FOLLOWING_T__10_IN_link_507 )
+        @state.following.push( TOKENS_FOLLOWING_link_value_IN_link_509 )
         link_value16 = link_value
         @state.following.pop
         # --> action
-         hash = link_value16 
+         mash = link_value16 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -897,43 +895,43 @@ module Occi
 
       end
       
-      return hash
+      return mash
     end
 
 
     # 
     # parser rule link_value
     # 
-    # (in Occi.g)
-    # 90:2: link_value returns [hash] : link_target link_rel ( link_self )? ( link_category )? link_attributes ( ';' )? ;
+    # (in OCCI.g)
+    # 100:2: link_value returns [mash] : link_target link_rel ( link_self )? ( link_category )? link_attributes ( ';' )? ;
     # 
     def link_value
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 12 )
-      hash = nil
+      mash = nil
       link_target17 = nil
       link_rel18 = nil
       link_self19 = nil
       link_category20 = nil
       link_attributes21 = nil
       # - - - - @init action - - - -
-       hash = Hash.new 
+       mash = Hashie::Mash.new 
 
       begin
-        # at line 92:6: link_target link_rel ( link_self )? ( link_category )? link_attributes ( ';' )?
-        @state.following.push( TOKENS_FOLLOWING_link_target_IN_link_value_667 )
+        # at line 102:6: link_target link_rel ( link_self )? ( link_category )? link_attributes ( ';' )?
+        @state.following.push( TOKENS_FOLLOWING_link_target_IN_link_value_531 )
         link_target17 = link_target
         @state.following.pop
         # --> action
-         hash[:target] = link_target17 
+         mash[:target] = link_target17 
         # <-- action
-        @state.following.push( TOKENS_FOLLOWING_link_rel_IN_link_value_676 )
+        @state.following.push( TOKENS_FOLLOWING_link_rel_IN_link_value_540 )
         link_rel18 = link_rel
         @state.following.pop
         # --> action
-         hash[:rel] = link_rel18 
+         mash[:rel] = link_rel18 
         # <-- action
-        # at line 94:6: ( link_self )?
+        # at line 104:6: ( link_self )?
         alt_19 = 2
         look_19_0 = @input.peek( 1 )
 
@@ -952,16 +950,16 @@ module Occi
         end
         case alt_19
         when 1
-          # at line 94:6: link_self
-          @state.following.push( TOKENS_FOLLOWING_link_self_IN_link_value_685 )
+          # at line 104:6: link_self
+          @state.following.push( TOKENS_FOLLOWING_link_self_IN_link_value_549 )
           link_self19 = link_self
           @state.following.pop
 
         end
         # --> action
-         hash[:self] = link_self19 
+         mash[:self] = link_self19 
         # <-- action
-        # at line 95:6: ( link_category )?
+        # at line 105:6: ( link_category )?
         alt_20 = 2
         look_20_0 = @input.peek( 1 )
 
@@ -980,22 +978,22 @@ module Occi
         end
         case alt_20
         when 1
-          # at line 95:6: link_category
-          @state.following.push( TOKENS_FOLLOWING_link_category_IN_link_value_695 )
+          # at line 105:6: link_category
+          @state.following.push( TOKENS_FOLLOWING_link_category_IN_link_value_559 )
           link_category20 = link_category
           @state.following.pop
 
         end
         # --> action
-         hash[:category] = link_category20 
+         mash[:category] = link_category20 
         # <-- action
-        @state.following.push( TOKENS_FOLLOWING_link_attributes_IN_link_value_705 )
+        @state.following.push( TOKENS_FOLLOWING_link_attributes_IN_link_value_569 )
         link_attributes21 = link_attributes
         @state.following.pop
         # --> action
-         hash[:attributes] = link_attributes21 
+         mash[:attributes] = link_attributes21 
         # <-- action
-        # at line 97:6: ( ';' )?
+        # at line 107:6: ( ';' )?
         alt_21 = 2
         look_21_0 = @input.peek( 1 )
 
@@ -1004,8 +1002,8 @@ module Occi
         end
         case alt_21
         when 1
-          # at line 97:6: ';'
-          match( T__11, TOKENS_FOLLOWING_T__11_IN_link_value_714 )
+          # at line 107:6: ';'
+          match( T__11, TOKENS_FOLLOWING_T__11_IN_link_value_578 )
 
         end
 
@@ -1019,15 +1017,15 @@ module Occi
 
       end
       
-      return hash
+      return mash
     end
 
 
     # 
     # parser rule link_target
     # 
-    # (in Occi.g)
-    # 99:2: link_target returns [value] : ( WS )? '<' target '>' ;
+    # (in OCCI.g)
+    # 109:2: link_target returns [value] : ( WS )? '<' target '>' ;
     # 
     def link_target
       # -> uncomment the next line to manually enable rule tracing
@@ -1036,8 +1034,8 @@ module Occi
       target22 = nil
 
       begin
-        # at line 99:32: ( WS )? '<' target '>'
-        # at line 99:32: ( WS )?
+        # at line 109:32: ( WS )? '<' target '>'
+        # at line 109:32: ( WS )?
         alt_22 = 2
         look_22_0 = @input.peek( 1 )
 
@@ -1046,15 +1044,15 @@ module Occi
         end
         case alt_22
         when 1
-          # at line 99:32: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_link_target_733 )
+          # at line 109:32: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_link_target_597 )
 
         end
-        match( T__22, TOKENS_FOLLOWING_T__22_IN_link_target_736 )
-        @state.following.push( TOKENS_FOLLOWING_target_IN_link_target_738 )
+        match( T__22, TOKENS_FOLLOWING_T__22_IN_link_target_600 )
+        @state.following.push( TOKENS_FOLLOWING_target_IN_link_target_602 )
         target22 = target
         @state.following.pop
-        match( T__23, TOKENS_FOLLOWING_T__23_IN_link_target_740 )
+        match( T__23, TOKENS_FOLLOWING_T__23_IN_link_target_604 )
         # --> action
          value = ( target22 && @input.to_s( target22.start, target22.stop ) ) 
         # <-- action
@@ -1076,8 +1074,8 @@ module Occi
     # 
     # parser rule link_rel
     # 
-    # (in Occi.g)
-    # 100:2: link_rel returns [value] : ';' ( WS )? 'rel' '=' '\"' rel '\"' ;
+    # (in OCCI.g)
+    # 110:2: link_rel returns [value] : ';' ( WS )? 'rel' '=' '\"' rel '\"' ;
     # 
     def link_rel
       # -> uncomment the next line to manually enable rule tracing
@@ -1086,9 +1084,9 @@ module Occi
       rel23 = nil
 
       begin
-        # at line 100:30: ';' ( WS )? 'rel' '=' '\"' rel '\"'
-        match( T__11, TOKENS_FOLLOWING_T__11_IN_link_rel_755 )
-        # at line 100:34: ( WS )?
+        # at line 110:30: ';' ( WS )? 'rel' '=' '\"' rel '\"'
+        match( T__11, TOKENS_FOLLOWING_T__11_IN_link_rel_619 )
+        # at line 110:34: ( WS )?
         alt_23 = 2
         look_23_0 = @input.peek( 1 )
 
@@ -1097,17 +1095,17 @@ module Occi
         end
         case alt_23
         when 1
-          # at line 100:34: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_link_rel_757 )
+          # at line 110:34: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_link_rel_621 )
 
         end
-        match( T__17, TOKENS_FOLLOWING_T__17_IN_link_rel_760 )
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_link_rel_762 )
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_link_rel_764 )
-        @state.following.push( TOKENS_FOLLOWING_rel_IN_link_rel_766 )
+        match( T__17, TOKENS_FOLLOWING_T__17_IN_link_rel_624 )
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_link_rel_626 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_link_rel_628 )
+        @state.following.push( TOKENS_FOLLOWING_rel_IN_link_rel_630 )
         rel23 = rel
         @state.following.pop
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_link_rel_768 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_link_rel_632 )
         # --> action
          value = ( rel23 && @input.to_s( rel23.start, rel23.stop ) ) 
         # <-- action
@@ -1129,8 +1127,8 @@ module Occi
     # 
     # parser rule link_self
     # 
-    # (in Occi.g)
-    # 101:2: link_self returns [value] : ';' ( WS )? 'self' '=' '\"' self_location '\"' ;
+    # (in OCCI.g)
+    # 111:2: link_self returns [value] : ';' ( WS )? 'self' '=' '\"' self_location '\"' ;
     # 
     def link_self
       # -> uncomment the next line to manually enable rule tracing
@@ -1139,9 +1137,9 @@ module Occi
       self_location24 = nil
 
       begin
-        # at line 101:31: ';' ( WS )? 'self' '=' '\"' self_location '\"'
-        match( T__11, TOKENS_FOLLOWING_T__11_IN_link_self_783 )
-        # at line 101:35: ( WS )?
+        # at line 111:31: ';' ( WS )? 'self' '=' '\"' self_location '\"'
+        match( T__11, TOKENS_FOLLOWING_T__11_IN_link_self_647 )
+        # at line 111:35: ( WS )?
         alt_24 = 2
         look_24_0 = @input.peek( 1 )
 
@@ -1150,17 +1148,17 @@ module Occi
         end
         case alt_24
         when 1
-          # at line 101:35: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_link_self_785 )
+          # at line 111:35: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_link_self_649 )
 
         end
-        match( T__24, TOKENS_FOLLOWING_T__24_IN_link_self_788 )
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_link_self_790 )
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_link_self_792 )
-        @state.following.push( TOKENS_FOLLOWING_self_location_IN_link_self_794 )
+        match( T__24, TOKENS_FOLLOWING_T__24_IN_link_self_652 )
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_link_self_654 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_link_self_656 )
+        @state.following.push( TOKENS_FOLLOWING_self_location_IN_link_self_658 )
         self_location24 = self_location
         @state.following.pop
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_link_self_796 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_link_self_660 )
         # --> action
          value = ( self_location24 && @input.to_s( self_location24.start, self_location24.stop ) ) 
         # <-- action
@@ -1182,8 +1180,8 @@ module Occi
     # 
     # parser rule link_category
     # 
-    # (in Occi.g)
-    # 102:2: link_category returns [value] : ';' ( WS )? 'category' '=' '\"' category_name '\"' ;
+    # (in OCCI.g)
+    # 112:2: link_category returns [value] : ';' ( WS )? 'category' '=' '\"' category_name '\"' ;
     # 
     def link_category
       # -> uncomment the next line to manually enable rule tracing
@@ -1192,9 +1190,9 @@ module Occi
       category_name25 = nil
 
       begin
-        # at line 102:35: ';' ( WS )? 'category' '=' '\"' category_name '\"'
-        match( T__11, TOKENS_FOLLOWING_T__11_IN_link_category_811 )
-        # at line 102:39: ( WS )?
+        # at line 112:35: ';' ( WS )? 'category' '=' '\"' category_name '\"'
+        match( T__11, TOKENS_FOLLOWING_T__11_IN_link_category_675 )
+        # at line 112:39: ( WS )?
         alt_25 = 2
         look_25_0 = @input.peek( 1 )
 
@@ -1203,17 +1201,17 @@ module Occi
         end
         case alt_25
         when 1
-          # at line 102:39: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_link_category_813 )
+          # at line 112:39: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_link_category_677 )
 
         end
-        match( T__25, TOKENS_FOLLOWING_T__25_IN_link_category_816 )
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_link_category_818 )
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_link_category_820 )
-        @state.following.push( TOKENS_FOLLOWING_category_name_IN_link_category_822 )
+        match( T__25, TOKENS_FOLLOWING_T__25_IN_link_category_680 )
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_link_category_682 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_link_category_684 )
+        @state.following.push( TOKENS_FOLLOWING_category_name_IN_link_category_686 )
         category_name25 = category_name
         @state.following.pop
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_link_category_824 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_link_category_688 )
         # --> action
          value = ( category_name25 && @input.to_s( category_name25.start, category_name25.stop ) ) 
         # <-- action
@@ -1235,20 +1233,20 @@ module Occi
     # 
     # parser rule link_attributes
     # 
-    # (in Occi.g)
-    # 103:2: link_attributes returns [value] : ( ';' ( WS )? attribute )* ;
+    # (in OCCI.g)
+    # 113:2: link_attributes returns [mash] : ( ';' ( WS )? attribute )* ;
     # 
     def link_attributes
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 17 )
-      value = nil
+      mash = nil
       attribute26 = nil
       # - - - - @init action - - - -
-       value = Hash.new 
+       mash = Hashie::Mash.new 
 
       begin
-        # at line 104:8: ( ';' ( WS )? attribute )*
-        # at line 104:8: ( ';' ( WS )? attribute )*
+        # at line 114:8: ( ';' ( WS )? attribute )*
+        # at line 114:8: ( ';' ( WS )? attribute )*
         while true # decision 27
           alt_27 = 2
           look_27_0 = @input.peek( 1 )
@@ -1264,9 +1262,9 @@ module Occi
           end
           case alt_27
           when 1
-            # at line 104:9: ';' ( WS )? attribute
-            match( T__11, TOKENS_FOLLOWING_T__11_IN_link_attributes_850 )
-            # at line 104:13: ( WS )?
+            # at line 114:9: ';' ( WS )? attribute
+            match( T__11, TOKENS_FOLLOWING_T__11_IN_link_attributes_714 )
+            # at line 114:13: ( WS )?
             alt_26 = 2
             look_26_0 = @input.peek( 1 )
 
@@ -1275,15 +1273,15 @@ module Occi
             end
             case alt_26
             when 1
-              # at line 104:13: WS
-              match( WS, TOKENS_FOLLOWING_WS_IN_link_attributes_852 )
+              # at line 114:13: WS
+              match( WS, TOKENS_FOLLOWING_WS_IN_link_attributes_716 )
 
             end
-            @state.following.push( TOKENS_FOLLOWING_attribute_IN_link_attributes_855 )
+            @state.following.push( TOKENS_FOLLOWING_attribute_IN_link_attributes_719 )
             attribute26 = attribute
             @state.following.pop
             # --> action
-             value.merge!(attribute26) 
+             mash.merge!(attribute26) 
             # <-- action
 
           else
@@ -1301,29 +1299,29 @@ module Occi
 
       end
       
-      return value
+      return mash
     end
 
 
     # 
     # parser rule x_occi_attribute
     # 
-    # (in Occi.g)
-    # 116:1: x_occi_attribute returns [hash] : 'X-OCCI-Attribute' ':' ( WS )? attribute ( ';' )? ;
+    # (in OCCI.g)
+    # 126:1: x_occi_attribute returns [mash] : 'X-OCCI-Attribute' ':' ( WS )? attribute ( ';' )? ;
     # 
     def x_occi_attribute
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 18 )
-      hash = nil
+      mash = nil
       attribute27 = nil
       # - - - - @init action - - - -
-       hash = Hash.new 
+       mash = Hashie::Mash.new 
 
       begin
-        # at line 118:4: 'X-OCCI-Attribute' ':' ( WS )? attribute ( ';' )?
-        match( T__26, TOKENS_FOLLOWING_T__26_IN_x_occi_attribute_882 )
-        match( T__10, TOKENS_FOLLOWING_T__10_IN_x_occi_attribute_884 )
-        # at line 118:27: ( WS )?
+        # at line 128:4: 'X-OCCI-Attribute' ':' ( WS )? attribute ( ';' )?
+        match( T__26, TOKENS_FOLLOWING_T__26_IN_x_occi_attribute_746 )
+        match( T__10, TOKENS_FOLLOWING_T__10_IN_x_occi_attribute_748 )
+        # at line 128:27: ( WS )?
         alt_28 = 2
         look_28_0 = @input.peek( 1 )
 
@@ -1332,14 +1330,14 @@ module Occi
         end
         case alt_28
         when 1
-          # at line 118:27: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_x_occi_attribute_886 )
+          # at line 128:27: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_x_occi_attribute_750 )
 
         end
-        @state.following.push( TOKENS_FOLLOWING_attribute_IN_x_occi_attribute_889 )
+        @state.following.push( TOKENS_FOLLOWING_attribute_IN_x_occi_attribute_753 )
         attribute27 = attribute
         @state.following.pop
-        # at line 118:41: ( ';' )?
+        # at line 128:41: ( ';' )?
         alt_29 = 2
         look_29_0 = @input.peek( 1 )
 
@@ -1348,12 +1346,12 @@ module Occi
         end
         case alt_29
         when 1
-          # at line 118:41: ';'
-          match( T__11, TOKENS_FOLLOWING_T__11_IN_x_occi_attribute_891 )
+          # at line 128:41: ';'
+          match( T__11, TOKENS_FOLLOWING_T__11_IN_x_occi_attribute_755 )
 
         end
         # --> action
-         hash = attribute27 
+         mash = attribute27 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -1366,29 +1364,27 @@ module Occi
 
       end
       
-      return hash
+      return mash
     end
 
 
     # 
     # parser rule x_occi_location
     # 
-    # (in Occi.g)
-    # 126:1: x_occi_location returns [string] : 'X-OCCI-Location' ':' ( WS )? location ( ';' )? ;
+    # (in OCCI.g)
+    # 136:1: x_occi_location returns [uri] : 'X-OCCI-Location' ':' ( WS )? location ( ';' )? ;
     # 
     def x_occi_location
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 19 )
-      string = nil
+      uri = nil
       location28 = nil
-      # - - - - @init action - - - -
-       string = String.new 
 
       begin
-        # at line 128:4: 'X-OCCI-Location' ':' ( WS )? location ( ';' )?
-        match( T__27, TOKENS_FOLLOWING_T__27_IN_x_occi_location_917 )
-        match( T__10, TOKENS_FOLLOWING_T__10_IN_x_occi_location_919 )
-        # at line 128:26: ( WS )?
+        # at line 137:4: 'X-OCCI-Location' ':' ( WS )? location ( ';' )?
+        match( T__27, TOKENS_FOLLOWING_T__27_IN_x_occi_location_775 )
+        match( T__10, TOKENS_FOLLOWING_T__10_IN_x_occi_location_777 )
+        # at line 137:26: ( WS )?
         alt_30 = 2
         look_30_0 = @input.peek( 1 )
 
@@ -1397,14 +1393,14 @@ module Occi
         end
         case alt_30
         when 1
-          # at line 128:26: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_x_occi_location_921 )
+          # at line 137:26: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_x_occi_location_779 )
 
         end
-        @state.following.push( TOKENS_FOLLOWING_location_IN_x_occi_location_924 )
+        @state.following.push( TOKENS_FOLLOWING_location_IN_x_occi_location_782 )
         location28 = location
         @state.following.pop
-        # at line 128:39: ( ';' )?
+        # at line 137:39: ( ';' )?
         alt_31 = 2
         look_31_0 = @input.peek( 1 )
 
@@ -1413,12 +1409,12 @@ module Occi
         end
         case alt_31
         when 1
-          # at line 128:39: ';'
-          match( T__11, TOKENS_FOLLOWING_T__11_IN_x_occi_location_926 )
+          # at line 137:39: ';'
+          match( T__11, TOKENS_FOLLOWING_T__11_IN_x_occi_location_784 )
 
         end
         # --> action
-         string = ( location28 && @input.to_s( location28.start, location28.stop ) ) 
+         uri = URI.parse(( location28 && @input.to_s( location28.start, location28.stop ) )) 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -1431,23 +1427,23 @@ module Occi
 
       end
       
-      return string
+      return uri
     end
 
 
     # 
     # parser rule uri
     # 
-    # (in Occi.g)
-    # 130:1: uri : ( LOALPHA | UPALPHA | DIGIT | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' | 'action' | 'kind' | 'mixin' )+ ;
+    # (in OCCI.g)
+    # 139:1: uri : ( LOALPHA | UPALPHA | DIGIT | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' | 'action' | 'kind' | 'mixin' )+ ;
     # 
     def uri
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 20 )
 
       begin
-        # at line 130:7: ( LOALPHA | UPALPHA | DIGIT | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' | 'action' | 'kind' | 'mixin' )+
-        # at file 130:7: ( LOALPHA | UPALPHA | DIGIT | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' | 'action' | 'kind' | 'mixin' )+
+        # at line 139:9: ( LOALPHA | UPALPHA | DIGIT | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' | 'action' | 'kind' | 'mixin' )+
+        # at file 139:9: ( LOALPHA | UPALPHA | DIGIT | '@' | ':' | '%' | '_' | '\\\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' | 'action' | 'kind' | 'mixin' )+
         match_count_32 = 0
         while true
           alt_32 = 2
@@ -1499,8 +1495,8 @@ module Occi
     # 
     # parser rule term
     # 
-    # (in Occi.g)
-    # 132:1: term : LOALPHA ( LOALPHA | DIGIT | '-' | '_' )* ;
+    # (in OCCI.g)
+    # 140:1: term : LOALPHA ( LOALPHA | DIGIT | '-' | '_' )* ;
     # 
     def term
       # -> uncomment the next line to manually enable rule tracing
@@ -1511,9 +1507,9 @@ module Occi
       return_value.start = @input.look
 
       begin
-        # at line 132:10: LOALPHA ( LOALPHA | DIGIT | '-' | '_' )*
-        match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_term_1029 )
-        # at line 132:18: ( LOALPHA | DIGIT | '-' | '_' )*
+        # at line 140:10: LOALPHA ( LOALPHA | DIGIT | '-' | '_' )*
+        match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_term_888 )
+        # at line 140:18: ( LOALPHA | DIGIT | '-' | '_' )*
         while true # decision 33
           alt_33 = 2
           look_33_0 = @input.peek( 1 )
@@ -1560,8 +1556,8 @@ module Occi
     # 
     # parser rule scheme
     # 
-    # (in Occi.g)
-    # 133:1: scheme : uri ;
+    # (in OCCI.g)
+    # 141:1: scheme : uri ;
     # 
     def scheme
       # -> uncomment the next line to manually enable rule tracing
@@ -1572,8 +1568,8 @@ module Occi
       return_value.start = @input.look
 
       begin
-        # at line 133:20: uri
-        @state.following.push( TOKENS_FOLLOWING_uri_IN_scheme_1064 )
+        # at line 141:20: uri
+        @state.following.push( TOKENS_FOLLOWING_uri_IN_scheme_923 )
         uri
         @state.following.pop
         # - - - - - - - rule clean up - - - - - - - -
@@ -1597,8 +1593,8 @@ module Occi
     # 
     # parser rule class_type
     # 
-    # (in Occi.g)
-    # 134:1: class_type : ( 'kind' | 'mixin' | 'action' ) ;
+    # (in OCCI.g)
+    # 142:1: class_type : ( 'kind' | 'mixin' | 'action' ) ;
     # 
     def class_type
       # -> uncomment the next line to manually enable rule tracing
@@ -1609,7 +1605,7 @@ module Occi
       return_value.start = @input.look
 
       begin
-        # at line 134:15: ( 'kind' | 'mixin' | 'action' )
+        # at line 142:15: ( 'kind' | 'mixin' | 'action' )
         if @input.peek( 1 ).between?( T__40, T__42 )
           @input.consume
           @state.error_recovery = false
@@ -1640,8 +1636,8 @@ module Occi
     # 
     # parser rule title
     # 
-    # (in Occi.g)
-    # 135:1: title : ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* ;
+    # (in OCCI.g)
+    # 143:1: title : ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* ;
     # 
     def title
       # -> uncomment the next line to manually enable rule tracing
@@ -1652,8 +1648,8 @@ module Occi
       return_value.start = @input.look
 
       begin
-        # at line 135:11: ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )*
-        # at line 135:11: ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )*
+        # at line 143:11: ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )*
+        # at line 143:11: ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )*
         while true # decision 34
           alt_34 = 2
           look_34_0 = @input.peek( 1 )
@@ -1700,8 +1696,8 @@ module Occi
     # 
     # parser rule rel
     # 
-    # (in Occi.g)
-    # 136:1: rel : uri ;
+    # (in OCCI.g)
+    # 144:1: rel : uri ;
     # 
     def rel
       # -> uncomment the next line to manually enable rule tracing
@@ -1712,8 +1708,8 @@ module Occi
       return_value.start = @input.look
 
       begin
-        # at line 136:9: uri
-        @state.following.push( TOKENS_FOLLOWING_uri_IN_rel_1129 )
+        # at line 144:9: uri
+        @state.following.push( TOKENS_FOLLOWING_uri_IN_rel_988 )
         uri
         @state.following.pop
         # - - - - - - - rule clean up - - - - - - - -
@@ -1737,8 +1733,8 @@ module Occi
     # 
     # parser rule location
     # 
-    # (in Occi.g)
-    # 137:1: location : uri ;
+    # (in OCCI.g)
+    # 145:1: location : uri ;
     # 
     def location
       # -> uncomment the next line to manually enable rule tracing
@@ -1749,8 +1745,8 @@ module Occi
       return_value.start = @input.look
 
       begin
-        # at line 137:13: uri
-        @state.following.push( TOKENS_FOLLOWING_uri_IN_location_1137 )
+        # at line 145:13: uri
+        @state.following.push( TOKENS_FOLLOWING_uri_IN_location_996 )
         uri
         @state.following.pop
         # - - - - - - - rule clean up - - - - - - - -
@@ -1773,29 +1769,57 @@ module Occi
     # 
     # parser rule attribute
     # 
-    # (in Occi.g)
-    # 138:1: attribute returns [value] : attribute_name '=' attribute_value ;
+    # (in OCCI.g)
+    # 146:1: attribute returns [mash] : comp_first= attribute_component ( '.' comp_next= attribute_component )* '=' attribute_value ;
     # 
     def attribute
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 27 )
-      value = nil
-      attribute_name29 = nil
-      attribute_value30 = nil
+      mash = nil
+      comp_first = nil
+      comp_next = nil
+      attribute_value29 = nil
       # - - - - @init action - - - -
-       value = Hash.new 
+       mash = Hashie::Mash.new 
 
       begin
-        # at line 139:6: attribute_name '=' attribute_value
-        @state.following.push( TOKENS_FOLLOWING_attribute_name_IN_attribute_1157 )
-        attribute_name29 = attribute_name
-        @state.following.pop
-        match( T__13, TOKENS_FOLLOWING_T__13_IN_attribute_1159 )
-        @state.following.push( TOKENS_FOLLOWING_attribute_value_IN_attribute_1161 )
-        attribute_value30 = attribute_value
+        # at line 147:6: comp_first= attribute_component ( '.' comp_next= attribute_component )* '=' attribute_value
+        @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_1018 )
+        comp_first = attribute_component
         @state.following.pop
         # --> action
-         value[( attribute_name29 && @input.to_s( attribute_name29.start, attribute_name29.stop ) )] = ( attribute_value30 && @input.to_s( attribute_value30.start, attribute_value30.stop ) ) 
+         cur_mash = mash; comp = ( comp_first && @input.to_s( comp_first.start, comp_first.stop ) ) 
+        # <-- action
+        # at line 148:6: ( '.' comp_next= attribute_component )*
+        while true # decision 35
+          alt_35 = 2
+          look_35_0 = @input.peek( 1 )
+
+          if ( look_35_0 == T__33 )
+            alt_35 = 1
+
+          end
+          case alt_35
+          when 1
+            # at line 148:8: '.' comp_next= attribute_component
+            match( T__33, TOKENS_FOLLOWING_T__33_IN_attribute_1030 )
+            @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_1034 )
+            comp_next = attribute_component
+            @state.following.pop
+            # --> action
+             cur_mash[comp.to_sym] = Hashie::Mash.new; cur_mash = cur_mash[comp.to_sym]; comp = ( comp_next && @input.to_s( comp_next.start, comp_next.stop ) ) 
+            # <-- action
+
+          else
+            break # out of loop for decision 35
+          end
+        end # loop for decision 35
+        match( T__13, TOKENS_FOLLOWING_T__13_IN_attribute_1046 )
+        @state.following.push( TOKENS_FOLLOWING_attribute_value_IN_attribute_1048 )
+        attribute_value29 = attribute_value
+        @state.following.pop
+        # --> action
+         cur_mash[comp.to_sym] = ( attribute_value29 && @input.to_s( attribute_value29.start, attribute_value29.stop ) ) 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -1808,53 +1832,60 @@ module Occi
 
       end
       
-      return value
+      return mash
     end
 
-    AttributeNameReturnValue = define_return_scope 
 
     # 
     # parser rule attribute_name
     # 
-    # (in Occi.g)
-    # 140:1: attribute_name : attribute_component ( '.' attribute_component )* ;
+    # (in OCCI.g)
+    # 150:1: attribute_name returns [mash] : comp_first= attribute_component ( '.' comp_next= attribute_component )* ;
     # 
     def attribute_name
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 28 )
-      return_value = AttributeNameReturnValue.new
-
-      # $rule.start = the first token seen before matching
-      return_value.start = @input.look
+      mash = nil
+      comp_first = nil
+      comp_next = nil
+      # - - - - @init action - - - -
+       mash = Hashie::Mash.new 
 
       begin
-        # at line 140:19: attribute_component ( '.' attribute_component )*
-        @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1171 )
-        attribute_component
+        # at line 151:27: comp_first= attribute_component ( '.' comp_next= attribute_component )*
+        @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1092 )
+        comp_first = attribute_component
         @state.following.pop
-        # at line 140:39: ( '.' attribute_component )*
-        while true # decision 35
-          alt_35 = 2
-          look_35_0 = @input.peek( 1 )
+        # --> action
+         cur_mash = mash; comp = ( comp_first && @input.to_s( comp_first.start, comp_first.stop ) ) 
+        # <-- action
+        # at line 152:6: ( '.' comp_next= attribute_component )*
+        while true # decision 36
+          alt_36 = 2
+          look_36_0 = @input.peek( 1 )
 
-          if ( look_35_0 == T__33 )
-            alt_35 = 1
+          if ( look_36_0 == T__33 )
+            alt_36 = 1
 
           end
-          case alt_35
+          case alt_36
           when 1
-            # at line 140:41: '.' attribute_component
-            match( T__33, TOKENS_FOLLOWING_T__33_IN_attribute_name_1175 )
-            @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1177 )
-            attribute_component
+            # at line 152:8: '.' comp_next= attribute_component
+            match( T__33, TOKENS_FOLLOWING_T__33_IN_attribute_name_1104 )
+            @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1108 )
+            comp_next = attribute_component
             @state.following.pop
+            # --> action
+             cur_mash[comp.to_sym] = Hashie::Mash.new; cur_mash = cur_mash[comp.to_sym]; comp = ( comp_next && @input.to_s( comp_next.start, comp_next.stop ) ) 
+            # <-- action
 
           else
-            break # out of loop for decision 35
+            break # out of loop for decision 36
           end
-        end # loop for decision 35
-        # - - - - - - - rule clean up - - - - - - - -
-        return_value.stop = @input.look( -1 )
+        end # loop for decision 36
+        # --> action
+         cur_mash[comp.to_sym] = ATTRIBUTE 
+        # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
         report_error(re)
@@ -1866,35 +1897,38 @@ module Occi
 
       end
       
-      return return_value
+      return mash
     end
 
+    AttributeComponentReturnValue = define_return_scope 
 
     # 
     # parser rule attribute_component
     # 
-    # (in Occi.g)
-    # 141:1: attribute_component : ( LOALPHA ( LOALPHA | DIGIT | '-' | '_' )* ) ;
+    # (in OCCI.g)
+    # 154:1: attribute_component : LOALPHA ( LOALPHA | DIGIT | '-' | '_' )* ;
     # 
     def attribute_component
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 29 )
+      return_value = AttributeComponentReturnValue.new
+
+      # $rule.start = the first token seen before matching
+      return_value.start = @input.look
 
       begin
-        # at line 141:23: ( LOALPHA ( LOALPHA | DIGIT | '-' | '_' )* )
-        # at line 141:23: ( LOALPHA ( LOALPHA | DIGIT | '-' | '_' )* )
-        # at line 141:25: LOALPHA ( LOALPHA | DIGIT | '-' | '_' )*
-        match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1189 )
-        # at line 141:33: ( LOALPHA | DIGIT | '-' | '_' )*
-        while true # decision 36
-          alt_36 = 2
-          look_36_0 = @input.peek( 1 )
+        # at line 154:23: LOALPHA ( LOALPHA | DIGIT | '-' | '_' )*
+        match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1128 )
+        # at line 154:31: ( LOALPHA | DIGIT | '-' | '_' )*
+        while true # decision 37
+          alt_37 = 2
+          look_37_0 = @input.peek( 1 )
 
-          if ( look_36_0 == LOALPHA || look_36_0 == DIGIT || look_36_0 == T__30 || look_36_0 == T__39 )
-            alt_36 = 1
+          if ( look_37_0 == LOALPHA || look_37_0 == DIGIT || look_37_0 == T__30 || look_37_0 == T__39 )
+            alt_37 = 1
 
           end
-          case alt_36
+          case alt_37
           when 1
             # at line 
             if @input.peek(1) == LOALPHA || @input.peek(1) == DIGIT || @input.peek(1) == T__30 || @input.peek(1) == T__39
@@ -1908,10 +1942,11 @@ module Occi
 
 
           else
-            break # out of loop for decision 36
+            break # out of loop for decision 37
           end
-        end # loop for decision 36
-
+        end # loop for decision 37
+        # - - - - - - - rule clean up - - - - - - - -
+        return_value.stop = @input.look( -1 )
 
       rescue ANTLR3::Error::RecognitionError => re
         report_error(re)
@@ -1923,7 +1958,7 @@ module Occi
 
       end
       
-      return 
+      return return_value
     end
 
     AttributeValueReturnValue = define_return_scope 
@@ -1931,8 +1966,8 @@ module Occi
     # 
     # parser rule attribute_value
     # 
-    # (in Occi.g)
-    # 142:1: attribute_value : ( ( '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"' ) | ( DIGIT ( '.' DIGIT )* ) ) ;
+    # (in OCCI.g)
+    # 155:1: attribute_value : ( ( '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"' ) | ( DIGIT ( '.' DIGIT )* ) ) ;
     # 
     def attribute_value
       # -> uncomment the next line to manually enable rule tracing
@@ -1943,34 +1978,34 @@ module Occi
       return_value.start = @input.look
 
       begin
-        # at line 142:20: ( ( '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"' ) | ( DIGIT ( '.' DIGIT )* ) )
-        # at line 142:20: ( ( '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"' ) | ( DIGIT ( '.' DIGIT )* ) )
-        alt_39 = 2
-        look_39_0 = @input.peek( 1 )
+        # at line 155:20: ( ( '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"' ) | ( DIGIT ( '.' DIGIT )* ) )
+        # at line 155:20: ( ( '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"' ) | ( DIGIT ( '.' DIGIT )* ) )
+        alt_40 = 2
+        look_40_0 = @input.peek( 1 )
 
-        if ( look_39_0 == T__14 )
-          alt_39 = 1
-        elsif ( look_39_0 == DIGIT )
-          alt_39 = 2
+        if ( look_40_0 == T__14 )
+          alt_40 = 1
+        elsif ( look_40_0 == DIGIT )
+          alt_40 = 2
         else
-          raise NoViableAlternative( "", 39, 0 )
+          raise NoViableAlternative( "", 40, 0 )
         end
-        case alt_39
+        case alt_40
         when 1
-          # at line 142:22: ( '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"' )
-          # at line 142:22: ( '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"' )
-          # at line 142:24: '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"'
-          match( T__14, TOKENS_FOLLOWING_T__14_IN_attribute_value_1222 )
-          # at line 142:28: ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )*
-          while true # decision 37
-            alt_37 = 2
-            look_37_0 = @input.peek( 1 )
+          # at line 155:22: ( '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"' )
+          # at line 155:22: ( '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"' )
+          # at line 155:24: '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"'
+          match( T__14, TOKENS_FOLLOWING_T__14_IN_attribute_value_1159 )
+          # at line 155:28: ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )*
+          while true # decision 38
+            alt_38 = 2
+            look_38_0 = @input.peek( 1 )
 
-            if ( look_37_0.between?( WS, T__13 ) || look_37_0.between?( T__15, T__30 ) || look_37_0.between?( T__32, T__43 ) )
-              alt_37 = 1
+            if ( look_38_0.between?( WS, T__13 ) || look_38_0.between?( T__15, T__30 ) || look_38_0.between?( T__32, T__43 ) )
+              alt_38 = 1
 
             end
-            case alt_37
+            case alt_38
             when 1
               # at line 
               if @input.peek( 1 ).between?( WS, T__13 ) || @input.peek( 1 ).between?( T__15, T__30 ) || @input.peek( 1 ).between?( T__32, T__43 )
@@ -1984,36 +2019,36 @@ module Occi
 
 
             else
-              break # out of loop for decision 37
-            end
-          end # loop for decision 37
-          match( T__14, TOKENS_FOLLOWING_T__14_IN_attribute_value_1252 )
-
-
-        when 2
-          # at line 142:76: ( DIGIT ( '.' DIGIT )* )
-          # at line 142:76: ( DIGIT ( '.' DIGIT )* )
-          # at line 142:78: DIGIT ( '.' DIGIT )*
-          match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_attribute_value_1259 )
-          # at line 142:84: ( '.' DIGIT )*
-          while true # decision 38
-            alt_38 = 2
-            look_38_0 = @input.peek( 1 )
-
-            if ( look_38_0 == T__33 )
-              alt_38 = 1
-
-            end
-            case alt_38
-            when 1
-              # at line 142:86: '.' DIGIT
-              match( T__33, TOKENS_FOLLOWING_T__33_IN_attribute_value_1263 )
-              match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_attribute_value_1265 )
-
-            else
               break # out of loop for decision 38
             end
           end # loop for decision 38
+          match( T__14, TOKENS_FOLLOWING_T__14_IN_attribute_value_1189 )
+
+
+        when 2
+          # at line 155:76: ( DIGIT ( '.' DIGIT )* )
+          # at line 155:76: ( DIGIT ( '.' DIGIT )* )
+          # at line 155:78: DIGIT ( '.' DIGIT )*
+          match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_attribute_value_1196 )
+          # at line 155:84: ( '.' DIGIT )*
+          while true # decision 39
+            alt_39 = 2
+            look_39_0 = @input.peek( 1 )
+
+            if ( look_39_0 == T__33 )
+              alt_39 = 1
+
+            end
+            case alt_39
+            when 1
+              # at line 155:86: '.' DIGIT
+              match( T__33, TOKENS_FOLLOWING_T__33_IN_attribute_value_1200 )
+              match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_attribute_value_1202 )
+
+            else
+              break # out of loop for decision 39
+            end
+          end # loop for decision 39
 
 
         end
@@ -2038,8 +2073,8 @@ module Occi
     # 
     # parser rule action_location
     # 
-    # (in Occi.g)
-    # 143:1: action_location : uri ;
+    # (in OCCI.g)
+    # 156:1: action_location : uri ;
     # 
     def action_location
       # -> uncomment the next line to manually enable rule tracing
@@ -2050,8 +2085,8 @@ module Occi
       return_value.start = @input.look
 
       begin
-        # at line 143:20: uri
-        @state.following.push( TOKENS_FOLLOWING_uri_IN_action_location_1280 )
+        # at line 156:20: uri
+        @state.following.push( TOKENS_FOLLOWING_uri_IN_action_location_1217 )
         uri
         @state.following.pop
         # - - - - - - - rule clean up - - - - - - - -
@@ -2075,8 +2110,8 @@ module Occi
     # 
     # parser rule target
     # 
-    # (in Occi.g)
-    # 144:1: target : uri ;
+    # (in OCCI.g)
+    # 157:1: target : uri ;
     # 
     def target
       # -> uncomment the next line to manually enable rule tracing
@@ -2087,8 +2122,8 @@ module Occi
       return_value.start = @input.look
 
       begin
-        # at line 144:12: uri
-        @state.following.push( TOKENS_FOLLOWING_uri_IN_target_1289 )
+        # at line 157:12: uri
+        @state.following.push( TOKENS_FOLLOWING_uri_IN_target_1226 )
         uri
         @state.following.pop
         # - - - - - - - rule clean up - - - - - - - -
@@ -2112,8 +2147,8 @@ module Occi
     # 
     # parser rule self_location
     # 
-    # (in Occi.g)
-    # 145:1: self_location : uri ;
+    # (in OCCI.g)
+    # 158:1: self_location : uri ;
     # 
     def self_location
       # -> uncomment the next line to manually enable rule tracing
@@ -2124,8 +2159,8 @@ module Occi
       return_value.start = @input.look
 
       begin
-        # at line 145:18: uri
-        @state.following.push( TOKENS_FOLLOWING_uri_IN_self_location_1297 )
+        # at line 158:18: uri
+        @state.following.push( TOKENS_FOLLOWING_uri_IN_self_location_1234 )
         uri
         @state.following.pop
         # - - - - - - - rule clean up - - - - - - - -
@@ -2149,8 +2184,8 @@ module Occi
     # 
     # parser rule category_name
     # 
-    # (in Occi.g)
-    # 146:1: category_name : uri ;
+    # (in OCCI.g)
+    # 159:1: category_name : uri ;
     # 
     def category_name
       # -> uncomment the next line to manually enable rule tracing
@@ -2161,8 +2196,8 @@ module Occi
       return_value.start = @input.look
 
       begin
-        # at line 146:18: uri
-        @state.following.push( TOKENS_FOLLOWING_uri_IN_category_name_1305 )
+        # at line 159:18: uri
+        @state.following.push( TOKENS_FOLLOWING_uri_IN_category_name_1242 )
         uri
         @state.following.pop
         # - - - - - - - rule clean up - - - - - - - -
@@ -2183,146 +2218,148 @@ module Occi
 
 
 
-    TOKENS_FOLLOWING_T__9_IN_category_38 = Set[ 10 ]
-    TOKENS_FOLLOWING_T__10_IN_category_40 = Set[ 4, 5 ]
-    TOKENS_FOLLOWING_category_value_IN_category_42 = Set[ 1 ]
-    TOKENS_FOLLOWING_category_term_IN_category_value_74 = Set[ 11 ]
-    TOKENS_FOLLOWING_category_scheme_IN_category_value_92 = Set[ 11 ]
-    TOKENS_FOLLOWING_category_class_IN_category_value_110 = Set[ 1, 11 ]
-    TOKENS_FOLLOWING_category_title_IN_category_value_128 = Set[ 1, 11 ]
-    TOKENS_FOLLOWING_category_rel_IN_category_value_147 = Set[ 1, 11 ]
-    TOKENS_FOLLOWING_category_location_IN_category_value_166 = Set[ 1, 11 ]
-    TOKENS_FOLLOWING_category_attributes_IN_category_value_185 = Set[ 1, 11 ]
-    TOKENS_FOLLOWING_category_actions_IN_category_value_204 = Set[ 1, 11 ]
-    TOKENS_FOLLOWING_T__11_IN_category_value_223 = Set[ 1 ]
-    TOKENS_FOLLOWING_WS_IN_category_term_254 = Set[ 4, 5 ]
-    TOKENS_FOLLOWING_term_IN_category_term_257 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__11_IN_category_scheme_287 = Set[ 4, 12 ]
-    TOKENS_FOLLOWING_WS_IN_category_scheme_289 = Set[ 12 ]
-    TOKENS_FOLLOWING_T__12_IN_category_scheme_292 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_category_scheme_294 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_scheme_296 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_scheme_IN_category_scheme_298 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_scheme_300 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__11_IN_category_class_330 = Set[ 4, 15 ]
-    TOKENS_FOLLOWING_WS_IN_category_class_332 = Set[ 15 ]
-    TOKENS_FOLLOWING_T__15_IN_category_class_335 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_category_class_337 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_class_339 = Set[ 40, 41, 42 ]
-    TOKENS_FOLLOWING_class_type_IN_category_class_341 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_class_343 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__11_IN_category_title_370 = Set[ 4, 16 ]
-    TOKENS_FOLLOWING_WS_IN_category_title_372 = Set[ 16 ]
-    TOKENS_FOLLOWING_T__16_IN_category_title_375 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_category_title_377 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_title_379 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43 ]
-    TOKENS_FOLLOWING_title_IN_category_title_381 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_title_383 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__11_IN_category_rel_411 = Set[ 4, 17 ]
-    TOKENS_FOLLOWING_WS_IN_category_rel_413 = Set[ 17 ]
-    TOKENS_FOLLOWING_T__17_IN_category_rel_416 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_category_rel_418 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_rel_420 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_rel_IN_category_rel_422 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_rel_424 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__11_IN_category_location_450 = Set[ 4, 18 ]
-    TOKENS_FOLLOWING_WS_IN_category_location_452 = Set[ 18 ]
-    TOKENS_FOLLOWING_T__18_IN_category_location_455 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_category_location_457 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_location_459 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_location_IN_category_location_461 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_location_463 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__11_IN_category_attributes_503 = Set[ 4, 19 ]
-    TOKENS_FOLLOWING_WS_IN_category_attributes_505 = Set[ 19 ]
-    TOKENS_FOLLOWING_T__19_IN_category_attributes_508 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_category_attributes_510 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_attributes_512 = Set[ 5 ]
-    TOKENS_FOLLOWING_attribute_name_IN_category_attributes_516 = Set[ 4, 5, 14 ]
-    TOKENS_FOLLOWING_WS_IN_category_attributes_533 = Set[ 5 ]
-    TOKENS_FOLLOWING_attribute_name_IN_category_attributes_538 = Set[ 4, 5, 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_attributes_546 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__11_IN_category_actions_577 = Set[ 4, 20 ]
-    TOKENS_FOLLOWING_WS_IN_category_actions_579 = Set[ 20 ]
-    TOKENS_FOLLOWING_T__20_IN_category_actions_582 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_category_actions_584 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_actions_586 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_action_location_IN_category_actions_590 = Set[ 4, 5, 6, 7, 10, 13, 14, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_WS_IN_category_actions_607 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_action_location_IN_category_actions_612 = Set[ 4, 5, 6, 7, 10, 13, 14, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_T__14_IN_category_actions_619 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__21_IN_link_641 = Set[ 10 ]
-    TOKENS_FOLLOWING_T__10_IN_link_643 = Set[ 4, 22 ]
-    TOKENS_FOLLOWING_link_value_IN_link_645 = Set[ 1 ]
-    TOKENS_FOLLOWING_link_target_IN_link_value_667 = Set[ 11 ]
-    TOKENS_FOLLOWING_link_rel_IN_link_value_676 = Set[ 11 ]
-    TOKENS_FOLLOWING_link_self_IN_link_value_685 = Set[ 11 ]
-    TOKENS_FOLLOWING_link_category_IN_link_value_695 = Set[ 11 ]
-    TOKENS_FOLLOWING_link_attributes_IN_link_value_705 = Set[ 1, 11 ]
-    TOKENS_FOLLOWING_T__11_IN_link_value_714 = Set[ 1 ]
-    TOKENS_FOLLOWING_WS_IN_link_target_733 = Set[ 22 ]
-    TOKENS_FOLLOWING_T__22_IN_link_target_736 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_target_IN_link_target_738 = Set[ 23 ]
-    TOKENS_FOLLOWING_T__23_IN_link_target_740 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__11_IN_link_rel_755 = Set[ 4, 17 ]
-    TOKENS_FOLLOWING_WS_IN_link_rel_757 = Set[ 17 ]
-    TOKENS_FOLLOWING_T__17_IN_link_rel_760 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_link_rel_762 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_link_rel_764 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_rel_IN_link_rel_766 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_link_rel_768 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__11_IN_link_self_783 = Set[ 4, 24 ]
-    TOKENS_FOLLOWING_WS_IN_link_self_785 = Set[ 24 ]
-    TOKENS_FOLLOWING_T__24_IN_link_self_788 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_link_self_790 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_link_self_792 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_self_location_IN_link_self_794 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_link_self_796 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__11_IN_link_category_811 = Set[ 4, 25 ]
-    TOKENS_FOLLOWING_WS_IN_link_category_813 = Set[ 25 ]
-    TOKENS_FOLLOWING_T__25_IN_link_category_816 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_link_category_818 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_link_category_820 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_category_name_IN_link_category_822 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_link_category_824 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__11_IN_link_attributes_850 = Set[ 4, 5 ]
-    TOKENS_FOLLOWING_WS_IN_link_attributes_852 = Set[ 4, 5 ]
-    TOKENS_FOLLOWING_attribute_IN_link_attributes_855 = Set[ 1, 11 ]
-    TOKENS_FOLLOWING_T__26_IN_x_occi_attribute_882 = Set[ 10 ]
-    TOKENS_FOLLOWING_T__10_IN_x_occi_attribute_884 = Set[ 4, 5 ]
-    TOKENS_FOLLOWING_WS_IN_x_occi_attribute_886 = Set[ 4, 5 ]
-    TOKENS_FOLLOWING_attribute_IN_x_occi_attribute_889 = Set[ 1, 11 ]
-    TOKENS_FOLLOWING_T__11_IN_x_occi_attribute_891 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__27_IN_x_occi_location_917 = Set[ 10 ]
-    TOKENS_FOLLOWING_T__10_IN_x_occi_location_919 = Set[ 4, 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_WS_IN_x_occi_location_921 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_location_IN_x_occi_location_924 = Set[ 1, 11 ]
-    TOKENS_FOLLOWING_T__11_IN_x_occi_location_926 = Set[ 1 ]
-    TOKENS_FOLLOWING_set_IN_uri_938 = Set[ 1, 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
-    TOKENS_FOLLOWING_LOALPHA_IN_term_1029 = Set[ 1, 5, 7, 30, 39 ]
-    TOKENS_FOLLOWING_set_IN_term_1031 = Set[ 1, 5, 7, 30, 39 ]
-    TOKENS_FOLLOWING_uri_IN_scheme_1064 = Set[ 1 ]
-    TOKENS_FOLLOWING_set_IN_class_type_1073 = Set[ 1 ]
-    TOKENS_FOLLOWING_set_IN_title_1094 = Set[ 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43 ]
-    TOKENS_FOLLOWING_uri_IN_rel_1129 = Set[ 1 ]
-    TOKENS_FOLLOWING_uri_IN_location_1137 = Set[ 1 ]
-    TOKENS_FOLLOWING_attribute_name_IN_attribute_1157 = Set[ 13 ]
-    TOKENS_FOLLOWING_T__13_IN_attribute_1159 = Set[ 7, 14 ]
-    TOKENS_FOLLOWING_attribute_value_IN_attribute_1161 = Set[ 1 ]
-    TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1171 = Set[ 1, 33 ]
-    TOKENS_FOLLOWING_T__33_IN_attribute_name_1175 = Set[ 5 ]
-    TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1177 = Set[ 1, 33 ]
-    TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1189 = Set[ 1, 5, 7, 30, 39 ]
-    TOKENS_FOLLOWING_set_IN_attribute_component_1191 = Set[ 1, 5, 7, 30, 39 ]
-    TOKENS_FOLLOWING_T__14_IN_attribute_value_1222 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43 ]
-    TOKENS_FOLLOWING_set_IN_attribute_value_1224 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43 ]
-    TOKENS_FOLLOWING_T__14_IN_attribute_value_1252 = Set[ 1 ]
-    TOKENS_FOLLOWING_DIGIT_IN_attribute_value_1259 = Set[ 1, 33 ]
-    TOKENS_FOLLOWING_T__33_IN_attribute_value_1263 = Set[ 7 ]
-    TOKENS_FOLLOWING_DIGIT_IN_attribute_value_1265 = Set[ 1, 33 ]
-    TOKENS_FOLLOWING_uri_IN_action_location_1280 = Set[ 1 ]
-    TOKENS_FOLLOWING_uri_IN_target_1289 = Set[ 1 ]
-    TOKENS_FOLLOWING_uri_IN_self_location_1297 = Set[ 1 ]
-    TOKENS_FOLLOWING_uri_IN_category_name_1305 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__9_IN_category_42 = Set[ 10 ]
+    TOKENS_FOLLOWING_T__10_IN_category_44 = Set[ 4, 5 ]
+    TOKENS_FOLLOWING_category_value_IN_category_46 = Set[ 1 ]
+    TOKENS_FOLLOWING_category_term_IN_category_value_78 = Set[ 11 ]
+    TOKENS_FOLLOWING_category_scheme_IN_category_value_80 = Set[ 11 ]
+    TOKENS_FOLLOWING_category_class_IN_category_value_82 = Set[ 1, 11 ]
+    TOKENS_FOLLOWING_category_title_IN_category_value_84 = Set[ 1, 11 ]
+    TOKENS_FOLLOWING_category_rel_IN_category_value_87 = Set[ 1, 11 ]
+    TOKENS_FOLLOWING_category_location_IN_category_value_90 = Set[ 1, 11 ]
+    TOKENS_FOLLOWING_category_attributes_IN_category_value_93 = Set[ 1, 11 ]
+    TOKENS_FOLLOWING_category_actions_IN_category_value_96 = Set[ 1, 11 ]
+    TOKENS_FOLLOWING_T__11_IN_category_value_99 = Set[ 1 ]
+    TOKENS_FOLLOWING_WS_IN_category_term_131 = Set[ 4, 5 ]
+    TOKENS_FOLLOWING_term_IN_category_term_134 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__11_IN_category_scheme_160 = Set[ 4, 12 ]
+    TOKENS_FOLLOWING_WS_IN_category_scheme_162 = Set[ 12 ]
+    TOKENS_FOLLOWING_T__12_IN_category_scheme_165 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__13_IN_category_scheme_167 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_category_scheme_169 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_scheme_IN_category_scheme_171 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_category_scheme_173 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__11_IN_category_class_202 = Set[ 4, 15 ]
+    TOKENS_FOLLOWING_WS_IN_category_class_204 = Set[ 15 ]
+    TOKENS_FOLLOWING_T__15_IN_category_class_207 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__13_IN_category_class_209 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_category_class_211 = Set[ 40, 41, 42 ]
+    TOKENS_FOLLOWING_class_type_IN_category_class_213 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_category_class_215 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__11_IN_category_title_240 = Set[ 4, 16 ]
+    TOKENS_FOLLOWING_WS_IN_category_title_242 = Set[ 16 ]
+    TOKENS_FOLLOWING_T__16_IN_category_title_245 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__13_IN_category_title_247 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_category_title_249 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43 ]
+    TOKENS_FOLLOWING_title_IN_category_title_251 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_category_title_253 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__11_IN_category_rel_280 = Set[ 4, 17 ]
+    TOKENS_FOLLOWING_WS_IN_category_rel_282 = Set[ 17 ]
+    TOKENS_FOLLOWING_T__17_IN_category_rel_285 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__13_IN_category_rel_287 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_category_rel_289 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_rel_IN_category_rel_291 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_category_rel_293 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__11_IN_category_location_318 = Set[ 4, 18 ]
+    TOKENS_FOLLOWING_WS_IN_category_location_320 = Set[ 18 ]
+    TOKENS_FOLLOWING_T__18_IN_category_location_323 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__13_IN_category_location_325 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_category_location_327 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_location_IN_category_location_329 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_category_location_331 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__11_IN_category_attributes_370 = Set[ 4, 19 ]
+    TOKENS_FOLLOWING_WS_IN_category_attributes_372 = Set[ 19 ]
+    TOKENS_FOLLOWING_T__19_IN_category_attributes_375 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__13_IN_category_attributes_377 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_category_attributes_379 = Set[ 5 ]
+    TOKENS_FOLLOWING_attribute_name_IN_category_attributes_383 = Set[ 4, 5, 14 ]
+    TOKENS_FOLLOWING_WS_IN_category_attributes_399 = Set[ 5 ]
+    TOKENS_FOLLOWING_attribute_name_IN_category_attributes_404 = Set[ 4, 5, 14 ]
+    TOKENS_FOLLOWING_T__14_IN_category_attributes_412 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__11_IN_category_actions_442 = Set[ 4, 20 ]
+    TOKENS_FOLLOWING_WS_IN_category_actions_444 = Set[ 20 ]
+    TOKENS_FOLLOWING_T__20_IN_category_actions_447 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__13_IN_category_actions_449 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_category_actions_451 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_action_location_IN_category_actions_455 = Set[ 4, 5, 6, 7, 10, 13, 14, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_WS_IN_category_actions_471 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_action_location_IN_category_actions_476 = Set[ 4, 5, 6, 7, 10, 13, 14, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_T__14_IN_category_actions_483 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__21_IN_link_505 = Set[ 10 ]
+    TOKENS_FOLLOWING_T__10_IN_link_507 = Set[ 4, 22 ]
+    TOKENS_FOLLOWING_link_value_IN_link_509 = Set[ 1 ]
+    TOKENS_FOLLOWING_link_target_IN_link_value_531 = Set[ 11 ]
+    TOKENS_FOLLOWING_link_rel_IN_link_value_540 = Set[ 11 ]
+    TOKENS_FOLLOWING_link_self_IN_link_value_549 = Set[ 11 ]
+    TOKENS_FOLLOWING_link_category_IN_link_value_559 = Set[ 11 ]
+    TOKENS_FOLLOWING_link_attributes_IN_link_value_569 = Set[ 1, 11 ]
+    TOKENS_FOLLOWING_T__11_IN_link_value_578 = Set[ 1 ]
+    TOKENS_FOLLOWING_WS_IN_link_target_597 = Set[ 22 ]
+    TOKENS_FOLLOWING_T__22_IN_link_target_600 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_target_IN_link_target_602 = Set[ 23 ]
+    TOKENS_FOLLOWING_T__23_IN_link_target_604 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__11_IN_link_rel_619 = Set[ 4, 17 ]
+    TOKENS_FOLLOWING_WS_IN_link_rel_621 = Set[ 17 ]
+    TOKENS_FOLLOWING_T__17_IN_link_rel_624 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__13_IN_link_rel_626 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_link_rel_628 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_rel_IN_link_rel_630 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_link_rel_632 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__11_IN_link_self_647 = Set[ 4, 24 ]
+    TOKENS_FOLLOWING_WS_IN_link_self_649 = Set[ 24 ]
+    TOKENS_FOLLOWING_T__24_IN_link_self_652 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__13_IN_link_self_654 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_link_self_656 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_self_location_IN_link_self_658 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_link_self_660 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__11_IN_link_category_675 = Set[ 4, 25 ]
+    TOKENS_FOLLOWING_WS_IN_link_category_677 = Set[ 25 ]
+    TOKENS_FOLLOWING_T__25_IN_link_category_680 = Set[ 13 ]
+    TOKENS_FOLLOWING_T__13_IN_link_category_682 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_link_category_684 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_category_name_IN_link_category_686 = Set[ 14 ]
+    TOKENS_FOLLOWING_T__14_IN_link_category_688 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__11_IN_link_attributes_714 = Set[ 4, 5 ]
+    TOKENS_FOLLOWING_WS_IN_link_attributes_716 = Set[ 4, 5 ]
+    TOKENS_FOLLOWING_attribute_IN_link_attributes_719 = Set[ 1, 11 ]
+    TOKENS_FOLLOWING_T__26_IN_x_occi_attribute_746 = Set[ 10 ]
+    TOKENS_FOLLOWING_T__10_IN_x_occi_attribute_748 = Set[ 4, 5 ]
+    TOKENS_FOLLOWING_WS_IN_x_occi_attribute_750 = Set[ 4, 5 ]
+    TOKENS_FOLLOWING_attribute_IN_x_occi_attribute_753 = Set[ 1, 11 ]
+    TOKENS_FOLLOWING_T__11_IN_x_occi_attribute_755 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__27_IN_x_occi_location_775 = Set[ 10 ]
+    TOKENS_FOLLOWING_T__10_IN_x_occi_location_777 = Set[ 4, 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_WS_IN_x_occi_location_779 = Set[ 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_location_IN_x_occi_location_782 = Set[ 1, 11 ]
+    TOKENS_FOLLOWING_T__11_IN_x_occi_location_784 = Set[ 1 ]
+    TOKENS_FOLLOWING_set_IN_uri_798 = Set[ 1, 5, 6, 7, 10, 13, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 ]
+    TOKENS_FOLLOWING_LOALPHA_IN_term_888 = Set[ 1, 5, 7, 30, 39 ]
+    TOKENS_FOLLOWING_set_IN_term_890 = Set[ 1, 5, 7, 30, 39 ]
+    TOKENS_FOLLOWING_uri_IN_scheme_923 = Set[ 1 ]
+    TOKENS_FOLLOWING_set_IN_class_type_932 = Set[ 1 ]
+    TOKENS_FOLLOWING_set_IN_title_953 = Set[ 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43 ]
+    TOKENS_FOLLOWING_uri_IN_rel_988 = Set[ 1 ]
+    TOKENS_FOLLOWING_uri_IN_location_996 = Set[ 1 ]
+    TOKENS_FOLLOWING_attribute_component_IN_attribute_1018 = Set[ 13, 33 ]
+    TOKENS_FOLLOWING_T__33_IN_attribute_1030 = Set[ 5 ]
+    TOKENS_FOLLOWING_attribute_component_IN_attribute_1034 = Set[ 13, 33 ]
+    TOKENS_FOLLOWING_T__13_IN_attribute_1046 = Set[ 7, 14 ]
+    TOKENS_FOLLOWING_attribute_value_IN_attribute_1048 = Set[ 1 ]
+    TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1092 = Set[ 1, 33 ]
+    TOKENS_FOLLOWING_T__33_IN_attribute_name_1104 = Set[ 5 ]
+    TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1108 = Set[ 1, 33 ]
+    TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1128 = Set[ 1, 5, 7, 30, 39 ]
+    TOKENS_FOLLOWING_set_IN_attribute_component_1130 = Set[ 1, 5, 7, 30, 39 ]
+    TOKENS_FOLLOWING_T__14_IN_attribute_value_1159 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43 ]
+    TOKENS_FOLLOWING_set_IN_attribute_value_1161 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43 ]
+    TOKENS_FOLLOWING_T__14_IN_attribute_value_1189 = Set[ 1 ]
+    TOKENS_FOLLOWING_DIGIT_IN_attribute_value_1196 = Set[ 1, 33 ]
+    TOKENS_FOLLOWING_T__33_IN_attribute_value_1200 = Set[ 7 ]
+    TOKENS_FOLLOWING_DIGIT_IN_attribute_value_1202 = Set[ 1, 33 ]
+    TOKENS_FOLLOWING_uri_IN_action_location_1217 = Set[ 1 ]
+    TOKENS_FOLLOWING_uri_IN_target_1226 = Set[ 1 ]
+    TOKENS_FOLLOWING_uri_IN_self_location_1234 = Set[ 1 ]
+    TOKENS_FOLLOWING_uri_IN_category_name_1242 = Set[ 1 ]
 
   end # class Parser < ANTLR3::Parser
 
