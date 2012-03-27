@@ -16,7 +16,7 @@ module OCCI
             object = OCCI::Core::Resource.new(attributes)
             LocationRegistry.register(location, object)
             LocationRegistry.get_location_of_object(object).should == location
-            LocationRegistry.get_object_by_location(location).should == object
+            LocationRegistry.get_object_at_location(location).should == object
             LocationRegistry.get_resources_below_location('/',[OCCI::Core::Resource::KIND]).first.should == object
             LocationRegistry.get_resources_below_location('/resource/',[OCCI::Core::Resource::KIND]).first.should == object
           end

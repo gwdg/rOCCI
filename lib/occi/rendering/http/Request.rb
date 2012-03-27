@@ -28,8 +28,7 @@ module OCCI
       class Request
 
         attr_reader :categories
-        attr_reader :resources
-        attr_reader :links
+        attr_reader :entities
         attr_reader :locations
 
         # Parses a Rack/Sinatra Request and extract OCCI relevant information
@@ -37,8 +36,8 @@ module OCCI
         # @param [Rack::Request] request from Sinatra/Rack
         def initialize(request)
           @categories = Hashie::Mash.new({:kinds=>[],:mixins=>[],:actions=>[]})
-          @links = Array.new
-          @locations = Array.new
+          @entities   = Hashie::Mash.new({:links=>[],:resources=>[]})
+          @locations  = Array.new
 
           $log.debug("HTTP Request Headers: ")
           request.env.each do |k, v|
@@ -85,11 +84,11 @@ module OCCI
                   @categories = parse_header_categories(request.env)
                 else
                   if request.path_info.start_with?('/link/')
-                    @links = parse_header_links(request.env)
+                    @entities[:links] = parse_header_links(request.env)
                   elsif request.path_info.include?('?action=')
                     @categories = parse_header_category(request.env)
                   else
-                    @resources = parse_header_resources(request.env)
+                    @entities[:resources] = parse_header_resources(request.env)
                   end
                 end
               end
@@ -100,11 +99,11 @@ module OCCI
                   @categories = parse_text_mixins(request.body)
                 else
                   if request.path_info.start_with?('/link/')
-                    @links = parse_text_links(request.body)
+                    @entities[:links] = parse_text_links(request.body)
                   elsif request.path_info.include?('?action=')
                     @categories = parse_text_categories(request.body)
                   else
-                    @resources = parse_text_resources(request.body)
+                    @entities[:resources] = parse_text_resources(request.body)
                   end
                 end
               end
@@ -113,7 +112,7 @@ module OCCI
             when 'application/occi-resource+json'
               @resources = parse_json(request.body)
             when 'application/occi-link+json'
-              @links = parse_json(request.body)
+              @entities = parse_json(request.body)
           end
         end
 

@@ -134,7 +134,7 @@ module OCCI
           # Link value
           location        = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(link)
           target_location = link.attributes["occi.core.target"]
-          target_resource = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(target_location)
+          target_resource = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(target_location)
           if target_resource.nil?
             target_resource_type = OCCI::Core::Link::KIND.type_identifier
           else

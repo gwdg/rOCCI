@@ -105,7 +105,7 @@ module OCCI
           
           # link it to the private ec2 network
           $log.debug("Linking instance to \"/network/ec2_private_network\".")
-          private_network = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location("/network/ec2_private_network")
+          private_network = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location("/network/ec2_private_network")
           attributes = OCCI::Core::Attributes.new()
           attributes["occi.networkinterface.interface"] = ""
           attributes["occi.core.source"] = compute.get_location
@@ -123,7 +123,7 @@ module OCCI
           
           # link it to the public ec2 network
           $log.debug("Linking instance to \"/network/ec2_public_network\".")
-          public_network = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location("/network/ec2_public_network")
+          public_network = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location("/network/ec2_public_network")
           attributes = OCCI::Core::Attributes.new()
           attributes["occi.networkinterface.interface"] = ""
           attributes["occi.core.source"] = compute.get_location

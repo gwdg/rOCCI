@@ -68,7 +68,7 @@ module OCCI
           attributes['opennebula.vm.boot']            = backend_object['TEMPLATE/BOOT']
   
           # check if object already exists
-          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/compute/' +  occi_id)
+          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location('/compute/' +  occi_id)
           if occi_object.nil?
             occi_object = OCCI::Infrastructure::Compute.new(attributes,mixins)
             occi_object.backend[:id] = backend_object.id
@@ -168,7 +168,7 @@ module OCCI
             # check if link already exists
             occi_id = self.generate_occi_id(OCCI::Infrastructure::StorageLink::KIND, disk['IMAGE_ID'].to_s)
             storagelink_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(OCCI::Infrastructure::StorageLink::KIND)
-            link = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(storagelink_location + occi_id)
+            link = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(storagelink_location + occi_id)
             if link.nil?
               # create new link
               attributes['occi.core.id'] = occi_id
@@ -203,7 +203,7 @@ module OCCI
             # check if link already exists
             occi_id = self.generate_occi_id(OCCI::Infrastructure::Networkinterface::KIND, nic['NETWORK_ID'].to_s)
             networkinterface_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(OCCI::Infrastructure::Networkinterface::KIND)
-            link = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(networkinterface_location + occi_id)
+            link = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(networkinterface_location + occi_id)
             if link.nil?
               # create new link
               attributes['occi.core.id'] = occi_id
@@ -260,7 +260,7 @@ module OCCI
               compute.links.each do |link|
                 $log.debug("Processing link: #{link.kind.type_identifier}, attributes: #{link.attributes.inspect}")
                 target_URI = link.attributes['occi.core.target'] if URI.parse(link.attributes['occi.core.target']).absolute?
-                target = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.attributes['occi.core.target'])
+                target = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(link.attributes['occi.core.target'])
                 
                 case link.kind.term
                 when 'storagelink'

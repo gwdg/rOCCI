@@ -127,7 +127,7 @@ module OCCI
           hash = {}
           hash['title'] = link.attributes['occi.core.title']
           hash['target'] = link.attributes['occi.core.target']
-          target_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location(link.attributes['occi.core.target'])
+          target_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(link.attributes['occi.core.target'])
           hash['target_type'] = target_object.type_identifier
           hash['location'] = link.get_location
           hash['type'] = link.type_identifier

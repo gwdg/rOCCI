@@ -73,7 +73,7 @@ module OCCI
           end
   
           # check if object already exists
-          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/network/' +  occi_id)
+          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location('/network/' +  occi_id)
           if occi_object.nil?
             occi_object = OCCI::Infrastructure::Network.new(attributes,mixins)
             occi_object.backend[:id] = backend_object.id

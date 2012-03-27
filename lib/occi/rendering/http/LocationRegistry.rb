@@ -104,7 +104,7 @@ module OCCI
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def self.get_object_by_location(location)
+        def self.get_object_at_location(location)
           return @@registry[location][:object] unless @@registry[location].nil?
         end
 

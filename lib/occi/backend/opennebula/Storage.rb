@@ -69,7 +69,7 @@ module OCCI
           mixins = [OCCI::Backend::ONE::Image::MIXIN]
   
           # check if object already exists
-          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_by_location('/storage/' +  occi_id)
+          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location('/storage/' +  occi_id)
           if occi_object.nil?
             occi_object = OCCI::Infrastructure::Storage.new(attributes, mixins)
             occi_object.backend[:id] = backend_object.id
