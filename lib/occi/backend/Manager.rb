@@ -95,17 +95,17 @@ module OCCI
         
         # Delegate
         
-        if operations[resource_type][operation].nil?
+        if operations[resource_type][operation.to_sym].nil?
           $log.debug("No backend method configured => doing nothing...")
           return
         end
         
         if operation_parameters.nil?
           # Generic resource operation
-          backend.send(operations[resource_type][operation], resource)
+          backend.send(operations[resource_type][operation.to_sym], resource)
         else
           # Action related operation, we need to pass on the action parameters
-          backend.send(operations[resource_type][operation], resource, operation_parameters)
+          backend.send(operations[resource_type][operation.to_sym], resource, operation_parameters)
         end
 
       end

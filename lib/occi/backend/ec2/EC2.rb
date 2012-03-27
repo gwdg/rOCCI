@@ -55,16 +55,13 @@ module OCCI
         OCCI::Rendering::HTTP::LocationRegistry.register("/network/ec2_public_network", public_network)
         public_network.state_machine.set_state(OCCI::Infrastructure::Network::STATE_ACTIVE)
         public_network.attributes['occi.network.state'] = "active"
-        
-        # Create elastic network
-        attributes = OCCI::Core::Attributes.new()
-        attributes['occi.core.title'] = "ec2_elastic_network"
-        attributes['occi.core.summary'] = "This network contains elastic ip links to all EC2 compute instances."
-        mixins = []
-        elastic_network = OCCI::Infrastructure::Network.new(attributes, mixins)
-        OCCI::Rendering::HTTP::LocationRegistry.register("/network/ec2_elastic_network", elastic_network)
-        elastic_network.state_machine.set_state(OCCI::Infrastructure::Network::STATE_ACTIVE)
-        elastic_network.attributes['occi.network.state'] = "active"
+      end
+      
+      public
+      
+      def self.get_ec2_interface
+        ec2 = AWS::EC2.new
+        return ec2.regions[$config["avail_zone"]]
       end
             
       class EC2
@@ -89,36 +86,36 @@ module OCCI
           :start          => :compute_start,
           :stop           => :compute_stop,
           :restart        => :compute_restart,
-          :suspend        => :compute_suspend        
+          :suspend        => nil        
         }
 
         OPERATIONS["http://schemas.ogf.org/occi/infrastructure#network"] = {
         
           # Generic resource operations
-          :deploy         => :resource_deploy,
-          :update_state   => :resource_update_state,
-          :refresh        => :resource_refresh,
-          :delete         => :resource_delete,
+          :deploy         => nil,
+          :update_state   => nil,
+          :refresh        => nil,
+          :delete         => nil,
         
           # Network specific resource operations
-          :up             => :action_dummy,
-          :down           => :action_dummy
+          :up             => nil,
+          :down           => nil
         }
 
         OPERATIONS["http://schemas.ogf.org/occi/infrastructure#storage"] = {
 
           # Generic resource operations
-          :deploy         => :resource_deploy,
-          :update_state   => :resource_update_state,
-          :refresh        => :resource_refresh,
-          :delete         => :resource_delete,
+          :deploy         => nil,
+          :update_state   => nil,
+          :refresh        => nil,
+          :delete         => nil,
    
           # Network specific resource operations
-          :online         => :action_dummy,
-          :offline        => :action_dummy,
-          :backup         => :action_dummy,
-          :snapshot       => :action_dummy,
-          :resize         => :action_dummy
+          :online         => nil,
+          :offline        => nil,
+          :backup         => nil,
+          :snapshot       => nil,
+          :resize         => nil
         }
 
         OPERATIONS["http://schemas.ogf.org/gwdg#nfsstorage"] = {
@@ -127,7 +124,7 @@ module OCCI
           :deploy         => nil,
           :update_state   => nil,
           :refresh        => nil,
-          :delete         => nil,   
+          :delete         => nil
         }
         
         # ---------------------------------------------------------------------------------------------------------------------
@@ -158,8 +155,7 @@ module OCCI
           
           ## import image templates
           # get the ec2 interface
-          ec2 = AWS::EC2.new
-          ec2 = ec2.regions["eu-west-1"]
+          ec2 = OCCI::Backend::EC2.get_ec2_interface()
           # register each image
           ec2.images.each do |image|
             term = image.id
