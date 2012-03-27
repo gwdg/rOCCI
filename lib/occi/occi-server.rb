@@ -25,7 +25,6 @@
 # gems
 require 'rubygems'
 require 'sinatra'
-require "sinatra/reloader" if development?
 require "sinatra/multi_route"
 require 'sinatra/cross_origin'
 require 'logger'
@@ -96,12 +95,15 @@ def initialize_backend(request)
     backend = case $config["backend"]
                when "opennebula"
                  require 'occi/backend/opennebula/OpenNebula'
+                 OCCI::Backend::Manager.register_backend(OCCI::Backend::OpenNebula::OpenNebula, OCCI::Backend::OpenNebula::OpenNebula::OPERATIONS)
                  OCCI::Backend::OpenNebula::OpenNebula.new(user, password)
                when "ec2"
                  require 'occi/backend/ec2/EC2'
+                 OCCI::Backend::Manager.register_backend(OCCI::Backend::EC2::EC2, OCCI::Backend::EC2::EC2::OPERATIONS)
                  OCCI::Backend::EC2::EC2.new(user, password)
                when "dummy" then
                  require 'occi/backend/Dummy'
+                 OCCI::Backend::Manager.register_backend(OCCI::Backend::Dummy, OCCI::Backend::Dummy::OPERATIONS)
                  OCCI::Backend::Dummy.new()
                else raise "Backend '" + $config["backend"] + "' not found"
              end
@@ -162,9 +164,8 @@ require 'occi/extensions/ConsoleLink'
 # OCCI HTTP rendering
 require 'occi/rendering/Rendering'
 require 'occi/rendering/http/LocationRegistry'
-require 'occi/rendering/http/OCCIParser'
-require 'occi/rendering/http/OCCIRequest'
 require 'occi/rendering/http/HTTP'
+require 'occi/rendering/http/Request'
 
 # Backend support
 require 'occi/backend/Manager'
@@ -197,7 +198,7 @@ class OCCIServer < Sinatra::Application
     @backend = initialize_backend(request)
     @rendering = OCCI::Rendering::Rendering.new
     OCCI::Rendering::HTTP::prepare_response(@response, request)
-    @occi_request = OCCI::Rendering::HTTP::OCCIRequest.new(@request, params)
+    @occi_request = OCCI::Rendering::HTTP::Request.new(request)
     @location = request.path_info
   end
 
@@ -207,7 +208,9 @@ class OCCIServer < Sinatra::Application
 
   get '/-/', '/.well-known/org/ogf/occi/-/' do
     $log.info("Listing all kinds and mixins ...")
-    @rendering.render_category_type(@occi_request.categories)
+    filter = @occi_request.categories
+    categories = OCCI::CategoryRegistry.get(filter)
+    @rendering.render_category_type(categories)
     nil
   end
 
