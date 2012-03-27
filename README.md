@@ -19,13 +19,12 @@ Download the latest version from http://dev.opennebula.org/projects/ogf-occi/fil
 
 Extract file
 
+    tar xzf rOCCI-*.tar.bz
+    unzip rOCCI-*.zip
+
 Install dependencies
 
     bundle install --deployment
-
-Run Passenger
-
-    passenger start
 
 ### Latest version
 
@@ -44,8 +43,21 @@ Install dependencies for deployment
 Install dependencies for testing
     bundle install
 
+Configure
+---------
+
+Edit etc/occi-server.conf and adapt to your setting.
+
+The default templates for the OpenNebula template are located at etc/one_templates .
+
+The default templates for EC2 are located at etc/ec2_templates .
+
 Usage
 -----
+
+Run Passenger
+
+    passenger start
 
 Testing
 -------
