@@ -1,3 +1,4 @@
-.idea
-tmp
-log
+.idea/
+.yardoc/
+tmp/
+log/
