@@ -14,11 +14,13 @@ gem "sinatra-cross_origin"
 # passenger
 gem "passenger"
 
-platforms :ec2 do
+group :ec2 do
   gem "aws-sdk"
   gem "xml-simple"
 end
 
-platforms :development do
+group :development do
   gem "rspec"
+  gem "yard"
+  gem "yard-sinatra"
 end
