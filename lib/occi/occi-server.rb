@@ -99,6 +99,7 @@ def initialize_backend(request)
                  OCCI::Backend::OpenNebula::OpenNebula.new(user, password)
                when "ec2"
                  require 'occi/backend/ec2/EC2'
+                 Bundler.require(:ec2)
                  OCCI::Backend::Manager.register_backend(OCCI::Backend::EC2::EC2, OCCI::Backend::EC2::EC2::OPERATIONS)
                  OCCI::Backend::EC2::EC2.new(user, password)
                when "dummy" then
