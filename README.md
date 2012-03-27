@@ -15,13 +15,15 @@ Installation
 
 ### Stable version
 
-* Download the latest version from http://dev.opennebula.org/projects/ogf-occi/files
-* Extract file
-* Install dependencies
+Download the latest version from http://dev.opennebula.org/projects/ogf-occi/files
+
+Extract file
+
+Install dependencies
 
     bundle install --deployment
 
-* Run Passenger
+Run Passenger
 
     passenger start
 
@@ -32,6 +34,7 @@ Checkout latest version from GIT:
     git clone git://github.com/gwdg/rOCCI.git
 
 Change to rOCCI folder
+
     cd rOCCI
 
 Install dependencies for deployment
