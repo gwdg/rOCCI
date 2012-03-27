@@ -1,1 +1,1 @@
---plugin yard-sinatra
+--plugin yard-sinatra --markup markdown
