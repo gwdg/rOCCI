@@ -48,19 +48,20 @@ module OCCI
       @@categories_by_location.fetch(location) { raise "Category with location " + location + " not found" }
     end
 
-    # ---------------------------------------------------------------------------------------------------------------------
-    def self.get_all(categories = [])
-      occi_categories = []
-      categories.each do |category|
-        id = category.scheme + category.term if category.scheme
-        id = category.type_identifier if category.type_identifier
+    # Return all categories from category registry. If filter is present, return only the categories specified by filter
+    #
+    # @param [Hashie:Mash] filter
+    # @return [Array] categories
+    def self.get(filter)
+      categories = Array.new
+      filter.values.flatten(1).each do |category|
         begin
-          occi_categories << self.get_by_id(id)
+          occi_categories << self.get_by_id(category.type_identifier)
         rescue OCCI::CategoryNotFoundException => e
           $log.warn(e.message)
         end
       end
-      return occi_categories if not occi_categories.empty? or categories.length > 0
+      return categories unless categories.empty?
       return @@categories_by_id.values
     end
   end
