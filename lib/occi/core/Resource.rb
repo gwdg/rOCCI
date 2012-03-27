@@ -46,7 +46,7 @@ module OCCI
         OCCI::CategoryRegistry.register(KIND)
       end
 
-      def initialize(attributes, mixins = [], kind = OCCI::Core::Resource)
+      def initialize(attributes, mixins = [], kind = OCCI::Core::Resource::KIND)
         attributes['occi.core.summary'] = "" if attributes['occi.core.summary'] == nil
         @links = []
         @template = false
