@@ -1,19 +1,24 @@
 source :rubygems
 
+# external ruby libraries
 gem "uuidtools"
-gem "sinatra"
-gem "sinatra-contrib"
-gem "sinatra-cross_origin"
-gem "passenger"
 gem "json"
 gem "antlr3"
 gem "hashie"
 
-group :ec2 do
+# sinatra and related
+gem "sinatra"
+gem "sinatra-contrib"
+gem "sinatra-cross_origin"
+
+# passenger
+gem "passenger"
+
+platforms :ec2 do
   gem "aws-sdk"
   gem "xml-simple"
 end
 
-group :development do
+platforms :development do
   gem "rspec"
 end
