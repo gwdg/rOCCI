@@ -14,8 +14,6 @@ namespace :rcov do
 =end
 
   RSpec::Core::RakeTask.new(:rspec) do |t|
-    t.rspec_opts = %w{"--color"}
-
     ENV['COVERAGE'] = "true"
   end
 
