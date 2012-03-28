@@ -194,15 +194,14 @@ class OCCIServer < Sinatra::Application
     authentication = Rack::Auth::Basic::Request.new(request.env)
     @backend = initialize_backend(authentication)
     @renderer = OCCI::Rendering::Renderer.new
-    OCCI::Rendering::HTTP::Response.prepare(@response, request)
     @occi_request = OCCI::Rendering::HTTP::Request.new(request)
-    @occi_response = OCCI::Rendering::HTTP::Response.new
+    @occi_response = OCCI::Rendering::HTTP::Response.prepare(response, request)
     @location = request.path_info
   end
 
   # taks to be executed after the requests are handled
   after do
-    @renderer.render(@occi_response)
+    @renderer.render(response)
   end
 
   # discovery interface
@@ -240,7 +239,7 @@ class OCCIServer < Sinatra::Application
           #locations << loc
         end
 
-        @renderer.render(@occi_request)
+        #@renderer.render(@occi_request)
 
 
         break
@@ -262,7 +261,7 @@ class OCCIServer < Sinatra::Application
 
         # When no resources found, return Not Found
         if resources.nil?
-          response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
+          response.status = OCCI::Rendering::HTTP::Response::HTTP_NOT_FOUND
           break
         end
 
@@ -277,14 +276,14 @@ class OCCIServer < Sinatra::Application
         break
       end
 
-      response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_NOT_FOUND
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
 
     rescue Exception => e
       logger.error(e)
-      response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_BAD_REQUEST
     end
   end
 
@@ -471,21 +470,21 @@ class OCCIServer < Sinatra::Application
         break
       end
 
-      response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_NOT_FOUND
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
 
     rescue OCCI::LocationAlreadyRegisteredException => e
       logger.error(e.message)
-      response.status = OCCI::Rendering::HTTP::HTTP_CONFLICT
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_CONFLICT
 
     rescue OCCI::MixinCreationException => e
       logger.error(e.message)
 
     rescue Exception => e
       logger.error(e)
-      response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_BAD_REQUEST
     end
   end
 
@@ -589,7 +588,7 @@ class OCCIServer < Sinatra::Application
         break
       end
 
-      response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_NOT_FOUND
       # Create resource instance at the given location
       raise "Creating resources with method 'put' is currently not possible!"
 
@@ -599,15 +598,15 @@ class OCCIServer < Sinatra::Application
 
     rescue OCCI::LocationAlreadyRegisteredException => e
       logger.error(e.message)
-      response.status = OCCI::Rendering::HTTP::HTTP_CONFLICT
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_CONFLICT
 
     rescue OCCI::MixinAlreadyExistsError => e
       logger.error(e.message)
-      response.status = OCCI::Rendering::HTTP::HTTP_CONFLICT
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_CONFLICT
 
     rescue Exception => e
       logger.error(e)
-      response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_BAD_REQUEST
     end
   end
 
@@ -659,24 +658,24 @@ class OCCIServer < Sinatra::Application
         break
       end
 
-      response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_NOT_FOUND
       # This must be the last statement in this block, so that sinatra does not try to respond with random body content
       # (or fail utterly while trying to do that!)
       nil
 
     rescue OCCI::LocationNotRegisteredException => e
       logger.error(e.message)
-      response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_NOT_FOUND
 
     rescue OCCI::CategoryMissingException => e
-      response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_BAD_REQUEST
 
     rescue OCCI::MixinNotFoundException => e
-      response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_NOT_FOUND
 
     rescue Exception => e
       logger.error(e)
-      response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_BAD_REQUEST
     end
   end
 end
