@@ -1,5 +1,5 @@
 require 'rspec'
-require 'Hashie'
+require 'hashie'
 require 'occi/antlr/OCCIParser'
 
 module OCCI

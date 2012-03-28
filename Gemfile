@@ -5,6 +5,7 @@ gem "uuidtools"
 gem "json"
 gem "antlr3"
 gem "hashie"
+gem "nokogiri",  "<=1.5.0"
 
 # sinatra and related
 gem "sinatra"

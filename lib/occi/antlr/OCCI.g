@@ -33,7 +33,7 @@ options {
 
 @header { 
 	require 'uri' 
-	require 'Hashie'
+	require 'hashie'
 	ATTRIBUTE = { :mutable => true, :required => false, :type => { :string => {} }, :default => '' }
 }
 
