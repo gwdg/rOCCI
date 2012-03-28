@@ -54,9 +54,9 @@ module OCCI
         def self.prepare(response, request)
 
           OCCI::Log.info("#################### Information on the client ####################")
-          ActiveSupport::Notifications.instrument("log",:level=>Logger::INFO,:message=>"Client IP Adress: #{request.env['REMOTE_ADDR']}")
-          ActiveSupport::Notifications.instrument("log",:level=>Logger::INFO,:message=>"Client User Agent: #{request.env['HTTP_USER_AGENT']}")
-          ActiveSupport::Notifications.instrument("log",:level=>Logger::INFO,:message=>"###################################################################")
+          OCCI::Log.info("Client IP Adress: #{request.env['REMOTE_ADDR']}")
+          OCCI::Log.info("Client User Agent: #{request.env['HTTP_USER_AGENT']}")
+          OCCI::Log.info("###################################################################")
 
           # determine content type from request content type or reques accept, fallback to text/plain
           content_type = ""
