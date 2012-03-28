@@ -85,9 +85,7 @@ module OCCI
             attribute_categories[name]  = category
           end
         end
-        
-        $log.debug("Attributes definitions to check against: #{attribute_definitions.keys}") 
-        
+
         # Check given attributes against set of definitions
 
         new_attributes.each do |name, value|
@@ -130,7 +128,6 @@ module OCCI
 
         # Make sure UUID is UNIQUE for every entity
         # TODO: occi.core.id should not be set by user but may be set by backend during startup
-        $log.debug("Creating #{kind.term} with OCCI ID: #{attributes['occi.core.id']}")
         attributes['occi.core.id']    = UUIDTools::UUID.timestamp_create.to_s if attributes['occi.core.id'] == nil || attributes['occi.core.id'] == ""
         attributes['occi.core.title'] = "" if attributes['occi.core.title'] == nil
 
@@ -146,8 +143,6 @@ module OCCI
         @attributes = attributes
 
         kind.entities << self
-
-        $log.debug("Mixins in entity #{@mixins}")
       end
 
       # ---------------------------------------------------------------------------------------------------------------------
@@ -160,16 +155,12 @@ module OCCI
         # remove all links from this entity and from all linked entities
         links = @links.clone unless @links.nil?
         links.each do |link|
-          $log.debug("occi.core.target #{link.attributes["occi.core.target"].chomp('"').reverse.chomp('"').reverse}")
           target_uri = URI.parse(link.attributes["occi.core.target"].chomp('"').reverse.chomp('"').reverse)
           target = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(target_uri.path)
-          $log.debug("Target #{target}") unless target.nil?
           target.links.delete(link) unless target.nil?
 
-          $log.debug("occi.core.source #{link.attributes["occi.core.source"].chomp('"').reverse.chomp('"').reverse}")
           source_uri = URI.parse(link.attributes["occi.core.source"].chomp('"').reverse.chomp('"').reverse)
           source = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(source_uri.path)
-          $log.debug("Source #{source}")
           source.links.delete(link) unless source.nil?
         end if links != nil
         kind.entities.delete(self)
@@ -177,7 +168,7 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------
       def get_location
-        location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(kind) + attributes['occi.core.id']
+        OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(kind) + attributes['occi.core.id']
       end
 
       def actions

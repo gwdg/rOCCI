@@ -4,8 +4,6 @@ require 'Hashie'
 
 require 'occi/rendering/http/Request'
 
-$log = Logger.new(NIL)
-
 module OCCI
   module Rendering
     module HTTP
@@ -20,13 +18,13 @@ module OCCI
           title="My Tag How's your quote's escaping \\" ?";
           rel="http://schemas.ogf.org/occi/infrastructure#resource_tpl";
           attributes="com.example.tags.my_tag" }
-          mixins = Request.parse_header_mixins(header)
-          mixins.first.should  be_kind_of(Hashie::Mash)
-          mixins.first.term.should == 'my_tag'
-          mixins.first.scheme.should == 'http://example.com/tags#'
-          mixins.first.title.should == %Q{My Tag How's your quote's escaping \\" ?}
-          mixins.first.related == 'http://schemas.ogf.org/occi/infrastructure#resource_tpl'
-          mixins.first.attributes.com.example.tags.my_tag == ATTRIBUTE
+          categories = Request.parse_header_categories(header)
+          categories[:mixins].first.should  be_kind_of(Hashie::Mash)
+          categories[:mixins].first.term.should == 'my_tag'
+          categories[:mixins].first.scheme.should == 'http://example.com/tags#'
+          categories[:mixins].first.title.should == %Q{My Tag How's your quote's escaping \\" ?}
+          categories[:mixins].first.related == 'http://schemas.ogf.org/occi/infrastructure#resource_tpl'
+          categories[:mixins].first.attributes.com.example.tags.my_tag == ATTRIBUTE
         end
 
         it "parses plain text successfully" do

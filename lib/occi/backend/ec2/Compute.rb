@@ -20,6 +20,7 @@
 ##############################################################################
 
 require 'aws-sdk'
+require 'occi/Log'
 
 module OCCI
   module Backend
@@ -46,7 +47,7 @@ module OCCI
         
         def has_console_link(compute)
           compute.links.each do |link|
-            $log.debug("Link: #{link}")
+            OCCI::Log.debug("Link: #{link}")
             if link.kind.term == "console"
               return true
             end
@@ -70,7 +71,7 @@ module OCCI
        
         # ---------------------------------------------------------------------------------------------------------------------     
         def compute_deploy(compute)
-          $log.debug("Deploying EC2 instance.")
+          OCCI::Log.debug("Deploying EC2 instance.")
 
           # look what template and instance type to use
           image_id = "ami-973b06e3" # fallback os template
@@ -104,7 +105,7 @@ module OCCI
           compute.backend[:id] = backend_instance.id
           
           # link it to the private ec2 network
-          $log.debug("Linking instance to \"/network/ec2_private_network\".")
+          OCCI::Log.debug("Linking instance to \"/network/ec2_private_network\".")
           private_network = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location("/network/ec2_private_network")
           attributes = OCCI::Core::Attributes.new()
           attributes["occi.networkinterface.interface"] = ""
@@ -122,7 +123,7 @@ module OCCI
           OCCI::Rendering::HTTP::LocationRegistry.register(private_networkinterface.get_location, private_networkinterface)
           
           # link it to the public ec2 network
-          $log.debug("Linking instance to \"/network/ec2_public_network\".")
+          OCCI::Log.debug("Linking instance to \"/network/ec2_public_network\".")
           public_network = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location("/network/ec2_public_network")
           attributes = OCCI::Core::Attributes.new()
           attributes["occi.networkinterface.interface"] = ""
@@ -138,26 +139,26 @@ module OCCI
           compute.links << public_networkinterface
           public_network.links << public_networkinterface
           OCCI::Rendering::HTTP::LocationRegistry.register(public_networkinterface.get_location, public_networkinterface)
-          
-          $log.debug("Deployed EC2 instance with EC2 ID: #{compute.backend[:id]}")
+
+          OCCI::Log.debug("Deployed EC2 instance with EC2 ID: #{compute.backend[:id]}")
         end
   
         # ---------------------------------------------------------------------------------------------------------------------     
         def compute_refresh(compute)
-          $log.debug("Refreshing EC2 compute object with backend ID: #{compute.backend[:id]}")
+          OCCI::Log.debug("Refreshing EC2 compute object with backend ID: #{compute.backend[:id]}")
           
           # get the ec2 backend instance
           backend_instance = get_backend_instance(compute)
           
           # check if there are any problems with the backend instance
           if backend_instance.nil?
-            $log.debug("Problems refreshing compute instance: An instance with the EC2 ID #{compute.backend[:id]} could not be found.")
+            OCCI::Log.debug("Problems refreshing compute instance: An instance with the EC2 ID #{compute.backend[:id]} could not be found.")
             return
           end
            
           # update the state
           compute_update_state(compute)
-          $log.debug("Refreshed EC2 compute object with backend ID: #{compute.backend[:id]}")
+          OCCI::Log.debug("Refreshed EC2 compute object with backend ID: #{compute.backend[:id]}")
           
           # setting the architecture
           compute.attributes["occi.compute.architecture"] = backend_instance.architecture.to_s
@@ -192,7 +193,7 @@ module OCCI
           # create the console link if not already existent and if in state active
           if compute.state_machine.current_state == OCCI::Infrastructure::Compute::STATE_ACTIVE and not has_console_link(compute) and backend_instance.key_name == "default_occi_key"
             # create a ConsoleLink
-            $log.debug("Creating a ConsoleLink to the EC2 Compute instance.")
+            OCCI::Log.debug("Creating a ConsoleLink to the EC2 Compute instance.")
             attributes = OCCI::Core::Attributes.new()
             attributes['occi.core.target'] = "ssh://" + backend_instance.public_dns_name
             attributes['occi.core.source'] = compute.get_location
@@ -213,7 +214,7 @@ module OCCI
           backend_instance = get_backend_instance(compute)
           
           # map the ec2 state to an OCCI state
-          $log.debug("Current EC2 VM state is: #{backend_instance.status}")
+          OCCI::Log.debug("Current EC2 VM state is: #{backend_instance.status}")
           state = case backend_instance.status
             when :running then OCCI::Infrastructure::Compute::STATE_ACTIVE
             when :pending, :shutting_down, :stopping, :terminated then OCCI::Infrastructure::Compute::STATE_INACTIVE
@@ -227,13 +228,13 @@ module OCCI
   
         # ---------------------------------------------------------------------------------------------------------------------     
         def compute_delete(compute)
-          $log.debug("Deleting EC2 Compute instance with EC2 ID #{compute.backend[:id]}")
+          OCCI::Log.debug("Deleting EC2 Compute instance with EC2 ID #{compute.backend[:id]}")
           
           # get the ec2 backend instance
           backend_instance = get_backend_instance(compute)
           
           if backend_instance.nil?
-            $log.debug("Problems refreshing compute instance: An instance with the EC2 ID #{compute.backend[:id]} could not be found.")
+            OCCI::Log.debug("Problems refreshing compute instance: An instance with the EC2 ID #{compute.backend[:id]} could not be found.")
             return
           end
           # terminate the instance
@@ -243,11 +244,11 @@ module OCCI
           compute.links.each do |link|
             if link.backend[:backend_id] == backend_instance.id
               location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(link)
-              $log.debug("Deleting link to #{location}")
+              OCCI::Log.debug("Deleting link to #{location}")
               OCCI::Rendering::HTTP::LocationRegistry.unregister(location)
             end
           end
-          $log.debug("Deleted EC2 Compute instance with EC2 ID #{compute.backend[:id]}")
+          OCCI::Log.debug("Deleted EC2 Compute instance with EC2 ID #{compute.backend[:id]}")
         end
   
         # ---------------------------------------------------------------------------------------------------------------------
@@ -255,46 +256,46 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------     
         # COMPUTE Action start
         def compute_start(compute, parameters=nil)
-          $log.debug("Starting EC2 VM with EC2 instance ID #{compute.backend[:id]}")
+          OCCI::Log.debug("Starting EC2 VM with EC2 instance ID #{compute.backend[:id]}")
           
           # get the ec2 backend instance
           backend_instance = get_backend_instance(compute)
           
           # suspend the instance (in EC2 lingo stop it)
           backend_instance.start()
-          $log.debug("Started EC2 VM with EC2 instance ID #{compute.backend[:id]}")
+          OCCI::Log.debug("Started EC2 VM with EC2 instance ID #{compute.backend[:id]}")
         end
   
         # ---------------------------------------------------------------------------------------------------------------------     
         # Action stop
         def compute_stop(compute, parameters=nil)
-          $log.debug("Stopping EC2 VM with EC2 instance ID #{compute.backend[:id]}")
+          OCCI::Log.debug("Stopping EC2 VM with EC2 instance ID #{compute.backend[:id]}")
           
           # get the ec2 backend instance
           backend_instance = get_backend_instance(compute)
           
           # stop the instance
           backend_instance.stop()
-          $log.debug("Stopped EC2 VM with EC2 instance ID #{compute.backend[:id]}")
+          OCCI::Log.debug("Stopped EC2 VM with EC2 instance ID #{compute.backend[:id]}")
         end
   
         # ---------------------------------------------------------------------------------------------------------------------     
         # Action restart
         def compute_restart(compute, parameters=nil)
-          $log.debug("Restarting EC2 VM with EC2 instance ID #{compute.backend[:id]}")
+          OCCI::Log.debug("Restarting EC2 VM with EC2 instance ID #{compute.backend[:id]}")
           
           # get the ec2 backend instance
           backend_instance = get_backend_instance(compute)
           
           # restart the instance
           backend_instance.reboot()
-          $log.debug("Restarted EC2 VM with EC2 instance ID #{compute.backend[:id]}")
+          OCCI::Log.debug("Restarted EC2 VM with EC2 instance ID #{compute.backend[:id]}")
         end
   
         # ---------------------------------------------------------------------------------------------------------------------     
         # Action suspend
         def compute_suspend(compute, parameters=nil)
-          $log.warning("Stop suspend is not supported on EC2 Compute instances.")
+          OCCI::Log.warning("Stop suspend is not supported on EC2 Compute instances.")
         end
       
       end

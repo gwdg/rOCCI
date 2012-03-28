@@ -19,6 +19,8 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'occi/Log'
+
 module OCCI
   class Configuration
 
@@ -46,9 +48,6 @@ module OCCI
     ###########################################################################
     def initialize(file)
       @conf=parse_conf(file)
-      $log.debug("Configuration file contains the following parameters:")
-      $log.debug(@conf)
-      check_params(@conf)
     end
 
     def add_configuration_value(key,value)
@@ -81,9 +80,7 @@ module OCCI
         if conf[param.upcase] == nil
           raise "Mandatory parameter " + param + " not provided in config file. exiting"
         end
-        $log.debug("Mandatory parameter " + param + " included in configuration file.")
       end
-      $log.debug("All mandatory parameters are provided in config file")
     end
 
     def parse_conf(file)

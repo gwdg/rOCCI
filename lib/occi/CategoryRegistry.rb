@@ -20,6 +20,8 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'occi/Log'
+
 module OCCI
   # ---------------------------------------------------------------------------------------------------------------------
   module CategoryRegistry
@@ -58,7 +60,7 @@ module OCCI
         begin
           occi_categories << self.get_by_id(category.type_identifier)
         rescue OCCI::CategoryNotFoundException => e
-          $log.warn(e.message)
+          OCCI::Log.warn(e.message)
         end
       end
       return categories unless categories.empty?

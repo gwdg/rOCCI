@@ -19,6 +19,8 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'logger'
+
 require 'occi/core/Category'
 require 'occi/core/Entity'
 require 'occi/core/Resource'
@@ -26,7 +28,7 @@ require 'occi/core/Resource'
 module OCCI
   module Rendering
     module HTTP
-      module LocationRegistry
+      class LocationRegistry
 
         # ---------------------------------------------------------------------------------------------------------------------
         private
@@ -60,10 +62,8 @@ module OCCI
           @@registry[location] = {:children => [], :object => nil} if @@registry[location].nil?
           @@registry[location][:object] = object
           child = [ @@registry[location] ]
-          $log.debug("### location before #{location}")
           until location == '/'
             location = location[0..location.rindex('/',-2)]
-            $log.debug("### location after #{location}")
             @@registry[location] = {:children => [], :object => nil} if @@registry[location].nil?
             @@registry[location][:children] = child | @@registry[location][:children]
             child = [ @@registry[location] ]

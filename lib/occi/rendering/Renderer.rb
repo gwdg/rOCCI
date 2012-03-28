@@ -23,22 +23,24 @@ require 'occi/rendering/AbstractRenderer'
 require 'occi/rendering/http/TextRenderer'
 require 'occi/rendering/http/JSONRenderer'
 
+require 'occi/Log'
+
 module OCCI
   module Rendering
 
     # ---------------------------------------------------------------------------------------------------------------------
-    class Rendering
+    class Renderer
 
       # ---------------------------------------------------------------------------------------------------------------------
       # Prepare current rendering pass
-      def self.prepare_renderer(content_type)
+      def self.prepare(content_type)
         @@request_content_type = content_type
-        $log.error("No renderer registered for content type '%{content_type}'") unless @@renderers.has_key?(content_type)
+        OCCI::Log.error("No renderer registered for content type '%{content_type}'") unless @@renderers.has_key?(content_type)
         @@renderers[@@request_content_type].send(:prepare_renderer)
       end
   
       # ---------------------------------------------------------------------------------------------------------------------
-      def self.register_renderer(content_type, renderer_instanz)
+      def self.register(content_type, renderer_instanz)
         @@renderers[content_type] = renderer_instanz
       end
   
@@ -65,13 +67,13 @@ module OCCI
       # ---------------------------------------------------------------------------------------------------------------------
       # Register available renderer
       text_renderer = OCCI::Rendering::HTTP::TextRenderer.new
-      OCCI::Rendering::Rendering.register_renderer("text/occi",         text_renderer)
-      OCCI::Rendering::Rendering.register_renderer("text/plain",        text_renderer)
-      OCCI::Rendering::Rendering.register_renderer("text/uri-list",     text_renderer)
+      self.register("text/occi",         text_renderer)
+      self.register("text/plain",        text_renderer)
+      self.register("text/uri-list",     text_renderer)
 
       json_renderer = OCCI::Rendering::HTTP::JSONRenderer.new
-      OCCI::Rendering::Rendering.register_renderer("application/json",      json_renderer)
-      OCCI::Rendering::Rendering.register_renderer("application/occi+json", json_renderer)
+      self.register("application/json",      json_renderer)
+      self.register("application/occi+json", json_renderer)
 
     end
 

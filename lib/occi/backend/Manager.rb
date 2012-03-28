@@ -96,7 +96,7 @@ module OCCI
         # Delegate
         
         if operations[resource_type][operation.to_sym].nil?
-          $log.debug("No backend method configured => doing nothing...")
+          OCCI::Log.debug("No backend method configured => doing nothing...")
           return
         end
         
@@ -112,8 +112,8 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------
       def self.delegate_action(backend, action, parameters, resource)
-  
-        $log.debug("Delegating invocation of action [#{action}] on resource [#{resource}] with parameters [#{parameters}] to backend...")
+
+        OCCI::Log.debug("Delegating invocation of action [#{action}] on resource [#{resource}] with parameters [#{parameters}] to backend...")
   
         # Verify
         state_machine = resource.state_machine
@@ -130,7 +130,7 @@ module OCCI
           signal_resource(backend, OCCI::Backend::RESOURCE_UPDATE_STATE,resource)
 
         rescue OCCI::BackendError
-          $log.error("Action invocation failed!")
+          OCCI::Log.error("Action invocation failed!")
           raise
         end   
       end

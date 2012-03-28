@@ -21,6 +21,8 @@
 
 require 'occi/backend/opennebula/NetworkERB'
 
+require 'occi/Log'
+
 module OCCI
   module Backend
     module OpenNebula
@@ -53,7 +55,7 @@ module OCCI
           attributes['occi.core.summary'] = backend_object['TEMPLATE/DESCRIPTION']
           # attributes['opennebula.network.bridge'] = vnet['TEMPLATE/BRIDGE']
           # attributes['opennebula.network.public'] = vnet['TEMPLATE/PUBLIC']
-#          $log.debug("*** object: " + backend_object.to_xml)
+#          OCCI::Log.debug("*** object: " + backend_object.to_xml)
           if backend_object['TEMPLATE/TYPE'].downcase == 'fixed'
             mixins << OCCI::Backend::ONE::Network::MIXIN
             # attributes['opennebula.network.leases'] = backend_object['TEMPLATE/LEASES']
@@ -99,11 +101,11 @@ module OCCI
           template_raw = $config["TEMPLATE_LOCATION"] + TEMPLATENETWORKRAWFILE
           template = ERB.new(File.read(template_raw)).result(network_erb.get_binding)
   
-          $log.debug("Parsed template #{template}")
+          OCCI::Log.debug("Parsed template #{template}")
           rc = backend_object.allocate(template)
           check_rc(rc)
           network.backend[:id] = backend_object.id
-          $log.debug("OpenNebula ID of virtual network: #{network.backend[:id]}")
+          OCCI::Log.debug("OpenNebula ID of virtual network: #{network.backend[:id]}")
         end
   
         # ---------------------------------------------------------------------------------------------------------------------     
@@ -115,7 +117,7 @@ module OCCI
           occi_object = network_parse_backend_object(backend_object)
   
           if occi_object.nil? then
-            $log.warn("Problem refreshing network with backend id #{network.backend[:id]}")
+            OCCI::Log.warn("Problem refreshing network with backend id #{network.backend[:id]}")
           else
   
             # merge new attributes with existing attributes, by overwriting existing attributes with refreshed values
@@ -147,14 +149,14 @@ module OCCI
           backend_object_pool=VirtualNetworkPool.new(@one_client, OCCI::Backend::OpenNebula::OpenNebula::INFO_ACL)
           backend_object_pool.info
           backend_object_pool.each do |backend_object|
-#            $log.debug("*** network_register_all_instances: backend_object: " + backend_object.to_xml)
+#            OCCI::Log.debug("*** network_register_all_instances: backend_object: " + backend_object.to_xml)
             backend_object.info
             occi_object = network_parse_backend_object(backend_object)
             if occi_object.nil?
-              $log.debug("Error creating network from backend")
+              OCCI::Log.debug("Error creating network from backend")
             else
               occi_object.backend[:id] = backend_object.id
-              $log.debug("Backend ID: #{occi_object.backend[:id]}")
+              OCCI::Log.debug("Backend ID: #{occi_object.backend[:id]}")
               occi_objects << occi_object
             end
           end

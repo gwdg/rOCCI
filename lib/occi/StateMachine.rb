@@ -20,6 +20,7 @@
 ##############################################################################
 
 require 'occi/core/Action'
+require 'occi/Log'
 
 module OCCI
 
@@ -113,8 +114,8 @@ module OCCI
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
-    def to_s() 
-      $log.debug("Current state: " + @current_state.name)
+    def to_s()
+      OCCI::Log.("Current state: " + @current_state.name)
     end
   end
 end

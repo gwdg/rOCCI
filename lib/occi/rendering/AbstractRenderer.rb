@@ -25,7 +25,7 @@ module OCCI
     # ---------------------------------------------------------------------------------------------------------------------
     class AbstractRenderer
 
-      def prepare_renderer()
+      def prepare()
       end
 
       def render_category_type(categories)

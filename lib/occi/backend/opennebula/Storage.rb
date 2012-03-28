@@ -21,6 +21,8 @@
 
 require 'occi/backend/opennebula/StorageERB'
 
+require 'occi/Log'
+
 module OCCI
   module Backend
     module OpenNebula
@@ -108,17 +110,17 @@ module OCCI
           template_raw = $config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
           template = ERB.new(File.read(template_raw)).result(storage_erb.get_binding)
   
-          $log.debug("Parsed template #{template}")
+          OCCI::Log.debug("Parsed template #{template}")
           rc = backend_object.allocate(template)
           check_rc(rc)
-          $log.debug("OpenNebula ID of image: #{storage.backend[:id]}")
+          OCCI::Log.debug("OpenNebula ID of image: #{storage.backend[:id]}")
         end
   
         # ---------------------------------------------------------------------------------------------------------------------
         def storage_update_state(storage)
           backend_object = Image.new(Image.build_xml(storage.backend[:id]), @one_client)
           backend_object.info
-          $log.debug("current Image state is: #{backend_object.state_str}")
+          OCCI::Log.debug("current Image state is: #{backend_object.state_str}")
           state = case backend_object.state_str
                     when "READY" , "USED" , "LOCKED" then OCCI::Infrastructure::Storage::STATE_ONLINE
                     else OCCI::Infrastructure::Storage::STATE_OFFLINE
@@ -143,7 +145,7 @@ module OCCI
           occi_object = storage_parse_backend_object(backend_object)
   
           if occi_object.nil? then
-            $log.warn("Problem refreshing storage with backend id #{storage.backend[:id]}")
+            OCCI::Log.warn("Problem refreshing storage with backend id #{storage.backend[:id]}")
           else
   
             # merge new attributes with existing attributes, by overwriting existing attributes with refreshed values
@@ -163,10 +165,10 @@ module OCCI
           backend_object_pool.each do |backend_object|
             occi_object = storage_parse_backend_object(backend_object)
             if occi_object.nil?
-              $log.debug("Error creating storage from backend")
+              OCCI::Log.debug("Error creating storage from backend")
             else
               occi_object.backend[:id] = backend_object.id
-              $log.debug("Backend ID: #{occi_object.backend[:id]}")
+              OCCI::Log.debug("Backend ID: #{occi_object.backend[:id]}")
               occi_objects << occi_object
             end
           end
@@ -200,19 +202,19 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------     
         # Action backup
         def storage_backup(network, parameters)
-          $log.debug("not yet implemented")
+          OCCI::Log.debug("not yet implemented")
         end
   
         # ---------------------------------------------------------------------------------------------------------------------     
         # Action snapshot
         def storage_snapshot(network, parameters)
-          $log.debug("not yet implemented")
+          OCCI::Log.debug("not yet implemented")
         end
   
         # ---------------------------------------------------------------------------------------------------------------------     
         # Action resize
         def storage_resize(network, parameters)
-          $log.debug("not yet implemented")
+          OCCI::Log.debug("not yet implemented")
         end
         
       end

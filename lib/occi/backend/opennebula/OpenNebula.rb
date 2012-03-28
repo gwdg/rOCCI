@@ -38,6 +38,8 @@ require 'occi/extensions/one/VNC'
 
 require 'occi/extensions/Reservation'
 
+require 'occi/Log'
+
 include OpenNebula
 
 module OCCI
@@ -154,7 +156,7 @@ module OCCI
           # TODO: create mixins from existing templates
   
           # initialize OpenNebula connection
-          $log.debug("Initializing connection with OpenNebula")
+          OCCI::Log.debug("Initializing connection with OpenNebula")
   
           # TODO: check for error!
    #       @one_client = Client.new($config['one_user'] + ':' + $config['one_password'], $config['one_xmlrpc'])

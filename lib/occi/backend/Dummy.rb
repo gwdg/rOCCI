@@ -20,6 +20,7 @@
 ##############################################################################
 
 require 'occi/backend/Manager'
+require 'occi/Log'
 
 module OCCI
   module Backend
@@ -91,22 +92,22 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------     
       def resource_deploy(resource)
-        $log.debug("Deploying resource '#{resource.attributes['occi.core.title']}'...")
+        OCCI::Log.debug("Deploying resource '#{resource.attributes['occi.core.title']}'...")
       end
       
       # ---------------------------------------------------------------------------------------------------------------------     
       def resource_refresh(resource)
-        $log.debug("Refreshing resource '#{resource.attributes['occi.core.title']}'...")
+        OCCI::Log.debug("Refreshing resource '#{resource.attributes['occi.core.title']}'...")
       end
 
       # ---------------------------------------------------------------------------------------------------------------------     
       def resource_update_state(resource)
-        $log.debug("Updating state of resource '#{resource.attributes['occi.core.title']}'...")
+        OCCI::Log.debug("Updating state of resource '#{resource.attributes['occi.core.title']}'...")
       end
 
       # ---------------------------------------------------------------------------------------------------------------------     
       def resource_delete(resource)
-        $log.debug("Deleting resource '#{resource.attributes['occi.core.title']}'...")
+        OCCI::Log.debug("Deleting resource '#{resource.attributes['occi.core.title']}'...")
       end
 
       # ---------------------------------------------------------------------------------------------------------------------
@@ -115,7 +116,7 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------     
       def action_dummy(compute, parameters)
-        $log.debug("Calling method for resource '#{resource.attributes['occi.core.title']}' with parameters: #{parameters.inspect}")
+        OCCI::Log.debug("Calling method for resource '#{resource.attributes['occi.core.title']}' with parameters: #{parameters.inspect}")
       end
 
     end

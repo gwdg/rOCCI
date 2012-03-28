@@ -28,6 +28,8 @@ require 'occi/backend/ec2/Compute'
 # for XML parsing (gem = "xml-simple")
 require 'xmlsimple'
 
+require 'occi/Log'
+
 
 module OCCI
   module Backend
@@ -137,7 +139,7 @@ module OCCI
         end
         
         def register_templates
-          $log.debug("Loading EC2 templates.")
+          OCCI::Log.debug("Loading EC2 templates.")
         
           # import Compute Resource Templates from etc/ec2_templates/resource_templates.xml
           xml = XmlSimple.xml_in("etc/ec2_templates/resource_templates.xml")
@@ -168,7 +170,7 @@ module OCCI
             mixin = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
             OCCI::CategoryRegistry.register(mixin)
           end
-          $log.debug("Finished loading EC2 templates.")
+          OCCI::Log.debug("Finished loading EC2 templates.")
         end
         
       
@@ -179,22 +181,22 @@ module OCCI
 
          # ---------------------------------------------------------------------------------------------------------------------     
         def resource_deploy(resource)
-          $log.debug("Deploying resource '#{resource.attributes['occi.core.title']}'...")
+          OCCI::Log.debug("Deploying resource '#{resource.attributes['occi.core.title']}'...")
         end
       
         # ---------------------------------------------------------------------------------------------------------------------     
         def resource_refresh(resource)
-          $log.debug("Refreshing resource '#{resource.attributes['occi.core.title']}'...")
+          OCCI::Log.debug("Refreshing resource '#{resource.attributes['occi.core.title']}'...")
         end
 
         # ---------------------------------------------------------------------------------------------------------------------     
         def resource_update_state(resource)
-          $log.debug("Updating state of resource '#{resource.attributes['occi.core.title']}'...")
+          OCCI::Log.debug("Updating state of resource '#{resource.attributes['occi.core.title']}'...")
         end
 
         # ---------------------------------------------------------------------------------------------------------------------     
         def resource_delete(resource)
-          $log.debug("Deleting resource '#{resource.attributes['occi.core.title']}'...")
+          OCCI::Log.debug("Deleting resource '#{resource.attributes['occi.core.title']}'...")
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -203,7 +205,7 @@ module OCCI
 
         # ---------------------------------------------------------------------------------------------------------------------     
         def action_dummy(compute, parameters)
-          $log.debug("Calling method for resource '#{resource.attributes['occi.core.title']}' with parameters: #{parameters.inspect}")
+          OCCI::Log.debug("Calling method for resource '#{resource.attributes['occi.core.title']}' with parameters: #{parameters.inspect}")
         end
 
       end

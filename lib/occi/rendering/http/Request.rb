@@ -20,6 +20,7 @@
 ##############################################################################
 
 require 'json'
+require 'occi/Log'
 require 'occi/antlr/OCCIParser'
 
 module OCCI
@@ -39,11 +40,6 @@ module OCCI
           @entities   = Hashie::Mash.new({:links=>[],:resources=>[]})
           @locations  = Array.new
 
-          $log.debug("HTTP Request Headers: ")
-          request.env.each do |k, v|
-            $log.debug(k.to_s + ":" + v.to_s) if k.include?('HTTP')
-          end
-
           content_type = request.env['CONTENT_TYPE'].to_s
 
 =begin
@@ -51,7 +47,7 @@ module OCCI
             # TODO: implement multipart handling
             # handle file upload
             if params['file'] != nil
-              $log.debug("Location of Image #{params['file'][:tempfile].path}")
+              OCCI::Log.debug("Location of Image #{params['file'][:tempfile].path}")
               $image_path = $config[:one_image_tmp_dir] + '/' + params['file'][:filename]
               FileUtils.cp(params['file'][:tempfile].path, $image_path)
             end

@@ -24,10 +24,11 @@
 
 # gems
 require 'rubygems'
+
+# sinatra
 require 'sinatra'
 require "sinatra/multi_route"
 require 'sinatra/cross_origin'
-require 'logger'
 
 # Ruby standard library
 require 'uri'
@@ -36,17 +37,8 @@ require 'fileutils'
 # Server configuration
 require 'occi/Configuration'
 
-##############################################################################
-# Initialize logger
-
-$stdout.sync = true
-class Logger;
-  alias_method :write, :<<
-end
-$log = Logger.new(STDOUT)
-
-# dump all requests to log
-use Rack::CommonLogger, $log
+# Active support notifications
+require 'active_support/notifications'
 
 ##############################################################################
 # Read configuration file and set log level
@@ -58,44 +50,29 @@ $image_path = ""
 
 $config = OCCI::Configuration.new(CONFIGURATION_FILE)
 
-if $config['LOG_LEVEL'] != nil
-  $log.level = case $config['LOG_LEVEL'].upcase
-                 when 'FATAL' then
-                   Logger::FATAL
-                 when 'ERROR' then
-                   Logger::ERROR
-                 when 'WARN' then
-                   Logger::WARN
-                 when 'INFO' then
-                   Logger::INFO
-                 when 'DEBUG' then
-                   Logger::DEBUG
-                 else
-                   $log.warn("Invalid log level specified. Log level set to INFO")
-                   Logger::INFO
-               end
-end
+# TODO: config loglevel
 
+# TODO: move NFS support to proper location or even better to proper OCCI structure
+=begin
 if !$config["NFS_SUPPORT"].nil? && ["true"].include?($config["NFS_SUPPORT"].downcase)
-  $log.info("Enabling NFS storage support...")
+  logger.info("Enabling NFS storage support...")
   $nfs_support = true
 else
-  $log.info("Disabling NFS storage support...")
+  logger.info("Disabling NFS storage support...")
   $nfs_support = false
 end
+=end
 
 $resources_initialized = false
 
 # ---------------------------------------------------------------------------------------------------------------------
-def initialize_backend(request)
-
-  auth = Rack::Auth::Basic::Request.new(request.env)
+def initialize_backend(auth)
 
   if auth.provided? && auth.basic? && auth.credentials
     user, password = auth.credentials
   else
     user, password = [$config['one_user'], $config['one_password']]
-    $log.debug("No basic auth data provided: using defaults from config (user = '#{user}')")
+    logger.debug("No basic auth data provided: using defaults from config (user = '#{user}')")
   end
 
   begin
@@ -124,7 +101,7 @@ def initialize_backend(request)
     # Initialize resources only once
     # FIXME: need better way to do resource init / refresh! (maybe async thread or somesuch)
     unless $resources_initalized
-      $log.debug("Loading existing resources from backend...")
+      logger.debug("Loading existing resources from backend...")
       backend.register_existing_resources
       register_existing_resources = true
     end
@@ -132,7 +109,7 @@ def initialize_backend(request)
     return backend
 
   rescue RuntimeError => e
-    $log.error(e)
+    logger.error(e)
   end
 end
 
@@ -171,10 +148,10 @@ require 'occi/extensions/NFSStorage'
 require 'occi/extensions/ConsoleLink'
 
 # OCCI HTTP rendering
-require 'occi/rendering/Rendering'
+require 'occi/rendering/Renderer'
 require 'occi/rendering/http/LocationRegistry'
-require 'occi/rendering/http/HTTP'
 require 'occi/rendering/http/Request'
+require 'occi/rendering/http/Response'
 
 # Backend support
 require 'occi/backend/Manager'
@@ -200,34 +177,41 @@ class OCCIServer < Sinatra::Application
 
   enable cross_origin
 
+  def initialize
+    # subscribe to log message notifications
+    @logger = Logger.new(STDOUT)
+    @log_subscriber = ActiveSupport::Notifications.subscribe("log") do |name, start, finish, id, payload|
+      @logger.log(payload[:level], payload[:message])
+    end
+    super
+  end
+
   # ---------------------------------------------------------------------------------------------------------------------
   # GET request
 
-  # before every route do:
-  # * initialize backend for this request
-  # * prepare the response
-  # * parse the request into a Mash
+  # tasks to be executed before the request is handled
   before do
-    @backend = initialize_backend(request)
-    @rendering = OCCI::Rendering::Rendering.new
-    OCCI::Rendering::HTTP::prepare_response(@response, request)
+    authentication = Rack::Auth::Basic::Request.new(request.env)
+    @backend = initialize_backend(authentication)
+    @renderer = OCCI::Rendering::Renderer.new
+    OCCI::Rendering::HTTP::Response.prepare(@response, request)
     @occi_request = OCCI::Rendering::HTTP::Request.new(request)
+    @occi_response = OCCI::Rendering::HTTP::Response.new
     @location = request.path_info
   end
 
-  # after every route do:
-  # * render response
+  # taks to be executed after the requests are handled
   after do
-    @rendering.render_response(response)
+    @renderer.render(@occi_response)
   end
 
   # discovery interface
   # returns all kinds, mixins and actions registered for the server
   get '/-/', '/.well-known/org/ogf/occi/-/' do
-    $log.info("Listing all kinds and mixins ...")
+    OCCI::Log.info("Listing all kinds and mixins ...")
     filter = @occi_request.categories
     categories = OCCI::CategoryRegistry.get(filter)
-    @rendering.render_category_type(categories)
+    @renderer.render_category_type(categories)
     nil
   end
 
@@ -239,23 +223,24 @@ class OCCIServer < Sinatra::Application
 
       # Render exact matches referring to kinds / mixins
       if object != nil and (object.kind_of?(OCCI::Core::Kind) or object.kind_of?(OCCI::Core::Mixin))
-        raise "Only mixins / kinds are supported for exact match rendering: location: #{location}; object: #{object}" if !object.instance_variable_defined?(:@entities)
-        $log.info("Listing all entities for kind/mixin #{object.type_identifier} ...")
-        locations = []
+        ActiveSupport::Notifications.instrument("log",:level=>Logger::INFO,:message=>"Listing all entities for kind/mixin #{object.type_identifier} ...")
+        entities = Array.new
         object.entities.each do |entity|
+          entities = helpers.filter_by_category(entity, @occi_request.categories)
+          entities = helpers.filter_by_attributes(entity, @occi_request.entities)
           # filter entities by requested categories
-          next unless @occi_request.categories.kinds.collect {|kind| kind.type_identifier}.include?(entity.kind.type_identifier) or (@occi_request.categories & entity.mixins) == @occi_request.categories
+          #next unless @occi_request.categories.kinds.collect {|kind| kind.type_identifier}.include?(entity.kind.type_identifier) or (@occi_request.categories & entity.mixins) == @occi_request.categories
           # filter entities by requested attributes
-          next unless (entity.attributes.keys & @occi_request.attributes.keys) == @occi_request.attributes.keys
-          loc = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
-          # fix for JSON rendering
-          $log.debug(@response['CONTENT-TYPE'])
-          @rendering.render_entity(entity) if @response['CONTENT-TYPE'].include?('json')
-          $log.debug("Rendering location: #{loc}")
-          locations << loc
+          #next unless (entity.attributes.keys & @occi_request.attributes.keys) == @occi_request.attributes.keys
+          #loc = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
+          # fix for JSON renderer
+          #logger.debug(@response['CONTENT-TYPE'])
+          #@renderer.render_entity(entity) if @response['CONTENT-TYPE'].include?('json')
+          #logger.debug("Rendering location: #{loc}")
+          #locations << loc
         end
 
-        @rendering.render_locations(locations)
+        @renderer.render(@occi_request)
 
 
         break
@@ -263,15 +248,15 @@ class OCCIServer < Sinatra::Application
 
       # Render exact matches referring to an entity
       if object != nil and object.kind_of?(OCCI::Core::Entity)
-        $log.info("Rendering entity [#{object.type_identifier}] for location [#{@location}] ...")
+        logger.info("Rendering entity [#{object.type_identifier}] for location [#{@location}] ...")
         OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_REFRESH, object) if object.kind_of?(OCCI::Core::Resource)
-        @rendering.render_entity(object)
+        @renderer.render_entity(object)
         break
       end
 
       # Render locations ending with "/", which are not exact matches
       if @location.end_with?("/")
-        $log.info("Listing all resource instances below location: #{@location}")
+        logger.info("Listing all resource instances below location: #{@location}")
         #TODO: fix get_resources_below_location !
         resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(@location, @occi_request.categories)
 
@@ -285,10 +270,10 @@ class OCCIServer < Sinatra::Application
         resources.each do |resource|
           OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_REFRESH, resource) if resource.kind_of?(OCCI::Core::Resource)
           locations << OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(resource)
-          @rendering.render_entity(resource) if @response['CONTENT-TYPE'].include?('json')
+          @renderer.render_entity(resource) if @response['CONTENT-TYPE'].include?('json')
         end
 
-        @rendering.render_locations(locations)
+        @renderer.render_locations(locations)
         break
       end
 
@@ -298,7 +283,7 @@ class OCCIServer < Sinatra::Application
       nil
 
     rescue Exception => e
-      $log.error(e)
+      logger.error(e)
       response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
     end
   end
@@ -306,15 +291,15 @@ class OCCIServer < Sinatra::Application
   # ---------------------------------------------------------------------------------------------------------------------
   # POST request
   post '/-/', '/.well-known/org/ogf/occi/-/' do
-    $log.info("Creating user defined mixin...")
-    $log.info(@occi_request.mixin)
+    logger.info("Creating user defined mixin...")
+    logger.info(@occi_request.mixin)
 
     raise OCCI::MixinAlreadyExistsError, "Mixin already exists!" unless @occi_request.mixins.empty?
 
     begin
       related_mixin = OCCI::CategoryRegistry.get_by_id(@occi_request.mixin.related) unless @occi_request.mixin.related.nil?
     rescue OCCI::CategoryNotFoundException => e
-      $log.warn(e.message)
+      logger.warn(e.message)
     end
     mixin = OCCI::Core::Mixin.new(@occi_request.mixin.term, @occi_request.mixin.scheme, @occi_request.mixin.title, nil, [], related_mixin, [])
     raise OCCI::MixinCreationException, 'Cannot create mixin' if mixin.nil?
@@ -328,13 +313,13 @@ class OCCIServer < Sinatra::Application
     begin
       # Trigger action on resource(s)
       unless @occi_request.action_category.nil?
-        $log.info("Triggering action on resource(s) below location #{@location}")
+        logger.info("Triggering action on resource(s) below location #{@location}")
         resources = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(@location, OCCI::CategoryRegistry.get_all)
         method = request.env["HTTP_X_OCCI_ATTRIBUTE"]
 
         raise "No entities corresponding to location [#{location}] could be found!" if resources.nil?
 
-        $log.debug("Action [#{@occi_request.action_category.type_identifier}] to be triggered on [#{resources.length}] entities:")
+        logger.debug("Action [#{@occi_request.action_category.type_identifier}] to be triggered on [#{resources.length}] entities:")
         resources.each do |resource|
           # TODO: check why networkinterface is showing up under /compute/
           next unless resource.kind_of?(OCCI::Core::Resource)
@@ -354,7 +339,7 @@ class OCCIServer < Sinatra::Application
 
       # If kind is a link and no actions specified then create link
       if @occi_request.kind.entity_type.ancestors.include?(OCCI::Core::Link)
-        $log.info("Creating link...")
+        logger.info("Creating link...")
         target_uri = URI.parse(@occi_request.attributes["occi.core.target"].chomp('"').reverse.chomp('"').reverse)
         target = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(target_uri.path)
 
@@ -367,7 +352,7 @@ class OCCIServer < Sinatra::Application
 
         link_location = link.get_location()
         OCCI::Rendering::HTTP::LocationRegistry.register(link_location, link)
-        $log.debug("Link created with location: #{link_location}")
+        logger.debug("Link created with location: #{link_location}")
         response['Location'] = OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(link)
         break
       end unless @occi_request.kind.nil?
@@ -375,12 +360,12 @@ class OCCIServer < Sinatra::Application
       # Create resource
       unless @occi_request.kind.nil?
         # If kind is not link and no actions specified, then create resource
-        $log.info("Creating resource...")
+        logger.info("Creating resource...")
         resource = @occi_request.kind.entity_type.new(@occi_request.attributes, @occi_request.mixins)
-        $log.debug("Resource attributes #{resource.attributes}")
+        logger.debug("Resource attributes #{resource.attributes}")
 
         @occi_request.links.each do |link|
-          $log.debug(link)
+          logger.debug(link)
 
           link_attributes = {}
           link_attributes = link.attributes unless link.attributes.nil?
@@ -394,7 +379,7 @@ class OCCIServer < Sinatra::Application
             begin
               cat = OCCI::CategoryRegistry.get_by_id(link_category)
             rescue OCCI::CategoryNotFoundException => e
-              $log.info("Category #{link_category} not found")
+              logger.info("Category #{link_category} not found")
               next
             end
             link_kind = cat if cat.kind_of?(OCCI::Core::Kind)
@@ -403,7 +388,7 @@ class OCCIServer < Sinatra::Application
           end
 
           occi_link = link_kind.entity_type.new(link_attributes, link_mixins)
-          $log.debug("Link Mixins: #{occi_link.mixins}")
+          logger.debug("Link Mixins: #{occi_link.mixins}")
 
           if URI.parse(link.target).relative?
             target = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(link.target)
@@ -418,11 +403,11 @@ class OCCIServer < Sinatra::Application
 
         OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_DEPLOY, resource)
 
-        $log.debug('Location:' + resource.get_location)
+        logger.debug('Location:' + resource.get_location)
 
         OCCI::Rendering::HTTP::LocationRegistry.register(resource.get_location, resource)
 
-        @rendering.render_location(OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(resource))
+        @renderer.render_location(OCCI::Rendering::HTTP::LocationRegistry.get_absolute_location_of_object(resource))
         break
       end
 
@@ -440,11 +425,11 @@ class OCCIServer < Sinatra::Application
             entities << OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
           end
         end
-        $log.info("Updating [#{entities.size}] entities...")
+        logger.info("Updating [#{entities.size}] entities...")
 
         # add mixins
         entities.each do |entity|
-          $log.debug("Adding entity: #{entity.get_location} to mixin #{object.type_identifier}")
+          logger.debug("Adding entity: #{entity.get_location} to mixin #{object.type_identifier}")
           entity.mixins.push(object).uniq!
           object.entities.push(entity).uniq!
         end if object.kind_of?(OCCI::Core::Mixin)
@@ -453,13 +438,13 @@ class OCCIServer < Sinatra::Application
         entities.each do |entity|
           # Refresh information from backend for entities of type resource
           OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_REFRESH, entity) if entity.kind_of?(OCCI::Core::Resource)
-          $log.debug("Adding the following attribute to mixin: #{@occi_request.attributes}")
+          logger.debug("Adding the following attribute to mixin: #{@occi_request.attributes}")
           entity.attributes.merge!(@occi_request.attributes)
         end unless @occi_request.attributes.empty?
 
         # Update / add links
         @occi_request.links.each do |link_data|
-          $log.debug("Extracted link data: #{link_data}")
+          logger.debug("Extracted link data: #{link_data}")
           raise "Mandatory information missing (related | target | category)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil
 
           kind = OCCI::CategoryRegistry.get_categories_by_category_string(link_data.category, filter="kinds")[0]
@@ -492,14 +477,14 @@ class OCCIServer < Sinatra::Application
       nil
 
     rescue OCCI::LocationAlreadyRegisteredException => e
-      $log.error(e.message)
+      logger.error(e.message)
       response.status = OCCI::Rendering::HTTP::HTTP_CONFLICT
 
     rescue OCCI::MixinCreationException => e
-      $log.error(e.message)
+      logger.error(e.message)
 
     rescue Exception => e
-      $log.error(e)
+      logger.error(e)
       response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
     end
   end
@@ -519,7 +504,7 @@ class OCCIServer < Sinatra::Application
           raise "No entity found at location: #{entity_location}" if entity == nil
           raise "Object referenced by uri [#{entity_location}] is not a OCCI::Core::Resource instance!" if !entity.kind_of?(OCCI::Core::Resource)
 
-          $log.debug("Associating entity [#{entity}] at location #{entity_location} with mixin #{mixin}")
+          logger.debug("Associating entity [#{entity}] at location #{entity_location} with mixin #{mixin}")
 
           entity.mixins << mixin
         end
@@ -540,7 +525,7 @@ class OCCIServer < Sinatra::Application
             entities << OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
           end
         end
-        $log.info("Full update for [#{entities.size}] entities...")
+        logger.info("Full update for [#{entities.size}] entities...")
 
         # full update of mixins
         object.entities.each do |entity|
@@ -549,7 +534,7 @@ class OCCIServer < Sinatra::Application
         end if object.kind_of?(OCCI::Core::Mixin)
 
         entities.each do |entity|
-          $log.debug("Adding entity: #{entity.get_location} to mixin #{object.type_identifier}")
+          logger.debug("Adding entity: #{entity.get_location} to mixin #{object.type_identifier}")
           entity.mixins.push(object).uniq!
           object.entities.push(entity).uniq!
         end if object.kind_of?(OCCI::Core::Mixin)
@@ -565,7 +550,7 @@ class OCCIServer < Sinatra::Application
         # full update of links
         # TODO: full update e.g. delete old links first
         @occi_request.links.each do |link_data|
-          $log.debug("Extracted link data: #{link_data}")
+          logger.debug("Extracted link data: #{link_data}")
           raise "Mandatory information missing (related | target | category)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil
 
           link_mixins = []
@@ -574,7 +559,7 @@ class OCCIServer < Sinatra::Application
             begin
               cat = OCCI::CategoryRegistry.get_by_id(link_category)
             rescue OCCI::CategoryNotFoundException => e
-              $log.info("Category #{link_category} not found")
+              logger.info("Category #{link_category} not found")
               next
             end
             link_kind = cat if cat.kind_of?(OCCI::Core::Kind)
@@ -613,15 +598,15 @@ class OCCIServer < Sinatra::Application
       nil
 
     rescue OCCI::LocationAlreadyRegisteredException => e
-      $log.error(e.message)
+      logger.error(e.message)
       response.status = OCCI::Rendering::HTTP::HTTP_CONFLICT
 
     rescue OCCI::MixinAlreadyExistsError => e
-      $log.error(e.message)
+      logger.error(e.message)
       response.status = OCCI::Rendering::HTTP::HTTP_CONFLICT
 
     rescue Exception => e
-      $log.error(e)
+      logger.error(e)
       response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
     end
   end
@@ -634,7 +619,7 @@ class OCCIServer < Sinatra::Application
     raise OCCI::CategoryMissingException if @occi_request.mixin.nil?
     raise OCCI::MixinNotFoundException if @occi_request.mixins.empty?
     @occi_request.mixins.each do |mixin|
-      $log.info("Deleting mixin #{mixin.type_identifier}")
+      logger.info("Deleting mixin #{mixin.type_identifier}")
       mixin.entities.each do |entity|
         entity.mixins.delete(mixin)
       end
@@ -651,7 +636,7 @@ class OCCIServer < Sinatra::Application
       object = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(@location)
       if object != nil && object.kind_of?(OCCI::Core::Mixin)
         mixin = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(@location)
-        $log.info("Unassociating entities from mixin: #{mixin}")
+        logger.info("Unassociating entities from mixin: #{mixin}")
 
         @occi_request.locations.each do |loc|
           entity = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
@@ -680,7 +665,7 @@ class OCCIServer < Sinatra::Application
       nil
 
     rescue OCCI::LocationNotRegisteredException => e
-      $log.error(e.message)
+      logger.error(e.message)
       response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
 
     rescue OCCI::CategoryMissingException => e
@@ -690,7 +675,7 @@ class OCCIServer < Sinatra::Application
       response.status = OCCI::Rendering::HTTP::HTTP_NOT_FOUND
 
     rescue Exception => e
-      $log.error(e)
+      logger.error(e)
       response.status = OCCI::Rendering::HTTP::HTTP_BAD_REQUEST
     end
   end
