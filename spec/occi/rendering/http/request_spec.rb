@@ -1,6 +1,6 @@
-require "rspec"
+require 'rspec'
 require 'logger'
-require 'Hashie'
+require 'hashie'
 
 require 'occi/rendering/http/Request'
 
