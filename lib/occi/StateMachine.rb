@@ -115,7 +115,7 @@ module OCCI
 
     # ---------------------------------------------------------------------------------------------------------------------
     def to_s()
-      OCCI::Log.("Current state: " + @current_state.name)
+      OCCI::Log("Current state: " + @current_state.name)
     end
   end
 end
