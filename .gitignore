@@ -1,4 +1,5 @@
-.idea/
-.yardoc/
-tmp/
-log/
+.idea
+.yardoc
+tmp
+log
+coverage

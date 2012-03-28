@@ -21,6 +21,7 @@ end
 
 group :development do
   gem "rspec"
+  gem "simplecov"
   gem "yard"
   gem "yard-sinatra"
 end
