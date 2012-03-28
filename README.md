@@ -1,6 +1,8 @@
 rOCCI - A Ruby OCCI Framework
 =============================
 
+[![Build Status](https://secure.travis-ci.org/gwdg/rOCCI.png)](http://travis-ci.org/gwdg/rOCCI)
+
 Requirements
 ------------
 
