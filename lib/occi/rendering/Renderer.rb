@@ -36,12 +36,12 @@ module OCCI
       def self.prepare(content_type)
         @@request_content_type = content_type
         OCCI::Log.error("No renderer registered for content type '%{content_type}'") unless @@renderers.has_key?(content_type)
-        @@renderers[@@request_content_type].send(:prepare_renderer)
+        @@renderers[@@request_content_type].send(:prepare)
       end
   
       # ---------------------------------------------------------------------------------------------------------------------
-      def self.register(content_type, renderer_instanz)
-        @@renderers[content_type] = renderer_instanz
+      def self.register(content_type, renderer_instance)
+        @@renderers[content_type] = renderer_instance
       end
   
       # ---------------------------------------------------------------------------------------------------------------------

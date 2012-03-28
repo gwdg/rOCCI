@@ -64,7 +64,7 @@ module OCCI
         raise NotImplementedError, "Method 'data' not implemented!"        
       end
       
-      def render_response(response)
+      def render(response)
         raise NotImplementedError, "Method 'render_response' not implemented!"
       end
 

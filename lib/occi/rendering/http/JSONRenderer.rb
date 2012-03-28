@@ -85,7 +85,7 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def prepare_renderer()
+        def prepare()
           # Re-initialize header array
           @data = {}
         end
@@ -195,10 +195,10 @@ module OCCI
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def render_response(response)
+        def render(response)
 
           # Don't put any data in the response if there was an error
-          return if response.status != OCCI::Rendering::HTTP::HTTP_OK
+          return if response.status != OCCI::Rendering::HTTP::Response::HTTP_OK
 
           response.write(JSON.pretty_generate(@data))
         end        

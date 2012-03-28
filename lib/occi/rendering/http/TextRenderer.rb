@@ -53,7 +53,7 @@ module OCCI
         OCCI_LOCATION   = "X-OCCI-Location"
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def prepare_renderer()
+        def prepare()
           # Re-initialize header array
           @data = {}
         end
@@ -225,10 +225,10 @@ module OCCI
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def render_response(response)
+        def render(response)
 
           # Don't put any data in the response if there was an error
-          return if response.status != OCCI::Rendering::HTTP::HTTP_OK
+          return if response.status != OCCI::Rendering::HTTP::Response::HTTP_OK
            
           if response['Content-Type'].include?('text/plain')
             render_text_plain_response(response)
