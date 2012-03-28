@@ -11,6 +11,9 @@ gem "sinatra"
 gem "sinatra-contrib"
 gem "sinatra-cross_origin"
 
+# active gems
+gem "activesupport"
+
 # passenger
 gem "passenger"
 
