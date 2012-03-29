@@ -42,9 +42,6 @@ Install dependencies for deployment
 
     bundle install --deployment
 
-Install dependencies for testing
-    bundle install
-
 Configure
 ---------
 
@@ -68,8 +65,18 @@ Use curl to request all categories
 
     curl -X GET http://localhost:3000/-/
 
-Contributing
-------------
+Development
+-----------
+
+### Code Documentation
+
+[Code Documentation for rOCCI by YARD](http://rubydoc.info/github/gwdg/rOCCI/)
+
+### Continuous integration
+
+[Continuous integration for rOCCI by Travis-CI](http://travis-ci.org/gwdg/rOCCI/)
+
+### Contribute
 
 1. Fork it.
 2. Create a branch (git checkout -b my_markup)
