@@ -59,6 +59,10 @@ module OCCI
       def render_entity(entity)
         raise NotImplementedError, "Method 'render_entity' not implemented!"
       end
+
+      def render_entities(entities)
+        raise NotImplementedError, "Method 'render_entity' not implemented!"
+      end
       
       def data()
         raise NotImplementedError, "Method 'data' not implemented!"        

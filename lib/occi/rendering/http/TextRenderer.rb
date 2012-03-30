@@ -219,6 +219,10 @@ module OCCI
           end
         end
 
+        def render_entities(entities)
+          entities.each {|entity| render_entity(entity)}
+        end
+
         # ---------------------------------------------------------------------------------------------------------------------
         def data()
           return @data
