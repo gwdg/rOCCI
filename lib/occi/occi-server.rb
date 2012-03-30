@@ -158,14 +158,6 @@ require 'occi/backend/Manager'
 
 require 'occi/helpers/OCCIRequestHelper'
 
-##############################################################################
-# Configuration of HTTP Authentication
-
-if $config['username'] != nil and $config['password'] != nil
-  use Rack::Auth::Basic, "Restricted Area" do |username, password|
-    [username, password] == [$config['username'], $config['password']]
-  end
-end
 
 ##############################################################################
 # Sinatra methods for handling HTTP requests
@@ -177,12 +169,26 @@ class OCCIServer < Sinatra::Application
 
   enable cross_origin
 
-  def initialize
-    # subscribe to log message notifications
-    @logger = Logger.new(STDOUT)
+  def initialize(config = {})
+    # create logger
+    config[:log_dest] ||= STDOUT
+    config[:log_level] ||= $config[:log_level]
+    config[:log_level] ||= Logger::INFO
+    @logger = Logger.new(config[:log_dest])
+    @logger.level = config[:log_level]
+
+    # subscribe to log messages and send to logger
     @log_subscriber = ActiveSupport::Notifications.subscribe("log") do |name, start, finish, id, payload|
       @logger.log(payload[:level], payload[:message])
     end
+
+    # Configuration of HTTP Authentication
+    if $config['username'] != nil and $config['password'] != nil
+      use Rack::Auth::Basic, "Restricted Area" do |username, password|
+        [username, password] == [$config['username'], $config['password']]
+      end
+    end
+
     super
   end
 
@@ -222,7 +228,7 @@ class OCCIServer < Sinatra::Application
 
       # Render exact matches referring to kinds / mixins
       if object != nil and (object.kind_of?(OCCI::Core::Kind) or object.kind_of?(OCCI::Core::Mixin))
-        ActiveSupport::Notifications.instrument("log",:level=>Logger::INFO,:message=>"Listing all entities for kind/mixin #{object.type_identifier} ...")
+        ActiveSupport::Notifications.instrument("log", :level => Logger::INFO, :message => "Listing all entities for kind/mixin #{object.type_identifier} ...")
         entities = Array.new
         object.entities.each do |entity|
           entities = helpers.filter_by_category(entity, @occi_request.categories)
@@ -239,8 +245,9 @@ class OCCIServer < Sinatra::Application
           #locations << loc
         end
 
-        #@renderer.render(@occi_request)
-
+        @renderer.render_entities(entities) if @response['CONTENT-TYPE'].include?('json')
+        locations = entities.collect { |entity| OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity) }
+        @renderer.render_locations(locations)
 
         break
       end
