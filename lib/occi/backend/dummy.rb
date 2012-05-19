@@ -32,7 +32,7 @@ module OCCI
     class Dummy
 
       def initialize
-        @store = PStore.new('collection', thread_safe=true)
+        @store = PStore.new('collection')
         @store.transaction do
           @store['resources'] ||= []
           @store['links'] ||= []
