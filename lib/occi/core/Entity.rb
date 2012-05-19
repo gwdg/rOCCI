@@ -22,9 +22,9 @@
 require 'rubygems'
 require 'uuidtools'
 require 'hashie'
-require 'occi/Registry'
+require 'occi/registry'
 require 'occi/core/attributes'
-require 'occi/core/Kind'
+require 'occi/core/kind'
 require 'occi/core/attribute_properties'
 
 module OCCI
@@ -32,7 +32,7 @@ module OCCI
     class Entity < Hashie::Mash
 
       # Define appropriate kind
-      begin
+      def self.register
         data = Hashie::Mash.new
         data[:term] = "entity"
         data[:scheme] = "http://schemas.ogf.org/occi/core#"

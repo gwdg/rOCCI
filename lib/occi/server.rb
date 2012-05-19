@@ -132,6 +132,10 @@ module OCCI
 
 # ---------------------------------------------------------------------------------------------------------------------
     def self.initialize_model
+      OCCI::Log.info("### Initializing OCCI Core Model ###")
+      OCCI::Core::Entity.register
+      OCCI::Core::Resource.register
+      OCCI::Core::Link.register
       OCCI::Log.info("### Initializing OCCI Model from #{$config['occi_model_path']} ###")
       Dir.glob($config['occi_model_path'] + '**/*.json').each do |file|
         collection = Hashie::Mash.new(JSON.parse(File.read(file)))
@@ -203,7 +207,6 @@ module OCCI
       @backend = initialize_backend(authentication)
       OCCI::Log.debug('### Reset OCCI model ###')
       OCCI::Registry.reset
-      OCCI::Server.initialize_model
       OCCI::Log.debug('### Parsing request data to OCCI data structure ###')
       @request_collection = OCCI::Request.new(request)
       OCCI::Log.debug('### Fill OCCI model with entities from backend ###')

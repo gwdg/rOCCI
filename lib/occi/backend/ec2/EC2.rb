@@ -28,7 +28,7 @@ require 'aws-sdk'
 # for XML parsing (gem = "xml-simple")
 require 'xmlsimple'
 
-require 'occi/Log'
+require 'occi/log'
 
 
 module OCCI

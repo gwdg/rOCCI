@@ -19,7 +19,7 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/Log'
+require 'occi/log'
 
 module OCCI
   class Configuration

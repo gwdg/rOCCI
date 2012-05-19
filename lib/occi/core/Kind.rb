@@ -20,8 +20,8 @@
 ##############################################################################
 
 require 'json'
-require 'occi/core/Category'
-require 'occi/core/Action'
+require 'occi/core/category'
+require 'occi/core/action'
 require 'occi/core/attribute_properties'
 
 module OCCI
@@ -36,13 +36,14 @@ module OCCI
       end
 
       def entity_type
+        puts type_identifier
         case type_identifier
           when "http://schemas.ogf.org/occi/core#resource"
             return OCCI::Core::Resource.name
           when "http://schemas.ogf.org/occi/core#link"
             return OCCI::Core::Link.name
           else
-            OCCI::Registry.get_by_id(regular_reader("related").first).entity_type unless self[:term] == 'entity'
+            OCCI::Registry.get_by_id(self[:related].first).entity_type unless self[:term] == 'entity'
         end
       end
 

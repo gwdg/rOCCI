@@ -20,8 +20,8 @@
 ##############################################################################
 
 require 'json'
-require 'occi/core/Category'
-require 'occi/core/Action'
+require 'occi/core/category'
+require 'occi/core/action'
 
 module OCCI
   module Core

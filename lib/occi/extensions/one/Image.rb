@@ -19,9 +19,9 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/core/Mixin'
-require 'occi/core/Attribute'
-require 'occi/core/Attributes'
+require 'occi/core/mixin'
+require 'occi/core/attribute'
+require 'occi/core/attributes'
 require 'singleton'
 
 module OCCI

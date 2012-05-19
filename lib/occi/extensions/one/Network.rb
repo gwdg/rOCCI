@@ -19,7 +19,7 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/core/Mixin'
+require 'occi/core/mixin'
 require 'singleton'
 
 module OCCI

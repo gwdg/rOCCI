@@ -20,7 +20,7 @@
 ##############################################################################
 
 require 'json'
-require 'occi/Log'
+require 'occi/log'
 require 'occi/antlr/OCCIParser'
 
 module OCCI

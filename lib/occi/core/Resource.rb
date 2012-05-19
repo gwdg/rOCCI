@@ -19,16 +19,16 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/Registry'
-require 'occi/core/Entity'
-require 'occi/core/Kind'
+require 'occi/registry'
+require 'occi/core/entity'
+require 'occi/core/kind'
 require 'hashie'
 
 module OCCI
   module Core
     class Resource < Entity
 
-      begin
+      def self.register
         data = Hashie::Mash.new
         data[:related] = %w{http://schemas.ogf.org/occi/core#entity}
         data[:term] = "resource"

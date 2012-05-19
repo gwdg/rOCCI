@@ -20,7 +20,7 @@
 ##############################################################################
 
 require 'aws-sdk'
-require 'occi/Log'
+require 'occi/log'
 
 module OCCI
   module Backend

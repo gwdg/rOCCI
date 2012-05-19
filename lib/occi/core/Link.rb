@@ -19,7 +19,8 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/core/Kind'
+require 'occi/core/entity'
+require 'occi/core/kind'
 require 'hashie'
 
 module OCCI
@@ -27,7 +28,7 @@ module OCCI
     class Link < Entity
 
       # Define appropriate kind
-      begin
+      def self.register
         data = Hashie::Mash.new
         data[:actions] = []
         data[:related] = %w{http://schemas.ogf.org/occi/core#entity}

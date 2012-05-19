@@ -19,9 +19,9 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/backend/Manager'
+require 'occi/backend/manager'
 require 'hashie/hash'
-require 'occi/Log'
+require 'occi/log'
 require 'uuidtools'
 require 'pstore'
 
