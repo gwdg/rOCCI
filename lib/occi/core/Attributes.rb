@@ -15,31 +15,24 @@
 ##############################################################################
 
 ##############################################################################
-# Description: storing all Attributes for Kinds
+# Description: storing a single Attribute
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
 module OCCI
   module Core
-    class Attributes < Hash
+    class Attributes < Hashie::Mash
 
-      def <<(attribute)
-        store(attribute.name, attribute)
-      end
-
-      def check(attributes)
-        values.each do |attribute|
-          raise "Mandatory attribute #{attribute.name} not provided" if attribute.required && !attributes.has_key?(attribute.name)
+      def combine
+        hash = {}
+        self.each_key do |key|
+          if self[key].kind_of? Hashie::Mash
+            self[key].combine.each_pair { |k, v| hash[key + '.' + k] = v }
+          else
+            hash[key] = self[key]
+          end
         end
-      end
-
-      def to_s()
-        string = ""
-        values.each do
-          |attribute|
-          string += attribute.to_s + ' '
-        end
-        return string.strip()
+        return hash
       end
 
     end
