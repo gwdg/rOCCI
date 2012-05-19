@@ -19,38 +19,42 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/CategoryRegistry'
+require 'occi/Registry'
 require 'occi/core/Entity'
 require 'occi/core/Kind'
+require 'hashie'
 
 module OCCI
   module Core
     class Resource < Entity
 
-      attr_reader   :links
-
       begin
-        actions     = []
-        related     = [OCCI::Core::Entity::KIND]
-        entity_type = self
-        entities    = []
+        data = Hashie::Mash.new
+        data[:related] = %w{http://schemas.ogf.org/occi/core#entity}
+        data[:term] = "resource"
+        data[:scheme] = "http://schemas.ogf.org/occi/core#"
+        data[:title] = "Resource"
 
-        term    = "resource"
-        scheme  = "http://schemas.ogf.org/occi/core#"
-        title   = "Resource"
+        data.attributes!.occi!.core!.summary!.type = "string"
+        data.attributes!.occi!.core!.summary!.pattern = ".*"
+        data.attributes!.occi!.core!.summary!.required = false
+        data.attributes!.occi!.core!.summary!.mutable = true
 
-        attributes = OCCI::Core::Attributes.new()
-        attributes << OCCI::Core::Attribute.new(name = 'occi.core.summary', mutable = true, required = false,  type = "string", range = "", default = "")
-
-        KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
-        OCCI::CategoryRegistry.register(KIND)
+        kind = OCCI::Core::Kind.new(data)
+        OCCI::Registry.register(kind)
       end
 
-      def initialize(attributes, mixins = [], kind = OCCI::Core::Resource::KIND)
-        attributes['occi.core.summary'] = "" if attributes['occi.core.summary'] == nil
-        @links = []
-        @template = false
-        super(attributes, mixins, kind)
+      def summary
+        return self[:summary]
+      end
+
+      def summary=(summary)
+        self[:summary] = summary
+        self.attributes!.occi!.core!.summary = summary
+      end
+
+      def applicable_actions
+        array = []
       end
 
     end

@@ -49,10 +49,10 @@ module OCCI
   module Backend
 
     # ---------------------------------------------------------------------------------------------------------------------
-    RESOURCE_DEPLOY         = :deploy
-    RESOURCE_UPDATE_STATE   = :update_state
-    RESOURCE_REFRESH        = :refresh
-    RESOURCE_DELETE         = :delete
+    RESOURCE_DEPLOY = :deploy
+    RESOURCE_UPDATE_STATE = :update_state
+    RESOURCE_REFRESH = :refresh
+    RESOURCE_DELETE = :delete
 
     # ---------------------------------------------------------------------------------------------------------------------
     class Manager
@@ -60,46 +60,46 @@ module OCCI
       # ---------------------------------------------------------------------------------------------------------------------              
       private
       # ---------------------------------------------------------------------------------------------------------------------
-      
-      @@backends_classes    = {}
+
+      @@backends_classes = {}
       @@backends_operations = {}
-      
+
       # ---------------------------------------------------------------------------------------------------------------------
       public
       # ---------------------------------------------------------------------------------------------------------------------
 
       # ---------------------------------------------------------------------------------------------------------------------
       def self.register_backend(backend_class, operations)
-        
+
         # Get ident of backend = class name downcased
-#        backend_ident = Object.const_get(backend_class).name.downcase
+        #        backend_ident = Object.const_get(backend_class).name.downcase
 
         backend_ident = backend_class.name.downcase
 
-        @@backends_classes[backend_ident]     = backend_class
-        @@backends_operations[backend_ident]  = operations
+        @@backends_classes[backend_ident] = backend_class
+        @@backends_operations[backend_ident] = operations
       end
 
       # ---------------------------------------------------------------------------------------------------------------------
       def self.signal_resource(backend, operation, resource, operation_parameters = nil)
 
-        resource_type = resource.kind.type_identifier
+        resource_type = resource.kind
         backend_ident = backend.class.name.downcase
-        
-        raise OCCI::BackendError, "Unknown backend: '#{backend_ident}'"                                             unless @@backends_classes.has_key?(backend_ident)
-        
+
+        raise OCCI::BackendError, "Unknown backend: '#{backend_ident}'" unless @@backends_classes.has_key?(backend_ident)
+
         operations = @@backends_operations[backend_ident]
-        
-        raise OCCI::BackendError, "Resource type '#{resource_type}' not supported!"                                 unless operations.has_key?(resource_type)
+
+        raise OCCI::BackendError, "Resource type '#{resource_type}' not supported!" unless operations.has_key?(resource_type)
         raise OCCI::BackendError, "Operation '#{operation}' not supported on resource category '#{resource_type}'!" unless operations[resource_type].has_key?(operation.to_sym)
-        
+
         # Delegate
-        
+
         if operations[resource_type][operation.to_sym].nil?
           OCCI::Log.debug("No backend method configured => doing nothing...")
           return
         end
-        
+
         if operation_parameters.nil?
           # Generic resource operation
           backend.send(operations[resource_type][operation.to_sym], resource)
@@ -114,11 +114,11 @@ module OCCI
       def self.delegate_action(backend, action, parameters, resource)
 
         OCCI::Log.debug("Delegating invocation of action [#{action}] on resource [#{resource}] with parameters [#{parameters}] to backend...")
-  
+
         # Verify
         state_machine = resource.state_machine
         raise "Action [#{action}] not valid for current state [#{state_machine.current_state}] of resource [#{resource}]!" if !state_machine.check_transition(action)
-        
+
         # Use action term as ident
         operation = action.category.term.to_s
 
@@ -127,12 +127,12 @@ module OCCI
           signal_resource(backend, operation, resource, parameters)
 
           state_machine.transition(action)
-          signal_resource(backend, OCCI::Backend::RESOURCE_UPDATE_STATE,resource)
+          signal_resource(backend, OCCI::Backend::RESOURCE_UPDATE_STATE, resource)
 
         rescue OCCI::BackendError
           OCCI::Log.error("Action invocation failed!")
           raise
-        end   
+        end
       end
     end
   end

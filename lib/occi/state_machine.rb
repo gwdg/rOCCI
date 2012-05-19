@@ -32,43 +32,43 @@ module OCCI
     class State
 
       attr_reader :name
-      attr_reader :transitions      
+      attr_reader :transitions
 
       # ---------------------------------------------------------------------------------------------------------------------
       private
       # ---------------------------------------------------------------------------------------------------------------------
-      
+
       def get_action_name(action)
         # TODO: Fix parsing of actions
         return action.category.term if not action.category.nil?
       end
-      
+
       # ---------------------------------------------------------------------------------------------------------------------
       public
       # ---------------------------------------------------------------------------------------------------------------------
 
       # ---------------------------------------------------------------------------------------------------------------------                
       def initialize(name)
-        @name         = name
-        @transitions  = {}
+        @name = name
+        @transitions = {}
       end
-                
+
       # ---------------------------------------------------------------------------------------------------------------------
       def add_transition(action, target_state)
-        @transitions[get_action_name(action)] = target_state 
+        @transitions[get_action_name(action)] = target_state
       end
-      
+
       # ---------------------------------------------------------------------------------------------------------------------
       def has_transition(action)
         return @transitions.has_key?(get_action_name(action))
       end
-      
+
       # ---------------------------------------------------------------------------------------------------------------------
       def get_target_state(action)
         raise "Unsupport transition [#{action}] for this state: #{self}" unless has_transition(action)
         return @transitions[get_action_name(action)]
       end
-      
+
       # ---------------------------------------------------------------------------------------------------------------------
       def to_s()
         string = "[" + @name + "]: transitions: "
@@ -78,18 +78,18 @@ module OCCI
         return string
       end
     end
-      
+
     # ---------------------------------------------------------------------------------------------------------------------
     def initialize(start_state, states, options = {})
       raise "Start state [#{start_state}] not part of provided states" if !states.include?(start_state)
-      @start_state    = start_state
-      @current_state  = start_state
-      @states         = states
-      @options        = options
+      @start_state = start_state
+      @current_state = start_state
+      @states = states
+      @options = options
     end
-    
+
     def set_state(state)
-      @current_state  = state
+      @current_state = state
     end
 
     # ---------------------------------------------------------------------------------------------------------------------

@@ -21,37 +21,31 @@
 
 require 'json'
 require 'occi/core/Category'
+require 'occi/core/Action'
+require 'occi/core/attribute_properties'
 
 module OCCI
   module Core
-    class Kind < Category
+    class Kind < OCCI::Core::Category
 
-      attr_accessor :entity_type
-      attr_accessor :related
       attr_accessor :entities
-      attr_accessor :actions
-      
-      def initialize(actions, related, entity_type, entities, term, scheme, title, attributes)
-        super(term, scheme, title, attributes)
-        @actions      = (actions != nil ? actions : []) 
-        @related      = (related != nil ? related : [])
-        @entities     = (entities != nil ? entities : [])
-        @entity_type  = entity_type
+
+      def initialize(kind, default = nil)
+        @entities = []
+        super(kind, default)
       end
-      
-      def to_json(options={})
-        hash = {}
-        actions = @actions.collect {|action| action.category.type_identifier }
-        hash['actions'] = actions.join(',') unless actions.empty?
-        rel = @related.collect {|related| related.type_identifier}
-        hash['related'] = rel.join(',') unless rel.empty?
-        super['Category'].merge!(hash)
+
+      def entity_type
+        case type_identifier
+          when "http://schemas.ogf.org/occi/core#resource"
+            return OCCI::Core::Resource.name
+          when "http://schemas.ogf.org/occi/core#link"
+            return OCCI::Core::Link.name
+          else
+            OCCI::Registry.get_by_id(regular_reader("related").first).entity_type unless self[:term] == 'entity'
+        end
       end
-      
-      def class_string
-        return 'kind'
-      end
-      
+
     end
   end
 end

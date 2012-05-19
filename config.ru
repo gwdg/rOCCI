@@ -2,8 +2,8 @@ $: << 'lib'
 
 require 'rubygems'
 require 'sinatra'
-require 'occi/occi-server.rb'
+require 'occi/server'
 
 VERSION_NUMBER=0.5
 
-run OCCIServer.new
+run OCCI::Server.new

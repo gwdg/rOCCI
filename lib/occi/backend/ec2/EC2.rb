@@ -23,7 +23,7 @@
 require 'aws-sdk'
 
 # EC2 backend
-require 'occi/backend/ec2/Compute'
+#require 'occi/backend/ec2/Compute'
 
 # for XML parsing (gem = "xml-simple")
 require 'xmlsimple'
@@ -34,113 +34,113 @@ require 'occi/Log'
 module OCCI
   module Backend
     module EC2
-    # --------------------------------------------------------------------------------------------------------------------- 
-    
-      begin
-        ### Create networks
-        # Create private network
-        attributes = OCCI::Core::Attributes.new()
-        attributes['occi.core.title'] = "ec2_private_network"
-        attributes['occi.core.summary'] = "This network contains private links to all EC2 compute instances."
-        mixins = []
-        private_network = OCCI::Infrastructure::Network.new(attributes, mixins)
-        OCCI::Rendering::HTTP::LocationRegistry.register("/network/ec2_private_network", private_network)
-        private_network.state_machine.set_state(OCCI::Infrastructure::Network::STATE_ACTIVE)
-        private_network.attributes['occi.network.state'] = "active"
-        
-        # Create public network
-        attributes = OCCI::Core::Attributes.new()
-        attributes['occi.core.title'] = "ec2_public_network"
-        attributes['occi.core.summary'] = "This network contains public links to all EC2 compute instances."
-        mixins = []
-        public_network = OCCI::Infrastructure::Network.new(attributes, mixins)
-        OCCI::Rendering::HTTP::LocationRegistry.register("/network/ec2_public_network", public_network)
-        public_network.state_machine.set_state(OCCI::Infrastructure::Network::STATE_ACTIVE)
-        public_network.attributes['occi.network.state'] = "active"
-      end
-      
+      # ---------------------------------------------------------------------------------------------------------------------
+
+      #begin
+      #  ### Create networks
+      #  # Create private network
+      #  attributes = OCCI::Core::Attributes.new()
+      #  attributes['occi.core.title'] = "ec2_private_network"
+      #  attributes['occi.core.summary'] = "This network contains private links to all EC2 compute instances."
+      #  mixins = []
+      #  private_network = OCCI::Infrastructure::Network.new(attributes, mixins)
+      #  OCCI::Rendering::HTTP::LocationRegistry.register("/network/ec2_private_network", private_network)
+      #  private_network.state_machine.set_state(OCCI::Infrastructure::Network::STATE_ACTIVE)
+      #  private_network.attributes['occi.network.state'] = "active"
+      #
+      #  # Create public network
+      #  attributes = OCCI::Core::Attributes.new()
+      #  attributes['occi.core.title'] = "ec2_public_network"
+      #  attributes['occi.core.summary'] = "This network contains public links to all EC2 compute instances."
+      #  mixins = []
+      #  public_network = OCCI::Infrastructure::Network.new(attributes, mixins)
+      #  OCCI::Rendering::HTTP::LocationRegistry.register("/network/ec2_public_network", public_network)
+      #  public_network.state_machine.set_state(OCCI::Infrastructure::Network::STATE_ACTIVE)
+      #  public_network.attributes['occi.network.state'] = "active"
+      #end
+
       public
-      
+
       def self.get_ec2_interface
         ec2 = AWS::EC2.new
         return ec2.regions[$config["avail_zone"]]
       end
-            
+
       class EC2
 
-        include Compute
+        #include Compute
 
         # ---------------------------------------------------------------------------------------------------------------------     
         # Operation mappings
 
 
         OPERATIONS = {}
-      
+
         OPERATIONS["http://schemas.ogf.org/occi/infrastructure#compute"] = {
-        
+
             # Generic resource operations
-          :deploy         => :compute_deploy,
-          :update_state   => :compute_update_state,
-          :refresh        => :compute_refresh,
-          :delete         => :compute_delete,
-        
-          # Compute specific resource operations
-          :start          => :compute_start,
-          :stop           => :compute_stop,
-          :restart        => :compute_restart,
-          :suspend        => nil        
+            :deploy => :compute_deploy,
+            :update_state => :compute_update_state,
+            :refresh => :compute_refresh,
+            :delete => :compute_delete,
+
+            # Compute specific resource operations
+            :start => :compute_start,
+            :stop => :compute_stop,
+            :restart => :compute_restart,
+            :suspend => nil
         }
 
         OPERATIONS["http://schemas.ogf.org/occi/infrastructure#network"] = {
-        
-          # Generic resource operations
-          :deploy         => nil,
-          :update_state   => nil,
-          :refresh        => nil,
-          :delete         => nil,
-        
-          # Network specific resource operations
-          :up             => nil,
-          :down           => nil
+
+            # Generic resource operations
+            :deploy => nil,
+            :update_state => nil,
+            :refresh => nil,
+            :delete => nil,
+
+            # Network specific resource operations
+            :up => nil,
+            :down => nil
         }
 
         OPERATIONS["http://schemas.ogf.org/occi/infrastructure#storage"] = {
 
-          # Generic resource operations
-          :deploy         => nil,
-          :update_state   => nil,
-          :refresh        => nil,
-          :delete         => nil,
-   
-          # Network specific resource operations
-          :online         => nil,
-          :offline        => nil,
-          :backup         => nil,
-          :snapshot       => nil,
-          :resize         => nil
+            # Generic resource operations
+            :deploy => nil,
+            :update_state => nil,
+            :refresh => nil,
+            :delete => nil,
+
+            # Network specific resource operations
+            :online => nil,
+            :offline => nil,
+            :backup => nil,
+            :snapshot => nil,
+            :resize => nil
         }
 
         OPERATIONS["http://schemas.ogf.org/gwdg#nfsstorage"] = {
 
-          # Generic resource operations
-          :deploy         => nil,
-          :update_state   => nil,
-          :refresh        => nil,
-          :delete         => nil
+            # Generic resource operations
+            :deploy => nil,
+            :update_state => nil,
+            :refresh => nil,
+            :delete => nil
         }
-        
+
         # ---------------------------------------------------------------------------------------------------------------------
-        
+
         def initialize(access_key_id, secret_access_key)
           # EC2 access key
           AWS.config(
-                     :access_key_id => access_key_id,
-                     :secret_access_key => secret_access_key)
+              :access_key_id => access_key_id,
+              :secret_access_key => secret_access_key)
         end
-        
+
         def register_templates
           OCCI::Log.debug("Loading EC2 templates.")
-        
+
           # import Compute Resource Templates from etc/ec2_templates/resource_templates.xml
           xml = XmlSimple.xml_in("etc/ec2_templates/resource_templates.xml")
           xml["instance"].each do |instance|
@@ -150,11 +150,11 @@ module OCCI
             attributes = OCCI::Core::Attributes.new()
             actions = []
             entities = []
-            related = [ OCCI::Infrastructure::ResourceTemplate::MIXIN ]
+            related = [OCCI::Infrastructure::ResourceTemplate::MIXIN]
             mixin = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
             OCCI::CategoryRegistry.register(mixin)
           end
-          
+
           ## import image templates
           # get the ec2 interface
           ec2 = OCCI::Backend::EC2.get_ec2_interface()
@@ -166,24 +166,24 @@ module OCCI
             attributes = OCCI::Core::Attributes.new()
             actions = []
             entities = []
-            related = [ OCCI::Infrastructure::OSTemplate::MIXIN ]
+            related = [OCCI::Infrastructure::OSTemplate::MIXIN]
             mixin = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
             OCCI::CategoryRegistry.register(mixin)
           end
           OCCI::Log.debug("Finished loading EC2 templates.")
         end
-        
-      
+
+
         # ---------------------------------------------------------------------------------------------------------------------     
         def register_existing_resources
-          
+
         end
 
-         # ---------------------------------------------------------------------------------------------------------------------     
+        # ---------------------------------------------------------------------------------------------------------------------
         def resource_deploy(resource)
           OCCI::Log.debug("Deploying resource '#{resource.attributes['occi.core.title']}'...")
         end
-      
+
         # ---------------------------------------------------------------------------------------------------------------------     
         def resource_refresh(resource)
           OCCI::Log.debug("Refreshing resource '#{resource.attributes['occi.core.title']}'...")

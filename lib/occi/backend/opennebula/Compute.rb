@@ -29,11 +29,11 @@ module OCCI
 
       # ---------------------------------------------------------------------------------------------------------------------
       module Compute
-      
+
         TEMPLATECOMPUTERAWFILE = 'occi_one_template_compute.erb'
-      
+
         # ---------------------------------------------------------------------------------------------------------------------       
-#        private
+        #        private
         # ---------------------------------------------------------------------------------------------------------------------
 
         # ---------------------------------------------------------------------------------------------------------------------     
@@ -49,85 +49,85 @@ module OCCI
           else
             occi_id = backend_object['TEMPLATE/OCCI_ID']
           end
-  
+
           mixins = []
           mixins << OCCI::Backend::ONE::VirtualMachine::MIXIN
-  
+
           attributes = {}
-          # parse all parameters from OpenNebula to OCCI
-          attributes['occi.core.id']        = occi_id
-          attributes['occi.core.title']     = backend_object['NAME']
-          attributes['occi.core.summary']   = backend_object['TEMPLATE/DESCRIPTION']
-          attributes['occi.compute.cores']  = backend_object['TEMPLATE/VCPU']
-  
+# parse all parameters from OpenNebula to OCCI
+          attributes['occi.core.id'] = occi_id
+          attributes['occi.core.title'] = backend_object['NAME']
+          attributes['occi.core.summary'] = backend_object['TEMPLATE/DESCRIPTION']
+          attributes['occi.compute.cores'] = backend_object['TEMPLATE/VCPU']
+
           if backend_object['TEMPLATE/ARCHITECTURE'] == "x86_64"
             attributes['occi.compute.architecture'] = "x64"
           else
             attributes['occi.compute.architecture'] = "x86"
           end
-          attributes['occi.compute.memory']           = backend_object['TEMPLATE/MEMORY']
+          attributes['occi.compute.memory'] = backend_object['TEMPLATE/MEMORY']
           attributes['opennebula.vm.cpu_reservation'] = backend_object['TEMPLATE/CPU']
-          attributes['opennebula.vm.boot']            = backend_object['TEMPLATE/BOOT']
-  
+          attributes['opennebula.vm.boot'] = backend_object['TEMPLATE/BOOT']
+
           # check if object already exists
-          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location('/compute/' +  occi_id)
+          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object('/compute/' + occi_id)
           if occi_object.nil?
-            occi_object = OCCI::Infrastructure::Compute.new(attributes,mixins)
+            occi_object = OCCI::Infrastructure::Compute.new(attributes, mixins)
             occi_object.backend[:id] = backend_object.id
             OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
           else
 
             # ALI start            
-#            id= backend_object.id
-#            OCCI::Log.debug("--- Monitoring start backend id : #{id}")
-#            watch_client = OneWatchClient::VmWatchClient.new
-#            monitoring_resources = [ :cpu_usage,
-#                                    :mem_usage,
-#                                    :net_rx,
-#                                    :net_tx
-#                                   ]
-#            vm_monitoring = watch_client.resource_monitoring(id.to_i,monitoring_resources)
-#            occi_object.mixins.each do |mixin|
-#              attributes['cpu']     = vm_monitoring[:monitoring][:cpu_usage].join(',')  if mixin.term == "rxtot"
-#              attributes['memory']  = vm_monitoring[:monitoring][:mem_usage].join(',')  if mixin.term == "memory"
-#              attributes['net_rx']  = vm_monitoring[:monitoring][:net_rx].join(',')     if mixin.term == "net_rx"
-#              attributes['net_tx']  = vm_monitoring[:monitoring][:net_tx].join(',')     if mixin.term == "net_tx"
-#              attributes['net_tx']  = (vm_monitoring[:monitoring][:net_tx]).join(',')   if mixin.term == "net_tx"
-#            end
+            #            id= backend_object.id
+            #            OCCI::Log.debug("--- Monitoring start backend id : #{id}")
+            #            watch_client = OneWatchClient::VmWatchClient.new
+            #            monitoring_resources = [ :cpu_usage,
+            #                                    :mem_usage,
+            #                                    :net_rx,
+            #                                    :net_tx
+            #                                   ]
+            #            vm_monitoring = watch_client.resource_monitoring(id.to_i,monitoring_resources)
+            #            occi_object.mixins.each do |mixin|
+            #              attributes['cpu']     = vm_monitoring[:monitoring][:cpu_usage].join(',')  if mixin.term == "rxtot"
+            #              attributes['memory']  = vm_monitoring[:monitoring][:mem_usage].join(',')  if mixin.term == "memory"
+            #              attributes['net_rx']  = vm_monitoring[:monitoring][:net_rx].join(',')     if mixin.term == "net_rx"
+            #              attributes['net_tx']  = vm_monitoring[:monitoring][:net_tx].join(',')     if mixin.term == "net_tx"
+            #              attributes['net_tx']  = (vm_monitoring[:monitoring][:net_tx]).join(',')   if mixin.term == "net_tx"
+            #            end
             # ALI end
-            
+
             occi_object.attributes.merge!(attributes)
           end
-  
+
           # VNC handling
           if backend_object['TEMPLATE/GRAPHICS/TYPE'] == 'vnc' \
           and backend_object['HISTORY_RECORDS/HISTORY/HOSTNAME'] \
           and not $config[:novnc_path].nil? \
           and not $config[:vnc_proxy_base_port].nil?
-  
+
             occi_object.mixins << OCCI::Backend::ONE::VNC::MIXIN
-  
+
             vnc_host = backend_object['HISTORY_RECORDS/HISTORY/HOSTNAME']
             vnc_port = backend_object['TEMPLATE/GRAPHICS/PORT']
-  
+
             vnc_proxy_host = URI.parse($config[:server]).host
-  
+
             # The noVNC proxy_port
             proxy_port = $config[:vnc_proxy_base_port].to_i + vnc_port.to_i
-  
+
             OCCI::Log.debug("NOVNC path: #{$config[:novnc_path]}")
             OCCI::Log.debug("Graphics type: #{backend_object['TEMPLATE/GRAPHICS/TYPE']}")
             OCCI::Log.debug("VNC base port: #{$config[:vnc_proxy_base_port]}")
             OCCI::Log.debug("VNC port: #{vnc_port}")
             OCCI::Log.debug("VNC host: #{vnc_host}")
-  
+
             if occi_object.attributes['opennebula.vm.vnc'].nil? or occi_object.backend[:novnc_pipe].nil?
-  
+
               # CREATE PROXY FOR VNC SERVER
               begin
                 novnc_cmd = "#{$config[:novnc_path]}/utils/websockify"
                 pipe = IO.popen("#{novnc_cmd} --web #{$config[:novnc_path]} #{proxy_port} #{vnc_host}:#{vnc_port}")
-  
+
                 if pipe
                   vnc_url = $config[:server].chomp('/') + ':' + vnc_port + '/vnc_auto.html?host=' + vnc_proxy_host + '&port=' + vnc_port
                   OCCI::Log.debug("VNC URL: #{vnc_url}")
@@ -140,13 +140,13 @@ module OCCI
               end
             end
           end
-  
+
           occi_object.backend[:id] = backend_object.id
           occi_object = self.compute_parse_links(occi_object, backend_object)
           OCCI::Log.info("OCCI compute object created/updated")
           return occi_object
         end
-  
+
         # ---------------------------------------------------------------------------------------------------------------------     
         # PARSE OPENNEBULA DEPENDENCIES TO E.G. STORAGE AND NETWORK LINKS
         def compute_parse_links(occi_object, backend_object)
@@ -170,7 +170,7 @@ module OCCI
             # check if link already exists
             occi_id = self.generate_occi_id(OCCI::Infrastructure::StorageLink::KIND, disk['IMAGE_ID'].to_s)
             storagelink_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(OCCI::Infrastructure::StorageLink::KIND)
-            link = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(storagelink_location + occi_id)
+            link = OCCI::Rendering::HTTP::LocationRegistry.get_object(storagelink_location + occi_id)
             if link.nil?
               # create new link
               attributes['occi.core.id'] = occi_id
@@ -181,7 +181,7 @@ module OCCI
             target.links.push(link).uniq!
             OCCI::Log.debug("Link successfully created")
           end
-  
+
           #create links for all network instances
           backend_object.each('TEMPLATE/NIC') do |nic|
             attributes = {}
@@ -205,7 +205,7 @@ module OCCI
             # check if link already exists
             occi_id = self.generate_occi_id(OCCI::Infrastructure::Networkinterface::KIND, nic['NETWORK_ID'].to_s)
             networkinterface_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(OCCI::Infrastructure::Networkinterface::KIND)
-            link = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(networkinterface_location + occi_id)
+            link = OCCI::Rendering::HTTP::LocationRegistry.get_object(networkinterface_location + occi_id)
             if link.nil?
               # create new link
               attributes['occi.core.id'] = occi_id
@@ -218,23 +218,23 @@ module OCCI
             target.links.push(link).uniq!
             OCCI::Log.debug("Link successfully created")
           end
-  
+
           return occi_object
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
         # ALI: Monitoring  
-#        def monitor(parameter)
-#          backend_object = VirtualMachine.new(VirtualMachine.build_xml(@backend[:id]), $backend.one_client)
-#          backend_object.info
-#          occi_object = parse_backend_object(backend_object)
-#          monitoring_resources = [ :cpu] if parameter == "cpu"
-#          monitoring_resources = [ :memory] if parameter == "memory"
-#          monitoring_resources = [ :net_rx] if parameter == "net_rx"
-#          monitoring_resources = [:net_tx] if parameter == "net_tx"
-#          occi_object.attributes["compute.cpu.value"]= watch_client.resource_monitoring(occi_object.backend[:id],monitoring_resources)
-#        end
-     
+        #        def monitor(parameter)
+        #          backend_object = VirtualMachine.new(VirtualMachine.build_xml(@backend[:id]), $backend.one_client)
+        #          backend_object.info
+        #          occi_object = parse_backend_object(backend_object)
+        #          monitoring_resources = [ :cpu] if parameter == "cpu"
+        #          monitoring_resources = [ :memory] if parameter == "memory"
+        #          monitoring_resources = [ :net_rx] if parameter == "net_rx"
+        #          monitoring_resources = [:net_tx] if parameter == "net_tx"
+        #          occi_object.attributes["compute.cpu.value"]= watch_client.resource_monitoring(occi_object.backend[:id],monitoring_resources)
+        #        end
+
         # ---------------------------------------------------------------------------------------------------------------------
         public
         # ---------------------------------------------------------------------------------------------------------------------
@@ -245,63 +245,63 @@ module OCCI
           # TODO: figure out templates
           # backend_object=Template.new(Template.build_xml, $backend.one_client)
           template_mixin = compute.mixins.select { |m| m.related == OCCI::Infrastructure::ResourceTemplate::MIXIN }
-    
+
           if template_mixin.empty?
-    
+
             backend_object = VirtualMachine.new(VirtualMachine.build_xml, @one_client)
-  
+
             compute_erb = ComputeERB.new
-    
-            compute_erb.compute           = compute
-            compute_erb.storage           = []
-            compute_erb.networks          = []
-            compute_erb.external_storage  = []
-            compute_erb.nfs_mounts        = []
-     
+
+            compute_erb.compute = compute
+            compute_erb.storage = []
+            compute_erb.networks = []
+            compute_erb.external_storage = []
+            compute_erb.nfs_mounts = []
+
             if compute.links != nil
               compute.links.each do |link|
                 OCCI::Log.debug("Processing link: #{link.kind.type_identifier}, attributes: #{link.attributes.inspect}")
                 target_URI = link.attributes['occi.core.target'] if URI.parse(link.attributes['occi.core.target']).absolute?
-                target = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(link.attributes['occi.core.target'])
-                
+                target = OCCI::Rendering::HTTP::LocationRegistry.get_object(link.attributes['occi.core.target'])
+
                 case link.kind.term
-                when 'storagelink'
-                  # TODO: incorporate mountpoint here (e.g. occi.storagelink.mountpoint )
-                  # Check for nfs mount points                  
-                  if $nfs_support
-                    if target.kind == OCCI::Infrastructure::NFSStorage::KIND
-                      # Keep track of nfs-export -> mount-point tuples
-                      OCCI::Log.debug("Adding nfs mount: #{target.attributes["occi.storage.export"]} -> #{link.attributes['occi.storagelink.mountpoint']}")
-                      compute_erb.nfs_mounts << [target.attributes['occi.storage.export'], link.attributes['occi.storagelink.mountpoint']]
-                      next
+                  when 'storagelink'
+                    # TODO: incorporate mountpoint here (e.g. occi.storagelink.mountpoint )
+                    # Check for nfs mount points
+                    if $nfs_support
+                      if target.kind == OCCI::Infrastructure::NFSStorage::KIND
+                        # Keep track of nfs-export -> mount-point tuples
+                        OCCI::Log.debug("Adding nfs mount: #{target.attributes["occi.storage.export"]} -> #{link.attributes['occi.storagelink.mountpoint']}")
+                        compute_erb.nfs_mounts << [target.attributes['occi.storage.export'], link.attributes['occi.storagelink.mountpoint']]
+                        next
+                      end
                     end
-                  end
-                  
-                  if not target.nil?
-                    compute_erb.storage << [target, link]
-                  elsif not target_URI.nil?
-                    compute_erb.external_storage << target_URI
-                  end
-    
-                when 'networkinterface'
-                  if not target.nil?
-                    compute_erb.networks << [target, link]
-                  end
-    
-                when 'link'
-                  case target.kind.term
-                  when 'storage'
-                    compute_erb.storage << [target, link]
-                  when 'network'
-                    compute_erb.networks << [target, link]
-                  end unless target.nil?
+
+                    if not target.nil?
+                      compute_erb.storage << [target, link]
+                    elsif not target_URI.nil?
+                      compute_erb.external_storage << target_URI
+                    end
+
+                  when 'networkinterface'
+                    if not target.nil?
+                      compute_erb.networks << [target, link]
+                    end
+
+                  when 'link'
+                    case target.kind.term
+                      when 'storage'
+                        compute_erb.storage << [target, link]
+                      when 'network'
+                        compute_erb.networks << [target, link]
+                    end unless target.nil?
                 end
               end
             end
-  
+
             template_raw = $config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
             compute_template = ERB.new(File.read(template_raw)).result(compute_erb.get_binding)
-  
+
             OCCI::Log.debug("Parsed template #{compute_template}")
             rc = backend_object.allocate(compute_template)
             check_rc(rc)
@@ -314,25 +314,25 @@ module OCCI
             compute.backend[:id] = backend_id
             compute_refresh(compute)
           end
-    
+
           OCCI::Log.debug("OpenNebula ID of virtual machine: #{compute.backend[:id]}")
           OCCI::Log.debug("OpenNebula automatically triggers action start for Virtual Machines")
           OCCI::Log.debug("Changing state to started")
         end
-  
+
         # ---------------------------------------------------------------------------------------------------------------------     
         def compute_refresh(compute)
           OCCI::Log.debug("Refreshing compute object with backend ID: #{compute.backend[:id]}")
           backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
-  
+
           backend_object.info
-  
+
           occi_object = compute_parse_backend_object(backend_object)
           if occi_object.nil?
             OCCI::Log.debug("Problems refreshing backend object")
           else
             # TODO: parse links?
-  
+
             # merge new attributes with existing attributes, by overwriting existing attributes with refreshed values
             compute.attributes.merge!(occi_object.attributes)
             # concat mixins and remove duplicate mixins
@@ -341,32 +341,36 @@ module OCCI
             compute_update_state(compute)
           end
         end
-  
+
         # ---------------------------------------------------------------------------------------------------------------------     
         def compute_update_state(compute)
           backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
           backend_object.info
           OCCI::Log.debug("current VM state is: #{backend_object.lcm_state_str}")
           state = case backend_object.lcm_state_str
-            when "RUNNING" then OCCI::Infrastructure::Compute::STATE_ACTIVE
-            when "PROLOG" , "BOOT" , "SAVE_STOP" , "SAVE_SUSPEND" , "SAVE_MIGRATE" , "MIGRATE" , "PROLOG_MIGRATE" , "PROLOG_RESUME" then OCCI::Infrastructure::Compute::STATE_INACTIVE
-            when "SUSPENDED" then OCCI::Infrastructure::Compute::STATE_SUSPENDED
-            else OCCI::Infrastructure::Compute::STATE_INACTIVE
-          end
+                    when "RUNNING" then
+                      OCCI::Infrastructure::Compute::STATE_ACTIVE
+                    when "PROLOG", "BOOT", "SAVE_STOP", "SAVE_SUSPEND", "SAVE_MIGRATE", "MIGRATE", "PROLOG_MIGRATE", "PROLOG_RESUME" then
+                      OCCI::Infrastructure::Compute::STATE_INACTIVE
+                    when "SUSPENDED" then
+                      OCCI::Infrastructure::Compute::STATE_SUSPENDED
+                    else
+                      OCCI::Infrastructure::Compute::STATE_INACTIVE
+                  end
           compute.state_machine.set_state(state)
           compute.attributes['occi.compute.state'] = compute.state_machine.current_state.name
         end
-  
+
         # ---------------------------------------------------------------------------------------------------------------------     
         def compute_delete(compute)
           backend_object=VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
-  
+
           rc = backend_object.finalize
           check_rc(rc)
           OCCI::Log.debug("killing NoVNC pipe with pid #{compute.backend[:novnc_pipe].pid}") unless compute.backend[:novnc_pipe].nil?
           Process.kill 'INT', compute.backend[:novnc_pipe].pid unless compute.backend[:novnc_pipe].nil?
         end
-  
+
         # ---------------------------------------------------------------------------------------------------------------------     
         # GET ALL COMPUTE INSTANCES
         def compute_register_all_instances
@@ -374,7 +378,7 @@ module OCCI
           backend_object_pool.info(OCCI::Backend::OpenNebula::OpenNebula::INFO_ACL, -1, -1, OpenNebula::VirtualMachinePool::INFO_NOT_DONE)
           compute_register_all_objects(backend_object_pool)
         end
-  
+
         # ---------------------------------------------------------------------------------------------------------------------     
         # GET ALL COMPUTE TEMPLATES
         def compute_register_all_templates
@@ -382,7 +386,7 @@ module OCCI
           backend_object_pool.info
           compute_register_all_objects(backend_object_pool, template = true)
         end
-  
+
         # ---------------------------------------------------------------------------------------------------------------------     
         # GET ALL COMPUTE OBJECTS
         def compute_register_all_objects(backend_object_pool, template = false)
@@ -403,11 +407,11 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         # COMPUTE ACTIONS
         # ---------------------------------------------------------------------------------------------------------------------
-  
+
         # ---------------------------------------------------------------------------------------------------------------------     
-        def compute_action_dummy(compute, parameters)       
+        def compute_action_dummy(compute, parameters)
         end
-  
+
         # ---------------------------------------------------------------------------------------------------------------------     
         # COMPUTE Action start
         def compute_start(compute, parameters)
@@ -415,42 +419,42 @@ module OCCI
           rc = backend_object.resume
           check_rc(rc)
         end
-  
+
         # ---------------------------------------------------------------------------------------------------------------------     
         # Action stop
         def compute_stop(compute, parameters)
           backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
           # TODO: implement parameters when available in OpenNebula
           case parameters
-          when 'method="graceful"'
-            OCCI::Log.debug("Trying to stop VM graceful")
-            rc = backend_object.shutdown
-          when 'method="acpioff"'
-            OCCI::Log.debug("Trying to stop VM via ACPI off")
-            rc = backend_object.shutdown
-          else # method="poweroff" or no method specified
-            OCCI::Log.debug("Powering off VM")
-            rc = backend_object.shutdown
+            when 'method="graceful"'
+              OCCI::Log.debug("Trying to stop VM graceful")
+              rc = backend_object.shutdown
+            when 'method="acpioff"'
+              OCCI::Log.debug("Trying to stop VM via ACPI off")
+              rc = backend_object.shutdown
+            else # method="poweroff" or no method specified
+              OCCI::Log.debug("Powering off VM")
+              rc = backend_object.shutdown
           end
           check_rc(rc)
         end
-  
+
         # ---------------------------------------------------------------------------------------------------------------------     
         # Action restart
         def compute_restart(compute, parameters)
           backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
           # TODO: implement parameters when available in OpenNebula
           case parameters
-          when "graceful"
-            rc = vm.resubmit
-          when "warm"
-            rc = vm.resubmit
-          else # "cold" or no parameter specified
-            rc = vm.resubmit
+            when "graceful"
+              rc = vm.resubmit
+            when "warm"
+              rc = vm.resubmit
+            else # "cold" or no parameter specified
+              rc = vm.resubmit
           end
           check_rc(rc)
         end
-  
+
         # ---------------------------------------------------------------------------------------------------------------------     
         # Action suspend
         def compute_suspend(compute, parameters)
@@ -458,9 +462,9 @@ module OCCI
           rc = vm.suspend
           check_rc(rc)
         end
-      
+
       end
-      
-    end    
-  end    
+
+    end
+  end
 end

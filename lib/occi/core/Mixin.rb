@@ -21,26 +21,19 @@
 
 require 'json'
 require 'occi/core/Category'
+require 'occi/core/Action'
 
 module OCCI
   module Core
+    class Mixin < OCCI::Core::Category
 
-    class Mixin < Category
-
-      attr_accessor :actions
-      attr_accessor :related
       attr_accessor :entities
 
-      def initialize(term, scheme, title, attributes, actions, related, entities)
-        super(term, scheme, title, attributes)
-        @actions  = (actions != nil ? actions : []) 
-        @related  = (related != nil ? related : [])
-        @entities = (entities != nil ? entities : [])
+      def initialize(mixin, default = nil)
+        @entities = []
+        super(mixin, default)
       end
-            
-      def class_string
-        return 'mixin'
-      end
+
     end
   end
 end

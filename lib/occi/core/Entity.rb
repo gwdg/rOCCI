@@ -21,100 +21,98 @@
 
 require 'rubygems'
 require 'uuidtools'
-require 'occi/CategoryRegistry'
-require 'occi/core/Attribute'
-require 'occi/core/Attributes'
+require 'hashie'
+require 'occi/Registry'
+require 'occi/core/attributes'
 require 'occi/core/Kind'
+require 'occi/core/attribute_properties'
 
 module OCCI
   module Core
-    
-    # ---------------------------------------------------------------------------------------------------------------------
-    class Entity
-
-      # Attributes are hashes and contain key - value pairs as defined by the corresponding kind
-      attr_reader   :attributes
-      attr_reader   :mixins
-      attr_reader   :kind
-      attr_reader   :state_machine
-
-      attr_reader   :backend
+    class Entity < Hashie::Mash
 
       # Define appropriate kind
       begin
-        actions     = []
-        related     = []
-        entity_type = self
-        entities    = []
+        data = Hashie::Mash.new
+        data[:term] = "entity"
+        data[:scheme] = "http://schemas.ogf.org/occi/core#"
+        data[:title] = "Entity"
+        data.attributes!.occi!.core!.id!.type = "string"
+        data.attributes!.occi!.core!.id!.pattern = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+        data.attributes!.occi!.core!.id!.required = false
+        data.attributes!.occi!.core!.id!.mutable = false
+        data.attributes!.occi!.core!.title!.type = "string"
+        data.attributes!.occi!.core!.title!.pattern = ".*"
+        data.attributes!.occi!.core!.title!.required = false
+        data.attributes!.occi!.core!.title!.mutable = true
 
-        term    = "entity"
-        scheme  = "http://schemas.ogf.org/occi/core#"
-        title   = "Entity"
+        kind = OCCI::Core::Kind.new(data)
+        OCCI::Registry.register(kind)
+      end
 
-        attributes = OCCI::Core::Attributes.new()
-        attributes << OCCI::Core::Attribute.new(name = 'occi.core.id',    mutable = false,  required = true,  type = "string", range = "", default = "")
-        attributes << OCCI::Core::Attribute.new(name = 'occi.core.title', mutable = true,   required = false, type = "string", range = "", default = "")
+      def id
+        return self[:id]
+      end
 
-        KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
-        OCCI::CategoryRegistry.register(KIND)
+      def id=(id)
+        self[:id] = id
+        self.attributes!.occi!.core!.id = id
+      end
+
+      def title
+        return self[:title]
+      end
+
+      def title=(title)
+        self[:title] = title
+        self.attributes!.occi!.core!.title = title
+      end
+
+      # ---------------------------------------------------------------------------------------------------------------------
+      def location
+        '/' + OCCI::Registry.get_by_id(self[:kind]).term + '/' + self[:id]
       end
 
       # ---------------------------------------------------------------------------------------------------------------------
       private
       # ---------------------------------------------------------------------------------------------------------------------
-      
+
       # ---------------------------------------------------------------------------------------------------------------------
-      def check_attributes(new_attributes, old_attributes = nil)
+      def type_identifier
+        OCCI::Registry.get_by_id(self.kind).type_identifier
+      end
 
-        # Construct set of all attribute definitions to check against (derived from kind + mixins)
-        
-        # Attribute name -> attribute def
-        attribute_definitions = {}
-        
-        # Attribute name -> category
-        attribute_categories  = {}
+      # ---------------------------------------------------------------------------------------------------------------------
+      private
+      # ---------------------------------------------------------------------------------------------------------------------
 
-        # Attribute definitions from kind + mixins
-        categories = Category::Related::get_all_related([kind]) + Category::Related::get_all_related(mixins)
-
-        # Attribute definitions from all mixins
-        categories.each do |category|
-          category.attributes.each do |name, attribute_def|
-            raise "Attribute [#{name}] already defined in category [#{attribute_categories[name]}], redefinition from category [#{category}]!" if attribute_definitions.has_key?(name)
-            attribute_definitions[name] = attribute_def
-            attribute_categories[name]  = category
+      # ---------------------------------------------------------------------------------------------------------------------
+      def check(attributes, definitions)
+        attributes ||= OCCI::Core::Attributes.new
+        definitions.each_key do |key|
+          properties = definitions[key]
+          value = attributes[key] ||= properties[:default]
+          if properties.include?(:type)
+            raise "required attribute #{key} not found" if value.nil? && properties.required
+            next if value.nil? && !properties.required
+            case properties.type
+              when 'string'
+                raise "attribute #{key} with value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless value.kind_of?(String)
+                raise "attribute #{key} with length #{value.length} not in range #{properties.minimum}-#{properties.maximum}" unless (properties.minimum..properties.maximum) === value.length if properties.minimum && properties.maximum
+              when 'number'
+                raise "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless value.kind_of?(Numeric)
+                raise "attribute #{key} with value #{value} not in range #{properties.minimum}-#{properties.maximum}" unless (properties.minimum..properties.maximum) === value if properties.minimum && properties.maximum
+              when 'boolean'
+                raise "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless !!value == value
+            end
+            raise "attribute #{key} with value #{value} does not match pattern #{properties.pattern}" if value.to_s.scan(Regexp.new(properties.pattern)).empty? if properties.pattern
+            attributes[key] = value
+          else
+            attributes[key] = check(value, definitions[key])
           end
         end
-
-        # Check given attributes against set of definitions
-
-        new_attributes.each do |name, value|
-
-          # Check for undefined attribute
-          raise "Attribute [#{name}] with value [#{value}] unknown!" unless attribute_definitions.has_key?(name)
-
-          # Check for uniqueness
-          # TODO: Multi-valued attributes are currently not supported but also not needed (can easily be added as arrays in the attributes-map later on)
-          if value.kind_of?(Array) && value.length > 1
-            raise "Attribute [#{name}] not unique: value: [#{value}], definition in: [#{attribute_categories[name]}]!" if attribute_definitions[name].unique
-          end
-          
-          # Check for mutability by client
-          if !attribute_definitions[name].mutable && old_attributes != nil && old_attributes.has_key?(name)
-            raise "Attribute [#{name}] is not mutable: old value: [#{old_attributes[name]}], new value: [#{value}]" unless old_attributes[name] == value
-          end
-        end
-        
-        # Make sure all mandatory attributes are set
-        attribute_definitions.each do |name, attribute|
-          if attribute.required
-            raise "Required attribute [#{name}] not set!" unless new_attributes.has_key?(name) && new_attributes[name] != nil
-          end
-        end
-
-        # TODO: Check attribute range
-
-        # TODO: Set attribute defaults if nothing set until now
+        attributes.delete_if { |k, v| v.nil? } # remove empty attributes
+        return attributes
       end
 
       # ---------------------------------------------------------------------------------------------------------------------
@@ -122,62 +120,27 @@ module OCCI
       # ---------------------------------------------------------------------------------------------------------------------
 
       # ---------------------------------------------------------------------------------------------------------------------
-      def initialize(attributes, mixins, kind)
-        
-        @backend = {}
-
-        # Make sure UUID is UNIQUE for every entity
-        # TODO: occi.core.id should not be set by user but may be set by backend during startup
-        attributes['occi.core.id']    = UUIDTools::UUID.timestamp_create.to_s if attributes['occi.core.id'] == nil || attributes['occi.core.id'] == ""
-        attributes['occi.core.title'] = "" if attributes['occi.core.title'] == nil
-
-        @mixins     = mixins
-        @kind       = kind
-
-        # Must be called AFTER kind + mixins are set
-        check_attributes(attributes)
-
-        # remove quotes at beginning and end of attributes
-        attributes.each { |k,v| attributes[k] = v.chomp('"').reverse.chomp('"').reverse unless v.nil? }
-        
-        @attributes = attributes
-
-        kind.entities << self
+      def initialize(entity_data, default = nil)
+        entity_data.attributes = OCCI::Core::Attributes.new(entity_data.attributes)
+        kind = OCCI::Registry.get_by_id(entity_data.kind)
+        entity_data.attributes = check(entity_data.attributes!, kind.attributes)
+        raise "kind not found" if kind.nil?
+        super(entity_data, default)
       end
 
-      # ---------------------------------------------------------------------------------------------------------------------
-      def delete
-        
-        self.mixins.each do |mixin|
-          mixin.entities.delete(self)
+      def convert_value(val, duping=false) #:nodoc:
+        case val
+          when self.class
+            val.dup
+          when ::Hash
+            val = val.dup if duping
+            self.class.subkey_class.new.merge(val) unless val.kind_of?(Hashie::Mash)
+            val
+          when Array
+            val.collect { |e| convert_value(e) }
+          else
+            val
         end
-
-        # remove all links from this entity and from all linked entities
-        links = @links.clone unless @links.nil?
-        links.each do |link|
-          target_uri = URI.parse(link.attributes["occi.core.target"].chomp('"').reverse.chomp('"').reverse)
-          target = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(target_uri.path)
-          target.links.delete(link) unless target.nil?
-
-          source_uri = URI.parse(link.attributes["occi.core.source"].chomp('"').reverse.chomp('"').reverse)
-          source = OCCI::Rendering::HTTP::LocationRegistry.get_object_at_location(source_uri.path)
-          source.links.delete(link) unless source.nil?
-        end if links != nil
-        kind.entities.delete(self)
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      def get_location
-        OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(kind) + attributes['occi.core.id']
-      end
-
-      def actions
-        kind.actions.select{|action| state_machine.check_transition(action) }
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      def type_identifier
-        self.kind.type_identifier
       end
 
     end

@@ -37,22 +37,22 @@ module OCCI
           related = []
           entities = []
 
-          term    = "virtualmachine"
-          scheme  = "http://schemas.opennebula.org/occi/infrastructure#"
-          title   = "OpenNebula Virtual Machine Mixin"
+          term = "virtualmachine"
+          scheme = "http://schemas.opennebula.org/occi/infrastructure#"
+          title = "OpenNebula Virtual Machine Mixin"
 
           attributes = OCCI::Core::Attributes.new()
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.cpu_reservation', mutable = true, required = false,  type = "string", range = "", default = "")
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.boot',            mutable = true, required = false,  type = "string", range = "", default = "")
-          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.vnc_url',         mutable = true, required = false,  type = "string", range = "", default = "")
-      
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.cpu_reservation', mutable = true, required = false, type = "string", range = "", default = "")
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.boot', mutable = true, required = false, type = "string", range = "", default = "")
+          attributes << OCCI::Core::Attribute.new(name = 'opennebula.vm.vnc_url', mutable = true, required = false, type = "string", range = "", default = "")
+
           MIXIN = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
         end
 
         def initialize(term, scheme, title, attributes, actions, related, entities)
           super(term, scheme, title, attributes, actions, related, entities)
         end
-        
+
       end
     end
   end

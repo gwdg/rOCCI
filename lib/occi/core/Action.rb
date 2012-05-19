@@ -19,19 +19,11 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/core/Category'
+require 'occi/core/category'
 
 module OCCI
   module Core
-
-    class Action
-      
-      attr_reader :category
-      
-      def initialize(scheme, term, title, attributes)
-        @category = OCCI::Core::Category.new(term, scheme, title, attributes)
-      end
-      
+    class Action < OCCI::Core::Category
     end
   end
 end

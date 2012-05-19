@@ -49,22 +49,21 @@ Category: storage;
   actions="http://schemas.ogf.org/occi/infrastructure/storage/action#resize http://schemas.ogf.org/occi/infrastructure/storage/action#online"
 */
 
-category returns [mash]
-	: 'Category' ':' category_value { mash = $category_value.mash };
-	 category_value returns [mash]
-	@init{ mash = Hashie::Mash.new( {:kinds=>[],:mixins=>[],:actions=>[] } ) }
+category returns [hash]
+	: 'Category' ':' category_value { hash = $category_value.hash };
+	 category_value returns [hash]
+	@init{ hash = Hashie::Mash.new( {:kinds=>[],:mixins=>[],:actions=>[] } ) }
 	           : category_term category_scheme category_class category_title? category_rel? category_location? category_attributes? category_actions? ';'?
 	             { type = $category_class.value
 	               cat = Hashie::Mash.new
 	               cat.term 		= $category_term.value
 	               cat.scheme 		= $category_scheme.value
-	               cat.type_identifier	= cat.scheme + cat.term
 	               cat.title		= $category_title.value
 	               cat.related		= $category_rel.value
 	               cat.location		= $category_location.value
-	               cat.attributes		= $category_attributes.mash
+	               cat.attributes		= $category_attributes.hash
 	               cat.actions		= $category_actions.array
-	               mash[(type+'s').to_sym] 	<< cat
+	               hash[(type+'s').to_sym] 	<< cat
 	             };
 	 category_term returns [value] 		: WS? term 
 	 				 	  { value = $term.text };
@@ -78,9 +77,9 @@ category returns [mash]
 					  	  { value = $rel.text };
 	 category_location returns [value]	: ';' WS? 'location' '=' '"' location '"'
 	 				  	  { value = $location.text };
-	 category_attributes  returns [mash] 	@init{mash = Hashie::Mash.new}
-	 					: ';' WS? 'attributes' '=' '"' attr=attribute_name { mash.merge!($attr.mash) } 
-	 					  ( WS? next_attr=attribute_name  { mash.merge!($next_attr.mash) } )* '"';
+	 category_attributes  returns [hash] 	@init{hash = Hashie::Mash.new}
+	 					: ';' WS? 'attributes' '=' '"' attr=attribute_name { hash.merge!($attr.hash) }
+	 					  ( WS? next_attr=attribute_name  { hash.merge!($next_attr.hash) } )* '"';
 	 category_actions  returns [array]     	@init{array = Array.new}
 	 					: ';' WS? 'actions' '=' '"' act=action_location { array << $act.text } 
 	 					  ( WS? next_act=action_location { array << $next_act.text } )* '"'; 
@@ -94,24 +93,23 @@ category="http://example.com/occi/link#disk_drive";
 com.example.drive0.interface="ide0"; com.example.drive1.interface="ide1"
 */
 
-link returns [mash]
-	@init{mash = Hashie::Mash.new}
-	: 'Link' ':' link_value { mash = $link_value.mash };
-	link_value returns [mash]
-	@init{ mash = Hashie::Mash.new }
-			: link_target { mash[:target] = $link_target.value }
-			  link_rel { mash[:rel] = $link_rel.value }
-			  link_self? { mash[:self] = $link_self.value }
-			  link_category? { mash[:category] = $link_category.value }
-			  link_attributes { mash[:attributes] = $link_attributes.mash }
+link returns [hash]
+	: 'Link' ':' link_value { hash = $link_value.hash };
+	link_value returns [hash]
+	@init{ hash = Hashie::Mash.new }
+			: link_target { hash[:target] = $link_target.value }
+			  link_rel { hash[:rel] = $link_rel.value }
+			  link_self? { hash[:self] = $link_self.value }
+			  link_category? { hash[:category] = $link_category.value }
+			  link_attributes { hash[:attributes] = $link_attributes.hash }
 			  ';'?
 			  ;
 	link_target returns [value]	: WS? '<' target '>' { value = $target.text };
 	link_rel  returns [value]	: ';' WS? 'rel' '=' '"' rel '"' { value = $rel.text };
 	link_self  returns [value]	: ';' WS? 'self' '=' '"' self_location '"' { value = $self_location.text };
 	link_category  returns [value]	: ';' WS? 'category' '=' '"' category_name '"' { value = $category_name.text };
-	link_attributes  returns [mash] @init { mash = Hashie::Mash.new }
-					: (';' WS? attribute { mash.merge!($attribute.mash) } )*;
+	link_attributes  returns [hash] @init { hash = Hashie::Mash.new }
+					: (';' WS? attribute { hash.merge!($attribute.hash) } )*;
 
 /*
 e.g.
@@ -123,9 +121,8 @@ X-OCCI-Attribute: occi.compute.memory=3.0
 X-OCCI-Attribute: occi.compute.state="active"
 */
 
-x_occi_attribute returns [mash]
-	@init { mash = Hashie::Mash.new }
-	: 'X-OCCI-Attribute' ':' WS? attribute ';'? { mash = $attribute.mash } ;
+x_occi_attribute returns [hash]
+	: 'X-OCCI-Attribute' ':' WS? attribute ';'? { hash = $attribute.hash } ;
 
 /*
 e.g.
@@ -143,16 +140,18 @@ class_type		: ( 'kind' | 'mixin' | 'action' );
 title			: ( ESC | ~( '\\' | '"' | '\'' ) | '\'' )*;
 rel			: uri;
 location		: uri;
-attribute returns [mash] @init { mash = Hashie::Mash.new }	
-			: comp_first=attribute_component { cur_mash = mash; comp = $comp_first.text } 
-			  ( '.' comp_next=attribute_component { cur_mash[comp.to_sym] = Hashie::Mash.new; cur_mash = cur_mash[comp.to_sym]; comp = $comp_next.text })* 
-			  '=' attribute_value { cur_mash[comp.to_sym] = $attribute_value.text };
-attribute_name returns [mash] @init { mash = Hashie::Mash.new }
-                        : comp_first=attribute_component { cur_mash = mash; comp = $comp_first.text } 
-			  ( '.' comp_next=attribute_component { cur_mash[comp.to_sym] = Hashie::Mash.new; cur_mash = cur_mash[comp.to_sym]; comp = $comp_next.text })*
-			  { cur_mash[comp.to_sym] = ATTRIBUTE };	 
+attribute returns [hash] @init { hash = Hashie::Mash.new }
+			: comp_first=attribute_component { cur_hash = hash; comp = $comp_first.text }
+			  ( '.' comp_next=attribute_component { cur_hash[comp.to_sym] = Hashie::Mash.new; cur_hash = cur_hash[comp.to_sym]; comp = $comp_next.text })*
+			  '=' attribute_value { cur_hash[comp.to_sym] = $attribute_value.value };
+attribute_name returns [hash] @init { hash = Hashie::Mash.new }
+                        : comp_first=attribute_component { cur_hash = hash; comp = $comp_first.text }
+			  ( '.' comp_next=attribute_component { cur_hash[comp.to_sym] = Hashie::Mash.new; cur_hash = cur_hash[comp.to_sym]; comp = $comp_next.text })*
+			  { cur_hash[comp.to_sym] = ATTRIBUTE };
 attribute_component	: LOALPHA ( LOALPHA | DIGIT | '-' | '_' )*;
-attribute_value		: ( ( '"' ( ESC | ~( '\\' | '"' | '\'' ) | '\'' )* '"') | ( DIGIT ( '.' DIGIT )* ) );
+attribute_value returns [value]	: ( string { value = $string.text } | number { value = $number.text.to_i } );
+string			: ( '"' ( ESC | ~( '\\' | '"' | '\'' ) | '\'' )* '"');
+number			: ( DIGIT* ( '.' DIGIT+ )? );
 action_location		: uri;
 target			: uri;
 self_location		: uri;
@@ -160,6 +159,6 @@ category_name		: uri;
 
 LOALPHA : ('a'..'z')+;
 UPALPHA	: ('A'..'Z')+;
-DIGIT   : ('0'..'9')+;	
+DIGIT   : ('0'..'9');	
 WS      : ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+;
 ESC     : '\\' ( '"' | '\'' );

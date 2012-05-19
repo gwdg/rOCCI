@@ -1,0 +1,13 @@
+{
+    "kinds":[
+        {
+            "term":"console",
+            "scheme":"http://schemas.ogf.org/occi/infrastructure/compute#",
+            "title":"Link to the VM's console",
+            "related":[
+                "http://schemas.ogf.org/occi/core#link"
+            ],
+            "location":"/consolelink/"
+        }
+    ]
+}

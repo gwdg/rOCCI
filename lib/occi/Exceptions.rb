@@ -21,25 +21,39 @@
 ##############################################################################
 
 module OCCI
-  
-  # Tried to create an already existing mixin
-  class MixinAlreadyExistsError < RuntimeError; end
-    
-  class CategoryNotFoundException < RuntimeError; end
-    
-  class CategoryMissingException < RuntimeError; end
-    
-  class MixinNotFoundException < RuntimeError; end
-    
-  class MixinCreationException < RuntimeError; end
-    
-  class LocationAlreadyRegisteredException < RuntimeError; end
 
-  class LocationNotRegisteredException < RuntimeError; end
-    
   # Tried to create an already existing mixin
-  class BackendError < RuntimeError; end
+  class MixinAlreadyExistsError < RuntimeError;
+  end
 
-  class ParserException < RuntimeError; end
-  
+  class CategoryNotFoundException < RuntimeError;
+  end
+
+  class CategoryMissingException < RuntimeError;
+  end
+
+  class MixinNotFoundException < RuntimeError;
+  end
+
+  class MixinCreationException < RuntimeError;
+  end
+
+  class LocationAlreadyRegisteredException < RuntimeError;
+  end
+
+  class LocationNotRegisteredException < RuntimeError;
+  end
+
+  # Tried to create an already existing mixin
+  class BackendError < RuntimeError;
+  end
+
+  class ParserException < RuntimeError;
+  end
+
+  class ContentTypeNotSupported < RuntimeError;
+  end
+
+  class CategoryNotFound < RuntimeError;
+  end
 end

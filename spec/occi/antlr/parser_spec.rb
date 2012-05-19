@@ -1,12 +1,13 @@
 require 'rspec'
 require 'hashie'
+
 require 'occi/antlr/OCCIParser'
 
 module OCCI
   describe Parser do
     describe "#Category" do
       it "is parsed successful" do
-        ATTRIBUTE = { :mutable => true, :required => false, :type => { :string => {} }, :default => '' }
+        ATTRIBUTE = {:mutable => true, :required => false, :type => {:string => {}}, :default => ''}
         term = 'entity'
         scheme = 'http://schemas.ogf.org/occi/core#'
         class_type = 'kind'
@@ -18,7 +19,7 @@ module OCCI
         attributes.occi!.storage!.state = ATTRIBUTE
         attributes_string = 'occi.storage.size occi.storage.state'
         actions = Array.new
-        actions << 'http://schemas.ogf.org/occi/infrastructure/storage/action#resize' 
+        actions << 'http://schemas.ogf.org/occi/infrastructure/storage/action#resize'
         actions << 'http://schemas.ogf.org/occi/infrastructure/storage/action#online'
 
         category_string = %Q{Category: #{term}; scheme="#{scheme}"; class="#{class_type}"; title="#{title}"; rel="#{rel}"; location="#{location}"; attributes="#{attributes_string}"; actions="#{actions.join(' ')}"}
@@ -47,7 +48,7 @@ module OCCI
         attributes.occi!.networkinterface!.state = '"active"'
         attributes_string = %Q{occi.networkinterface.interface="eth0";occi.networkinterface.mac="00:11:22:33:44:55";occi.networkinterface.state="active"}
         link_string = %Q{Link: <#{target}>; rel="#{rel}"; self="#{self_location}"; category="#{category}"; #{attributes_string}}
-            
+
         link = OCCI::Parser.new(link_string).link
         link[:target].should == target
         link[:rel].should == rel

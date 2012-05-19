@@ -19,39 +19,60 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/rendering/http/LocationRegistry'
 require 'occi/core/Kind'
+require 'hashie'
 
 module OCCI
   module Core
     class Link < Entity
-      
+
       # Define appropriate kind
       begin
-        actions     = []
-        related     = [OCCI::Core::Entity::KIND]
-        entity_type = self
-        entities    = []
+        data = Hashie::Mash.new
+        data[:actions] = []
+        data[:related] = %w{http://schemas.ogf.org/occi/core#entity}
+        data[:term] = "link"
+        data[:scheme] = "http://schemas.ogf.org/occi/core#"
+        data[:title] = "Link"
 
-        term    = "link"
-        scheme  = "http://schemas.ogf.org/occi/core#"
-        title   = "Link"
+        data.attributes!.occi!.core!.target!.type = "string"
+        data.attributes!.occi!.core!.target!.pattern = ".*"
+        data.attributes!.occi!.core!.target!.required = false
+        data.attributes!.occi!.core!.target!.mutable = true
 
-        attributes = OCCI::Core::Attributes.new()
-        attributes << OCCI::Core::Attribute.new(name = 'occi.core.source', mutable = true, required = true,  type = "string", range = "", default = "")
-        attributes << OCCI::Core::Attribute.new(name = 'occi.core.target', mutable = true, required = true,  type = "string", range = "", default = "")
-          
-        KIND = OCCI::Core::Kind.new(actions, related, entity_type, entities, term, scheme, title, attributes)
-        
-        # register in category and location registry
-        OCCI::CategoryRegistry.register(KIND)
-        OCCI::Rendering::HTTP::LocationRegistry.register('/link/', KIND)
+        data.attributes!.occi!.core!.source!.type = "string"
+        data.attributes!.occi!.core!.source!.pattern = ".*"
+        data.attributes!.occi!.core!.source!.required = false
+        data.attributes!.occi!.core!.source!.mutable = true
+
+        kind = OCCI::Core::Kind.new(data)
+        OCCI::Registry.register(kind)
       end
-      
-      def initialize(attributes, mixins = [], kind = OCCI::Core::Link::KIND)
-        super(attributes, mixins, kind)
+
+      def initialize(link_data, default = nil)
+        raise OCCI::BadRequestException, 'No source specified for link' if link_data.source.nil?
+        raise OCCI::BadRequestException, 'No target specified for link' if link_data.target.nil?
+        super(link_data, default)
       end
-      
+
+      def target
+        return self[:target]
+      end
+
+      def target=(target)
+        self[:target] = target
+        self.attributes!.occi!.core!.target = target
+      end
+
+      def source
+        return self[:source]
+      end
+
+      def source=(source)
+        self[:source] = source
+        self.attributes!.occi!.core!.source = source
+      end
+
     end
   end
 end

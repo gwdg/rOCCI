@@ -20,52 +20,40 @@
 ##############################################################################
 
 require 'json'
-require 'occi/core/Attributes'
+require 'hashie/mash'
 
 module OCCI
   module Core
-    class Category
+    class Category < Hashie::Mash
 
-      module Related
-        def self.get_all_related(categories)
-          related     = []
-          to_process  = categories.clone
-          while !to_process.empty? do
-            element = to_process.shift
-            related << element unless related.include?(element)
-            to_process.concat(element.related)
-          end
-          return related
+      def initialize(category, default = nil)
+        category.attributes = OCCI::Core::AttributeProperties.new(category.attributes) if category.attributes
+        super(category, default)
+      end
+
+      def convert_value(val, duping=false) #:nodoc:
+        case val
+          when self.class
+            val.dup
+          when ::Hash
+            val = val.dup if duping
+            self.class.subkey_class.new.merge(val) unless val.kind_of?(Hashie::Mash)
+            val
+          when Array
+            val.collect { |e| convert_value(e) }
+          else
+            val
         end
       end
 
-      attr_reader   :scheme
-      attr_reader   :term
-      attr_reader   :title
-      attr_reader   :attributes
-      attr_reader   :backend
-
-      def initialize(term, scheme, title, attributes)
-        @backend = {}
-        @term   = term
-        @scheme = scheme
-        @title  = title
-        @attributes = (attributes != nil ? attributes : OCCI::Core::Attributes.new())
+      def type_identifier
+        regular_reader("scheme") + regular_reader("term")
       end
 
       def location
-        location = '/' + @term + '/'
+        '/' + self[:term] + '/'
       end
 
-      def type_identifier
-        @scheme + @term
-      end
-
-      def class_string
-        #only action uses category directly
-        return 'action'
-      end
-      
     end
   end
 end
