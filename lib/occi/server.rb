@@ -36,7 +36,7 @@ require 'uri'
 require 'fileutils'
 
 # Server configuration
-require 'occi/Configuration'
+require 'occi/configuration'
 
 # Active support notifications
 require 'active_support/notifications'
@@ -65,19 +65,6 @@ require 'occi/core/kind'
 require 'occi/core/link'
 require 'occi/core/mixin'
 require 'occi/core/resource'
-
-# OCCI Infrastructure classes
-#require 'occi/infrastructure/Networkinterface'
-#require 'occi/infrastructure/StorageLink'
-#require 'occi/infrastructure/Ipnetworking'
-#require 'occi/infrastructure/OSTemplate'
-#require 'occi/infrastructure/ResourceTemplate'
-#require 'occi/infrastructure/IPNetworkInterface'
-
-# OCCI extensions
-#require 'occi/extensions/Reservation'
-#require 'occi/extensions/NFSStorage'
-#require 'occi/extensions/ConsoleLink'
 
 # OCCI Request handling
 require 'occi/request'

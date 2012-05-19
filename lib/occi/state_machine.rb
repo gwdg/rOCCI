@@ -19,8 +19,8 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/core/Action'
-require 'occi/Log'
+require 'occi/core/action'
+require 'occi/log'
 
 module OCCI
 

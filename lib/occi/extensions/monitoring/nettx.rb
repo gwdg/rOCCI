@@ -20,7 +20,7 @@
 ##############################################################################
 
 require 'singleton'
-require 'occi/core/Mixin'
+require 'occi/core/mixin'
 
 module OCCI
   module Monitor
