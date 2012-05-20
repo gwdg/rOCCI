@@ -45,13 +45,6 @@ require 'active_support/notifications'
 require 'active_support/core_ext'
 
 ##############################################################################
-# Read configuration file and set log level
-
-CONFIGURATION_FILE = 'etc/occi-server.conf'
-
-$config = OCCI::Configuration.new(CONFIGURATION_FILE)
-
-##############################################################################
 # Require OCCI classes
 
 # Exceptions
@@ -87,11 +80,28 @@ module OCCI
 
     enable cross_origin
 
+    # Read configuration file
+    def self.config
+      @@config ||= OCCI::Configuration.new('etc/occi-server.conf')
+    end
+
+    def self.location
+      OCCI::Server.config[:server].chomp('/')
+    end
+
+    def self.port
+      OCCI::Server.config[:port]
+    end
+
+    def self.uri
+      self.port.nil? ? self.location : self.location + ':' + self.port
+    end
+
     def initialize(config = {})
       # create logger
       config[:log_dest] ||= STDOUT
       config[:log_level] ||= Logger::INFO
-      config[:log_level] = case $config[:log_level]
+      config[:log_level] = case OCCI::Server.config[:log_level]
                              when "debug"
                                Logger::DEBUG
                              when "info"
@@ -114,18 +124,15 @@ module OCCI
         @logger.log(payload[:level], payload[:message])
       end
 
-      # create base URI for server
-      @server_uri = URI.parse($config['server'])
-      @server_uri.port = $config['port'].to_i
-
       # Configuration of HTTP Authentication
-      if $config['username'] != nil and $config['password'] != nil
+      if OCCI::Server.config['username'] != nil and OCCI::Server.config['password'] != nil
         use Rack::Auth::Basic, "Restricted Area" do |username, password|
-          [username, password] == [$config['username'], $config['password']]
+          [username, password] == [OCCI::Server.config['username'], OCCI::Server.config['password']]
         end
       end
 
-      OCCI::Server.initialize_model
+      OCCI::Server.initialize_core_model
+      OCCI::Server.initialize_model(OCCI::Server.config['occi_model_path'])
 
       # set views explicitly
       set :views, File.dirname(__FILE__) + "/../../views"
@@ -134,17 +141,26 @@ module OCCI
     end
 
 # ---------------------------------------------------------------------------------------------------------------------
-    def self.initialize_model
+
+    def self.initialize_core_model
       OCCI::Log.info("### Initializing OCCI Core Model ###")
       OCCI::Core::Entity.register
       OCCI::Core::Resource.register
       OCCI::Core::Link.register
-      OCCI::Log.info("### Initializing OCCI Model from #{$config['occi_model_path']} ###")
-      Dir.glob($config['occi_model_path'] + '**/*.json').each do |file|
+    end
+
+    def self.initialize_model(path)
+      OCCI::Log.info("### Initializing OCCI Model from #{path} ###")
+      Dir.glob(path + '**/*.json').each do |file|
         collection = Hashie::Mash.new(JSON.parse(File.read(file)))
-        collection.kinds.each { |kind_data| OCCI::Registry.register(OCCI::Core::Kind.new(kind_data)) } if collection.kinds
-        collection.mixins.each { |mixin_data| OCCI::Registry.register(OCCI::Core::Mixin.new(mixin_data)) } if collection.mixins
-        collection.actions.each { |action_data| OCCI::Registry.register(OCCI::Core::Action.new(action_data)) } if collection.actions
+        # add location of service provider to scheme if it has a relative location
+        collection.kinds.collect { |kind| kind.scheme = self.location + kind.scheme if kind.scheme.start_with? '/' } if collection.kinds
+        collection.mixins.collect { |mixin| mixin.scheme = self.location + mixin.scheme if mixin.scheme.start_with? '/' } if collection.mixins
+        collection.actions.collect { |action| action.scheme = self.location + action.scheme if action.scheme.start_with? '/' } if collection.actions
+        # register categories
+        collection.kinds.each { |kind| OCCI::Registry.register(OCCI::Core::Kind.new(kind)) } if collection.kinds
+        collection.mixins.each { |mixin| OCCI::Registry.register(OCCI::Core::Mixin.new(mixin)) } if collection.mixins
+        collection.actions.each { |action| OCCI::Registry.register(OCCI::Core::Action.new(action)) } if collection.actions
       end
     end
 
@@ -154,34 +170,31 @@ module OCCI
       if auth.provided? && auth.basic? && auth.credentials
         user, password = auth.credentials
       else
-        user, password = [$config['one_user'], $config['one_password']]
+        user, password = [OCCI::Server.config['one_user'], OCCI::Server.config['one_password']]
         logger.debug("No basic auth data provided: using defaults from config (user = '#{user}')")
       end
 
-      begin
-        backend = case $config["backend"]
-                    when "opennebula"
-                      require 'occi/backend/opennebula/OpenNebula'
-                      OCCI::Backend::Manager.register_backend(OCCI::Backend::OpenNebula::OpenNebula, OCCI::Backend::OpenNebula::OpenNebula::OPERATIONS)
-                      OCCI::Backend::OpenNebula::OpenNebula.new(user, password)
-                    when "ec2"
-                      require 'occi/backend/ec2/EC2'
-                      Bundler.require(:ec2)
-                      OCCI::Backend::Manager.register_backend(OCCI::Backend::EC2::EC2, OCCI::Backend::EC2::EC2::OPERATIONS)
-                      OCCI::Backend::EC2::EC2.new(user, password)
-                    when "dummy" then
-                      require 'occi/backend/dummy'
-                      OCCI::Backend::Manager.register_backend(OCCI::Backend::Dummy, OCCI::Backend::Dummy::OPERATIONS)
-                      OCCI::Backend::Dummy.new()
-                    else
-                      raise "Backend '" + $config["backend"] + "' not found"
-                  end
+      @backend = case OCCI::Server.config["backend"]
+                   when "opennebula"
+                     require 'occi/backend/opennebula/opennebula'
+                     OCCI::Server.initialize_model('etc/backend/opennebula')
+                     OCCI::Backend::Manager.register_backend(OCCI::Backend::OpenNebula::OpenNebula, OCCI::Backend::OpenNebula::OpenNebula::OPERATIONS)
+                     OCCI::Backend::OpenNebula::OpenNebula.new(user, password)
+                   when "ec2"
+                     require 'occi/backend/ec2/ec2'
+                     Bundler.require(:ec2)
+                     OCCI::Server.initialize_model('etc/backend/ec2')
+                     OCCI::Backend::Manager.register_backend(OCCI::Backend::EC2::EC2, OCCI::Backend::EC2::EC2::OPERATIONS)
+                     OCCI::Backend::EC2::EC2.new(user, password)
+                   when "dummy" then
+                     require 'occi/backend/dummy'
+                     OCCI::Backend::Manager.register_backend(OCCI::Backend::Dummy, OCCI::Backend::Dummy::OPERATIONS)
+                     OCCI::Backend::Dummy.new()
+                   else
+                     raise "Backend '" + OCCI::Server.config["backend"] + "' not found"
+                 end
 
-        return backend
 
-      rescue RuntimeError => e
-        logger.error(e)
-      end
     end
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -207,7 +220,7 @@ module OCCI
       OCCI::Log.debug('### Preparing authentication handling ###')
       authentication = Rack::Auth::Basic::Request.new(request.env)
       OCCI::Log.debug('### Initializing backend ###')
-      @backend = initialize_backend(authentication)
+      initialize_backend(authentication)
       OCCI::Log.debug('### Reset OCCI model ###')
       OCCI::Registry.reset
       OCCI::Log.debug('### Parsing request data to OCCI data structure ###')
@@ -226,8 +239,8 @@ module OCCI
         f.on('application/occi+json') { @collection.to_json }
         f.xml { @collection.to_xml(:root => "collection") }
         f.on('application/occi+xml') { @collection.to_xml(:root => "collection") }
-        f.on('text/uri-list') { ((@collection.resources.to_a + @collection.links.to_a).collect { |entity| @server_uri.to_s.chop + entity.location } + @collection.locations.to_a).join("\n") }
-        f.on('*/*') { erb :text, :locals => {:collection => @collection} }
+        f.on('text/uri-list') { ((@collection.resources.to_a + @collection.links.to_a).collect { |entity| self.uri + entity.location } + @collection.locations.to_a).join("\n") }
+        f.on('*/*') { erb :collection, :locals => {:collection => @collection} }
       end
       OCCI::Log.debug('### Successfully rendered ###')
     end
@@ -307,7 +320,7 @@ module OCCI
           @request_collection.resources.each do |resource|
             OCCI::Log.debug("Deploying resource with title #{resource.title} in backend #{@backend.class.name}")
             OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_DEPLOY, resource)
-            @collection.locations << @server_uri.to_s.chop + resource.location
+            @collection.locations << self.uri + resource.location
             status 201
           end
         elsif category.kind_of?(OCCI::Core::Mixin)
@@ -472,7 +485,7 @@ module OCCI
 
       begin
         # unassociate resources specified by URI in payload from mixin specified by request location
-        if request.path_info = '/'
+        if request.path_info == '/'
           categories = OCCI::Registry.get.kinds
         else
           categories = [OCCI::Registry.get_by_location(request.path_info.rpartition('/').first + '/')]

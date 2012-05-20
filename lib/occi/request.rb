@@ -50,7 +50,7 @@ module OCCI
             # handle file upload
             if params['file'] != nil
               OCCI::Log.debug("Location of Image #{params['file'][:tempfile].path}")
-              $image_path = $config[:one_image_tmp_dir] + '/' + params['file'][:filename]
+              $image_path = OCCI::Server.config[:one_image_tmp_dir] + '/' + params['file'][:filename]
               FileUtils.cp(params['file'][:tempfile].path, $image_path)
             end
 
