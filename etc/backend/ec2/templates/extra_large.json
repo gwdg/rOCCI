@@ -1,0 +1,42 @@
+{
+    "mixins":[
+        {
+            "term":"extra_large",
+            "scheme":"http://aws.amazon.com/ec2/instance-types#",
+            "title":"Extra Large Instance",
+            "attributes":{
+                "occi":{
+                    "compute":{
+                        "architecture":{
+                            "mutable":false,
+                            "type":"string",
+                            "default":"x64"
+                        },
+                        "cores":{
+                            "mutable":false,
+                            "type":"number",
+                            "default":4
+                        },
+                        "speed":{
+                            "mutable":false,
+                            "type":"number",
+                            "default":2
+                        },
+                        "memory":{
+                            "mutable":false,
+                            "type":"number",
+                            "default":15
+                        }
+                    },
+                    "storage":{
+                        "size":{
+                            "mutable":false,
+                            "type":"number",
+                            "default":1690
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
