@@ -98,7 +98,7 @@ module OCCI
           network_erb = NetworkERB.new
           network_erb.network = network
 
-          template_raw = $config["TEMPLATE_LOCATION"] + TEMPLATENETWORKRAWFILE
+          template_raw = OCCI::Server.config["TEMPLATE_LOCATION"] + TEMPLATENETWORKRAWFILE
           template = ERB.new(File.read(template_raw)).result(network_erb.get_binding)
 
           OCCI::Log.debug("Parsed template #{template}")

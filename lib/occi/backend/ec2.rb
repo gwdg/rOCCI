@@ -63,7 +63,7 @@ module OCCI
 
       def self.get_ec2_interface
         ec2 = AWS::EC2.new
-        return ec2.regions[$config["avail_zone"]]
+        return ec2.regions[OCCI::Server.config["avail_zone"]]
       end
 
       class EC2

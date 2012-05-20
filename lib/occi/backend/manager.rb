@@ -21,8 +21,8 @@
 
 require 'rubygems'
 
-require 'occi/backend/opennebula/opennebula'
-require 'occi/backend/ec2/ec2'
+require 'occi/backend/opennebula'
+require 'occi/backend/ec2'
 require 'occi/backend/dummy'
 
 #require 'uuidtools'

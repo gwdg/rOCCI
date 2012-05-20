@@ -22,12 +22,12 @@
 require 'rubygems'
 require 'uuidtools'
 require 'OpenNebula/OpenNebula'
-require 'occi/Registry'
+require 'occi/registry'
 
 # OpenNebula backend
-require 'occi/backend/opennebula/Compute'
-require 'occi/backend/opennebula/Network'
-require 'occi/backend/opennebula/Storage'
+require 'occi/backend/opennebula/compute'
+require 'occi/backend/opennebula/network'
+require 'occi/backend/opennebula/storage'
 
 # OpenNebula backend based mixins
 #require 'occi/extensions/one/Image'
@@ -37,7 +37,7 @@ require 'occi/backend/opennebula/Storage'
 
 #require 'occi/extensions/Reservation'
 
-require 'occi/Log'
+require 'occi/log'
 
 include OpenNebula
 
@@ -155,11 +155,11 @@ module OCCI
           # TODO: create mixins from existing templates
 
           # initialize OpenNebula connection
-          OCCI::Log.debug("Initializing connection with OpenNebula")
+          OCCI::Log.debug("### Initializing connection with OpenNebula")
 
           # TODO: check for error!
-          #       @one_client = Client.new($config['one_user'] + ':' + $config['one_password'], $config['one_xmlrpc'])
-          @one_client = Client.new(user + ':' + password, $config['one_xmlrpc'])
+          #       @one_client = Client.new(OCCI::Server.config['one_user'] + ':' + OCCI::Server.config['one_password'], OCCI::Server.config['one_xmlrpc'])
+          @one_client = Client.new(user + ':' + password, OCCI::Server.config['one_xmlrpc'])
 
         end
 
@@ -175,25 +175,22 @@ module OCCI
 
         # ---------------------------------------------------------------------------------------------------------------------     
         def resource_template_register
-          backend_object_pool=TemplatePool.new(@one_client, INFO_ACL)
-          backend_object_pool.info
-          backend_object_pool.each do |backend_object|
-            actions = []
-            related = [OCCI::Infrastructure::ResourceTemplate::MIXIN]
-            entities = []
-            term = backend_object['NAME'].downcase.chomp.gsub(/\W/, '_')
-            scheme = "http://schemas.ogf.org/occi/infrastructure#"
-            title = backend_object['NAME']
-            attributes = OCCI::Core::Attributes.new()
-            mixin = OCCI::Core::Mixin.new(term, scheme, title, attributes, actions, related, entities)
-            mixin.backend[:id] = backend_object.id
-            OCCI::CategoryRegistry.register(mixin)
-          end
+          # currently not directly supported by OpenNebula
         end
 
         # ---------------------------------------------------------------------------------------------------------------------     
         def os_template_register
-          # TODO: implement
+          backend_object_pool=TemplatePool.new(@one_client, INFO_ACL)
+          backend_object_pool.info
+          backend_object_pool.each do |backend_object|
+            related = OCCI::Registry.get_by_id('http://schemas.ogf.org/occi/infrastructure#os_tpl')
+            term = backend_object['NAME'].downcase.chomp.gsub(/\W/, '_')
+            # TODO: implement correct schema for service provider
+            scheme = "http://schemas.opennebula.org/occi/infrastructure/os_tpl#"
+            title = backend_object['NAME']
+            mixin = OCCI::Core::Mixin.new(:related => related, :term=>term, :scheme=>scheme,:title=>title)
+            OCCI::CategoryRegistry.register(mixin)
+          end
         end
 
       end

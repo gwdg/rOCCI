@@ -103,9 +103,8 @@ module OCCI
           entities = @store['resources'] + @store['links']
           entities.each do |entity|
             kind = OCCI::Registry.get_by_id(entity.kind)
-            OCCI::Log.debug('Entity from dummy backend #{entity}')
             kind.entities << entity
-            OCCI::Log.debug("Entities in kind #{kind.type_identifier}: #{kind.entities.size}")
+            OCCI::Log.debug("#### Number of entities in kind #{kind.type_identifier}: #{kind.entities.size}")
           end
         end
       end
@@ -119,7 +118,6 @@ module OCCI
         @store.transaction do
           @store['resources'] << resource
         end
-        OCCI::Log.debug(@collection)
       end
 
       # ---------------------------------------------------------------------------------------------------------------------     

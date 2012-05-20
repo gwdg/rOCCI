@@ -107,7 +107,7 @@ module OCCI
           # check creation of images
           raise "No image or storagelink provided" if $image_path == ""
 
-          template_raw = $config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
+          template_raw = OCCI::Server.config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
           template = ERB.new(File.read(template_raw)).result(storage_erb.get_binding)
 
           OCCI::Log.debug("Parsed template #{template}")
