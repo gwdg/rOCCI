@@ -41,6 +41,9 @@ require 'occi/configuration'
 # Active support notifications
 require 'active_support/notifications'
 
+# Active support for xml rendering
+require 'active_support/core_ext'
+
 ##############################################################################
 # Read configuration file and set log level
 
@@ -167,7 +170,7 @@ module OCCI
                       OCCI::Backend::Manager.register_backend(OCCI::Backend::EC2::EC2, OCCI::Backend::EC2::EC2::OPERATIONS)
                       OCCI::Backend::EC2::EC2.new(user, password)
                     when "dummy" then
-                      require 'occi/backend/Dummy'
+                      require 'occi/backend/dummy'
                       OCCI::Backend::Manager.register_backend(OCCI::Backend::Dummy, OCCI::Backend::Dummy::OPERATIONS)
                       OCCI::Backend::Dummy.new()
                     else
@@ -197,7 +200,7 @@ module OCCI
       OCCI::Log.debug('--------------------------------------------------------------------')
 
       OCCI::Log.debug('### Prepare response ###')
-      response['Accept'] = "application/occi+json,application/json,text/plain,text/uri-list"
+      response['Accept'] = "application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml"
       response['Server'] = "rOCCI/#{VERSION_NUMBER} OCCI/1.1"
       OCCI::Log.debug('### Initialize response OCCI collection ###')
       @collection = Hashie::Mash.new(:kinds => [], :mixins => [], :actions => [], :resources => [], :links => [], :locations => [])
@@ -218,9 +221,11 @@ module OCCI
       OCCI::Log.debug('### Rendering response ###')
       @collection.delete_if { |k, v| v.empty? } # remove empty entries
       respond_to do |f|
-        f.txt { erb :text, :locals => {:collection => @collection} }
+        f.txt { erb :collection, :locals => {:collection => @collection} }
         f.json { @collection.to_json }
         f.on('application/occi+json') { @collection.to_json }
+        f.xml { @collection.to_xml(:root => "collection") }
+        f.on('application/occi+xml') { @collection.to_xml(:root => "collection") }
         f.on('text/uri-list') { ((@collection.resources.to_a + @collection.links.to_a).collect { |entity| @server_uri.to_s.chop + entity.location } + @collection.locations.to_a).join("\n") }
         f.on('*/*') { erb :text, :locals => {:collection => @collection} }
       end
