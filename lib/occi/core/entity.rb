@@ -120,12 +120,12 @@ module OCCI
       # ---------------------------------------------------------------------------------------------------------------------
 
       # ---------------------------------------------------------------------------------------------------------------------
-      def initialize(entity_data, default = nil)
-        entity_data.attributes = OCCI::Core::Attributes.new(entity_data.attributes)
-        kind = OCCI::Registry.get_by_id(entity_data.kind)
-        entity_data.attributes = check(entity_data.attributes!, kind.attributes)
+      def initialize(entity, default = nil)
+        entity.attributes = OCCI::Core::Attributes.new(entity.attributes) if entity.attributes
+        kind = OCCI::Registry.get_by_id(entity.kind)
+        entity.attributes = check(entity.attributes!, kind.attributes)
         raise "kind not found" if kind.nil?
-        super(entity_data, default)
+        super(entity, default)
       end
 
       def convert_value(val, duping=false) #:nodoc:
