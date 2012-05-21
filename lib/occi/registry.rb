@@ -27,18 +27,16 @@ module OCCI
   module Registry
 
     @@categories = {}
-    @@categories_initial = {}
     @@locations = {}
 
     def self.reset()
-      @@categories = @@categories_initial
+      @@categories.each_value.each {|category| category.entities = [] if category.entities}
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
     def self.register(category)
       OCCI::Log.debug("### Registering category #{category.type_identifier}")
       @@categories[category.type_identifier] = category
-      @@categories_initial[category.type_identifier] = category
       @@locations[category.term] = category.type_identifier unless category.kind_of?(OCCI::Core::Action)
     end
 
@@ -46,7 +44,6 @@ module OCCI
     def self.unregister(category)
       OCCI::Log.debug("### Unregistering category #{category.type_identifier}")
       @@categories.delete(category.type_identifier)
-      @@categories_initial.delete(category.type_identifier)
       @@locations.delete(category.term) unless category.kind_of?(OCCI :Core::Action)
     end
 
