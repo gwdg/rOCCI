@@ -50,6 +50,15 @@ module OCCI
         OCCI::Registry.register(kind)
       end
 
+      def initialize(entity=nil, default = nil)
+        if entity
+          entity.attributes = OCCI::Core::Attributes.new(entity.attributes) if entity
+          kind = OCCI::Registry.get_by_id(entity.kind) if entity
+          entity.attributes = Entity.check(entity.attributes, kind.attributes) if entity
+        end
+        super(entity, default)
+      end
+
       def id
         return self[:id]
       end
@@ -68,26 +77,15 @@ module OCCI
         self.attributes!.occi!.core!.title = title
       end
 
-      # ---------------------------------------------------------------------------------------------------------------------
       def location
         '/' + OCCI::Registry.get_by_id(self[:kind]).term + '/' + self[:id]
       end
 
-      # ---------------------------------------------------------------------------------------------------------------------
-      private
-      # ---------------------------------------------------------------------------------------------------------------------
-
-      # ---------------------------------------------------------------------------------------------------------------------
       def type_identifier
         OCCI::Registry.get_by_id(self.kind).type_identifier
       end
 
-      # ---------------------------------------------------------------------------------------------------------------------
-      private
-      # ---------------------------------------------------------------------------------------------------------------------
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      def check(attributes, definitions)
+      def self.check(attributes, definitions)
         attributes ||= OCCI::Core::Attributes.new
         definitions.each_key do |key|
           properties = definitions[key]
@@ -115,18 +113,7 @@ module OCCI
         return attributes
       end
 
-      # ---------------------------------------------------------------------------------------------------------------------
-      public
-      # ---------------------------------------------------------------------------------------------------------------------
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      def initialize(entity, default = nil)
-        entity.attributes = OCCI::Core::Attributes.new(entity.attributes) if entity.attributes
-        kind = OCCI::Registry.get_by_id(entity.kind)
-        entity.attributes = check(entity.attributes!, kind.attributes)
-        raise "kind not found" if kind.nil?
-        super(entity, default)
-      end
+      private
 
       def convert_value(val, duping=false) #:nodoc:
         case val
