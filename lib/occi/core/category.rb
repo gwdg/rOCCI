@@ -26,8 +26,8 @@ module OCCI
   module Core
     class Category < Hashie::Mash
 
-      def initialize(category, default = nil)
-        category.attributes = OCCI::Core::AttributeProperties.new(category.attributes) if category.attributes
+      def initialize(category=nil, default = nil)
+        category.attributes = OCCI::Core::AttributeProperties.new(category.attributes) if category
         super(category, default)
       end
 
