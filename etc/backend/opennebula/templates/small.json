@@ -29,13 +29,6 @@
                             "type":"number",
                             "default":1.7
                         }
-                    },
-                    "storage":{
-                        "size":{
-                            "mutable":false,
-                            "type":"number",
-                            "default":160
-                        }
                     }
                 }
             }
