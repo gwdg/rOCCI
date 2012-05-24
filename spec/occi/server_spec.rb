@@ -26,7 +26,7 @@ describe OCCI::Server do
     end
 
     it "initializes Infrastructure Model successfully" do
-      OCCI::Server.initialize_model('etc/model/infrastructure')
+      OCCI::Server.initialize_model('etc/model/infrastructure/')
       OCCI::Registry.get_by_id('http://schemas.ogf.org/occi/infrastructure#compute').should be_kind_of OCCI::Core::Kind
       OCCI::Registry.get_by_id('http://schemas.ogf.org/occi/infrastructure#os_tpl').should be_kind_of OCCI::Core::Mixin
       OCCI::Registry.get_by_id('http://schemas.ogf.org/occi/infrastructure#resource_tpl').should be_kind_of OCCI::Core::Mixin
@@ -39,13 +39,17 @@ describe OCCI::Server do
     end
 
     it "initializes Model Extensions successfully" do
-      OCCI::Server.initialize_model('etc/model/extensions')
+      OCCI::Server.initialize_model('etc/model/extensions/')
       OCCI::Registry.get_by_id('http://schemas.ogf.org/occi/infrastructure/compute#console').should be_kind_of OCCI::Core::Kind
     end
 
     it "initializes OpenNebula Model Extensions successfully" do
-      OCCI::Server.initialize_model('etc/backend/opennebula/model')
-      OCCI::Registry.get_by_id('http://opennebula.org/occi/infrastructure#virtualmachine').should be_kind_of OCCI::Core::Mixin
+      OCCI::Server.initialize_model('etc/backend/opennebula/model/')
+      OCCI::Registry.get_by_id('http://opennebula.org/occi/infrastructure#compute').should be_kind_of OCCI::Core::Mixin
+      OCCI::Registry.get_by_id('http://opennebula.org/occi/infrastructure#storage').should be_kind_of OCCI::Core::Mixin
+      OCCI::Registry.get_by_id('http://opennebula.org/occi/infrastructure#storagelink').should be_kind_of OCCI::Core::Mixin
+      OCCI::Registry.get_by_id('http://opennebula.org/occi/infrastructure#network').should be_kind_of OCCI::Core::Mixin
+      OCCI::Registry.get_by_id('http://opennebula.org/occi/infrastructure#networkinterface').should be_kind_of OCCI::Core::Mixin
     end
 
     #it "initializes OpenNebula Templates successfully" do
