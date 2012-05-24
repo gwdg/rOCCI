@@ -9,18 +9,18 @@ Category: <%= action.term %>;scheme="<%= action.scheme %>";class="action"<%= ';t
 <% end if collection.actions %>
 <% collection.resources.each do |resource| %>
 Category: <%= resource.kind.split('#').last %>;scheme="<%= resource.kind.split('#').first + '#' %>";class="kind"
-    <% resource.mixins.each do |mixin| %>
+<% resource.mixins.each do |mixin| %>
 Category: <%= mixin.split('#').last %>;scheme="<%= mixin.split('#').first + '#' %>";class="mixin"
-    <% end if resource.mixins %>
-    <% resource.attributes.combine.each_pair do |name, value| %>
+<% end if resource.mixins %>
+<% resource.attributes.combine.each_pair do |name, value| %>
 X-OCCI-Attribute: <%= name + '=' + value.inspect %>
-    <% end if resource.attributes %>
-    <% resource.links.each do |link| %>
+<% end if resource.attributes %>
+<% resource.links.each do |link| %>
 Link: <<%= link.target %>>;rel="<%= link.related %>";self="<%= link.location %>";category="<%= link.kind %><%= ';' + link.attributes.combine.collect { |attr| attr.keys.first + '=' + attr.values.first.inspect }.join(' ') if link.attributes %>
-    <% end if resource.links %>
-    <% resource.applicable_actions do |action| %>
+<% end if resource.links %>
+<% resource.applicable_actions do |action| %>
 Link: <<%= resource.location + '?action=' + action.term %>>;rel="<%= action.type_identifier %>"
-    <% end if resource.applicable_actions %>
+<% end if resource.applicable_actions %>
 <% end if collection.resources %>
 <% collection.links.each do |link| %>
 Link: <<%= link.target %>>;rel="<%= link.related %>";self="<%= link.location %>";category="<%= link.kind %><%= ';' + link.attributes.combine.collect { |attr| attr.keys.first + '=' + attr.values.first.inspect }.join(' ') if link.attributes %>
