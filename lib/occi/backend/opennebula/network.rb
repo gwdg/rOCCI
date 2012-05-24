@@ -19,9 +19,8 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/backend/opennebula/NetworkERB'
-
-require 'occi/Log'
+require 'occi/log'
+require 'ipaddr'
 
 module OCCI
   module Backend
@@ -30,7 +29,7 @@ module OCCI
       # ---------------------------------------------------------------------------------------------------------------------
       module Network
 
-        TEMPLATENETWORKRAWFILE = 'occi_one_template_network.erb'
+        TEMPLATENETWORKRAWFILE = 'network.erb'
 
         # ---------------------------------------------------------------------------------------------------------------------       
         #        private
@@ -38,52 +37,39 @@ module OCCI
 
         # ---------------------------------------------------------------------------------------------------------------------     
         def network_parse_backend_object(backend_object)
-          if backend_object['TEMPLATE/OCCI_ID'].nil?
-            raise "no backend ID found" if backend_object.id.nil?
-            occi_id = self.generate_occi_id(OCCI::Infrastructure::Network::KIND, backend_object.id.to_s)
-          else
-            occi_id = backend_object['TEMPLATE/OCCI_ID']
-          end
 
-          attributes = {}
-          mixins = []
+          # get information on storage object from OpenNebula backend
           backend_object.info
-          attributes = {}
-          # parse all parameters from OpenNebula to OCCI
-          attributes['occi.core.id'] = occi_id
-          attributes['occi.core.title'] = backend_object['NAME']
-          attributes['occi.core.summary'] = backend_object['TEMPLATE/DESCRIPTION']
-          # attributes['opennebula.network.bridge'] = vnet['TEMPLATE/BRIDGE']
-          # attributes['opennebula.network.public'] = vnet['TEMPLATE/PUBLIC']
-          #          OCCI::Log.debug("*** object: " + backend_object.to_xml)
-          if backend_object['TEMPLATE/TYPE'].downcase == 'fixed'
-            mixins << OCCI::Backend::ONE::Network::MIXIN
-            # attributes['opennebula.network.leases'] = backend_object['TEMPLATE/LEASES']
-            mixins << OCCI::Infrastructure::Ipnetworking::MIXIN
-            attributes['occi.network.allocation'] = 'static'
-          end
-          if backend_object['TEMPLATE/TYPE'].downcase == 'ranged'
-            require 'occi/infrastructure/Ipnetworking'
-            mixins << OCCI::Infrastructure::Ipnetworking::MIXIN
-            attributes['occi.network.allocation'] = 'dynamic'
-            if backend_object['TEMPLATE/NETWORK_SIZE'].to_i > 0
-              network_size = backend_object['TEMPLATE/NETWORK_SIZE'].to_i
-            else
-              network_size = 8*(backend_object['TEMPLATE/NETWORK_SIZE'].upcase.ord - 64)
-            end
-            attributes['occi.network.address'] = backend_object['TEMPLATE/NETWORK_ADDRESS'] + '/' + (32-(Math.log(network_size)/Math.log(2)).ceil).to_s
-          end
 
-          # check if object already exists
-          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object('/network/' + occi_id)
-          if occi_object.nil?
-            occi_object = OCCI::Infrastructure::Network.new(attributes, mixins)
-            occi_object.backend[:id] = backend_object.id
-            OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
-          else
-            occi_object.attributes.merge!(attributes)
-          end
-          return occi_object
+          network_kind = OCCI::Registry.get_by_id("http://schemas.ogf.org/occi/infrastructure#network")
+
+          network = OCCI::Core::Resource.new
+
+          network.kind = storage_kind.type_identifier
+          network.mixins = [OCCI::Registry.get_by_id('http://opennebula.org/occi/infrastructure#network')]
+          network.id = backend_object['TEMPLATE/OCCI_ID']||= self.generate_occi_id(network_kind, backend_object.id.to_s)
+          network.title = backend_object['NAME']
+          network.summary = backend_object['TEMPLATE/DESCRIPTION'] if backend_object['TEMPLATE/DESCRIPTION']
+
+          network.attributes!.occi!.network!.address = backend_object['TEMPLATE/NETWORK_ADDRESS'] if backend_object['TEMPLATE/NETWORK_ADDRESS']
+          network.attributes!.occi!.network!.gateway = backend_object['TEMPLATE/GATEWAY'] if backend_object['TEMPLATE/GATEWAY']
+          network.attributes!.occi!.network!.vlan = backend_object['TEMPLATE/VLAN_ID'] if backend_object['TEMPLATE/VLAN_ID']
+          network.attributes!.occi!.network!.allocation = "static" if backend_object['TEMPLATE/TYPE'].downcase == "fixed"
+          network.attributes!.occi!.network!.allocation = "dynamic" if backend_object['TEMPLATE/TYPE'].downcase == "ranged"
+
+          network.attributes!.org!.opennebula!.network!.vlan = backend_object['TEMPLATE/VLAN'] if backend_object['TEMPLATE/VLAN']
+          network.attributes!.org!.opennebula!.network!.phydev = backend_object['TEMPLATE/PHYDEV'] if backend_object['TEMPLATE/PHYDEV']
+          network.attributes!.org!.opennebula!.network!.bridge = backend_object['TEMPLATE/BRIDGE'] if backend_object['TEMPLATE/BRIDGE']
+
+          network.attributes!.org!.opennebula!.network!.ip_start = backend_object['TEMPLATE/IP_START'] if backend_object['TEMPLATE/IP_START']
+          network.attributes!.org!.opennebula!.network!.ip_end = backend_object['TEMPLATE/IP_END'] if backend_object['TEMPLATE/IP_END']
+
+          network_update_state(storage)
+
+          # check storage attributes against definition in kind and mixins
+          network.check
+
+          network_kind.entities << network
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -95,11 +81,8 @@ module OCCI
 
           backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(), @one_client)
 
-          network_erb = NetworkERB.new
-          network_erb.network = network
-
-          template_raw = OCCI::Server.config["TEMPLATE_LOCATION"] + TEMPLATENETWORKRAWFILE
-          template = ERB.new(File.read(template_raw)).result(network_erb.get_binding)
+          template_location = OCCI::Server.config["TEMPLATE_LOCATION"] + TEMPLATENETWORKRAWFILE
+          template = Erubis::Eruby.new(File.read(template_raw)).evaluate(network)
 
           OCCI::Log.debug("Parsed template #{template}")
           rc = backend_object.allocate(template)
@@ -109,31 +92,8 @@ module OCCI
         end
 
         # ---------------------------------------------------------------------------------------------------------------------     
-        def network_refresh(network)
-          backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(network.backend[:id]), @one_client)
-
-          backend_object.info
-
-          occi_object = network_parse_backend_object(backend_object)
-
-          if occi_object.nil? then
-            OCCI::Log.warn("Problem refreshing network with backend id #{network.backend[:id]}")
-          else
-
-            # merge new attributes with existing attributes, by overwriting existing attributes with refreshed values
-            network.attributes.merge!(occi_object.attributes)
-            # concat mixins and remove duplicate mixins
-            network.mixins.concat(occi_object.mixins).uniq!
-            # update state
-            network_update_state(network)
-          end
-        end
-
-        # ---------------------------------------------------------------------------------------------------------------------     
         def network_update_state(network)
-          state = OCCI::Infrastructure::Network::STATE_ACTIVE
-          network.state_machine.set_state(state)
-          network.attributes['occi.network.state'] = network.state_machine.current_state.name
+          network.attributes!.occi!.network!.state = "active"
         end
 
         # ---------------------------------------------------------------------------------------------------------------------     
@@ -148,43 +108,27 @@ module OCCI
           occi_objects = []
           backend_object_pool=VirtualNetworkPool.new(@one_client, OCCI::Backend::OpenNebula::OpenNebula::INFO_ACL)
           backend_object_pool.info
-          backend_object_pool.each do |backend_object|
-#            OCCI::Log.debug("*** network_register_all_instances: backend_object: " + backend_object.to_xml)
-            backend_object.info
-            occi_object = network_parse_backend_object(backend_object)
-            if occi_object.nil?
-              OCCI::Log.debug("Error creating network from backend")
-            else
-              occi_object.backend[:id] = backend_object.id
-              OCCI::Log.debug("Backend ID: #{occi_object.backend[:id]}")
-              occi_objects << occi_object
-            end
-          end
-          return occi_objects
+          backend_object_pool.each { |backend_object| network_parse_backend_object(backend_object) }
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
         # STORAGE ACTIONS
         # ---------------------------------------------------------------------------------------------------------------------
 
-        # ---------------------------------------------------------------------------------------------------------------------     
+        # ---------------------------------------------------------------------------------------------------------------------
         def network_action_dummy(network, parameters)
         end
 
-        # ---------------------------------------------------------------------------------------------------------------------     
+        # ---------------------------------------------------------------------------------------------------------------------
         def network_up(network, parameters)
           backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(network.backend[:id]), @one_client)
-          # FIXME
-          network.enable
-          check_rc(rc)
+          # not implemented in OpenNebula
         end
 
-        # ---------------------------------------------------------------------------------------------------------------------     
+        # ---------------------------------------------------------------------------------------------------------------------
         def network_down(network, parameters)
           backend_object = VirtualNetwork.new(VirtualNetwork.build_xml(network.backend[:id]), @one_client)
-          # FIXME
-          network.disable
-          check_rc(rc)
+          # not implemented in OpenNebula
         end
 
       end
@@ -192,4 +136,3 @@ module OCCI
     end
   end
 end
-

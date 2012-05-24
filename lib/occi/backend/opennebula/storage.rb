@@ -19,9 +19,7 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
-require 'occi/backend/opennebula/StorageERB'
-
-require 'occi/Log'
+require 'occi/log'
 
 module OCCI
   module Backend
@@ -30,7 +28,7 @@ module OCCI
       # ---------------------------------------------------------------------------------------------------------------------
       module Storage
 
-        TEMPLATESTORAGERAWFILE = 'occi_one_template_storage.erb'
+        TEMPLATESTORAGERAWFILE = 'storage.erb'
 
         # ---------------------------------------------------------------------------------------------------------------------       
         #        private
@@ -39,47 +37,33 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------     
         def storage_parse_backend_object(backend_object)
 
-          if backend_object['TEMPLATE/OCCI_ID'].nil?
-            raise "no backend ID found" if backend_object.id.nil?
-            occi_id = self.generate_occi_id(OCCI::Infrastructure::Storage::KIND, backend_object.id.to_s)
-          else
-            occi_id = backend_object['TEMPLATE/OCCI_ID']
-          end
-
-          attributes = {}
-          mixins = []
+          # get information on storage object from OpenNebula backend
           backend_object.info
-          attributes = {}
-          # parse all parameters from OpenNebula to OCCI
-          attributes['occi.core.id'] = occi_id
-          attributes['occi.core.title'] = backend_object['NAME']
-          attributes['occi.core.summary'] = backend_object['TEMPLATE/DESCRIPTION']
 
-          attributes['opennebula.image.type'] = backend_object['TEMPLATE/TYPE']
-          attributes['opennebula.image.public'] = backend_object['TEMPLATE/PUBLIC']
-          attributes['opennebula.image.persistent'] = backend_object['TEMPLATE/PERSISTENT']
-          attributes['opennebula.image.dev_prefix'] = backend_object['TEMPLATE/DEV_PREFIX']
-          attributes['opennebula.image.bus'] = backend_object['TEMPLATE/BUS']
+          storage_kind = OCCI::Registry.get_by_id("http://schemas.ogf.org/occi/infrastructure#storage")
 
-          if backend_object['TEMPLATE/SIZE'] != nil
-            attributes['occi.storage.size'] = backend_object['TEMPLATE/SIZE']
-          end
-          if backend_object['TEMPLATE/FSTYPE'] != nil
-            attributes['occi.storage.fstype']
-          end
+          storage = OCCI::Core::Resource.new
 
-          mixins = [OCCI::Backend::ONE::Image::MIXIN]
+          storage.kind = storage_kind.type_identifier
+          storage.mixins = [OCCI::Registry.get_by_id('http://opennebula.org/occi/infrastructure#storage')]
+          storage.id = backend_object['TEMPLATE/OCCI_ID']||= self.generate_occi_id(storage_kind, backend_object.id.to_s)
+          storage.title = backend_object['NAME']
+          storage.summary = backend_object['TEMPLATE/DESCRIPTION'] if backend_object['TEMPLATE/DESCRIPTION']
 
-          # check if object already exists
-          occi_object = OCCI::Rendering::HTTP::LocationRegistry.get_object('/storage/' + occi_id)
-          if occi_object.nil?
-            occi_object = OCCI::Infrastructure::Storage.new(attributes, mixins)
-            occi_object.backend[:id] = backend_object.id
-            OCCI::Rendering::HTTP::LocationRegistry.register(occi_object.get_location, occi_object)
-          else
-            occi_object.attributes.merge!(attributes)
-          end
-          return occi_object
+          storage.attributes!.occi!.storage!.size = backend_object['TEMPLATE/SIZE'].to_f/1000 if backend_object['TEMPLATE/SIZE']
+
+          storage.attributes!.org!.opennebula!.storage!.type = backend_object['TEMPLATE/TYPE'] if backend_object['TEMPLATE/TYPE']
+          storage.attributes!.org!.opennebula!.storage!.persistent = backend_object['TEMPLATE/PERSISTENT'] if backend_object['TEMPLATE/PERSISTENT']
+          storage.attributes!.org!.opennebula!.storage!.dev_prefix = backend_object['TEMPLATE/DEV_PREFIX'] if backend_object['TEMPLATE/DEV_PREFIX']
+          storage.attributes!.org!.opennebula!.storage!.bus = backend_object['TEMPLATE/BUS'] if backend_object['TEMPLATE/BUS']
+          storage.attributes!.org!.opennebula!.storage!.driver = backend_object['TEMPLATE/DRIVER'] if backend_object['TEMPLATE/DRIVER']
+
+          storage_update_state(storage)
+
+          # check storage attributes against definition in kind and mixins
+          storage.check
+
+          storage_kind.entities << storage
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -89,31 +73,17 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         def storage_deploy(storage)
 
-          backend_object = Image.new(Image.build_xml, @one_client)
+          storage = Image.new(Image.build_xml, @one_client)
 
-          storage_erb = StorageERB.new
-          storage_erb.storage = storage
-
-          storagelink = nil
-
-          if storage.links != nil
-            storage.links.each do |link|
-              if link.kind.term == 'storagelink'
-                $image_path = link.attributes['occi.core.target']
-              end
-            end
-          end
-
-          # check creation of images
-          raise "No image or storagelink provided" if $image_path == ""
-
-          template_raw = OCCI::Server.config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
-          template = ERB.new(File.read(template_raw)).result(storage_erb.get_binding)
+          template_location = OCCI::Server.config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
+          template = Erubis::Eruby.new(File.read(template_raw)).evaluate(storage)
 
           OCCI::Log.debug("Parsed template #{template}")
           rc = backend_object.allocate(template)
           check_rc(rc)
           OCCI::Log.debug("OpenNebula ID of image: #{storage.backend[:id]}")
+
+          storage_update_state
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -121,14 +91,14 @@ module OCCI
           backend_object = Image.new(Image.build_xml(storage.backend[:id]), @one_client)
           backend_object.info
           OCCI::Log.debug("current Image state is: #{backend_object.state_str}")
-          state = case backend_object.state_str
-                    when "READY", "USED", "LOCKED" then
-                      OCCI::Infrastructure::Storage::STATE_ONLINE
-                    else
-                      OCCI::Infrastructure::Storage::STATE_OFFLINE
-                  end
-          storage.state_machine.set_state(state)
-          storage.attributes['occi.storage.state'] = storage.state_machine.current_state.name
+          case backend_object.state_str
+            when "READY", "USED", "LOCKED" then
+              storage.attributes!.occi!.storage!.state = "online"
+            when "ERROR" then
+              storage.attributes!.occi!.storage!.state = "error"
+            else
+              storage.attributes!.occi!.storage!.state = "offline"
+          end
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
@@ -139,53 +109,22 @@ module OCCI
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def storage_refresh(storage)
-          backend_object = Image.new(Image.build_xml(storage.backend[:id]), @one_client)
-
-          backend_object.info
-
-          occi_object = storage_parse_backend_object(backend_object)
-
-          if occi_object.nil? then
-            OCCI::Log.warn("Problem refreshing storage with backend id #{storage.backend[:id]}")
-          else
-
-            # merge new attributes with existing attributes, by overwriting existing attributes with refreshed values
-            storage.attributes.merge!(occi_object.attributes)
-            # concat mixins and remove duplicate mixins
-            storage.mixins.concat(occi_object.mixins).uniq!
-            # update state
-            storage_update_state(storage)
-          end
-        end
-
-        # ---------------------------------------------------------------------------------------------------------------------
         def storage_register_all_instances
           occi_objects = []
           backend_object_pool=ImagePool.new(@one_client, OCCI::Backend::OpenNebula::OpenNebula::INFO_ACL)
           backend_object_pool.info
-          backend_object_pool.each do |backend_object|
-            occi_object = storage_parse_backend_object(backend_object)
-            if occi_object.nil?
-              OCCI::Log.debug("Error creating storage from backend")
-            else
-              occi_object.backend[:id] = backend_object.id
-              OCCI::Log.debug("Backend ID: #{occi_object.backend[:id]}")
-              occi_objects << occi_object
-            end
-          end
-          return occi_objects
+          backend_object_pool.each { |backend_object| storage_parse_backend_object(backend_object) }
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
         # STORAGE ACTIONS
         # ---------------------------------------------------------------------------------------------------------------------
 
-        # ---------------------------------------------------------------------------------------------------------------------     
+        # ---------------------------------------------------------------------------------------------------------------------
         def storage_action_dummy(storage, parameters)
         end
 
-        # ---------------------------------------------------------------------------------------------------------------------     
+        # ---------------------------------------------------------------------------------------------------------------------
         # Action online
         def storage_online(network, parameters)
           backend_object = Image.new(Image.build_xml(network.backend[:id]), @one_client)
@@ -193,7 +132,7 @@ module OCCI
           check_rc(rc)
         end
 
-        # ---------------------------------------------------------------------------------------------------------------------     
+        # ---------------------------------------------------------------------------------------------------------------------
         # Action offline
         def storage_offline(network, parameters)
           backend_object = Image.new(Image.build_xml(network.backend[:id]), @one_client)
@@ -201,26 +140,25 @@ module OCCI
           check_rc(rc)
         end
 
-        # ---------------------------------------------------------------------------------------------------------------------     
+        # ---------------------------------------------------------------------------------------------------------------------
         # Action backup
         def storage_backup(network, parameters)
           OCCI::Log.debug("not yet implemented")
         end
 
-        # ---------------------------------------------------------------------------------------------------------------------     
+        # ---------------------------------------------------------------------------------------------------------------------
         # Action snapshot
         def storage_snapshot(network, parameters)
           OCCI::Log.debug("not yet implemented")
         end
 
-        # ---------------------------------------------------------------------------------------------------------------------     
+        # ---------------------------------------------------------------------------------------------------------------------
         # Action resize
         def storage_resize(network, parameters)
           OCCI::Log.debug("not yet implemented")
         end
 
       end
-
     end
   end
 end
