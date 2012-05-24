@@ -151,7 +151,7 @@ module OCCI
 
     def self.initialize_model(path)
       OCCI::Log.info("### Initializing OCCI Model from #{path} ###")
-      Dir.glob(path + '**/*.json').each do |file|
+      Dir.glob(path + '/**/*.json').each do |file|
         collection = Hashie::Mash.new(JSON.parse(File.read(file)))
         # add location of service provider to scheme if it has a relative location
         collection.kinds.collect { |kind| kind.scheme = self.location + kind.scheme if kind.scheme.start_with? '/' } if collection.kinds
@@ -235,6 +235,7 @@ module OCCI
       @collection.delete_if { |k, v| v.empty? } # remove empty entries
       respond_to do |f|
         f.txt { erb :collection, :locals => {:collection => @collection} }
+        # f.html { haml :collection, :locals => {:collection => @collection} }
         f.json { @collection.to_json }
         f.on('application/occi+json') { @collection.to_json }
         f.xml { @collection.to_xml(:root => "collection") }
