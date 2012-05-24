@@ -50,12 +50,6 @@ module OCCI
         OCCI::Registry.register(kind)
       end
 
-      def initialize(link_data, default = nil)
-        raise OCCI::BadRequestException, 'No source specified for link' if link_data.source.nil?
-        raise OCCI::BadRequestException, 'No target specified for link' if link_data.target.nil?
-        super(link_data, default)
-      end
-
       def target
         return self[:target]
       end
