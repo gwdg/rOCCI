@@ -53,10 +53,6 @@ module OCCI
         self.attributes!.occi!.core!.summary = summary
       end
 
-      def applicable_actions
-        array = []
-      end
-
     end
   end
 end
