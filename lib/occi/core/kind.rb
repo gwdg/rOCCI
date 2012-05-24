@@ -28,6 +28,13 @@ module OCCI
   module Core
     class Kind < OCCI::Core::Category
 
+      attr_accessor :entities
+
+      def initialize(kind, default = nil)
+        @entities = []
+        super(kind, default)
+      end
+
       def entity_type
         puts type_identifier
         case type_identifier
