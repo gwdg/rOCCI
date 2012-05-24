@@ -27,6 +27,13 @@ module OCCI
   module Core
     class Mixin < OCCI::Core::Category
 
+      attr_accessor :entities
+
+      def initialize(mixin, default = nil)
+        @entities = []
+        super(mixin, default)
+      end
+
     end
   end
 end
