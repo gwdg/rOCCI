@@ -1,0 +1,41 @@
+{
+    "mixins":[
+        {
+            "term":"networkinterface",
+            "scheme":"http://opennebula.org/occi/infrastructure#",
+            "title":"OpenNebula specific Storagelink attributes",
+            "attributes":{
+                "org":{
+                    "opennebula":{
+                        "storagelink":{
+                            "bridge":{
+                                "description":"Name of the bridge the network device is going to be attached to."
+                            },
+                            "script":{
+                                "description":"name of a shell script to be executed after creating the tun device for the VM"
+                            },
+                            "model":{
+                                "description":"hardware that will emulate this network interface. With Xen this is the type attribute of the vif."
+                            },
+                            "white_ports_tcp":{
+                                "description":"iptables_range: Permits access to the VM only through the specified ports in the TCP protocol. Supersedes BLACK_PORTS_TCP if defined."
+                            },
+                            "black_ports_tcp":{
+                                "description":"iptables_range: Doesn't permit access to the VM through the specified ports in the TCP protocol. Superseded by WHITE_PORTS_TCP if defined."
+                            },
+                            "white_ports_udp":{
+                                "description":"iptables_range: Permits access to the VM only through the specified ports in the UDP protocol. Supersedes BLACK_PORTS_UDP if defined. "
+                            },
+                            "black_ports_udp":{
+                                "description":"iptables_range: Doesn't permit access to the VM through the specified ports in the UDP protocol. Superseded by WHITE_PORTS_UDP if defined."
+                            },
+                            "icmp":{
+                                "description":"drop: Blocks ICMP connections to the VM. By default it's set to accept."
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
