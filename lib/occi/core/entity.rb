@@ -31,6 +31,8 @@ module OCCI
   module Core
     class Entity < Hashie::Mash
 
+      attr_accessor :applicable_actions
+
       # Define appropriate kind
       def self.register
         data = Hashie::Mash.new
@@ -54,9 +56,10 @@ module OCCI
         if entity
           entity.attributes = OCCI::Core::Attributes.new(entity.attributes) if entity
           kind = OCCI::Registry.get_by_id(entity.kind) if entity
-          entity.attributes = Entity.check(entity.attributes, kind.attributes) if entity
+          @applicable_actions = []
         end
         super(entity, default)
+        self.check
       end
 
       def id
@@ -83,6 +86,12 @@ module OCCI
 
       def type_identifier
         OCCI::Registry.get_by_id(self.kind).type_identifier
+      end
+
+      def check
+        definitions = OCCI::Registry.get_by_id(self.kind).attributes if self.kind
+        self.mixins.each { |mixin| definitions.merge!(mixin.attributes) if mixin.attributes } if self.mixins
+        self.attributes = Entity.check(self.attributes, definitions) if definitions
       end
 
       def self.check(attributes, definitions)
