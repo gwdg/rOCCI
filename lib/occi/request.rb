@@ -102,6 +102,13 @@ module OCCI
           raise OCCI::ContentTypeNotSupported
       end
 
+      OCCI::Log.debug("### Successfully parsed #{@kinds.size} kinds")
+      OCCI::Log.debug("### Successfully parsed #{@mixins.size} mixins")
+      OCCI::Log.debug("### Successfully parsed #{@actions.size} actions")
+      OCCI::Log.debug("### Successfully parsed #{@resources.size} resources")
+      OCCI::Log.debug("### Successfully parsed #{@links.size} links")
+      OCCI::Log.debug("### Successfully parsed #{@locations.size} locations")
+
     end
 
     def categories
