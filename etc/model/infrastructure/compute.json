@@ -48,7 +48,7 @@
                             "mutable":false,
                             "required":false,
                             "type":"string",
-                            "pattern":"inactive|active|suspended|failed",
+                            "pattern":"inactive|active|suspended|error",
                             "default":"inactive"
                         }
                     }

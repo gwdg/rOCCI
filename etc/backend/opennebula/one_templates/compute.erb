@@ -1,25 +1,25 @@
 <%# Mandatory settings %>
-OCCI_ID       = <%= compute.id %>
-NAME          = "<%= compute.title.inspect if compute.title %>"
-DESCRIPTION   = "<%= compute.summary.inspect if compute.summary %>"
-MEMORY        = <%= compute.attributes!.occi!.compute!.memory.to_f * 1000 if compute.attributes!.occi!.compute!.memory %>
-VCPU          = <%= compute.attributes!.occi!.compute!.cores ||= 1 %>
-CPU        	  = <%= compute.attributes!.occi!.compute!.speed ||= 0.01 %>
+OCCI_ID       = <%= @compute.id %>
+NAME          = <%= @compute.title.inspect if @compute.title %>
+DESCRIPTION   = <%= @compute.summary.inspect if @compute.summary %>
+MEMORY        = <%= @compute.attributes!.occi!.compute!.memory.to_f * 1000 if @compute.attributes!.occi!.compute!.memory %>
+VCPU          = <%= @compute.attributes!.occi!.compute!.cores ||= 1 %>
+CPU        	  = <%= @compute.attributes!.occi!.compute!.speed ||= 0.01 %>
 
 <%# KVM specific settings %>
 RAW = [TYPE = kvm]
 OS = [
-	<% if compute.attributes!.occi!.compute!.architecture == "x64" %>
+	<% if @compute.attributes!.occi!.compute!.architecture == "x64" %>
 	ARCH = x86_64,
 	<% else %>
 	ARCH = i686,
 	<% end %>
 
-	BOOT          = <%= compute.attributes!.org!.opennebula!.boot ||= "hd" %>
-]
+	BOOT          = <%= @compute.attributes!.org!.opennebula!.boot ||= "hd" %>
+]           
 
 <%# Links to images %>
-<% compute.links.select {|link| link.kind == "http://schemas.ogf.org/occi/infrastructure#storagelink"}.each do |storagelink| %>
+<% @compute.links.select {|link| link.kind == "http://schemas.ogf.org/occi/infrastructure#storagelink"}.each do |storagelink| %>
 DISK = [
     <% if URI.parse(storagelink.target).relative? %>
 	IMAGE 	= <%= OCCI::Registry.get_by_id("http://schemas.ogf.org/occi/infrastructure#storage").entities.select {|storage| storage.id == storagelink.target.split('/').last}.first.title.inspect %>,
@@ -34,7 +34,7 @@ DISK = [
 <%end%>
 
 <%# Links to networks %>
-<% compute.links.select {|link| link.kind == "http://schemas.ogf.org/occi/infrastructure#networkinterface"}.each do |networkinterface| %>
+<% @compute.links.select {|link| link.kind == "http://schemas.ogf.org/occi/infrastructure#networkinterface"}.each do |networkinterface| %>
 NIC = [
     NETWORK   = <%= OCCI::Registry.get_by_id("http://schemas.ogf.org/occi/infrastructure#network").entities.select {|network| network.id == networkinterface.target.split('/').last}.first.title.inspect %>,
     IP        = <%= link.attributes!.occi!.networkinferface!.address %>,

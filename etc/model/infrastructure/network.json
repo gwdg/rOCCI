@@ -28,7 +28,7 @@
                             "mutable":false,
                             "required":false,
                             "type":"string",
-                            "pattern":"active|inactive",
+                            "pattern":"active|inactive|error",
                             "default":"inactive"
                         }
                     }

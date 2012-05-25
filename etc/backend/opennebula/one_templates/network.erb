@@ -1,23 +1,23 @@
-OCCI_ID         = <%= network.id %>
-NAME            = <%= network.title.inspect %>
-DESCRIPTION     = <%= network.summary.inspect if network.summary %>
-VLAN            = <%= network.attributes!.org!.opennebula!.network!.vlan %>
-VLAN_ID         = <%= network.attributes!.occi!.network!.vlan %>
-PHYDEV          = <%= network.attributes!.org!.opennebula!.network!.phydev %>
-BRIDGE          = <%= network.attributes!.org!.opennebula!.network!.bridge %>
+OCCI_ID         = <%= @network.id %>
+NAME            = <%= @network.title.inspect %>
+DESCRIPTION     = <%= @network.summary.inspect if @network.summary %>
+VLAN            = <%= @network.attributes!.org!.opennebula!.network!.vlan %>
+VLAN_ID         = <%= @network.attributes!.occi!.network!.vlan %>
+PHYDEV          = <%= @network.attributes!.org!.opennebula!.network!.phydev %>
+BRIDGE          = <%= @network.attributes!.org!.opennebula!.network!.bridge %>
 
-<% if network.attributes!.occi!.network!.allocation == 'static' %>
+<% if @network.attributes!.occi!.network!.allocation == 'static' %>
 TYPE            = FIXED
 <% for lease in IPAddr.new(network.attributes!.occi!.network!.address).to_range.select {|address| address != IPAddr.new(network.attributes!.occi!.network!.gateway)} do %>
 LEASES          = [ <%= lease.to_s %> ]
 <% end %>
 <% else %>
 TYPE            = RANGED
-NETWORK_ADDRESS = <%= network.attributes!.occi!.network!.address %>
-IP_START        = <%= network.attributes!.org!.opennebula!.network!.ip_start %>
-IP_END          = <%= network.attributes!.org!.opennebula!.network!.ip_end %>
+NETWORK_ADDRESS = <%= @network.attributes!.occi!.network!.address %>
+IP_START        = <%= @network.attributes!.org!.opennebula!.network!.ip_start %>
+IP_END          = <%= @network.attributes!.org!.opennebula!.network!.ip_end %>
 <% end %>
 
-GATEWAY         = <%= network.attributes!.occi!.network!.gateway %>
+GATEWAY         = <%= @network.attributes!.occi!.network!.gateway %>
 
 
