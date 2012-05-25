@@ -321,7 +321,7 @@ module OCCI
           @request_collection.resources.each do |resource|
             OCCI::Log.debug("Deploying resource with title #{resource.title} in backend #{@backend.class.name}")
             OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_DEPLOY, resource)
-            @collection.locations << self.uri + resource.location
+            @collection.locations << OCCI::Server.uri + resource.location
             status 201
           end
         elsif category.kind_of?(OCCI::Core::Mixin)
@@ -336,7 +336,7 @@ module OCCI
         end
 
       rescue Exception => e
-        logger.error(e)
+        OCCI::Log.error(e.message)
         status 400
       end
     end
