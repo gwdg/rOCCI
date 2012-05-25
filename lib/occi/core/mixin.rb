@@ -34,6 +34,10 @@ module OCCI
         super(mixin, default)
       end
 
+      def location
+        '/mixin/' + self[:term] + '/'
+      end
+
     end
   end
 end

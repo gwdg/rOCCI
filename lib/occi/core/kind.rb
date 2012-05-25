@@ -36,7 +36,6 @@ module OCCI
       end
 
       def entity_type
-        puts type_identifier
         case type_identifier
           when "http://schemas.ogf.org/occi/core#resource"
             return OCCI::Core::Resource.name
@@ -45,6 +44,10 @@ module OCCI
           else
             OCCI::Registry.get_by_id(self[:related].first).entity_type unless self[:term] == 'entity'
         end
+      end
+
+      def location
+        '/' + self[:term] + '/'
       end
 
     end

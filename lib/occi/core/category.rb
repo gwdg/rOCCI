@@ -50,10 +50,6 @@ module OCCI
         regular_reader("scheme") + regular_reader("term")
       end
 
-      def location
-        '/' + self[:term] + '/'
-      end
-
       def related_to?(category_id)
         self.related.each do |category|
           return true if category.type_identifier == category_id || category.related_to?(category_id)
