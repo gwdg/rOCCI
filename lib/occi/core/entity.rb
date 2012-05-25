@@ -31,8 +31,6 @@ module OCCI
   module Core
     class Entity < Hashie::Mash
 
-      attr_accessor :applicable_actions
-
       # Define appropriate kind
       def self.register
         data = Hashie::Mash.new
@@ -53,11 +51,6 @@ module OCCI
       end
 
       def initialize(entity=nil, default = nil)
-        if entity
-          entity.attributes = OCCI::Core::Attributes.new(entity.attributes) if entity
-          kind = OCCI::Registry.get_by_id(entity.kind) if entity
-          @applicable_actions = []
-        end
         super(entity, default)
         self.check
       end
@@ -90,7 +83,7 @@ module OCCI
 
       def check
         definitions = OCCI::Registry.get_by_id(self.kind).attributes if self.kind
-        self.mixins.each { |mixin| definitions.merge!(mixin.attributes) if mixin.attributes } if self.mixins
+        self.mixins.each { |mixin| definitions.merge!(OCCI::Registry.get_by_id(mixin).attributes) if OCCI::Registry.get_by_id(mixin).attributes } if self.mixins
         self.attributes = Entity.check(self.attributes, definitions) if definitions
       end
 
@@ -121,8 +114,6 @@ module OCCI
         attributes.delete_if { |k, v| v.nil? } # remove empty attributes
         return attributes
       end
-
-      private
 
       def convert_value(val, duping=false) #:nodoc:
         case val
