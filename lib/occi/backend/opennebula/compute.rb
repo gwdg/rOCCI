@@ -20,6 +20,7 @@
 ##############################################################################
 
 require 'occi/log'
+require 'erubis'
 
 module OCCI
   module Backend
@@ -28,7 +29,7 @@ module OCCI
       # ---------------------------------------------------------------------------------------------------------------------
       module Compute
 
-        TEMPLATECOMPUTERAWFILE = 'occi_one_template_compute.erb'
+        TEMPLATECOMPUTERAWFILE = 'compute.erb'
 
         # ---------------------------------------------------------------------------------------------------------------------       
         #        private
@@ -43,11 +44,11 @@ module OCCI
 
           compute_kind = OCCI::Registry.get_by_id("http://schemas.ogf.org/occi/infrastructure#compute")
 
-          compute = OCCI::Core::Resource.new
+          compute = Hashie::Mash.new
 
           compute.kind = compute_kind.type_identifier
-          compute.mixins = [OCCI::Registry.get_by_id('http://opennebula.org/occi/infrastructure#compute')]
-          compute.id = backend_object['TEMPLATE/OCCI_ID']||= self.generate_occi_id(compute_kind, backend_object.id.to_s)
+          compute.mixins = %w|http://opennebula.org/occi/infrastructure#compute|
+          compute.id = self.generate_occi_id(compute_kind, backend_object.id.to_s)
           compute.title = backend_object['NAME']
           compute.summary = backend_object['TEMPLATE/DESCRIPTION'] if backend_object['TEMPLATE/DESCRIPTION']
 
@@ -64,10 +65,9 @@ module OCCI
           compute.attributes!.org!.opennebula!.compute!.bootloader = backend_object['TEMPLATE/BOOTLOADER'] if backend_object['TEMPLATE/BOOTLOADER']
           compute.attributes!.org!.opennebula!.compute!.boot = backend_object['TEMPLATE/BOOT'] if backend_object['TEMPLATE/BOOT']
 
-          compute_update_state(compute)
+          compute = OCCI::Core::Resource.new(compute)
 
-          # check compute attributes against definition in kind and mixins
-          compute.check
+          compute_set_state(backend_object, compute)
 
           # TODO: refactor VNC handling
           #if backend_object['TEMPLATE/GRAPHICS/TYPE'] == 'vnc' \
@@ -202,7 +202,9 @@ module OCCI
         def compute_deploy(compute)
           os_tpl = compute.mixins!.select { |mixin| mixin.related_to?("http://schemas.ogf.org/occi/infrastructure#os_tpl") }.first
 
-          templates = TemplatePool.new(@one_client, INFO_ACL)
+          backend_object = nil
+
+          templates = TemplatePool.new(@one_client, OpenNebula::INFO_ACL)
           templates.info
           template = templates.select { |template| template['NAME'] == os_tpl.title }.first
           if template
@@ -211,13 +213,13 @@ module OCCI
             template['TEMPLATE/MEMORY'] = (compute.attributes.occi.compute.memory.to_f * 1000).to_s if compute.attributes!.occi!.compute!.memory
             template['TEMPLATE/ARCHITECTURE'] = compute.attributes.occi.compute.architecture if compute.attributes!.occi!.compute!.architecture
             template['TEMPLATE/CPU'] = compute.attributes.occi.compute.speed if compute.attributes!.occi!.compute!.speed
-            compute = template.instantiate
-            check_rc(compute)
+            backend_object = template.instantiate
+            check_rc(backend_object)
           else
-            compute = VirtualMachine.new(VirtualMachine.build_xml, @one_client)
+            backend_object = VirtualMachine.new(VirtualMachine.build_xml, @one_client)
 
             template_location = OCCI::Server.config["TEMPLATE_LOCATION"] + TEMPLATECOMPUTERAWFILE
-            template = Erubis::Eruby.new(File.read(template_location)).evaluate(compute)
+            template = Erubis::Eruby.new(File.read(template_location)).evaluate(:compute => compute)
 
             OCCI::Log.debug("Parsed template #{template}")
             rc = backend_object.allocate(template)
@@ -225,132 +227,134 @@ module OCCI
             OCCI::Log.debug("Return code from OpenNebula #{rc}") if rc != nil
           end
 
-          compute_update_state(compute)
+          backend_object.info
+          compute.id = self.generate_occi_id(OCCI::Registry.get_by_id(compute.kind), backend_object['ID'].to_s)
 
-          OCCI::Log.debug("OpenNebula ID of virtual machine: #{compute.backend[:id]}")
+          compute_set_state(backend_object, compute)
+
           OCCI::Log.debug("OpenNebula automatically triggers action start for Virtual Machines")
           OCCI::Log.debug("Changing state to started")
         end
 
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      def compute_update_state(compute)
-        backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
-        backend_object.info
-        OCCI::Log.debug("current VM state is: #{backend_object.lcm_state_str}")
-        case backend_object.lcm_state_str
-          when "RUNNING" then
-            compute.attributes!.occi!.compute!.state = "active"
-            compute.applicable_actions << OCCI::Registry.get_by_id("http://schemas.ogf.org/occi/infrastructure/compute/action#stop")
-            compute.applicable_actions << OCCI::Registry.get_by_id("http://schemas.ogf.org/occi/infrastructure/compute/action#restart")
-            compute.applicable_actions << OCCI::Registry.get_by_id("http://schemas.ogf.org/occi/infrastructure/compute/action#suspend")
-          when "PROLOG", "BOOT", "SAVE_STOP", "SAVE_SUSPEND", "SAVE_MIGRATE", "MIGRATE", "PROLOG_MIGRATE", "PROLOG_RESUME" then
-            compute.attributes!.occi!.compute!.state = "inactive"
-          when "SUSPENDED" then
-            compute.attributes!.occi!.compute!.state = "suspended"
-            compute.applicable_actions << OCCI::Registry.get_by_id("http://schemas.ogf.org/occi/infrastructure/compute/action#start")
-          when "FAIL" then
-            compute.attributes!.occi!.compute!.state = "error"
-            compute.applicable_actions << OCCI::Registry.get_by_id("http://schemas.ogf.org/occi/infrastructure/compute/action#start")
-          else
-            compute.attributes!.occi!.compute!.state = "inactive"
-            compute.applicable_actions << OCCI::Registry.get_by_id("http://schemas.ogf.org/occi/infrastructure/compute/action#start")
+        # ---------------------------------------------------------------------------------------------------------------------
+        def compute_set_state(backend_object, compute)
+          OCCI::Log.debug("current VM state is: #{backend_object.lcm_state_str}")
+          compute.actions = []
+          case backend_object.lcm_state_str
+            when "RUNNING" then
+              compute.attributes!.occi!.compute!.state = "active"
+              compute.actions << OCCI::Server.uri + compute.location + '?action=stop'
+              compute.actions << OCCI::Server.uri + compute.location + '?action=restart'
+              compute.actions << OCCI::Server.uri + compute.location + '?action=suspend'
+            when "PROLOG", "BOOT", "SAVE_STOP", "SAVE_SUSPEND", "SAVE_MIGRATE", "MIGRATE", "PROLOG_MIGRATE", "PROLOG_RESUME" then
+              compute.attributes!.occi!.compute!.state = "inactive"
+              compute.actions << OCCI::Server.uri + compute.location + '?action=stop'
+              compute.actions << OCCI::Server.uri + compute.location + '?action=restart'
+            when "SUSPENDED" then
+              compute.attributes!.occi!.compute!.state = "suspended"
+              compute.actions << OCCI::Server.uri + compute.location + '?action=start'
+            when "FAIL" then
+              compute.attributes!.occi!.compute!.state = "error"
+              compute.actions << OCCI::Server.uri + compute.location + '?action=start'
+            else
+              compute.attributes!.occi!.compute!.state = "inactive"
+              compute.actions << OCCI::Server.uri + compute.location + '?action=start'
+          end
         end
-      end
 
-      # ---------------------------------------------------------------------------------------------------------------------
-      def compute_delete(compute)
-        backend_object=VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
+        # ---------------------------------------------------------------------------------------------------------------------
+        def compute_delete(compute)
+          backend_object=VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
 
-        rc = backend_object.finalize
-        check_rc(rc)
-        # TODO: VNC
-        #OCCI::Log.debug("killing NoVNC pipe with pid #{compute.backend[:novnc_pipe].pid}") unless compute.backend[:novnc_pipe].nil?
-        #Process.kill 'INT', compute.backend[:novnc_pipe].pid unless compute.backend[:novnc_pipe].nil?
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      # GET ALL COMPUTE INSTANCES
-      def compute_register_all_instances
-        backend_object_pool = VirtualMachinePool.new(@one_client)
-        backend_object_pool.info(OCCI::Backend::OpenNebula::OpenNebula::INFO_ACL, -1, -1, OpenNebula::VirtualMachinePool::INFO_NOT_DONE)
-        compute_register_all_objects(backend_object_pool)
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      # GET ALL COMPUTE TEMPLATES
-      def compute_register_all_templates
-        backend_object_pool = TemplatePool.new(@one_client, INFO_ACL)
-        backend_object_pool.info
-        compute_register_all_objects(backend_object_pool, template = true)
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      # GET ALL COMPUTE OBJECTS
-      def compute_register_all_objects(backend_object_pool, template = false)
-        backend_object_pool.each { |backend_object| compute_parse_backend_object(backend_object) }
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      # COMPUTE ACTIONS
-      # ---------------------------------------------------------------------------------------------------------------------
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      def compute_action_dummy(compute, parameters)
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      # COMPUTE Action start
-      def compute_start(compute, parameters)
-        backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
-        rc = backend_object.resume
-        check_rc(rc)
-      end
-
-      # ---------------------------------------------------------------------------------------------------------------------
-      # Action stop
-      def compute_stop(compute, parameters)
-        backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
-        # TODO: implement parameters when available in OpenNebula
-        case parameters
-          when 'method="graceful"'
-            OCCI::Log.debug("Trying to stop VM graceful")
-            rc = backend_object.shutdown
-          when 'method="acpioff"'
-            OCCI::Log.debug("Trying to stop VM via ACPI off")
-            rc = backend_object.shutdown
-          else # method="poweroff" or no method specified
-            OCCI::Log.debug("Powering off VM")
-            rc = backend_object.shutdown
+          rc = backend_object.finalize
+          check_rc(rc)
+          # TODO: VNC
+          #OCCI::Log.debug("killing NoVNC pipe with pid #{compute.backend[:novnc_pipe].pid}") unless compute.backend[:novnc_pipe].nil?
+          #Process.kill 'INT', compute.backend[:novnc_pipe].pid unless compute.backend[:novnc_pipe].nil?
         end
-        check_rc(rc)
-      end
 
-      # ---------------------------------------------------------------------------------------------------------------------
-      # Action restart
-      def compute_restart(compute, parameters)
-        backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
-        # TODO: implement parameters when available in OpenNebula
-        case parameters
-          when "graceful"
-            rc = vm.reboot
-          when "warm"
-            rc = vm.reboot
-          else # "cold" or no parameter specified
-            rc = vm.resubmit
+        # ---------------------------------------------------------------------------------------------------------------------
+        # GET ALL COMPUTE INSTANCES
+        def compute_register_all_instances
+          backend_object_pool = VirtualMachinePool.new(@one_client)
+          backend_object_pool.info(OCCI::Backend::OpenNebula::OpenNebula::INFO_ACL, -1, -1, OpenNebula::VirtualMachinePool::INFO_NOT_DONE)
+          compute_register_all_objects(backend_object_pool)
         end
-        check_rc(rc)
-      end
 
-      # ---------------------------------------------------------------------------------------------------------------------
-      # Action suspend
-      def compute_suspend(compute, parameters)
-        backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
-        rc = vm.suspend
-        check_rc(rc)
-      end
+        # ---------------------------------------------------------------------------------------------------------------------
+        # GET ALL COMPUTE TEMPLATES
+        def compute_register_all_templates
+          backend_object_pool = TemplatePool.new(@one_client, INFO_ACL)
+          backend_object_pool.info
+          compute_register_all_objects(backend_object_pool, template = true)
+        end
 
+        # ---------------------------------------------------------------------------------------------------------------------
+        # GET ALL COMPUTE OBJECTS
+        def compute_register_all_objects(backend_object_pool, template = false)
+          backend_object_pool.each { |backend_object| compute_parse_backend_object(backend_object) }
+        end
+
+        # ---------------------------------------------------------------------------------------------------------------------
+        # COMPUTE ACTIONS
+        # ---------------------------------------------------------------------------------------------------------------------
+
+        # ---------------------------------------------------------------------------------------------------------------------
+        def compute_action_dummy(compute, parameters)
+        end
+
+        # ---------------------------------------------------------------------------------------------------------------------
+        # COMPUTE Action start
+        def compute_start(compute, parameters)
+          backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
+          rc = backend_object.resume
+          check_rc(rc)
+        end
+
+        # ---------------------------------------------------------------------------------------------------------------------
+        # Action stop
+        def compute_stop(compute, parameters)
+          backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
+          # TODO: implement parameters when available in OpenNebula
+          case parameters
+            when 'method="graceful"'
+              OCCI::Log.debug("Trying to stop VM graceful")
+              rc = backend_object.shutdown
+            when 'method="acpioff"'
+              OCCI::Log.debug("Trying to stop VM via ACPI off")
+              rc = backend_object.shutdown
+            else # method="poweroff" or no method specified
+              OCCI::Log.debug("Powering off VM")
+              rc = backend_object.shutdown
+          end
+          check_rc(rc)
+        end
+
+        # ---------------------------------------------------------------------------------------------------------------------
+        # Action restart
+        def compute_restart(compute, parameters)
+          backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
+          # TODO: implement parameters when available in OpenNebula
+          case parameters
+            when "graceful"
+              rc = vm.reboot
+            when "warm"
+              rc = vm.reboot
+            else # "cold" or no parameter specified
+              rc = vm.resubmit
+          end
+          check_rc(rc)
+        end
+
+        # ---------------------------------------------------------------------------------------------------------------------
+        # Action suspend
+        def compute_suspend(compute, parameters)
+          backend_object = VirtualMachine.new(VirtualMachine.build_xml(compute.backend[:id]), @one_client)
+          rc = vm.suspend
+          check_rc(rc)
+        end
+
+      end
     end
   end
 end

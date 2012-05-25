@@ -20,6 +20,7 @@
 ##############################################################################
 
 require 'occi/log'
+require 'erubis'
 require 'ipaddr'
 
 module OCCI
@@ -43,11 +44,11 @@ module OCCI
 
           network_kind = OCCI::Registry.get_by_id("http://schemas.ogf.org/occi/infrastructure#network")
 
-          network = OCCI::Core::Resource.new
+          network = Hashie::Mash.new
 
           network.kind = storage_kind.type_identifier
-          network.mixins = [OCCI::Registry.get_by_id('http://opennebula.org/occi/infrastructure#network')]
-          network.id = backend_object['TEMPLATE/OCCI_ID']||= self.generate_occi_id(network_kind, backend_object.id.to_s)
+          network.mixins = %w|http://opennebula.org/occi/infrastructure#network http://schemas.ogf.org/occi/infrastructure#ipnetwork|
+          network.id = self.generate_occi_id(network_kind, backend_object.id.to_s)
           network.title = backend_object['NAME']
           network.summary = backend_object['TEMPLATE/DESCRIPTION'] if backend_object['TEMPLATE/DESCRIPTION']
 
@@ -64,10 +65,9 @@ module OCCI
           network.attributes!.org!.opennebula!.network!.ip_start = backend_object['TEMPLATE/IP_START'] if backend_object['TEMPLATE/IP_START']
           network.attributes!.org!.opennebula!.network!.ip_end = backend_object['TEMPLATE/IP_END'] if backend_object['TEMPLATE/IP_END']
 
-          network_update_state(storage)
+          network = OCCI::Core::Resource.new(network)
 
-          # check storage attributes against definition in kind and mixins
-          network.check
+          network_set_state(backend_object, network)
 
           network_kind.entities << network
         end
@@ -87,12 +87,17 @@ module OCCI
           OCCI::Log.debug("Parsed template #{template}")
           rc = backend_object.allocate(template)
           check_rc(rc)
-          network.backend[:id] = backend_object.id
+
+          backend_object.info
+          network.id = self.generate_occi_id(OCCI::Registry.get_by_id(network.kind), backend_object['ID'].to_s)
+
+          network_set_state(backend_object, network)
+
           OCCI::Log.debug("OpenNebula ID of virtual network: #{network.backend[:id]}")
         end
 
-        # ---------------------------------------------------------------------------------------------------------------------     
-        def network_update_state(network)
+        # ---------------------------------------------------------------------------------------------------------------------
+        def network_set_state(backend_object, network)
           network.attributes!.occi!.network!.state = "active"
         end
 

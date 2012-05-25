@@ -20,6 +20,7 @@
 ##############################################################################
 
 require 'occi/log'
+require 'erubis'
 
 module OCCI
   module Backend
@@ -42,11 +43,11 @@ module OCCI
 
           storage_kind = OCCI::Registry.get_by_id("http://schemas.ogf.org/occi/infrastructure#storage")
 
-          storage = OCCI::Core::Resource.new
+          storage = Hashie::Mash.new
 
           storage.kind = storage_kind.type_identifier
-          storage.mixins = [OCCI::Registry.get_by_id('http://opennebula.org/occi/infrastructure#storage')]
-          storage.id = backend_object['TEMPLATE/OCCI_ID']||= self.generate_occi_id(storage_kind, backend_object.id.to_s)
+          storage.mixins = %w|http://opennebula.org/occi/infrastructure#storage|
+          storage.id = self.generate_occi_id(storage_kind, backend_object.id.to_s)
           storage.title = backend_object['NAME']
           storage.summary = backend_object['TEMPLATE/DESCRIPTION'] if backend_object['TEMPLATE/DESCRIPTION']
 
@@ -58,10 +59,9 @@ module OCCI
           storage.attributes!.org!.opennebula!.storage!.bus = backend_object['TEMPLATE/BUS'] if backend_object['TEMPLATE/BUS']
           storage.attributes!.org!.opennebula!.storage!.driver = backend_object['TEMPLATE/DRIVER'] if backend_object['TEMPLATE/DRIVER']
 
-          storage_update_state(storage)
+          storage = OCCI::Core::Resource.new(storage)
 
-          # check storage attributes against definition in kind and mixins
-          storage.check
+          storage_set_state(backend_object, storage)
 
           storage_kind.entities << storage
         end
@@ -73,7 +73,7 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         def storage_deploy(storage)
 
-          storage = Image.new(Image.build_xml, @one_client)
+          backend_object = Image.new(Image.build_xml, @one_client)
 
           template_location = OCCI::Server.config["TEMPLATE_LOCATION"] + TEMPLATESTORAGERAWFILE
           template = Erubis::Eruby.new(File.read(template_raw)).evaluate(storage)
@@ -83,21 +83,32 @@ module OCCI
           check_rc(rc)
           OCCI::Log.debug("OpenNebula ID of image: #{storage.backend[:id]}")
 
-          storage_update_state
+          backend_object.info
+          storage.id = self.generate_occi_id(OCCI::Registry.get_by_id(storage.kind), backend_object['ID'].to_s)
+
+          storage_set_state(backend_object)
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
-        def storage_update_state(storage)
-          backend_object = Image.new(Image.build_xml(storage.backend[:id]), @one_client)
-          backend_object.info
+        def storage_set_state(backend_object, storage)
           OCCI::Log.debug("current Image state is: #{backend_object.state_str}")
+          storage.actions = []
           case backend_object.state_str
             when "READY", "USED", "LOCKED" then
               storage.attributes!.occi!.storage!.state = "online"
+              storage.actions << OCCI::Server.uri + storage.location + '?action=offline'
+              storage.actions << OCCI::Server.uri + storage.location + '?action=backup'
+              storage.actions << OCCI::Server.uri + storage.location + '?action=snapshot'
+              storage.actions << OCCI::Server.uri + storage.location + '?action=resize'
             when "ERROR" then
-              storage.attributes!.occi!.storage!.state = "error"
+              storage.attributes!.occi!.storage!.state = "degraded"
+              storage.actions << OCCI::Server.uri + storage.location + '?action=online'
             else
               storage.attributes!.occi!.storage!.state = "offline"
+              storage.actions << OCCI::Server.uri + storage.location + '?action=offline'
+              storage.actions << OCCI::Server.uri + storage.location + '?action=backup'
+              storage.actions << OCCI::Server.uri + storage.location + '?action=snapshot'
+              storage.actions << OCCI::Server.uri + storage.location + '?action=resize'
           end
         end
 
