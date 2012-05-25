@@ -53,6 +53,21 @@ module OCCI
         self.attributes!.occi!.core!.summary = summary
       end
 
+      def convert_value(val, duping=false) #:nodoc:
+        case val
+          when self.class
+            val.dup
+          when ::Hash
+            val = val.dup if duping
+            self.class.subkey_class.new.merge(val) unless val.kind_of?(Hashie::Mash)
+            val
+          when Array
+            val.collect { |e| convert_value(e) }
+          else
+            val
+        end
+      end
+
     end
   end
 end
