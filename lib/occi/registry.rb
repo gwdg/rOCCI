@@ -37,14 +37,14 @@ module OCCI
     def self.register(category)
       OCCI::Log.debug("### Registering category #{category.type_identifier}")
       @@categories[category.type_identifier] = category
-      @@locations[category.term] = category.type_identifier unless category.kind_of?(OCCI::Core::Action)
+      @@locations[category.location] = category.type_identifier unless category.kind_of?(OCCI::Core::Action)
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
     def self.unregister(category)
       OCCI::Log.debug("### Unregistering category #{category.type_identifier}")
       @@categories.delete(category.type_identifier)
-      @@locations.delete(category.term) unless category.kind_of?(OCCI :Core::Action)
+      @@locations.delete(category.location) unless category.kind_of?(OCCI :Core::Action)
     end
 
     # Returns the category corresponding to a given type identifier
@@ -58,7 +58,7 @@ module OCCI
     #
     # @param [URI] Location of a category
     def self.get_by_location(location)
-      id = @@locations.fetch(location.delete('/')) { OCCI::Log.debug("Category with location #{location} not found"); nil }
+      id = @@locations.fetch(location) { OCCI::Log.debug("Category with location #{location} not found"); nil }
       self.get_by_id(id)
     end
 
