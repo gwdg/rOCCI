@@ -166,11 +166,11 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------     
         def register_existing_resources
           # get all compute objects
-          resource_template_register()
-          os_template_register()
-          compute_register_all_instances()
-          network_register_all_instances()
-          storage_register_all_instances()
+          resource_template_register
+          os_template_register
+          compute_register_all_instances
+          network_register_all_instances
+          storage_register_all_instances
         end
 
         # ---------------------------------------------------------------------------------------------------------------------     
