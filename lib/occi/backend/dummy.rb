@@ -49,7 +49,6 @@ module OCCI
           # Generic resource operations
           :deploy => :resource_deploy,
           :update_state => :resource_update_state,
-          :refresh => :resource_refresh,
           :delete => :resource_delete,
 
           # Compute specific resource operations
@@ -64,7 +63,6 @@ module OCCI
           # Generic resource operations
           :deploy => :resource_deploy,
           :update_state => :resource_update_state,
-          :refresh => :resource_refresh,
           :delete => :resource_delete,
 
           # Network specific resource operations
@@ -77,7 +75,6 @@ module OCCI
           # Generic resource operations
           :deploy => :resource_deploy,
           :update_state => :resource_update_state,
-          :refresh => :resource_refresh,
           :delete => :resource_delete,
 
           # Network specific resource operations
@@ -93,7 +90,6 @@ module OCCI
           # Generic resource operations
           :deploy => :resource_deploy,
           :update_state => :resource_update_state,
-          :refresh => :resource_refresh,
           :delete => :resource_delete,
       }
 

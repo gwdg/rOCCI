@@ -68,7 +68,6 @@ module OCCI
             # Generic resource operations
             :deploy => :compute_deploy,
             :update_state => :compute_update_state,
-            :refresh => :compute_refresh,
             :delete => :compute_delete,
 
             # Compute specific resource operations
@@ -83,7 +82,6 @@ module OCCI
             # Generic resource operations
             :deploy => :network_deploy,
             :update_state => :network_update_state,
-            :refresh => :network_refresh,
             :delete => :network_delete,
 
             # Network specific resource operations
@@ -96,7 +94,6 @@ module OCCI
             # Generic resource operations
             :deploy => :storage_deploy,
             :update_state => :storage_update_state,
-            :refresh => :storage_refresh,
             :delete => :storage_delete,
 
             # Network specific resource operations
@@ -105,15 +102,6 @@ module OCCI
             :backup => :storage_backup,
             :snapshot => :storage_snapshot,
             :resize => :storage_resize
-        }
-
-        OPERATIONS["http://schemas.ogf.org/gwdg#nfsstorage"] = {
-
-            # Generic resource operations
-            :deploy => nil,
-            :update_state => nil,
-            :refresh => nil,
-            :delete => nil,
         }
 
         # ---------------------------------------------------------------------------------------------------------------------       
