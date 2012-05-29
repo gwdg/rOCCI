@@ -114,19 +114,12 @@ module OCCI
 
         OCCI::Log.debug("Delegating invocation of action [#{action}] on resource [#{resource}] with parameters [#{parameters}] to backend...")
 
-        # Verify
-        state_machine = resource.state_machine
-        raise "Action [#{action}] not valid for current state [#{state_machine.current_state}] of resource [#{resource}]!" if !state_machine.check_transition(action)
-
         # Use action term as ident
-        operation = action.category.term.to_s
+        operation = action.term
 
         begin
           # TODO: define some convention for result handling!
           signal_resource(backend, operation, resource, parameters)
-
-          state_machine.transition(action)
-          signal_resource(backend, OCCI::Backend::RESOURCE_UPDATE_STATE, resource)
 
         rescue OCCI::BackendError
           OCCI::Log.error("Action invocation failed!")

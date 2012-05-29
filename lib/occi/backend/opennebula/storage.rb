@@ -86,35 +86,35 @@ module OCCI
           backend_object.info
           storage.id = self.generate_occi_id(OCCI::Registry.get_by_id(storage.kind), backend_object['ID'].to_s)
 
-          storage_set_state(backend_object)
+          storage_set_state(backend_object, storage)
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
         def storage_set_state(backend_object, storage)
           OCCI::Log.debug("current Image state is: #{backend_object.state_str}")
-          storage.actions = []
+          storage.links = []
           case backend_object.state_str
             when "READY", "USED", "LOCKED" then
               storage.attributes!.occi!.storage!.state = "online"
-              storage.actions << OCCI::Server.uri + storage.location + '?action=offline'
-              storage.actions << OCCI::Server.uri + storage.location + '?action=backup'
-              storage.actions << OCCI::Server.uri + storage.location + '?action=snapshot'
-              storage.actions << OCCI::Server.uri + storage.location + '?action=resize'
+              storage.links << OCCI::Core::Link.new(:target=>storage.location + '?action=offline',:rel=>'http://schemas.ogf.org/occi/infrastructure/storage/action#offline')
+              storage.links << OCCI::Core::Link.new(:target=>storage.location + '?action=backup',:rel=>'http://schemas.ogf.org/occi/infrastructure/storage/action#backup')
+              storage.links << OCCI::Core::Link.new(:target=>storage.location + '?action=snapshot',:rel=>'http://schemas.ogf.org/occi/infrastructure/storage/action#snapshot')
+              storage.links << OCCI::Core::Link.new(:target=>storage.location + '?action=resize',:rel=>'http://schemas.ogf.org/occi/infrastructure/storage/action#resize')
             when "ERROR" then
               storage.attributes!.occi!.storage!.state = "degraded"
-              storage.actions << OCCI::Server.uri + storage.location + '?action=online'
+              storage.links << OCCI::Core::Link.new(:target=>storage.location + '?action=online',:rel=>'http://schemas.ogf.org/occi/infrastructure/storage/action#online')
             else
               storage.attributes!.occi!.storage!.state = "offline"
-              storage.actions << OCCI::Server.uri + storage.location + '?action=offline'
-              storage.actions << OCCI::Server.uri + storage.location + '?action=backup'
-              storage.actions << OCCI::Server.uri + storage.location + '?action=snapshot'
-              storage.actions << OCCI::Server.uri + storage.location + '?action=resize'
+              storage.links << OCCI::Core::Link.new(:target=>storage.location + '?action=online',:rel=>'http://schemas.ogf.org/occi/infrastructure/storage/action#online')
+              storage.links << OCCI::Core::Link.new(:target=>storage.location + '?action=backup',:rel=>'http://schemas.ogf.org/occi/infrastructure/storage/action#backup')
+              storage.links << OCCI::Core::Link.new(:target=>storage.location + '?action=snapshot',:rel=>'http://schemas.ogf.org/occi/infrastructure/storage/action#snapshot')
+              storage.links << OCCI::Core::Link.new(:target=>storage.location + '?action=resize',:rel=>'http://schemas.ogf.org/occi/infrastructure/storage/action#resize')
           end
         end
 
         # ---------------------------------------------------------------------------------------------------------------------
         def storage_delete(storage)
-          backend_object = Image.new(Image.build_xml(storage.backend[:id]), @one_client)
+          backend_object = Image.new(Image.build_xml(storage.backend.id), @one_client)
           rc = backend_object.delete
           check_rc(rc)
         end
@@ -138,7 +138,7 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         # Action online
         def storage_online(network, parameters)
-          backend_object = Image.new(Image.build_xml(network.backend[:id]), @one_client)
+          backend_object = Image.new(Image.build_xml(network.backend.id), @one_client)
           rc = backend_object.enable
           check_rc(rc)
         end
@@ -146,7 +146,7 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         # Action offline
         def storage_offline(network, parameters)
-          backend_object = Image.new(Image.build_xml(network.backend[:id]), @one_client)
+          backend_object = Image.new(Image.build_xml(network.backend.id), @one_client)
           rc = backend_object.disable
           check_rc(rc)
         end

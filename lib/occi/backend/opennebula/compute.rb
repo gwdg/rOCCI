@@ -239,26 +239,26 @@ module OCCI
         # ---------------------------------------------------------------------------------------------------------------------
         def compute_set_state(backend_object, compute)
           OCCI::Log.debug("current VM state is: #{backend_object.lcm_state_str}")
-          compute.actions = []
+          compute.links ||= []
           case backend_object.lcm_state_str
             when "RUNNING" then
               compute.attributes!.occi!.compute!.state = "active"
-              compute.actions << OCCI::Server.uri + compute.location + '?action=stop'
-              compute.actions << OCCI::Server.uri + compute.location + '?action=restart'
-              compute.actions << OCCI::Server.uri + compute.location + '?action=suspend'
+              compute.links << OCCI::Core::Link.new(:target=>compute.location + '?action=stop',:rel=>'http://schemas.ogf.org/occi/infrastructure/compute/action#stop')
+              compute.links << OCCI::Core::Link.new(:target=>compute.location + '?action=restart',:rel=>'http://schemas.ogf.org/occi/infrastructure/compute/action#restart')
+              compute.links << OCCI::Core::Link.new(:target=>compute.location + '?action=suspend',:rel=>'http://schemas.ogf.org/occi/infrastructure/compute/action#suspend')
             when "PROLOG", "BOOT", "SAVE_STOP", "SAVE_SUSPEND", "SAVE_MIGRATE", "MIGRATE", "PROLOG_MIGRATE", "PROLOG_RESUME" then
               compute.attributes!.occi!.compute!.state = "inactive"
-              compute.actions << OCCI::Server.uri + compute.location + '?action=stop'
-              compute.actions << OCCI::Server.uri + compute.location + '?action=restart'
+              compute.links << OCCI::Core::Link.new(:target=>compute.location + '?action=stop',:rel=>'http://schemas.ogf.org/occi/infrastructure/compute/action#stop')
+              compute.links << OCCI::Core::Link.new(:target=>compute.location + '?action=restart',:rel=>'http://schemas.ogf.org/occi/infrastructure/compute/action#restart')
             when "SUSPENDED" then
               compute.attributes!.occi!.compute!.state = "suspended"
-              compute.actions << OCCI::Server.uri + compute.location + '?action=start'
+              compute.links << OCCI::Core::Link.new(:target=>compute.location + '?action=start',:rel=>'http://schemas.ogf.org/occi/infrastructure/compute/action#start')
             when "FAIL" then
               compute.attributes!.occi!.compute!.state = "error"
-              compute.actions << OCCI::Server.uri + compute.location + '?action=start'
+              compute.links << OCCI::Core::Link.new(:target=>compute.location + '?action=start',:rel=>'http://schemas.ogf.org/occi/infrastructure/compute/action#start')
             else
               compute.attributes!.occi!.compute!.state = "inactive"
-              compute.actions << OCCI::Server.uri + compute.location + '?action=start'
+              compute.links << OCCI::Core::Link.new(:target=>compute.location + '?action=start',:rel=>'http://schemas.ogf.org/occi/infrastructure/compute/action#start')
           end
         end
 
