@@ -3,6 +3,7 @@ require 'rspec/http'
 require 'rack/test'
 require 'logger'
 require 'json'
+require 'uri'
 
 require 'occi/server'
 require 'occi/registry'
@@ -79,7 +80,7 @@ describe OCCI::Server do
   end
 
   describe "POST /compute/" do
-    it "creates a new compute resource with plain text format" do
+    it "creates a new compute resource with a request in plain text format" do
       header "Accept", "text/uri-list"
       header "Content-type", "text/plain"
       body = %Q{Category: compute; scheme="http://schemas.ogf.org/occi/infrastructure#"; class="kind"}
@@ -88,10 +89,10 @@ describe OCCI::Server do
       last_response.should be_http_created
     end
 
-    it "creates a new compute resource with json format" do
+    it "creates a new compute resource with a request in json format" do
       header "Accept", "text/uri-list"
       header "Content-type", "application/occi+json"
-      body = %Q|{"resources":[{"attributes":{"occi":{"compute":{"cores":2,"architecture":"x86"}}},"kind":"http://schemas.ogf.org/occi/infrastructure#compute"}]}|
+      body = %Q|{"resources":[{"attributes":{"occi":{"compute":{"cores":2}}},"kind":"http://schemas.ogf.org/occi/infrastructure#compute"}]}|
       post '/compute/', body
       last_response.should be_http_created
     end
@@ -102,7 +103,71 @@ describe OCCI::Server do
       header "Accept", "text/uri-list"
       get '/compute/'
       last_response.should be_http_ok
-      last_response.body.lines.count.should >= 1
+      last_response.body.lines.count.should == 2
+    end
+  end
+
+  describe "GET /compute/$uuid" do
+    it "gets specific compute resource in text/plain format" do
+      header "Accept", "text/uri-list"
+      get '/compute/'
+      last_response.should be_http_ok
+      location = URI.parse(last_response.body.lines.to_a.last)
+      header "Accept", "text/plain"
+      get location.path
+      last_response.should be_http_ok
+      last_response.body.should include('scheme="http://schemas.ogf.org/occi/infrastructure#"')
+    end
+  end
+
+  describe "GET /compute/$uuid" do
+    it "gets specific compute resource in application/json format" do
+      header "Accept", "text/uri-list"
+      get '/compute/'
+      last_response.should be_http_ok
+      location = URI.parse(last_response.body.lines.to_a.last)
+      header "Accept", "application/occi+json"
+      get location.path
+      last_response.should be_http_ok
+      collection = Hashie::Mash.new(JSON.parse(last_response.body))
+      collection.resources.first.kind.should == 'http://schemas.ogf.org/occi/infrastructure#compute'
+    end
+  end
+
+  describe "POST /compute/$uuid?action=X" do
+    it "triggers applicable action on a previously created compute resource" do
+      header "Content-type", ''
+      header "Accept", "text/uri-list"
+      get '/compute/'
+      last_response.should be_http_ok
+      location = URI.parse(last_response.body.lines.to_a.last)
+      header "Accept", "application/occi+json"
+      get location.path
+      last_response.should be_http_ok
+      collection = Hashie::Mash.new(JSON.parse(last_response.body))
+      action_location = collection.resources.first.links.first.target
+      puts action_location
+      post action_location
+      last_response.should be_http_ok
+    end
+  end
+
+  describe "POST /storage/" do
+    it "creates a new storage resource with a request in plain text format" do
+      header "Accept", "text/uri-list"
+      header "Content-type", "text/plain"
+      body = %Q{Category: storage; scheme="http://schemas.ogf.org/occi/infrastructure#"; class="kind"}
+      body += %Q{\nX-OCCI-Attribute: occi.storage.size=2}
+      post '/storage/', body
+      last_response.should be_http_created
+    end
+
+    it "creates a new storage resource with a request in plain text format" do
+      header "Accept", "text/uri-list"
+      header "Content-type", "application/occi+json"
+      body = %Q|{"resources":[{"attributes":{"occi":{"storage":{"size":2}}},"kind":"http://schemas.ogf.org/occi/infrastructure#storage"}]}|
+      post '/storage/', body
+      last_response.should be_http_created
     end
   end
 
@@ -110,10 +175,21 @@ describe OCCI::Server do
     it "deletes all compute resources" do
       header "Content-type", ''
       delete '/compute/'
-      puts last_response.body
       last_response.should be_http_ok
       header "Accept", "text/uri-list"
       get '/compute/'
+      last_response.should be_http_ok
+      last_response.body.should be_empty
+    end
+  end
+
+  describe "DELETE /" do
+    it "deletes all resources" do
+      header "Content-type", ''
+      delete '/'
+      last_response.should be_http_ok
+      header "Accept", "text/uri-list"
+      get '/storage/'
       last_response.should be_http_ok
       last_response.body.should be_empty
     end
