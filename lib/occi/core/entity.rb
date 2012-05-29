@@ -74,7 +74,7 @@ module OCCI
       end
 
       def location
-        '/' + OCCI::Registry.get_by_id(self[:kind]).term + '/' + self[:id]
+        '/' + OCCI::Registry.get_by_id(self.kind).term + '/' + self.id if self.kind
       end
 
       def type_identifier
@@ -88,7 +88,7 @@ module OCCI
       end
 
       def self.check(attributes, definitions)
-        attributes ||= OCCI::Core::Attributes.new
+        attributes = OCCI::Core::Attributes.new(attributes)
         definitions.each_key do |key|
           properties = definitions[key]
           value = attributes[key] ||= properties[:default]
