@@ -21,10 +21,10 @@ Link: <<%= link.target %>>;rel="<%= link.related %>";self="<%= link.location %>"
 <% resource.applicable_actions do |action| %>
 Link: <<%= resource.location + '?action=' + action.term %>>;rel="<%= action.type_identifier %>"
 <% end if resource.applicable_actions %>
-<% end if collection.resources %>
+<% end if collection.resources and locations.empty? %>
 <% collection.links.each do |link| %>
 Link: <<%= link.target %>>;rel="<%= link.related %>";self="<%= link.location %>";category="<%= link.kind %><%= ';' + link.attributes.combine.collect { |attr| attr.keys.first + '=' + attr.values.first.inspect }.join(' ') if link.attributes %>
 <% end if collection.links %>
-<% collection.locations.each do |location| %>
+<% locations.each do |location| %>
 X-OCCI-Location:  <%= location.to_s %>
-<% end if collection.locations %>
+<% end if locations.any? %>

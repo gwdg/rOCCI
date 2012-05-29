@@ -216,7 +216,8 @@ module OCCI
       response['Accept'] = "application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml"
       response['Server'] = "rOCCI/#{VERSION_NUMBER} OCCI/1.1"
       OCCI::Log.debug('### Initialize response OCCI collection ###')
-      @collection = Hashie::Mash.new(:kinds => [], :mixins => [], :actions => [], :resources => [], :links => [], :locations => [])
+      @collection = Hashie::Mash.new(:kinds => [], :mixins => [], :actions => [], :resources => [], :links => [])
+      @locations = Array.new
       OCCI::Log.debug('### Preparing authentication handling ###')
       authentication = Rack::Auth::Basic::Request.new(request.env)
       OCCI::Log.debug('### Initializing backend ###')
@@ -234,14 +235,14 @@ module OCCI
       OCCI::Log.debug('### Rendering response ###')
       @collection.delete_if { |k, v| v.empty? } # remove empty entries
       respond_to do |f|
-        f.txt { erb :collection, :locals => {:collection => @collection} }
+        f.txt { erb :collection, :locals => {:collection => @collection, :locations => @locations} }
+        f.on('*/*') { erb :collection, :locals => {:collection => @collection, :locations => @locations} }
         # f.html { haml :collection, :locals => {:collection => @collection} }
         f.json { @collection.to_json }
         f.on('application/occi+json') { @collection.to_json }
         f.xml { @collection.to_xml(:root => "collection") }
         f.on('application/occi+xml') { @collection.to_xml(:root => "collection") }
-        f.on('text/uri-list') { ((@collection.resources.to_a + @collection.links.to_a).collect { |entity| self.uri + entity.location } + @collection.locations.to_a).join("\n") }
-        f.on('*/*') { erb :collection, :locals => {:collection => @collection} }
+        f.on('text/uri-list') { @locations.join("\n") }
       end
       OCCI::Log.debug('### Successfully rendered ###')
     end
@@ -264,12 +265,11 @@ module OCCI
           kinds = [OCCI::Registry.get_by_location(request.path_info)]
         end
 
-        @collection.resources = []
-        @collection.links = []
         kinds.each do |kind|
           OCCI::Log.info("### Listing all entities of kind #{kind.type_identifier} ###")
           @collection.resources.concat kind.entities if kind.entity_type == OCCI::Core::Resource.name
           @collection.links.concat kind.entities if kind.entity_type == OCCI::Core::Link.name
+          @locations.concat kind.entities.collect { |entity| OCCI::Server.uri + entity.location }
         end
       else
         kind = OCCI::Registry.get_by_location(request.path_info.rpartition('/').first + '/')
