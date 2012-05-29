@@ -61,36 +61,28 @@ module OCCI
       OPERATIONS["http://schemas.ogf.org/occi/infrastructure#network"] = {
 
           # Generic resource operations
-          :deploy => :resource_deploy,
+          :deploy => :network_deploy,
           :update_state => :resource_update_state,
           :delete => :resource_delete,
 
           # Network specific resource operations
-          :up => :action_dummy,
-          :down => :action_dummy
+          :up => :network_action_up,
+          :down => :network_action_down
       }
 
       OPERATIONS["http://schemas.ogf.org/occi/infrastructure#storage"] = {
 
           # Generic resource operations
-          :deploy => :resource_deploy,
+          :deploy => :storage_deploy,
           :update_state => :resource_update_state,
           :delete => :resource_delete,
 
           # Network specific resource operations
-          :online => :action_dummy,
-          :offline => :action_dummy,
-          :backup => :action_dummy,
-          :snapshot => :action_dummy,
-          :resize => :action_dummy
-      }
-
-      OPERATIONS["http://schemas.ogf.org/gwdg#nfsstorage"] = {
-
-          # Generic resource operations
-          :deploy => :resource_deploy,
-          :update_state => :resource_update_state,
-          :delete => :resource_delete,
+          :online => :storage_action_online,
+          :offline => :storage_action_offline,
+          :backup => :storage_action_backup,
+          :snapshot => :storage_action_snapshot,
+          :resize => :storage_action_resize
       }
 
       # ---------------------------------------------------------------------------------------------------------------------
@@ -207,7 +199,8 @@ module OCCI
       end
 
       def storage_action_resize(storage, parameters=nil)
-        storage.attributes!.occi!.storage!.size = parameters.size
+        puts "Parameters: #{parameters}"
+        storage.attributes!.occi!.storage!.size = parameters[:size].to_i
         # state and actions stay the same after the resize which is instant for the dummy
         store(storage)
       end

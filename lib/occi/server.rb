@@ -305,18 +305,15 @@ module OCCI
 
       # if action
       if params[:action]
-        method = params[:method]
         if @request_collection.actions.any?
           action = @request_collection.actions.first
-          method ||= action.attributes!.method if action
+          params[:method] ||= action.attributes!.method if action
         else
           action = OCCI::Registry.get_by_id(category.actions.select { |action| action.split('#').last == params[:action] }.first)
         end
 
-        puts action
-
         category.entities.each do |entity|
-          OCCI::Backend::Manager.delegate_action(@backend, action, method, entity)
+          OCCI::Backend::Manager.delegate_action(@backend, action, params, entity)
           status 200
         end
       elsif category.kind_of?(OCCI::Core::Kind)
