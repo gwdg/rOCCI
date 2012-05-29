@@ -295,50 +295,48 @@ module OCCI
 
 # Create an instance appropriate to category field and optionally link an instance to another one
     post '*' do
-      begin
-        category = OCCI::Registry.get_by_location(request.path_info)
 
-        if category.nil?
-          OCCI::Log.debug("### No category found for request location #{request.path_info} ###")
-          status 404
-        end
+      category = OCCI::Registry.get_by_location(request.path_info.rpartition('/').first + '/')
 
-        # if action
-        if params[:action]
-          method = params[:method]
-          if @request_collection.actions
-            action = @request_collection.actions.first
-            method ||= action.attributes!.method
-          else
-            action = OCCI::Registry.get_by_id(category.actions.select { |action| action.split('#').last == params[:action] }.first)
-          end
+      if category.nil?
+        OCCI::Log.debug("### No category found for request location #{request.path_info} ###")
+        status 404
+      end
 
-          category.entities.each do |entity|
-            OCCI::Backend::Manager.delegate_action(@backend, action, method, entity)
-            status 200
-          end
-        elsif category.kind_of?(OCCI::Core::Kind)
-          @request_collection.resources.each do |resource|
-            OCCI::Log.debug("Deploying resource with title #{resource.title} in backend #{@backend.class.name}")
-            OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_DEPLOY, resource)
-            @collection.locations << OCCI::Server.uri + resource.location
-            status 201
-          end
-        elsif category.kind_of?(OCCI::Core::Mixin)
-          @request_collection.locations.each do |location|
-            OCCI::Log.debug("Attaching resource #{resource.title} to mixin #{mixin.type_identifier} in backend #{@backend.class.name}")
-            # TODO: let backend carry out tasks related to the added mixin
-            category.entities << OCCI::Rendering::HTTP::LocationRegistry.get_object(location)
-            status 200
-          end
+      # if action
+      if params[:action]
+        method = params[:method]
+        if @request_collection.actions.any?
+          action = @request_collection.actions.first
+          method ||= action.attributes!.method if action
         else
-          status 400
+          action = OCCI::Registry.get_by_id(category.actions.select { |action| action.split('#').last == params[:action] }.first)
         end
 
-      rescue Exception => e
-        OCCI::Log.error(e.message)
+        puts action
+
+        category.entities.each do |entity|
+          OCCI::Backend::Manager.delegate_action(@backend, action, method, entity)
+          status 200
+        end
+      elsif category.kind_of?(OCCI::Core::Kind)
+        @request_collection.resources.each do |resource|
+          OCCI::Log.debug("Deploying resource with title #{resource.title} in backend #{@backend.class.name}")
+          OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_DEPLOY, resource)
+          @locations << OCCI::Server.uri + resource.location
+          status 201
+        end
+      elsif category.kind_of?(OCCI::Core::Mixin)
+        @request_collection.locations.each do |location|
+          OCCI::Log.debug("Attaching resource #{resource.title} to mixin #{mixin.type_identifier} in backend #{@backend.class.name}")
+          # TODO: let backend carry out tasks related to the added mixin
+          category.entities << OCCI::Rendering::HTTP::LocationRegistry.get_object(location)
+          status 200
+        end
+      else
         status 400
       end
+
     end
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -576,5 +574,11 @@ module OCCI
         response.status = OCCI::Rendering::HTTP::Response::HTTP_BAD_REQUEST
       end
     end
+
+    error do
+      OCCI::Log.error(sinatra.error)
+      'Sorry there was a nasty error - ' + env['sinatra.error'].name
+    end
+
   end
 end
