@@ -9,7 +9,7 @@
             ],
             "attributes":{
                 "occi":{
-                    "storage":{
+                    "network":{
                         "vlan":{
                             "mutable":true,
                             "required":false,
