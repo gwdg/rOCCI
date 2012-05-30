@@ -3,4 +3,4 @@
 	url = git://github.com/kanaka/noVNC
 [submodule "lib/occi/antlr"]
 	path = lib/occi/antlr
-	url = git@github.com:gwdg/occi-antlr-ruby.git
+	url = git://github.com/gwdg/occi-antlr-ruby
