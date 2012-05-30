@@ -26,8 +26,8 @@ module OCCI
     class AttributeProperties < Hashie::Mash
 
       def initialize(attributes = nil, default = nil)
-        if attributes.type || attributes.required || attributes.mutable || attributes.pattern || attributes.minimum || attributes.maximum || attributes.description
-          attributes.type ||= "string"
+        if attributes[:type] || attributes.required || attributes.mutable || attributes.pattern || attributes.minimum || attributes.maximum || attributes.description
+          attributes[:type] ||= "string"
           attributes.required ||= false
           attributes.mutable ||= false
           attributes.pattern ||= ".*"
