@@ -62,8 +62,8 @@ require 'occi/core/link'
 require 'occi/core/mixin'
 require 'occi/core/resource'
 
-# OCCI Request handling
-require 'occi/request'
+# OCCI parser
+require 'occi/parse'
 
 # Backend support
 require 'occi/backend/manager'
@@ -197,6 +197,47 @@ module OCCI
 
     end
 
+    # Parses a Rack/Sinatra Request and extract OCCI relevant information
+    def parse(request)
+      OCCI::Log.debug('### Parsing request data to OCCI data structure ###')
+      body = request.body.read
+      header = request.env
+      collection = OCCI::Core::Collection.new
+      locations = []
+      # always check headers
+      locations = OCCI::Parse.header_locations(header)
+      if locations.empty?
+        if request.path_info.include?('/-/')
+          collection = OCCI::Parse.header_categories(header)
+        else
+          collection = OCCI::Parse.header_entity(header)
+        end
+      end
+
+      case request.media_type
+        when 'text/uri-list'
+          body.each_line do |line|
+            locations << URI.parse(line)
+          end
+        when 'text/plain', nil
+          locations = OCCI::Parse.text_locations(body)
+          if locations.empty?
+            if request.path_info.include?('/-/')
+              collection = OCCI::Parse.text_categories(body)
+            else
+              collection = OCCI::Parse.text_entity(body)
+            end
+          end
+        when 'application/occi+json', 'application/json'
+          collection = OCCI::Parse.json(body)
+        when 'application/occi+xml', 'application/xml'
+          collection = OCCI::Parse.xml(body)
+        else
+          raise OCCI::ContentTypeNotSupported
+      end
+      return locations, collection
+    end
+
 # ---------------------------------------------------------------------------------------------------------------------
 
 # GET request
@@ -224,8 +265,7 @@ module OCCI
       initialize_backend(authentication)
       OCCI::Log.debug('### Reset OCCI model ###')
       OCCI::Registry.reset
-      OCCI::Log.debug('### Parsing request data to OCCI data structure ###')
-      @request_collection = OCCI::Request.new(request)
+      @request_locations, @request_collection = parse(request)
       OCCI::Log.debug('### Fill OCCI model with entities from backend ###')
       @backend.register_existing_resources
     end
@@ -274,7 +314,7 @@ module OCCI
       else
         kind = OCCI::Registry.get_by_location(request.path_info.rpartition('/').first + '/')
         uuid = request.path_info.rpartition('/').last
-        break if kind.nil? or uuid.nil?
+        error 404 if kind.nil? or uuid.nil?
         OCCI::Log.info("### Listing entity with uuid #{uuid} ###")
         @collection.resources = kind.entities.select { |entity| entity.id == uuid } if kind.entity_type == OCCI::Core::Resource.name
         @collection.links = kind.entities.select { |entity| entity.id == uuid } if kind.entity_type == OCCI::Core::Link.name
@@ -340,122 +380,110 @@ module OCCI
 # PUT request
 
     put '*' do
-      begin
-        # Add an resource instance to a mixin
-        unless @occi_request.mixins.empty?
-          mixin = OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info)
 
-          @occi_request.locations.each do |location|
-            entity = OCCI::Rendering::HTTP::LocationRegistry.get_object(URI.parse(location).path)
+      # Add an resource instance to a mixin
+      unless @occi_request.mixins.empty?
+        mixin = OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info)
 
-            raise "No entity found at location: #{entity_location}" if entity == nil
-            raise "Object referenced by uri [#{entity_location}] is not a OCCI::Core::Resource instance!" if !entity.kind_of?(OCCI::Core::Resource)
+        @occi_request.locations.each do |location|
+          entity = OCCI::Rendering::HTTP::LocationRegistry.get_object(URI.parse(location).path)
 
-            logger.debug("Associating entity [#{entity}] at location #{entity_location} with mixin #{mixin}")
+          raise "No entity found at location: #{entity_location}" if entity == nil
+          raise "Object referenced by uri [#{entity_location}] is not a OCCI::Core::Resource instance!" if !entity.kind_of?(OCCI::Core::Resource)
 
-            entity.mixins << mixin
-          end
-          break
+          logger.debug("Associating entity [#{entity}] at location #{entity_location} with mixin #{mixin}")
+
+          entity.mixins << mixin
         end
-
-        # Update resource instance(s) at the given location
-        unless OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info).nil?
-          entities = []
-          # Determine set of resources to be updated
-          if OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info).kind_of?(OCCI::Core::Resource)
-            entities = [OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info)]
-          elsif not OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info).kind_of?(OCCI::Core::Category)
-            entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(request.path_info, OCCI::CategoryRegistry.get_all)
-          elsif OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info).kind_of?(OCCI::Core::Category)
-            object = OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info)
-            @occi_request.locations.each do |loc|
-              entities << OCCI::Rendering::HTTP::LocationRegistry.get_object(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
-            end
-          end
-          logger.info("Full update for [#{entities.size}] entities...")
-
-          # full update of mixins
-          object.entities.each do |entity|
-            entity.mixins.delete(object)
-            object.entities.delete(entity)
-          end if object.kind_of?(OCCI::Core::Mixin)
-
-          entities.each do |entity|
-            logger.debug("Adding entity: #{entity.get_location} to mixin #{object.type_identifier}")
-            entity.mixins.push(object).uniq!
-            object.entities.push(entity).uniq!
-          end if object.kind_of?(OCCI::Core::Mixin)
-
-          # full update of attributes
-          entities.each do |entity|
-            # Refresh information from backend for entities of type resource
-            # TODO: full update
-            entity.attributes.merge!(@occi_request.attributes)
-            # TODO: update entity in backend
-          end unless @occi_request.attributes.empty?
-
-          # full update of links
-          # TODO: full update e.g. delete old links first
-          @occi_request.links.each do |link_data|
-            logger.debug("Extracted link data: #{link_data}")
-            raise "Mandatory information missing (related | target | category)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil
-
-            link_mixins = []
-            link_kind = nil
-            link_data.category.split(' ').each do |link_category|
-              begin
-                cat = OCCI::CategoryRegistry.get_by_id(link_category)
-              rescue OCCI::CategoryNotFoundException => e
-                logger.info("Category #{link_category} not found")
-                next
-              end
-              link_kind = cat if cat.kind_of?(OCCI::Core::Kind)
-              link_mixins << cat if cat.kind_of?(OCCI::Core::Mixin)
-            end
-
-            raise "No kind for link category #{link_data.category} found" if link_kind.nil?
-
-            target_location = link_data.target_attr
-            target = OCCI::Rendering::HTTP::LocationRegistry.get_object(target_location)
-
-            entities.each do |entity|
-
-              source_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
-
-              link_attributes = link_data.attributes.clone
-              link_attributes["occi.core.target"] = target_location.chomp('"').reverse.chomp('"').reverse
-              link_attributes["occi.core.source"] = source_location
-
-              link = link_kind.entity_type.new(link_attributes, link_mixins)
-              OCCI::Rendering::HTTP::LocationRegistry.register_location(link.get_location(), link)
-
-              target.links << link
-              entity.links << link
-            end
-          end
-          break
-        end
-
-        response.status = OCCI::Rendering::HTTP::Response::HTTP_NOT_FOUND
-        # Create resource instance at the given location
-        raise "Creating resources with method 'put' is currently not possible!"
-
-        # This must be the last statement in this block, so that sinatra does not try to respond with random body content
-        # (or fail utterly while trying to do that!)
-        nil
-
-      rescue OCCI::LocationAlreadyRegisteredException => e
-        logger.error(e.message)
-        response.status = OCCI::Rendering::HTTP::Response::HTTP_CONFLICT
-
-      rescue OCCI::MixinAlreadyExistsError => e
-        logger.error(e.message)
-        response.status = OCCI::Rendering::HTTP::Response::HTTP_CONFLICT
-
-      rescue Exception => e
-        logger.error(e)
-        response.status = OCCI::Rendering::HTTP::Response::HTTP_BAD_REQUEST
+        break
       end
+
+      # Update resource instance(s) at the given location
+      unless OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info).nil?
+        entities = []
+        # Determine set of resources to be updated
+        if OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info).kind_of?(OCCI::Core::Resource)
+          entities = [OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info)]
+        elsif not OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info).kind_of?(OCCI::Core::Category)
+          entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(request.path_info, OCCI::CategoryRegistry.get_all)
+        elsif OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info).kind_of?(OCCI::Core::Category)
+          object = OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info)
+          @occi_request.locations.each do |loc|
+            entities << OCCI::Rendering::HTTP::LocationRegistry.get_object(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
+          end
+        end
+        logger.info("Full update for [#{entities.size}] entities...")
+
+        # full update of mixins
+        object.entities.each do |entity|
+          entity.mixins.delete(object)
+          object.entities.delete(entity)
+        end if object.kind_of?(OCCI::Core::Mixin)
+
+        entities.each do |entity|
+          logger.debug("Adding entity: #{entity.get_location} to mixin #{object.type_identifier}")
+          entity.mixins.push(object).uniq!
+          object.entities.push(entity).uniq!
+        end if object.kind_of?(OCCI::Core::Mixin)
+
+        # full update of attributes
+        entities.each do |entity|
+          # Refresh information from backend for entities of type resource
+          # TODO: full update
+          entity.attributes.merge!(@occi_request.attributes)
+          # TODO: update entity in backend
+        end unless @occi_request.attributes.empty?
+
+        # full update of links
+        # TODO: full update e.g. delete old links first
+        @occi_request.links.each do |link_data|
+          logger.debug("Extracted link data: #{link_data}")
+          raise "Mandatory information missing (related | target | category)!" unless link_data.related != nil && link_data.target != nil && link_data.category != nil
+
+          link_mixins = []
+          link_kind = nil
+          link_data.category.split(' ').each do |link_category|
+            begin
+              cat = OCCI::CategoryRegistry.get_by_id(link_category)
+            rescue OCCI::CategoryNotFoundException => e
+              logger.info("Category #{link_category} not found")
+              next
+            end
+            link_kind = cat if cat.kind_of?(OCCI::Core::Kind)
+            link_mixins << cat if cat.kind_of?(OCCI::Core::Mixin)
+          end
+
+          raise "No kind for link category #{link_data.category} found" if link_kind.nil?
+
+          target_location = link_data.target_attr
+          target = OCCI::Rendering::HTTP::LocationRegistry.get_object(target_location)
+
+          entities.each do |entity|
+
+            source_location = OCCI::Rendering::HTTP::LocationRegistry.get_location_of_object(entity)
+
+            link_attributes = link_data.attributes.clone
+            link_attributes["occi.core.target"] = target_location.chomp('"').reverse.chomp('"').reverse
+            link_attributes["occi.core.source"] = source_location
+
+            link = link_kind.entity_type.new(link_attributes, link_mixins)
+            OCCI::Rendering::HTTP::LocationRegistry.register_location(link.get_location(), link)
+
+            target.links << link
+            entity.links << link
+          end
+        end
+        break
+      end
+
+      response.status = OCCI::Rendering::HTTP::Response::HTTP_NOT_FOUND
+      # Create resource instance at the given location
+      raise "Creating resources with method 'put' is currently not possible!"
+
+      # This must be the last statement in this block, so that sinatra does not try to respond with random body content
+      # (or fail utterly while trying to do that!)
+      nil
+
     end
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -479,97 +507,82 @@ module OCCI
 
     delete '*' do
 
-      begin
-        # unassociate resources specified by URI in payload from mixin specified by request location
-        if request.path_info == '/'
-          categories = OCCI::Registry.get.kinds
-        else
-          categories = [OCCI::Registry.get_by_location(request.path_info.rpartition('/').first + '/')]
-        end
+      # unassociate resources specified by URI in payload from mixin specified by request location
+      if request.path_info == '/'
+        categories = OCCI::Registry.get.kinds
+      else
+        categories = [OCCI::Registry.get_by_location(request.path_info.rpartition('/').first + '/')]
+      end
 
-        categories.each do |category|
-          case category
-            when OCCI::Core::Mixin
-              mixin = category
-              OCCI::Log.debug("### Deleting entities from mixin #{mixin.type_identifier} ###")
-              @request_collection.locations.each do |location|
-                uuid = location.to_s.rpartition('/').last
-                mixin.entities.delete_if { |entity| entity.id == uuid }
-              end
-            when OCCI::Core::Kind
-              kind = category
-              if request.path_info.end_with?('/')
-                if @request_collection.mixins.any?
-                  @request_collection.mixins.each do |mixin|
-                    OCCI::Log.debug("### Deleting entities from kind #{kind.type_identifier} with mixin #{mixin.type_identifier} ###")
-                    kind.entities.delete_if? { |entity| mixin.include?(entity) }
-                    # TODO: links
-                    OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_DELETE, entity)
-                  end
-                else
+      categories.each do |category|
+        case category
+          when OCCI::Core::Mixin
+            mixin = category
+            OCCI::Log.debug("### Deleting entities from mixin #{mixin.type_identifier} ###")
+            @request_collection.locations.each do |location|
+              uuid = location.to_s.rpartition('/').last
+              mixin.entities.delete_if { |entity| entity.id == uuid }
+            end
+          when OCCI::Core::Kind
+            kind = category
+            if request.path_info.end_with?('/')
+              if @request_collection.mixins.any?
+                @request_collection.mixins.each do |mixin|
+                  OCCI::Log.debug("### Deleting entities from kind #{kind.type_identifier} with mixin #{mixin.type_identifier} ###")
+                  kind.entities.each { |entity| OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_DELETE, entity) if mixin.include?(entity) }
+                  kind.entities.delete_if? { |entity| mixin.include?(entity) }
                   # TODO: links
-                  OCCI::Log.debug("### Deleting entities from kind #{kind.type_identifier} ###")
-                  kind.entities.each { |resource| OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_DELETE, resource) }
-                  kind.entities.clear
                 end
               else
-                uuid = request.path_info.rpartition('/').last
-                OCCI::Log.debug("### Deleting entity with id #{uuid} from kind #{kind.type_identifier} ###")
-                OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_DELETE, entity)
-                kind.entities.delete_if? { |entity| entity.id == uuid }
+                # TODO: links
+                OCCI::Log.debug("### Deleting entities from kind #{kind.type_identifier} ###")
+                kind.entities.each { |resource| OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_DELETE, resource) }
+                kind.entities.clear
               end
-          end
+            else
+              uuid = request.path_info.rpartition('/').last
+              OCCI::Log.debug("### Deleting entity with id #{uuid} from kind #{kind.type_identifier} ###")
+              OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_DELETE, entity)
+              kind.entities.delete_if? { |entity| entity.id == uuid }
+            end
         end
-
-          # delete entities
-
-
-          #  # Location references a mixin => unassociate all provided resources (by X_OCCI_LOCATION) from it
-          #  object = OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info)
-          #  if object != nil && object.kind_of?(OCCI::Core::Mixin)
-          #    mixin = OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info)
-          #    logger.info("Unassociating entities from mixin: #{mixin}")
-          #
-          #    @occi_request.locations.each do |loc|
-          #      entity = OCCI::Rendering::HTTP::LocationRegistry.get_object(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
-          #      mixin.entities.delete(entity)
-          #      entity.mixins.delete(mixin)
-          #    end
-          #    break
-          #  end
-          #
-          #  entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(request.path_info, @occi_request.categories)
-          #
-          #  unless entities.nil?
-          #    entities.each do |entity|
-          #      location = entity.get_location
-          #      OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_DELETE, entity) if entity.kind_of? OCCI::Core::Resource
-          #      # TODO: delete links in backend!
-          #      entity.delete
-          #      OCCI::Rendering::HTTP::LocationRegistry.unregister(location)
-          #    end
-          #    break
-          #  end
-          #
-          #  response.status = OCCI::Rendering::HTTP::Response::HTTP_NOT_FOUND
-          #  # This must be the last statement in this block, so that sinatra does not try to respond with random body content
-          #  # (or fail utterly while trying to do that!)
-          #  nil
-
-      rescue OCCI::LocationNotRegisteredException => e
-        logger.error(e.message)
-        response.status = OCCI::Rendering::HTTP::Response::HTTP_NOT_FOUND
-
-      rescue OCCI::CategoryMissingException => e
-        response.status = OCCI::Rendering::HTTP::Response::HTTP_BAD_REQUEST
-
-      rescue OCCI::MixinNotFoundException => e
-        response.status = OCCI::Rendering::HTTP::Response::HTTP_NOT_FOUND
-
-      rescue Exception => e
-        logger.error(e)
-        response.status = OCCI::Rendering::HTTP::Response::HTTP_BAD_REQUEST
       end
+
+      # delete entities
+
+
+      #  # Location references a mixin => unassociate all provided resources (by X_OCCI_LOCATION) from it
+      #  object = OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info)
+      #  if object != nil && object.kind_of?(OCCI::Core::Mixin)
+      #    mixin = OCCI::Rendering::HTTP::LocationRegistry.get_object(request.path_info)
+      #    logger.info("Unassociating entities from mixin: #{mixin}")
+      #
+      #    @occi_request.locations.each do |loc|
+      #      entity = OCCI::Rendering::HTTP::LocationRegistry.get_object(URI.parse(loc.chomp('"').reverse.chomp('"').reverse).path)
+      #      mixin.entities.delete(entity)
+      #      entity.mixins.delete(mixin)
+      #    end
+      #    break
+      #  end
+      #
+      #  entities = OCCI::Rendering::HTTP::LocationRegistry.get_resources_below_location(request.path_info, @occi_request.categories)
+      #
+      #  unless entities.nil?
+      #    entities.each do |entity|
+      #      location = entity.get_location
+      #      OCCI::Backend::Manager.signal_resource(@backend, OCCI::Backend::RESOURCE_DELETE, entity) if entity.kind_of? OCCI::Core::Resource
+      #      # TODO: delete links in backend!
+      #      entity.delete
+      #      OCCI::Rendering::HTTP::LocationRegistry.unregister(location)
+      #    end
+      #    break
+      #  end
+      #
+      #  response.status = OCCI::Rendering::HTTP::Response::HTTP_NOT_FOUND
+      #  # This must be the last statement in this block, so that sinatra does not try to respond with random body content
+      #  # (or fail utterly while trying to do that!)
+      #  nil
+
     end
 
     error do
