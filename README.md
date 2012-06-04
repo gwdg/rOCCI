@@ -9,7 +9,7 @@ Requirements
 The following setup is recommended
 
 * usage of the Ruby Version Manger recommended
-* Ruby 1.8.7
+* Ruby 1.9.3
 * RubyGems installed
 
 Installation
