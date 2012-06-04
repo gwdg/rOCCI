@@ -1,3 +1,6 @@
+require 'bundler'
+Bundler::GemHelper.install_tasks
+
 task :default => 'rcov:all'
 
 require 'rspec/core/rake_task'
