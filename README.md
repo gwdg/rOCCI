@@ -8,25 +8,14 @@ Requirements
 
 The following setup is recommended
 
-* usage of the Ruby Version Manger
-* Ruby 1.9.3
-* Bundler gem installed (use ```gem install bundler```)
+* usage of the Ruby Version Manger recommended
+* Ruby 1.8.7
+* RubyGems installed
 
 Installation
 ------------
 
-### Stable version
-
-Download the latest version from http://dev.opennebula.org/projects/ogf-occi/files
-
-Extract file
-
-    tar xzf rOCCI-*.tar.bz
-    unzip rOCCI-*.zip
-
-Install dependencies
-
-    bundle install --deployment
+    gem install occi
 
 ### Latest version
 
@@ -41,29 +30,6 @@ Change to rOCCI folder
 Install dependencies for deployment
 
     bundle install --deployment
-
-Configure
----------
-
-Edit etc/occi-server.conf and adapt to your setting.
-
-The default templates for the OpenNebula template are located at etc/one_templates .
-
-The default templates for EC2 are located at etc/ec2_templates .
-
-Usage
------
-
-Run Passenger
-
-    passenger start
-
-Testing
--------
-
-Use curl to request all categories
-
-    curl -X GET http://localhost:3000/-/
 
 Development
 -----------
