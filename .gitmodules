@@ -1,3 +1,0 @@
-[submodule "lib/occi/antlr"]
-	path = lib/occi/antlr
-	url = git://github.com/gwdg/occi-antlr-ruby
