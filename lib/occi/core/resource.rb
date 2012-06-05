@@ -45,6 +45,7 @@ module OCCI
       end
 
       def summary
+        self[:summary] ||= self.attributes!.occi!.core!.summary if self.attributes!.occi!.core
         return self[:summary]
       end
 

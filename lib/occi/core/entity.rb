@@ -56,6 +56,7 @@ module OCCI
       end
 
       def id
+        self[:id] ||= self.attributes!.occi!.core!.id if self.attributes!.occi!.core
         return self[:id]
       end
 
@@ -65,6 +66,7 @@ module OCCI
       end
 
       def title
+        self[:title] ||= self.attributes!.occi!.core!.title  if self.attributes!.occi!.core
         return self[:title]
       end
 
