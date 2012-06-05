@@ -1,0 +1,17 @@
+module OCCI
+  require 'occi/version'
+  require 'occi/parse'
+  require 'occi/registry'
+  require 'occi/log'
+  require 'occi/exceptions'
+  require 'occi/core/action'
+  require 'occi/core/attribute_properties'
+  require 'occi/core/attributes'
+  require 'occi/core/category'
+  require 'occi/core/collection'
+  require 'occi/core/entity'
+  require 'occi/core/kind'
+  require 'occi/core/link'
+  require 'occi/core/mixin'
+  require 'occi/core/resource'
+end
