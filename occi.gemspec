@@ -18,5 +18,8 @@ Gem::Specification.new do |gem|
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   gem.require_paths = ["lib"]
 
+  gem.add_dependency 'json'
+  gem.add_dependency 'antlr3'
+
   gem.required_ruby_version     = ">= 1.8.7"
 end
