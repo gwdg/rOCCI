@@ -19,6 +19,8 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'hashie/mash'
+
 module OCCI
   module Core
     class Attributes < Hashie::Mash

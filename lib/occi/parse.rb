@@ -21,6 +21,7 @@
 
 require 'json'
 #require 'nokogiri'
+require 'hashie/mash'
 require 'occi/core/collection'
 require 'occi/log'
 require 'occi/antlr/OCCIParser'

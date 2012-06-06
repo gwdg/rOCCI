@@ -21,7 +21,6 @@
 
 require 'json'
 require 'occi/core/category'
-require 'occi/core/action'
 
 module OCCI
   module Core

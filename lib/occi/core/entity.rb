@@ -21,7 +21,7 @@
 
 require 'rubygems'
 require 'uuidtools'
-require 'hashie'
+require 'hashie/mash'
 require 'occi/registry'
 require 'occi/core/attributes'
 require 'occi/core/kind'

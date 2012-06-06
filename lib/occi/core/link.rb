@@ -19,9 +19,9 @@
 # Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
 ##############################################################################
 
+require 'hashie/mash'
 require 'occi/core/entity'
 require 'occi/core/kind'
-require 'hashie'
 
 module OCCI
   module Core
