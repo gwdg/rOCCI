@@ -24,6 +24,16 @@ require 'logger'
 module OCCI
   class Log
 
+    def initialize(destination,level)
+      @logger = Logger.new(destination)
+      @logger.level = level
+
+      # subscribe to log messages and send to logger
+      @log_subscriber = ActiveSupport::Notifications.subscribe("log") do |name, start, finish, id, payload|
+        @logger.log(payload[:level], payload[:message])
+      end
+    end
+
     def self.debug(message)
       ActiveSupport::Notifications.instrument("log",:level=>Logger::DEBUG,:message=>message)
     end
