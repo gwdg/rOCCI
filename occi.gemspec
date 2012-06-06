@@ -20,6 +20,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'json'
   gem.add_dependency 'antlr3'
+  gem.add_dependency 'hashie'
 
   gem.required_ruby_version     = ">= 1.8.7"
 end
