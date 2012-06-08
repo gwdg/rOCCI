@@ -1,28 +1,7 @@
-##############################################################################
-#  Copyright 2011 Service Computing group, TU Dortmund
-#
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-##############################################################################
-
-##############################################################################
-# Description: OCCI Core Entity
-# Author(s): Hayati Bice, Florian Feldhaus, Piotr Kasprzak
-##############################################################################
-
 require 'rubygems'
 require 'uuidtools'
 require 'hashie/mash'
-require 'occi/registry'
+require 'occi/model'
 require 'occi/core/attributes'
 require 'occi/core/kind'
 require 'occi/core/attribute_properties'
@@ -47,7 +26,7 @@ module OCCI
         data.attributes!.occi!.core!.title!.mutable = true
 
         kind = OCCI::Core::Kind.new(data)
-        OCCI::Registry.register(kind)
+        OCCI::Model.register(kind)
       end
 
       def initialize(entity=nil, default = nil)
@@ -76,16 +55,16 @@ module OCCI
       end
 
       def location
-        '/' + OCCI::Registry.get_by_id(self.kind).term + '/' + self.id if self.kind
+        '/' + OCCI::Model.get_by_id(self.kind).term + '/' + self.id if self.kind
       end
 
       def type_identifier
-        OCCI::Registry.get_by_id(self.kind).type_identifier
+        OCCI::Model.get_by_id(self.kind).type_identifier
       end
 
       def check
-        definitions = OCCI::Registry.get_by_id(self.kind).attributes if self.kind
-        self.mixins.each { |mixin| definitions.merge!(OCCI::Registry.get_by_id(mixin).attributes) if OCCI::Registry.get_by_id(mixin).attributes } if self.mixins
+        definitions = OCCI::Model.get_by_id(self.kind).attributes if self.kind
+        self.mixins.each { |mixin| definitions.merge!(OCCI::Model.get_by_id(mixin).attributes) if OCCI::Model.get_by_id(mixin).attributes } if self.mixins
         self.attributes = Entity.check(self.attributes, definitions) if definitions
       end
 
