@@ -8,7 +8,7 @@ Requirements
 
 The following setup is recommended
 
-* usage of the Ruby Version Manger recommended
+* usage of the Ruby Version Manger
 * Ruby 1.9.3
 * RubyGems installed
 
