@@ -21,6 +21,9 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'json'
   gem.add_dependency 'antlr3'
   gem.add_dependency 'hashie'
+  gem.add_dependency 'uuidtools'
+  gem.add_dependency 'nokogiri'
+  gem.add_dependency 'activesupport'
 
   gem.required_ruby_version     = ">= 1.8.7"
 end
