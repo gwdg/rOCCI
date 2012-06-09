@@ -1,3 +1,3 @@
 module OCCI
-  VERSION = "2.0.6" unless defined?(::OCCI::VERSION)
+  VERSION = "2.1.0" unless defined?(::OCCI::VERSION)
 end
