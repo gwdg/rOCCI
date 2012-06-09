@@ -78,6 +78,21 @@ OCCI messages can be parsed for example like
 
 The OCCI gem includes all OCCI Core classes necessary to handly arbitrary OCCI objects.
 
+Changelog
+---------
+
+### Version 2.1
+
+Several improvements to the gem structure and code documentation. First rSpec test were added. Readme has been extended to include instructions how the gem can be used.
+
+### Version 2.0
+
+Starting with version 2.0 Florian Feldhaus and Piotr Kasprzak took over the development of the OCCI gem. The codebase was taken from the rOCCI framework and improved to be bundled as a standalone gem.
+
+### Version 1.X
+
+Version 1.X of the OCCI gem has been developed by retr0h and served as a simple way to access the first OpenNebula OCCI implementation.
+
 Development
 -----------
 
