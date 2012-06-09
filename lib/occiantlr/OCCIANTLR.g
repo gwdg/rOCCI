@@ -1,4 +1,4 @@
-grammar OCCI;
+grammar OCCIANTLR;
 
 options { 
 	language = Ruby; 
@@ -7,7 +7,7 @@ options {
 @header { 
 	require 'uri' 
 	require 'hashie'
-	ATTRIBUTE = { :mutable => true, :required => false, :type => { :string => {} }, :default => '' }
+	ATTRIBUTE = { :mutable => true, :required => false, :type => "string" }
 }
 
 /*
@@ -46,16 +46,14 @@ category returns [hash]
 	 					  { value = $class_type.text };
 	 category_title returns [value]		: ';' WS? 'title' '=' '"' title '"'
 	 				  	  { value = $title.text };
-	 category_rel returns [value]		: ';' WS? 'rel' '=' '"' rel '"'
-					  	  { value = $rel.text };
-	 category_location returns [value]	: ';' WS? 'location' '=' '"' location '"'
-	 				  	  { value = $location.text };
+	 category_rel returns [value]		: ';' WS? 'rel' '=' '"' uri '"'
+					  	  { value = $uri.text };
+	 category_location returns [value]	: ';' WS? 'location' '=' '"' uri '"'
+	 				  	  { value = $uri.text };
 	 category_attributes  returns [hash] 	@init{hash = Hashie::Mash.new}
-	 					: ';' WS? 'attributes' '=' '"' attr=attribute_name { hash.merge!($attr.hash) }
-	 					  ( WS? next_attr=attribute_name  { hash.merge!($next_attr.hash) } )* '"';
+	 					: ';' WS? 'attributes' '=' '"' ( attr=attribute_name { hash.merge!($attr.hash) } WS? )+ '"';
 	 category_actions  returns [array]     	@init{array = Array.new}
-	 					: ';' WS? 'actions' '=' '"' act=action_location { array << $act.text } 
-	 					  ( WS? next_act=action_location { array << $next_act.text } )* '"'; 
+	 					: ';' WS? 'actions' '=' '"' ( act=uri { array << $act.text } WS? )+ '"'; 
 
 /* e.g.
 Link:
@@ -77,10 +75,10 @@ link returns [hash]
 			  link_attributes { hash[:attributes] = $link_attributes.hash }
 			  ';'?
 			  ;
-	link_target returns [value]	: WS? '<' target '>' { value = $target.text };
-	link_rel  returns [value]	: ';' WS? 'rel' '=' '"' rel '"' { value = $rel.text };
-	link_self  returns [value]	: ';' WS? 'self' '=' '"' self_location '"' { value = $self_location.text };
-	link_category  returns [value]	: ';' WS? 'category' '=' '"' category_name '"' { value = $category_name.text };
+	link_target returns [value]	: WS? '<' uri '>' { value = $uri.text };
+	link_rel  returns [value]	: ';' WS? 'rel' '=' '"' uri '"' { value = $uri.text };
+	link_self  returns [value]	: ';' WS? 'self' '=' '"' uri '"' { value = $uri.text };
+	link_category  returns [value]	: ';' WS? 'category' '=' '"' uri '"' { value = $uri.text };
 	link_attributes  returns [hash] @init { hash = Hashie::Mash.new }
 					: (';' WS? attribute { hash.merge!($attribute.hash) } )*;
 
@@ -104,15 +102,13 @@ X-OCCI-Location: http://example.com/compute/456
 */
 
 x_occi_location returns [uri]
-	: 'X-OCCI-Location' ':' WS? location ';'? { uri = URI.parse($location.text) } ;
+	: 'X-OCCI-Location' ':' WS? uri ';'? { puts $uri.text; uri = URI.parse($uri.text) } ;
 
 uri			: ( LOALPHA | UPALPHA | DIGIT | '@' | ':' | '%' | '_' | '\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' | 'action' | 'kind' | 'mixin' )+;
 term			: LOALPHA ( LOALPHA | DIGIT | '-' | '_')*;
 scheme 		        : uri; 
 class_type		: ( 'kind' | 'mixin' | 'action' );
 title			: ( ESC | ~( '\\' | '"' | '\'' ) | '\'' )*;
-rel			: uri;
-location		: uri;
 attribute returns [hash] @init { hash = Hashie::Mash.new }
 			: comp_first=attribute_component { cur_hash = hash; comp = $comp_first.text }
 			  ( '.' comp_next=attribute_component { cur_hash[comp.to_sym] = Hashie::Mash.new; cur_hash = cur_hash[comp.to_sym]; comp = $comp_next.text })*
@@ -125,10 +121,6 @@ attribute_component	: LOALPHA ( LOALPHA | DIGIT | '-' | '_' )*;
 attribute_value returns [value]	: ( string { value = $string.text } | number { value = $number.text.to_i } );
 string			: ( '"' ( ESC | ~( '\\' | '"' | '\'' ) | '\'' )* '"');
 number			: ( DIGIT* ( '.' DIGIT+ )? );
-action_location		: uri;
-target			: uri;
-self_location		: uri;
-category_name		: uri;
 
 LOALPHA : ('a'..'z')+;
 UPALPHA	: ('A'..'Z')+;
