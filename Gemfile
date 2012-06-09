@@ -8,6 +8,7 @@ gem "uuidtools"
 gem "nokogiri"
 gem "builder"
 gem "activesupport"
+gem "rake"
 
 # development related gems
 group :development do
