@@ -12,6 +12,7 @@ module OCCI
     #
     # @param [Hash] collection including one or more of the keys kinds, mixins, actions, resources, links
     def initialize(collection={})
+      collection = Hashie::Mash.new(collection)
       @kinds = collection.kinds.collect { |kind| OCCI::Core::Kind.new(kind) } if collection.kinds.instance_of? Array
       @mixins = collection.mixins.collect { |mixin| OCCI::Core::Mixin.new(mixin) } if collection.mixins.instance_of? Array
       @actions = collection.actions.collect { |action| OCCI::Core::Action.new(action) } if collection.actions.instance_of? Array
