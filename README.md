@@ -42,10 +42,13 @@ First require the gem
 The OCCI gem includes its own logging mechanism using a message queue. By default, no one is listening to that queue.
 A new OCCI Logger can be initialized by specifying the log destination (either a filename or an IO object like
 STDOUT) and the log level.
+
     OCCI::Log.new(STDOUT,OCCI::Log::INFO)
+
 You can create multiple Loggers to receive the log output.
 
 You can always, even if there is no logger defined, log output using the class methods of OCCI::Log e.g.
+
     OCCI::Log.info("Test message")
 
 ### Registering categories in the OCCI Model
@@ -53,6 +56,7 @@ You can always, even if there is no logger defined, log output using the class m
 Before the parser may be used, the available categories have to be registered in the OCCI Model.
 
 For categories already specified by the OCCI WG a method exists in the OCCI Model class to register them:
+
     OCCI::Model.register_core
     OCCI::Model.register_infrastructure
 
@@ -68,11 +72,10 @@ category and a message with an entity which has a kind, it has to be specified i
 .g. for user defined mixins)
 
 OCCI messages can be parsed for example like
+
     media_type = text/plain
     body = %Q|Category: compute; scheme="http://schemas.ogf.org/occi/infrastructure#"; class="kind"|
-    header = {}
-    category = false
-    OCCI::Parser.parse(media_type,body,header,category)
+    OCCI::Parser.parse(media_type,body)
 
 ### Using the OCCI model
 
