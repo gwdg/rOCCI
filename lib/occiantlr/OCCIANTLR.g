@@ -51,9 +51,11 @@ category returns [hash]
 	 category_location returns [value]	: ';' WS? 'location' '=' '"' uri '"'
 	 				  	  { value = $uri.text };
 	 category_attributes  returns [hash] 	@init{hash = Hashie::Mash.new}
-	 					: ';' WS? 'attributes' '=' '"' ( attr=attribute_name { hash.merge!($attr.hash) } WS? )+ '"';
+	 					: ';' WS? 'attributes' '=' '"' attr=attribute_name { hash.merge!($attr.hash) }
+	 					  ( WS next_attr=attribute_name  { hash.merge!($next_attr.hash) } )* '"';
 	 category_actions  returns [array]     	@init{array = Array.new}
-	 					: ';' WS? 'actions' '=' '"' ( act=uri { array << $act.text } WS? )+ '"'; 
+	 					: ';' WS? 'actions' '=' '"' act=uri { array << $act.text } 
+	 					  ( WS next_act=uri { array << $next_act.text } )* '"'; 
 
 /* e.g.
 Link:
@@ -101,10 +103,10 @@ X-OCCI-Location: http://example.com/compute/123
 X-OCCI-Location: http://example.com/compute/456
 */
 
-x_occi_location returns [uri]
-	: 'X-OCCI-Location' ':' WS? uri ';'? { puts $uri.text; uri = URI.parse($uri.text) } ;
+x_occi_location returns [location]
+	: 'X-OCCI-Location' ':' WS? uri ';'? { location = URI.parse($uri.text) } ;
 
-uri			: ( LOALPHA | UPALPHA | DIGIT | '@' | ':' | '%' | '_' | '\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' | 'action' | 'kind' | 'mixin' )+;
+uri			: ( LOALPHA | UPALPHA | DIGIT | '@' | ':' | '%' | '_' | '\\' | '+' | '.' | '~' | '#' | '?' | '&' | '/' | '=' | '-' | 'action' | 'kind' | 'mixin' | 'location' | 'attributes' | 'rel' | 'title' | 'actions' | 'scheme' | 'term' | 'category' | 'self' | 'Link' )+;
 term			: LOALPHA ( LOALPHA | DIGIT | '-' | '_')*;
 scheme 		        : uri; 
 class_type		: ( 'kind' | 'mixin' | 'action' );
