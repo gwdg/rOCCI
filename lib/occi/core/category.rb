@@ -30,8 +30,8 @@ module OCCI
       end
 
       def related_to?(category_id)
-        self.related.each do |category|
-          return true if category.type_identifier == category_id || category.related_to?(category_id)
+        self.related.each do |rel_id|
+          return true if rel_id == category_id || OCCI::Model.get_by_id(rel_id).related_to?(category_id)
         end if self.related
         false
       end
