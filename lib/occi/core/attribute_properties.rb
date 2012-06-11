@@ -17,8 +17,6 @@ module OCCI
       def combine
         array = []
         self.each_key do |key|
-          puts key
-          puts self[key]
           if self[key].include? 'type'
             array << key + "{}"
           else
