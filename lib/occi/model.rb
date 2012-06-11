@@ -17,7 +17,7 @@ module OCCI
     # register OCCI Infrastructure categories
     def self.register_infrastructure
       OCCI::Log.info("### Registering OCCI Infrastructure categories ###")
-      self.register_files('etc/model/infrastructure', nil)
+      self.register_files('etc/model/infrastructure')
     end
 
     # register OCCI categories from files
@@ -25,7 +25,7 @@ module OCCI
     # @param [String] path to a folder containing files which include OCCI collections in JSON format. The path is
     #  recursively searched for files with the extension .json .
     # @param [Sting] scheme_base_url base location for provider specific extensions of the OCCI model
-    def self.register_files(path, scheme_base_url)
+    def self.register_files(path, scheme_base_url='http://localhost')
       OCCI::Log.info("### Initializing OCCI Model from #{path} ###")
       Dir.glob(path + '/**/*.json').each do |file|
         collection = OCCI::Collection.new(JSON.parse(File.read(file)))
