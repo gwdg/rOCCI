@@ -41,6 +41,7 @@ module OCCI
 
       def id=(id)
         self[:id] = id
+        self.attributes ||= OCCI::Core::Attributes.new
         self.attributes!.occi!.core!.id = id
       end
 
@@ -51,6 +52,7 @@ module OCCI
 
       def title=(title)
         self[:title] = title
+        self.attributes ||= OCCI::Core::Attributes.new
         self.attributes!.occi!.core!.title = title
       end
 
@@ -64,7 +66,12 @@ module OCCI
 
       def check
         definitions = OCCI::Model.get_by_id(self.kind).attributes if self.kind
-        self.mixins.each { |mixin| definitions.merge!(OCCI::Model.get_by_id(mixin).attributes) if OCCI::Model.get_by_id(mixin).attributes } if self.mixins
+        self.mixins.each do |mixin_id|
+          mixin = OCCI::Model.get_by_id(mixin_id)
+          next if mixin.nil?
+          definitions.merge!(mixin.attributes) if mixin.attributes
+        end if self.mixins
+
         self.attributes = Entity.check(self.attributes, definitions) if definitions
       end
 

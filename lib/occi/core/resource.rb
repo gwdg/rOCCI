@@ -30,6 +30,7 @@ module OCCI
 
       def summary=(summary)
         self[:summary] = summary
+        self.attributes ||= OCCI::Core::Attributes.new
         self.attributes!.occi!.core!.summary = summary
       end
 
