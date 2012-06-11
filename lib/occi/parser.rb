@@ -39,15 +39,15 @@ module OCCI
     # @param [String] body the body of the OCCI message
     # @param [true, false] category for text/plain and text/occi media types information e.g. from the HTTP request location is needed to determine if the OCCI message includes a category or an entity
     # @param [Hash] header optional header of the OCCI message
-    # @return [Array<Array, OCCI::Core::Collection>] list consisting of an array of locations and the OCCI object collection
+    # @return [Array<Array, OCCI::Collection>] list consisting of an array of locations and the OCCI object collection
     def self.parse(media_type, body, category=false, header={ })
       OCCI::Log.debug('### Parsing request data to OCCI data structure ###')
       collection = OCCI::Collection.new
-      # always check header for locations
-      locations  = self.header_locations(header)
-      category ? collection = self.header_categories(header) : collection = self.header_entity(header) if locations.empty?
 
       case media_type
+        when 'text/occi'
+          locations  = self.header_locations(header)
+          category ? collection = self.header_categories(header) : collection = self.header_entity(header) if locations.empty?
         when 'text/uri-list'
           body.each_line { |line| locations << URI.parse(line) }
         when 'text/plain', nil
@@ -60,7 +60,7 @@ module OCCI
         #when 'application/ovf+xml'
         #  collection = self.ovf(body)
         else
-          raise OCCI::ContentTypeNotSupported
+          raise "Content Type not supported"
       end
       return locations, collection
     end
@@ -73,7 +73,7 @@ module OCCI
     end
 
     def self.header_categories(header)
-      collection       = OCCI::Core::Collection.new
+      collection       = OCCI::Collection.new
       category_strings = header['HTTP_CATEGORY'].to_s.split(',')
       category_strings.each do |cat|
         category = OCCIANTLR::Parser.new('Category: ' + cat).category
@@ -116,9 +116,10 @@ module OCCI
     end
 
     def self.text_categories(text)
-      collection = OCCI::Core::Collection.new
+      collection = OCCI::Collection.new
       text.each_line do |line|
         category = OCCIANTLR::Parser.new(line).category
+        next if category.nil?
         collection.kinds.concat category.kinds.collect { |kind| OCCI::Core::Kind.new(kind) }
         collection.mixins.concat category.mixins.collect { |mixin| OCCI::Core::Mixin.new(mixin) }
         collection.actions.concat category.actions.collect { |action| OCCI::Core::Action.new(action) }
@@ -153,7 +154,7 @@ module OCCI
     end
 
     def self.json(json)
-      collection = OCCI::Core::Collection.new
+      collection = OCCI::Collection.new
       hash       = Hashie::Mash.new(JSON.parse(json))
       collection.kinds.concat hash.kinds.collect { |kind| OCCI::Core::Kind.new(kind) } if hash.kinds
       collection.mixins.concat hash.mixins.collect { |mixin| OCCI::Core::Mixin.new(mixin) } if hash.mixins
