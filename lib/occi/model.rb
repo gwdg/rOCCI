@@ -24,14 +24,15 @@ module OCCI
     #
     # @param [String] path to a folder containing files which include OCCI collections in JSON format. The path is
     #  recursively searched for files with the extension .json .
-    def self.register_files(path)
+    # @param [Sting] scheme_base_url base location for provider specific extensions of the OCCI model
+    def self.register_files(path,scheme_base_url)
       OCCI::Log.info("### Initializing OCCI Model from #{path} ###")
       Dir.glob(path + '/**/*.json').each do |file|
         collection = OCCI::Collection.new(JSON.parse(File.read(file)))
         # add location of service provider to scheme if it has a relative location
-        collection.kinds.collect { |kind| kind.scheme = self.location + kind.scheme if kind.scheme.start_with? '/' } if collection.kinds
-        collection.mixins.collect { |mixin| mixin.scheme = self.location + mixin.scheme if mixin.scheme.start_with? '/' } if collection.mixins
-        collection.actions.collect { |action| action.scheme = self.location + action.scheme if action.scheme.start_with? '/' } if collection.actions
+        collection.kinds.collect { |kind| kind.scheme = scheme_base_url + kind.scheme if kind.scheme.start_with? '/' } if collection.kinds
+        collection.mixins.collect { |mixin| mixin.scheme = scheme_base_url + mixin.scheme if mixin.scheme.start_with? '/' } if collection.mixins
+        collection.actions.collect { |action| action.scheme = scheme_base_url + action.scheme if action.scheme.start_with? '/' } if collection.actions
         self.register_collection(collection)
       end
     end
