@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: OCCIANTLR.g
-# Generated at: 2012-06-09 10:31:15
+# Generated at: 2012-06-12 13:27:25
 # 
 
 # ~~~> start load path setup
@@ -83,10 +83,10 @@ module OCCIANTLR
                    :T__18 => 18, :T__17 => 17, :T__12 => 12, :T__11 => 11, 
                    :T__14 => 14, :T__13 => 13, :T__10 => 10, :DIGIT => 7, 
                    :LOALPHA => 5, :T__42 => 42, :T__43 => 43, :T__40 => 40, 
-                   :T__41 => 41, :T__44 => 44, :T__30 => 30, :T__31 => 31, 
-                   :T__32 => 32, :T__33 => 33, :WS => 4, :T__34 => 34, :T__35 => 35, 
-                   :T__36 => 36, :T__37 => 37, :UPALPHA => 6, :T__38 => 38, 
-                   :T__39 => 39 )
+                   :T__41 => 41, :T__44 => 44, :T__45 => 45, :T__30 => 30, 
+                   :T__31 => 31, :T__32 => 32, :T__33 => 33, :WS => 4, :T__34 => 34, 
+                   :T__35 => 35, :T__36 => 36, :T__37 => 37, :UPALPHA => 6, 
+                   :T__38 => 38, :T__39 => 39 )
 
     # register the proper human-readable name or literal value
     # for each token type
@@ -100,7 +100,8 @@ module OCCIANTLR
                     "'Link'", "'<'", "'>'", "'self'", "'category'", "'X-OCCI-Attribute'", 
                     "'X-OCCI-Location'", "'@'", "'%'", "'_'", "'\\\\'", 
                     "'+'", "'.'", "'~'", "'#'", "'?'", "'&'", "'/'", "'-'", 
-                    "'action'", "'kind'", "'mixin'", "'term'", "'\\''" )
+                    "'action'", "'kind'", "'mixin'", "'term'", "'\\''", 
+                    "'link'" )
     
   end
 
@@ -1632,14 +1633,14 @@ module OCCIANTLR
           alt_32 = 2
           look_32_0 = @input.peek( 1 )
 
-          if ( look_32_0.between?( WS, T__13 ) || look_32_0.between?( T__15, T__30 ) || look_32_0.between?( T__32, T__44 ) )
+          if ( look_32_0.between?( WS, T__13 ) || look_32_0.between?( T__15, T__30 ) || look_32_0.between?( T__32, T__45 ) )
             alt_32 = 1
 
           end
           case alt_32
           when 1
             # at line 
-            if @input.peek( 1 ).between?( WS, T__13 ) || @input.peek( 1 ).between?( T__15, T__30 ) || @input.peek( 1 ).between?( T__32, T__44 )
+            if @input.peek( 1 ).between?( WS, T__13 ) || @input.peek( 1 ).between?( T__15, T__30 ) || @input.peek( 1 ).between?( T__32, T__45 )
               @input.consume
               @state.error_recovery = false
             else
@@ -1810,7 +1811,7 @@ module OCCIANTLR
     # parser rule attribute_component
     # 
     # (in OCCIANTLR.g)
-    # 122:1: attribute_component : LOALPHA ( LOALPHA | DIGIT | '-' | '_' )* ;
+    # 122:1: attribute_component : LOALPHA ( LOALPHA | DIGIT | '-' | '_' | 'action' | 'kind' | 'mixin' | 'location' | 'attributes' | 'rel' | 'title' | 'actions' | 'scheme' | 'term' | 'category' | 'self' | 'link' )* ;
     # 
     def attribute_component
       # -> uncomment the next line to manually enable rule tracing
@@ -1821,21 +1822,21 @@ module OCCIANTLR
       return_value.start = @input.look
 
       begin
-        # at line 122:23: LOALPHA ( LOALPHA | DIGIT | '-' | '_' )*
+        # at line 122:23: LOALPHA ( LOALPHA | DIGIT | '-' | '_' | 'action' | 'kind' | 'mixin' | 'location' | 'attributes' | 'rel' | 'title' | 'actions' | 'scheme' | 'term' | 'category' | 'self' | 'link' )*
         match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1128 )
-        # at line 122:31: ( LOALPHA | DIGIT | '-' | '_' )*
+        # at line 122:31: ( LOALPHA | DIGIT | '-' | '_' | 'action' | 'kind' | 'mixin' | 'location' | 'attributes' | 'rel' | 'title' | 'actions' | 'scheme' | 'term' | 'category' | 'self' | 'link' )*
         while true # decision 35
           alt_35 = 2
           look_35_0 = @input.peek( 1 )
 
-          if ( look_35_0 == LOALPHA || look_35_0 == DIGIT || look_35_0 == T__30 || look_35_0 == T__39 )
+          if ( look_35_0 == LOALPHA || look_35_0 == DIGIT || look_35_0 == T__12 || look_35_0.between?( T__16, T__20 ) || look_35_0.between?( T__24, T__25 ) || look_35_0 == T__30 || look_35_0.between?( T__39, T__43 ) || look_35_0 == T__45 )
             alt_35 = 1
 
           end
           case alt_35
           when 1
             # at line 
-            if @input.peek(1) == LOALPHA || @input.peek(1) == DIGIT || @input.peek(1) == T__30 || @input.peek(1) == T__39
+            if @input.peek(1) == LOALPHA || @input.peek(1) == DIGIT || @input.peek(1) == T__12 || @input.peek( 1 ).between?( T__16, T__20 ) || @input.peek( 1 ).between?( T__24, T__25 ) || @input.peek(1) == T__30 || @input.peek( 1 ).between?( T__39, T__43 ) || @input.peek(1) == T__45
               @input.consume
               @state.error_recovery = false
             else
@@ -1895,7 +1896,7 @@ module OCCIANTLR
         case alt_36
         when 1
           # at line 123:37: string
-          @state.following.push( TOKENS_FOLLOWING_string_IN_attribute_value_1160 )
+          @state.following.push( TOKENS_FOLLOWING_string_IN_attribute_value_1212 )
           string30 = string
           @state.following.pop
           # --> action
@@ -1904,7 +1905,7 @@ module OCCIANTLR
 
         when 2
           # at line 123:71: number
-          @state.following.push( TOKENS_FOLLOWING_number_IN_attribute_value_1166 )
+          @state.following.push( TOKENS_FOLLOWING_number_IN_attribute_value_1218 )
           number31 = number
           @state.following.pop
           # --> action
@@ -1946,20 +1947,20 @@ module OCCIANTLR
         # at line 124:12: ( '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"' )
         # at line 124:12: ( '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"' )
         # at line 124:14: '\"' ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )* '\"'
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_string_1181 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_string_1233 )
         # at line 124:18: ( ESC | ~ ( '\\\\' | '\"' | '\\'' ) | '\\'' )*
         while true # decision 37
           alt_37 = 2
           look_37_0 = @input.peek( 1 )
 
-          if ( look_37_0.between?( WS, T__13 ) || look_37_0.between?( T__15, T__30 ) || look_37_0.between?( T__32, T__44 ) )
+          if ( look_37_0.between?( WS, T__13 ) || look_37_0.between?( T__15, T__30 ) || look_37_0.between?( T__32, T__45 ) )
             alt_37 = 1
 
           end
           case alt_37
           when 1
             # at line 
-            if @input.peek( 1 ).between?( WS, T__13 ) || @input.peek( 1 ).between?( T__15, T__30 ) || @input.peek( 1 ).between?( T__32, T__44 )
+            if @input.peek( 1 ).between?( WS, T__13 ) || @input.peek( 1 ).between?( T__15, T__30 ) || @input.peek( 1 ).between?( T__32, T__45 )
               @input.consume
               @state.error_recovery = false
             else
@@ -1973,7 +1974,7 @@ module OCCIANTLR
             break # out of loop for decision 37
           end
         end # loop for decision 37
-        match( T__14, TOKENS_FOLLOWING_T__14_IN_string_1211 )
+        match( T__14, TOKENS_FOLLOWING_T__14_IN_string_1263 )
 
         # - - - - - - - rule clean up - - - - - - - -
         return_value.stop = @input.look( -1 )
@@ -2023,7 +2024,7 @@ module OCCIANTLR
           case alt_38
           when 1
             # at line 125:14: DIGIT
-            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_number_1223 )
+            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_number_1275 )
 
           else
             break # out of loop for decision 38
@@ -2039,7 +2040,7 @@ module OCCIANTLR
         case alt_40
         when 1
           # at line 125:23: '.' ( DIGIT )+
-          match( T__33, TOKENS_FOLLOWING_T__33_IN_number_1228 )
+          match( T__33, TOKENS_FOLLOWING_T__33_IN_number_1280 )
           # at file 125:27: ( DIGIT )+
           match_count_39 = 0
           while true
@@ -2053,7 +2054,7 @@ module OCCIANTLR
             case alt_39
             when 1
               # at line 125:27: DIGIT
-              match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_number_1230 )
+              match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_number_1282 )
 
             else
               match_count_39 > 0 and break
@@ -2118,7 +2119,7 @@ module OCCIANTLR
     TOKENS_FOLLOWING_WS_IN_category_title_239 = Set[ 16 ]
     TOKENS_FOLLOWING_T__16_IN_category_title_242 = Set[ 13 ]
     TOKENS_FOLLOWING_T__13_IN_category_title_244 = Set[ 14 ]
-    TOKENS_FOLLOWING_T__14_IN_category_title_246 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44 ]
+    TOKENS_FOLLOWING_T__14_IN_category_title_246 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45 ]
     TOKENS_FOLLOWING_title_IN_category_title_248 = Set[ 14 ]
     TOKENS_FOLLOWING_T__14_IN_category_title_250 = Set[ 1 ]
     TOKENS_FOLLOWING_T__11_IN_category_rel_277 = Set[ 4, 17 ]
@@ -2205,7 +2206,7 @@ module OCCIANTLR
     TOKENS_FOLLOWING_set_IN_term_913 = Set[ 1, 5, 7, 30, 39 ]
     TOKENS_FOLLOWING_uri_IN_scheme_946 = Set[ 1 ]
     TOKENS_FOLLOWING_set_IN_class_type_955 = Set[ 1 ]
-    TOKENS_FOLLOWING_set_IN_title_976 = Set[ 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44 ]
+    TOKENS_FOLLOWING_set_IN_title_976 = Set[ 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45 ]
     TOKENS_FOLLOWING_attribute_component_IN_attribute_1023 = Set[ 13, 33 ]
     TOKENS_FOLLOWING_T__33_IN_attribute_1034 = Set[ 5 ]
     TOKENS_FOLLOWING_attribute_component_IN_attribute_1038 = Set[ 13, 33 ]
@@ -2214,16 +2215,16 @@ module OCCIANTLR
     TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1095 = Set[ 1, 33 ]
     TOKENS_FOLLOWING_T__33_IN_attribute_name_1106 = Set[ 5 ]
     TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1110 = Set[ 1, 33 ]
-    TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1128 = Set[ 1, 5, 7, 30, 39 ]
-    TOKENS_FOLLOWING_set_IN_attribute_component_1130 = Set[ 1, 5, 7, 30, 39 ]
-    TOKENS_FOLLOWING_string_IN_attribute_value_1160 = Set[ 1 ]
-    TOKENS_FOLLOWING_number_IN_attribute_value_1166 = Set[ 1 ]
-    TOKENS_FOLLOWING_T__14_IN_string_1181 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44 ]
-    TOKENS_FOLLOWING_set_IN_string_1183 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44 ]
-    TOKENS_FOLLOWING_T__14_IN_string_1211 = Set[ 1 ]
-    TOKENS_FOLLOWING_DIGIT_IN_number_1223 = Set[ 1, 7, 33 ]
-    TOKENS_FOLLOWING_T__33_IN_number_1228 = Set[ 7 ]
-    TOKENS_FOLLOWING_DIGIT_IN_number_1230 = Set[ 1, 7 ]
+    TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1128 = Set[ 1, 5, 7, 12, 16, 17, 18, 19, 20, 24, 25, 30, 39, 40, 41, 42, 43, 45 ]
+    TOKENS_FOLLOWING_set_IN_attribute_component_1130 = Set[ 1, 5, 7, 12, 16, 17, 18, 19, 20, 24, 25, 30, 39, 40, 41, 42, 43, 45 ]
+    TOKENS_FOLLOWING_string_IN_attribute_value_1212 = Set[ 1 ]
+    TOKENS_FOLLOWING_number_IN_attribute_value_1218 = Set[ 1 ]
+    TOKENS_FOLLOWING_T__14_IN_string_1233 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45 ]
+    TOKENS_FOLLOWING_set_IN_string_1235 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45 ]
+    TOKENS_FOLLOWING_T__14_IN_string_1263 = Set[ 1 ]
+    TOKENS_FOLLOWING_DIGIT_IN_number_1275 = Set[ 1, 7, 33 ]
+    TOKENS_FOLLOWING_T__33_IN_number_1280 = Set[ 7 ]
+    TOKENS_FOLLOWING_DIGIT_IN_number_1282 = Set[ 1, 7 ]
 
   end # class Parser < ANTLR3::Parser
 

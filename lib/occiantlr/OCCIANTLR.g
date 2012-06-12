@@ -119,7 +119,7 @@ attribute_name returns [hash] @init { hash = Hashie::Mash.new }
                         : comp_first=attribute_component { cur_hash = hash; comp = $comp_first.text }
 			  ( '.' comp_next=attribute_component { cur_hash[comp.to_sym] = Hashie::Mash.new; cur_hash = cur_hash[comp.to_sym]; comp = $comp_next.text })*
 			  { cur_hash[comp.to_sym] = ATTRIBUTE };
-attribute_component	: LOALPHA ( LOALPHA | DIGIT | '-' | '_' )*;
+attribute_component	: LOALPHA ( LOALPHA | DIGIT | '-' | '_' | 'action' | 'kind' | 'mixin' | 'location' | 'attributes' | 'rel' | 'title' | 'actions' | 'scheme' | 'term' | 'category' | 'self' | 'link' )*;
 attribute_value returns [value]	: ( string { value = $string.text } | number { value = $number.text.to_i } );
 string			: ( '"' ( ESC | ~( '\\' | '"' | '\'' ) | '\'' )* '"');
 number			: ( DIGIT* ( '.' DIGIT+ )? );

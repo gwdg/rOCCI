@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: OCCIANTLR.g
-# Generated at: 2012-06-09 10:31:15
+# Generated at: 2012-06-12 13:27:25
 # 
 
 # ~~~> start load path setup
@@ -73,9 +73,10 @@ module OCCIANTLR
                    :T__17 => 17, :T__12 => 12, :T__11 => 11, :T__14 => 14, 
                    :T__13 => 13, :T__10 => 10, :DIGIT => 7, :LOALPHA => 5, 
                    :T__42 => 42, :T__43 => 43, :T__40 => 40, :T__41 => 41, 
-                   :T__44 => 44, :T__30 => 30, :T__31 => 31, :T__32 => 32, 
-                   :T__33 => 33, :WS => 4, :T__34 => 34, :T__35 => 35, :T__36 => 36, 
-                   :T__37 => 37, :UPALPHA => 6, :T__38 => 38, :T__39 => 39 )
+                   :T__44 => 44, :T__45 => 45, :T__30 => 30, :T__31 => 31, 
+                   :T__32 => 32, :T__33 => 33, :WS => 4, :T__34 => 34, :T__35 => 35, 
+                   :T__36 => 36, :T__37 => 37, :UPALPHA => 6, :T__38 => 38, 
+                   :T__39 => 39 )
     
   end
 
@@ -97,14 +98,14 @@ module OCCIANTLR
                      "T__27", "T__28", "T__29", "T__30", "T__31", "T__32", 
                      "T__33", "T__34", "T__35", "T__36", "T__37", "T__38", 
                      "T__39", "T__40", "T__41", "T__42", "T__43", "T__44", 
-                     "LOALPHA", "UPALPHA", "DIGIT", "WS", "ESC" ].freeze
+                     "T__45", "LOALPHA", "UPALPHA", "DIGIT", "WS", "ESC" ].freeze
     RULE_METHODS = [ :t__9!, :t__10!, :t__11!, :t__12!, :t__13!, :t__14!, 
                      :t__15!, :t__16!, :t__17!, :t__18!, :t__19!, :t__20!, 
                      :t__21!, :t__22!, :t__23!, :t__24!, :t__25!, :t__26!, 
                      :t__27!, :t__28!, :t__29!, :t__30!, :t__31!, :t__32!, 
                      :t__33!, :t__34!, :t__35!, :t__36!, :t__37!, :t__38!, 
                      :t__39!, :t__40!, :t__41!, :t__42!, :t__43!, :t__44!, 
-                     :loalpha!, :upalpha!, :digit!, :ws!, :esc! ].freeze
+                     :t__45!, :loalpha!, :upalpha!, :digit!, :ws!, :esc! ].freeze
 
     
     def initialize( input=nil, options = {} )
@@ -978,11 +979,35 @@ module OCCIANTLR
 
     end
 
+    # lexer rule t__45! (T__45)
+    # (in OCCIANTLR.g)
+    def t__45!
+      # -> uncomment the next line to manually enable rule tracing
+      # trace_in( __method__, 37 )
+
+      type = T__45
+      channel = ANTLR3::DEFAULT_CHANNEL
+
+      
+      # - - - - main rule block - - - -
+      # at line 43:9: 'link'
+      match( "link" )
+
+      
+      @state.type = type
+      @state.channel = channel
+
+    ensure
+      # -> uncomment the next line to manually enable rule tracing
+      # trace_out( __method__, 37 )
+
+    end
+
     # lexer rule loalpha! (LOALPHA)
     # (in OCCIANTLR.g)
     def loalpha!
       # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 37 )
+      # trace_in( __method__, 38 )
 
       type = LOALPHA
       channel = ANTLR3::DEFAULT_CHANNEL
@@ -1022,7 +1047,7 @@ module OCCIANTLR
 
     ensure
       # -> uncomment the next line to manually enable rule tracing
-      # trace_out( __method__, 37 )
+      # trace_out( __method__, 38 )
 
     end
 
@@ -1030,7 +1055,7 @@ module OCCIANTLR
     # (in OCCIANTLR.g)
     def upalpha!
       # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 38 )
+      # trace_in( __method__, 39 )
 
       type = UPALPHA
       channel = ANTLR3::DEFAULT_CHANNEL
@@ -1070,7 +1095,7 @@ module OCCIANTLR
 
     ensure
       # -> uncomment the next line to manually enable rule tracing
-      # trace_out( __method__, 38 )
+      # trace_out( __method__, 39 )
 
     end
 
@@ -1078,7 +1103,7 @@ module OCCIANTLR
     # (in OCCIANTLR.g)
     def digit!
       # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 39 )
+      # trace_in( __method__, 40 )
 
       type = DIGIT
       channel = ANTLR3::DEFAULT_CHANNEL
@@ -1097,7 +1122,7 @@ module OCCIANTLR
 
     ensure
       # -> uncomment the next line to manually enable rule tracing
-      # trace_out( __method__, 39 )
+      # trace_out( __method__, 40 )
 
     end
 
@@ -1105,7 +1130,7 @@ module OCCIANTLR
     # (in OCCIANTLR.g)
     def ws!
       # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 40 )
+      # trace_in( __method__, 41 )
 
       type = WS
       channel = ANTLR3::DEFAULT_CHANNEL
@@ -1153,7 +1178,7 @@ module OCCIANTLR
 
     ensure
       # -> uncomment the next line to manually enable rule tracing
-      # trace_out( __method__, 40 )
+      # trace_out( __method__, 41 )
 
     end
 
@@ -1161,7 +1186,7 @@ module OCCIANTLR
     # (in OCCIANTLR.g)
     def esc!
       # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 41 )
+      # trace_in( __method__, 42 )
 
       type = ESC
       channel = ANTLR3::DEFAULT_CHANNEL
@@ -1186,7 +1211,7 @@ module OCCIANTLR
 
     ensure
       # -> uncomment the next line to manually enable rule tracing
-      # trace_out( __method__, 41 )
+      # trace_out( __method__, 42 )
 
     end
 
@@ -1198,8 +1223,8 @@ module OCCIANTLR
     # but instead use the next_token method, which will
     # build and emit the actual next token
     def token!
-      # at line 1:8: ( T__9 | T__10 | T__11 | T__12 | T__13 | T__14 | T__15 | T__16 | T__17 | T__18 | T__19 | T__20 | T__21 | T__22 | T__23 | T__24 | T__25 | T__26 | T__27 | T__28 | T__29 | T__30 | T__31 | T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | LOALPHA | UPALPHA | DIGIT | WS | ESC )
-      alt_4 = 41
+      # at line 1:8: ( T__9 | T__10 | T__11 | T__12 | T__13 | T__14 | T__15 | T__16 | T__17 | T__18 | T__19 | T__20 | T__21 | T__22 | T__23 | T__24 | T__25 | T__26 | T__27 | T__28 | T__29 | T__30 | T__31 | T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | T__45 | LOALPHA | UPALPHA | DIGIT | WS | ESC )
+      alt_4 = 42
       alt_4 = @dfa4.predict( @input )
       case alt_4
       when 1
@@ -1347,23 +1372,27 @@ module OCCIANTLR
         t__44!
 
       when 37
-        # at line 1:225: LOALPHA
-        loalpha!
+        # at line 1:225: T__45
+        t__45!
 
       when 38
-        # at line 1:233: UPALPHA
-        upalpha!
+        # at line 1:231: LOALPHA
+        loalpha!
 
       when 39
-        # at line 1:241: DIGIT
-        digit!
+        # at line 1:239: UPALPHA
+        upalpha!
 
       when 40
-        # at line 1:247: WS
-        ws!
+        # at line 1:247: DIGIT
+        digit!
 
       when 41
-        # at line 1:250: ESC
+        # at line 1:253: WS
+        ws!
+
+      when 42
+        # at line 1:256: ESC
         esc!
 
       end
@@ -1373,50 +1402,51 @@ module OCCIANTLR
     # - - - - - - - - - - DFA definitions - - - - - - - - - - -
     class DFA4 < ANTLR3::DFA
       EOT = unpack( 1, -1, 1, 32, 2, -1, 1, 31, 2, -1, 5, 31, 1, 32, 2, 
-                    -1, 1, 32, 3, -1, 1, 49, 8, -1, 2, 31, 6, -1, 10, 31, 
-                    4, -1, 8, 31, 1, 71, 3, 31, 1, -1, 3, 31, 1, 79, 3, 
-                    31, 1, 83, 1, -1, 3, 31, 1, -1, 1, 88, 2, 31, 1, -1, 
-                    1, 91, 1, 31, 1, 93, 1, -1, 3, 31, 2, -1, 1, 98, 1, 
-                    99, 1, -1, 1, 31, 1, -1, 2, 31, 1, 104, 3, -1, 3, 31, 
-                    1, 109, 2, -1, 1, 112, 1, 113, 1, 31, 5, -1, 1, 31, 
-                    1, 116, 1, -1 )
-      EOF = unpack( 117, -1 )
+                    -1, 1, 32, 3, -1, 1, 50, 8, -1, 2, 31, 6, -1, 11, 31, 
+                    4, -1, 8, 31, 1, 73, 4, 31, 1, -1, 3, 31, 1, 82, 3, 
+                    31, 1, 86, 1, -1, 1, 31, 1, 88, 2, 31, 1, -1, 1, 92, 
+                    2, 31, 1, -1, 1, 95, 1, 31, 1, 97, 1, -1, 1, 31, 1, 
+                    -1, 2, 31, 2, -1, 1, 102, 1, 103, 1, -1, 1, 31, 1, -1, 
+                    2, 31, 1, 108, 3, -1, 3, 31, 1, 113, 2, -1, 1, 116, 
+                    1, 117, 1, 31, 5, -1, 1, 31, 1, 120, 1, -1 )
+      EOF = unpack( 121, -1 )
       MIN = unpack( 1, 9, 1, 97, 2, -1, 1, 99, 2, -1, 1, 97, 2, 101, 1, 
-                    111, 1, 99, 1, 105, 2, -1, 1, 45, 3, -1, 1, 34, 8, -1, 
+                    105, 1, 99, 1, 105, 2, -1, 1, 45, 3, -1, 1, 34, 8, -1, 
                     2, 105, 6, -1, 1, 104, 1, 108, 1, 97, 2, 116, 1, 114, 
-                    1, 108, 1, 99, 2, 116, 1, -1, 1, 79, 2, -1, 1, 110, 
-                    1, 120, 1, 101, 1, 102, 1, 115, 1, 101, 1, 108, 1, 109, 
-                    2, 97, 1, 114, 1, 105, 1, 67, 1, 100, 1, 105, 1, 109, 
-                    1, 97, 1, 115, 1, 103, 1, 101, 1, 97, 1, -1, 1, 116, 
-                    1, 105, 1, 111, 1, 67, 1, 97, 1, 110, 1, 101, 1, -1, 
-                    1, 97, 1, 111, 1, 97, 1, -1, 1, 105, 1, 98, 1, 110, 
-                    1, 73, 1, -1, 2, 97, 1, -1, 1, 114, 1, -1, 1, 111, 1, 
-                    117, 1, 97, 1, 45, 2, -1, 1, 121, 1, 110, 1, 116, 1, 
-                    97, 1, -1, 1, 65, 2, 97, 1, 101, 5, -1, 1, 115, 1, 97, 
-                    1, -1 )
+                    1, 108, 1, 99, 1, 110, 2, 116, 1, -1, 1, 79, 2, -1, 
+                    1, 110, 1, 120, 1, 101, 1, 102, 1, 115, 1, 101, 1, 108, 
+                    1, 109, 2, 97, 1, 107, 1, 114, 1, 105, 1, 67, 1, 100, 
+                    1, 105, 1, 109, 1, 97, 1, 115, 1, 103, 1, 101, 1, 97, 
+                    1, -1, 1, 116, 1, 97, 1, 105, 1, 111, 1, 67, 1, 97, 
+                    1, 110, 1, 101, 1, -1, 1, 97, 1, 111, 1, 97, 1, -1, 
+                    1, 105, 1, -1, 1, 98, 1, 110, 1, 73, 1, -1, 2, 97, 1, 
+                    -1, 1, 114, 1, -1, 1, 111, 1, 117, 1, 97, 1, 45, 2, 
+                    -1, 1, 121, 1, 110, 1, 116, 1, 97, 1, -1, 1, 65, 2, 
+                    97, 1, 101, 5, -1, 1, 115, 1, 97, 1, -1 )
       MAX = unpack( 1, 126, 1, 97, 2, -1, 1, 101, 2, -1, 1, 108, 1, 105, 
                     1, 101, 1, 111, 1, 116, 1, 105, 2, -1, 1, 45, 3, -1, 
                     1, 39, 8, -1, 2, 105, 6, -1, 1, 104, 1, 108, 1, 97, 
-                    2, 116, 1, 114, 1, 108, 1, 99, 2, 116, 1, -1, 1, 79, 
-                    2, -1, 1, 110, 1, 120, 1, 101, 1, 102, 1, 115, 1, 101, 
-                    1, 108, 1, 109, 1, 122, 1, 97, 1, 114, 1, 105, 1, 67, 
-                    1, 100, 1, 105, 1, 109, 1, 122, 1, 115, 1, 103, 1, 101, 
-                    1, 122, 1, -1, 1, 116, 1, 105, 1, 111, 1, 67, 1, 122, 
-                    1, 110, 1, 101, 1, -1, 1, 122, 1, 111, 1, 122, 1, -1, 
-                    1, 105, 1, 98, 1, 110, 1, 73, 1, -1, 2, 122, 1, -1, 
-                    1, 114, 1, -1, 1, 111, 1, 117, 1, 122, 1, 45, 2, -1, 
-                    1, 121, 1, 110, 1, 116, 1, 122, 1, -1, 1, 76, 2, 122, 
-                    1, 101, 5, -1, 1, 115, 1, 122, 1, -1 )
+                    2, 116, 1, 114, 1, 108, 1, 99, 1, 110, 2, 116, 1, -1, 
+                    1, 79, 2, -1, 1, 110, 1, 120, 1, 101, 1, 102, 1, 115, 
+                    1, 101, 1, 108, 1, 109, 1, 122, 1, 97, 1, 107, 1, 114, 
+                    1, 105, 1, 67, 1, 100, 1, 105, 1, 109, 1, 122, 1, 115, 
+                    1, 103, 1, 101, 1, 122, 1, -1, 1, 116, 1, 122, 1, 105, 
+                    1, 111, 1, 67, 1, 122, 1, 110, 1, 101, 1, -1, 1, 122, 
+                    1, 111, 1, 122, 1, -1, 1, 105, 1, -1, 1, 98, 1, 110, 
+                    1, 73, 1, -1, 2, 122, 1, -1, 1, 114, 1, -1, 1, 111, 
+                    1, 117, 1, 122, 1, 45, 2, -1, 1, 121, 1, 110, 1, 116, 
+                    1, 122, 1, -1, 1, 76, 2, 122, 1, 101, 5, -1, 1, 115, 
+                    1, 122, 1, -1 )
       ACCEPT = unpack( 2, -1, 1, 2, 1, 3, 1, -1, 1, 5, 1, 6, 6, -1, 1, 14, 
                        1, 15, 1, -1, 1, 20, 1, 21, 1, 22, 1, -1, 1, 24, 
                        1, 25, 1, 26, 1, 27, 1, 28, 1, 29, 1, 30, 1, 31, 
-                       2, -1, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 1, 10, 
-                       -1, 1, 13, 1, -1, 1, 41, 1, 23, 21, -1, 1, 9, 7, 
-                       -1, 1, 16, 3, -1, 1, 35, 4, -1, 1, 33, 2, -1, 1, 
-                       7, 1, -1, 1, 8, 4, -1, 1, 34, 1, 4, 4, -1, 1, 32, 
-                       4, -1, 1, 12, 1, 18, 1, 19, 1, 17, 1, 10, 2, -1, 
-                       1, 11 )
-      SPECIAL = unpack( 117, -1 )
+                       2, -1, 1, 36, 1, 38, 1, 39, 1, 40, 1, 41, 1, 1, 11, 
+                       -1, 1, 13, 1, -1, 1, 42, 1, 23, 22, -1, 1, 9, 8, 
+                       -1, 1, 16, 3, -1, 1, 35, 1, -1, 1, 37, 3, -1, 1, 
+                       33, 2, -1, 1, 7, 1, -1, 1, 8, 4, -1, 1, 34, 1, 4, 
+                       4, -1, 1, 32, 4, -1, 1, 12, 1, 18, 1, 19, 1, 17, 
+                       1, 10, 2, -1, 1, 11 )
+      SPECIAL = unpack( 121, -1 )
       TRANSITION = [
         unpack( 2, 34, 1, -1, 2, 34, 18, -1, 1, 34, 1, -1, 1, 6, 1, 23, 
                 1, -1, 1, 17, 1, 25, 1, 30, 3, -1, 1, 20, 1, -1, 1, 27, 
@@ -1434,33 +1464,32 @@ module OCCIANTLR
         unpack( 1, 39, 10, -1, 1, 38 ),
         unpack( 1, 41, 3, -1, 1, 40 ),
         unpack( 1, 42 ),
-        unpack( 1, 43 ),
-        unpack( 1, 45, 16, -1, 1, 44 ),
-        unpack( 1, 46 ),
-        unpack(  ),
-        unpack(  ),
+        unpack( 1, 44, 5, -1, 1, 43 ),
+        unpack( 1, 46, 16, -1, 1, 45 ),
         unpack( 1, 47 ),
         unpack(  ),
         unpack(  ),
-        unpack(  ),
-        unpack( 1, 48, 4, -1, 1, 48 ),
-        unpack(  ),
+        unpack( 1, 48 ),
         unpack(  ),
         unpack(  ),
         unpack(  ),
+        unpack( 1, 49, 4, -1, 1, 49 ),
         unpack(  ),
         unpack(  ),
         unpack(  ),
         unpack(  ),
-        unpack( 1, 50 ),
+        unpack(  ),
+        unpack(  ),
+        unpack(  ),
+        unpack(  ),
         unpack( 1, 51 ),
-        unpack(  ),
-        unpack(  ),
-        unpack(  ),
-        unpack(  ),
-        unpack(  ),
-        unpack(  ),
         unpack( 1, 52 ),
+        unpack(  ),
+        unpack(  ),
+        unpack(  ),
+        unpack(  ),
+        unpack(  ),
+        unpack(  ),
         unpack( 1, 53 ),
         unpack( 1, 54 ),
         unpack( 1, 55 ),
@@ -1470,75 +1499,80 @@ module OCCIANTLR
         unpack( 1, 59 ),
         unpack( 1, 60 ),
         unpack( 1, 61 ),
-        unpack(  ),
         unpack( 1, 62 ),
-        unpack(  ),
-        unpack(  ),
         unpack( 1, 63 ),
+        unpack(  ),
         unpack( 1, 64 ),
+        unpack(  ),
+        unpack(  ),
         unpack( 1, 65 ),
         unpack( 1, 66 ),
         unpack( 1, 67 ),
         unpack( 1, 68 ),
         unpack( 1, 69 ),
         unpack( 1, 70 ),
-        unpack( 26, 31 ),
+        unpack( 1, 71 ),
         unpack( 1, 72 ),
-        unpack( 1, 73 ),
+        unpack( 26, 31 ),
         unpack( 1, 74 ),
         unpack( 1, 75 ),
         unpack( 1, 76 ),
         unpack( 1, 77 ),
         unpack( 1, 78 ),
-        unpack( 26, 31 ),
+        unpack( 1, 79 ),
         unpack( 1, 80 ),
         unpack( 1, 81 ),
-        unpack( 1, 82 ),
         unpack( 26, 31 ),
-        unpack(  ),
+        unpack( 1, 83 ),
         unpack( 1, 84 ),
         unpack( 1, 85 ),
-        unpack( 1, 86 ),
+        unpack( 26, 31 ),
+        unpack(  ),
         unpack( 1, 87 ),
         unpack( 26, 31 ),
         unpack( 1, 89 ),
         unpack( 1, 90 ),
-        unpack(  ),
+        unpack( 1, 91 ),
         unpack( 26, 31 ),
-        unpack( 1, 92 ),
-        unpack( 26, 31 ),
-        unpack(  ),
+        unpack( 1, 93 ),
         unpack( 1, 94 ),
-        unpack( 1, 95 ),
+        unpack(  ),
+        unpack( 26, 31 ),
         unpack( 1, 96 ),
-        unpack( 1, 97 ),
-        unpack(  ),
-        unpack( 26, 31 ),
         unpack( 26, 31 ),
         unpack(  ),
+        unpack( 1, 98 ),
+        unpack(  ),
+        unpack( 1, 99 ),
         unpack( 1, 100 ),
-        unpack(  ),
         unpack( 1, 101 ),
-        unpack( 1, 102 ),
-        unpack( 18, 31, 1, 103, 7, 31 ),
+        unpack(  ),
+        unpack( 26, 31 ),
+        unpack( 26, 31 ),
+        unpack(  ),
+        unpack( 1, 104 ),
+        unpack(  ),
         unpack( 1, 105 ),
-        unpack(  ),
-        unpack(  ),
         unpack( 1, 106 ),
-        unpack( 1, 107 ),
-        unpack( 1, 108 ),
+        unpack( 18, 31, 1, 107, 7, 31 ),
+        unpack( 1, 109 ),
+        unpack(  ),
+        unpack(  ),
+        unpack( 1, 110 ),
+        unpack( 1, 111 ),
+        unpack( 1, 112 ),
         unpack( 26, 31 ),
         unpack(  ),
-        unpack( 1, 110, 10, -1, 1, 111 ),
+        unpack( 1, 114, 10, -1, 1, 115 ),
         unpack( 26, 31 ),
         unpack( 26, 31 ),
-        unpack( 1, 114 ),
+        unpack( 1, 118 ),
         unpack(  ),
         unpack(  ),
         unpack(  ),
         unpack(  ),
         unpack(  ),
-        unpack( 1, 115 ),
+        unpack( 1, 119 ),
         unpack( 26, 31 ),
         unpack(  )
       ].freeze
@@ -1554,7 +1588,7 @@ module OCCIANTLR
 
       def description
         <<-'__dfa_description__'.strip!
-          1:1: Tokens : ( T__9 | T__10 | T__11 | T__12 | T__13 | T__14 | T__15 | T__16 | T__17 | T__18 | T__19 | T__20 | T__21 | T__22 | T__23 | T__24 | T__25 | T__26 | T__27 | T__28 | T__29 | T__30 | T__31 | T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | LOALPHA | UPALPHA | DIGIT | WS | ESC );
+          1:1: Tokens : ( T__9 | T__10 | T__11 | T__12 | T__13 | T__14 | T__15 | T__16 | T__17 | T__18 | T__19 | T__20 | T__21 | T__22 | T__23 | T__24 | T__25 | T__26 | T__27 | T__28 | T__29 | T__30 | T__31 | T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | T__45 | LOALPHA | UPALPHA | DIGIT | WS | ESC );
         __dfa_description__
       end
     end
