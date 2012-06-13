@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: OCCIANTLR.g
-# Generated at: 2012-06-12 13:27:25
+# Generated at: 2012-06-12 16:37:00
 # 
 
 # ~~~> start load path setup
@@ -66,17 +66,18 @@ module OCCIANTLR
   module TokenData
 
     # define the token constants
-    define_tokens( :T__29 => 29, :T__28 => 28, :T__27 => 27, :T__26 => 26, 
-                   :T__25 => 25, :T__24 => 24, :T__23 => 23, :T__22 => 22, 
-                   :ESC => 8, :T__21 => 21, :T__20 => 20, :EOF => -1, :T__9 => 9, 
-                   :T__19 => 19, :T__16 => 16, :T__15 => 15, :T__18 => 18, 
-                   :T__17 => 17, :T__12 => 12, :T__11 => 11, :T__14 => 14, 
-                   :T__13 => 13, :T__10 => 10, :DIGIT => 7, :LOALPHA => 5, 
-                   :T__42 => 42, :T__43 => 43, :T__40 => 40, :T__41 => 41, 
-                   :T__44 => 44, :T__45 => 45, :T__30 => 30, :T__31 => 31, 
-                   :T__32 => 32, :T__33 => 33, :WS => 4, :T__34 => 34, :T__35 => 35, 
-                   :T__36 => 36, :T__37 => 37, :UPALPHA => 6, :T__38 => 38, 
-                   :T__39 => 39 )
+    define_tokens( :TERM => 45, :LT => 18, :CLASS => 11, :ATTRIBUTES => 15, 
+                   :ESC => 42, :EQUALS => 9, :EOF => -1, :ACTION => 41, 
+                   :ACTIONS => 16, :AT => 27, :QUOTE => 10, :SLASH => 37, 
+                   :TILDE => 33, :PLUS => 31, :DIGIT => 26, :DOT => 32, 
+                   :LOALPHA => 24, :X_OCCI_ATTRIBUTE_KEY => 22, :PERCENT => 28, 
+                   :DASH => 38, :HASH => 34, :AMPERSAND => 36, :CATEGORY => 21, 
+                   :UNDERSCORE => 29, :REL => 13, :CATEGORY_KEY => 4, :SEMICOLON => 6, 
+                   :LINK => 44, :SQUOTE => 43, :KIND => 39, :SCHEME => 8, 
+                   :COLON => 5, :MIXIN => 40, :WS => 7, :QUESTION => 35, 
+                   :UPALPHA => 25, :LINK_KEY => 17, :LOCATION => 14, :GT => 19, 
+                   :X_OCCI_LOCATION_KEY => 23, :SELF => 20, :BACKSLASH => 30, 
+                   :TITLE => 12 )
     
   end
 
@@ -92,20 +93,22 @@ module OCCIANTLR
       # ignore
     end
     
-    RULE_NAMES   = [ "T__9", "T__10", "T__11", "T__12", "T__13", "T__14", 
-                     "T__15", "T__16", "T__17", "T__18", "T__19", "T__20", 
-                     "T__21", "T__22", "T__23", "T__24", "T__25", "T__26", 
-                     "T__27", "T__28", "T__29", "T__30", "T__31", "T__32", 
-                     "T__33", "T__34", "T__35", "T__36", "T__37", "T__38", 
-                     "T__39", "T__40", "T__41", "T__42", "T__43", "T__44", 
-                     "T__45", "LOALPHA", "UPALPHA", "DIGIT", "WS", "ESC" ].freeze
-    RULE_METHODS = [ :t__9!, :t__10!, :t__11!, :t__12!, :t__13!, :t__14!, 
-                     :t__15!, :t__16!, :t__17!, :t__18!, :t__19!, :t__20!, 
-                     :t__21!, :t__22!, :t__23!, :t__24!, :t__25!, :t__26!, 
-                     :t__27!, :t__28!, :t__29!, :t__30!, :t__31!, :t__32!, 
-                     :t__33!, :t__34!, :t__35!, :t__36!, :t__37!, :t__38!, 
-                     :t__39!, :t__40!, :t__41!, :t__42!, :t__43!, :t__44!, 
-                     :t__45!, :loalpha!, :upalpha!, :digit!, :ws!, :esc! ].freeze
+    RULE_NAMES   = [ "CATEGORY_KEY", "LINK_KEY", "X_OCCI_ATTRIBUTE_KEY", 
+                     "X_OCCI_LOCATION_KEY", "ACTION", "ACTIONS", "AMPERSAND", 
+                     "AT", "ATTRIBUTES", "BACKSLASH", "CATEGORY", "CLASS", 
+                     "COLON", "DASH", "DOT", "EQUALS", "GT", "HASH", "KIND", 
+                     "LINK", "LOCATION", "LT", "MIXIN", "PERCENT", "PLUS", 
+                     "QUESTION", "QUOTE", "REL", "SCHEME", "SELF", "SEMICOLON", 
+                     "SLASH", "SQUOTE", "TERM", "TILDE", "TITLE", "UNDERSCORE", 
+                     "LOALPHA", "UPALPHA", "DIGIT", "WS", "ESC" ].freeze
+    RULE_METHODS = [ :category_key!, :link_key!, :x_occi_attribute_key!, 
+                     :x_occi_location_key!, :action!, :actions!, :ampersand!, 
+                     :at!, :attributes!, :backslash!, :category!, :class!, 
+                     :colon!, :dash!, :dot!, :equals!, :gt!, :hash!, :kind!, 
+                     :link!, :location!, :lt!, :mixin!, :percent!, :plus!, 
+                     :question!, :quote!, :rel!, :scheme!, :self!, :semicolon!, 
+                     :slash!, :squote!, :term!, :tilde!, :title!, :underscore!, 
+                     :loalpha!, :upalpha!, :digit!, :ws!, :esc! ].freeze
 
     
     def initialize( input=nil, options = {} )
@@ -115,18 +118,18 @@ module OCCIANTLR
     
     
     # - - - - - - - - - - - lexer rules - - - - - - - - - - - -
-    # lexer rule t__9! (T__9)
+    # lexer rule category_key! (CATEGORY_KEY)
     # (in OCCIANTLR.g)
-    def t__9!
+    def category_key!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 1 )
 
-      type = T__9
+      type = CATEGORY_KEY
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 7:8: 'Category'
+      # at line 130:4: 'Category'
       match( "Category" )
 
       
@@ -139,19 +142,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__10! (T__10)
+    # lexer rule link_key! (LINK_KEY)
     # (in OCCIANTLR.g)
-    def t__10!
+    def link_key!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 2 )
 
-      type = T__10
+      type = LINK_KEY
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 8:9: ':'
-      match( 0x3a )
+      # at line 132:4: 'Link'
+      match( "Link" )
 
       
       @state.type = type
@@ -163,19 +166,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__11! (T__11)
+    # lexer rule x_occi_attribute_key! (X_OCCI_ATTRIBUTE_KEY)
     # (in OCCIANTLR.g)
-    def t__11!
+    def x_occi_attribute_key!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 3 )
 
-      type = T__11
+      type = X_OCCI_ATTRIBUTE_KEY
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 9:9: ';'
-      match( 0x3b )
+      # at line 134:4: 'X-OCCI-Attribute'
+      match( "X-OCCI-Attribute" )
 
       
       @state.type = type
@@ -187,19 +190,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__12! (T__12)
+    # lexer rule x_occi_location_key! (X_OCCI_LOCATION_KEY)
     # (in OCCIANTLR.g)
-    def t__12!
+    def x_occi_location_key!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 4 )
 
-      type = T__12
+      type = X_OCCI_LOCATION_KEY
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 10:9: 'scheme'
-      match( "scheme" )
+      # at line 136:4: 'X-OCCI-Location'
+      match( "X-OCCI-Location" )
 
       
       @state.type = type
@@ -211,19 +214,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__13! (T__13)
+    # lexer rule action! (ACTION)
     # (in OCCIANTLR.g)
-    def t__13!
+    def action!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 5 )
 
-      type = T__13
+      type = ACTION
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 11:9: '='
-      match( 0x3d )
+      # at line 140:10: 'action'
+      match( "action" )
 
       
       @state.type = type
@@ -235,19 +238,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__14! (T__14)
+    # lexer rule actions! (ACTIONS)
     # (in OCCIANTLR.g)
-    def t__14!
+    def actions!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 6 )
 
-      type = T__14
+      type = ACTIONS
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 12:9: '\"'
-      match( 0x22 )
+      # at line 141:11: 'actions'
+      match( "actions" )
 
       
       @state.type = type
@@ -259,19 +262,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__15! (T__15)
+    # lexer rule ampersand! (AMPERSAND)
     # (in OCCIANTLR.g)
-    def t__15!
+    def ampersand!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 7 )
 
-      type = T__15
+      type = AMPERSAND
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 13:9: 'class'
-      match( "class" )
+      # at line 143:4: '&'
+      match( 0x26 )
 
       
       @state.type = type
@@ -283,19 +286,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__16! (T__16)
+    # lexer rule at! (AT)
     # (in OCCIANTLR.g)
-    def t__16!
+    def at!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 8 )
 
-      type = T__16
+      type = AT
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 14:9: 'title'
-      match( "title" )
+      # at line 144:6: '@'
+      match( 0x40 )
 
       
       @state.type = type
@@ -307,19 +310,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__17! (T__17)
+    # lexer rule attributes! (ATTRIBUTES)
     # (in OCCIANTLR.g)
-    def t__17!
+    def attributes!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 9 )
 
-      type = T__17
+      type = ATTRIBUTES
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 15:9: 'rel'
-      match( "rel" )
+      # at line 146:4: 'attributes'
+      match( "attributes" )
 
       
       @state.type = type
@@ -331,19 +334,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__18! (T__18)
+    # lexer rule backslash! (BACKSLASH)
     # (in OCCIANTLR.g)
-    def t__18!
+    def backslash!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 10 )
 
-      type = T__18
+      type = BACKSLASH
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 16:9: 'location'
-      match( "location" )
+      # at line 148:4: '\\\\'
+      match( 0x5c )
 
       
       @state.type = type
@@ -355,19 +358,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__19! (T__19)
+    # lexer rule category! (CATEGORY)
     # (in OCCIANTLR.g)
-    def t__19!
+    def category!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 11 )
 
-      type = T__19
+      type = CATEGORY
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 17:9: 'attributes'
-      match( "attributes" )
+      # at line 149:11: 'category'
+      match( "category" )
 
       
       @state.type = type
@@ -379,19 +382,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__20! (T__20)
+    # lexer rule class! (CLASS)
     # (in OCCIANTLR.g)
-    def t__20!
+    def class!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 12 )
 
-      type = T__20
+      type = CLASS
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 18:9: 'actions'
-      match( "actions" )
+      # at line 150:9: 'class'
+      match( "class" )
 
       
       @state.type = type
@@ -403,19 +406,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__21! (T__21)
+    # lexer rule colon! (COLON)
     # (in OCCIANTLR.g)
-    def t__21!
+    def colon!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 13 )
 
-      type = T__21
+      type = COLON
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 19:9: 'Link'
-      match( "Link" )
+      # at line 151:9: ':'
+      match( 0x3a )
 
       
       @state.type = type
@@ -427,19 +430,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__22! (T__22)
+    # lexer rule dash! (DASH)
     # (in OCCIANTLR.g)
-    def t__22!
+    def dash!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 14 )
 
-      type = T__22
+      type = DASH
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 20:9: '<'
-      match( 0x3c )
+      # at line 152:8: '-'
+      match( 0x2d )
 
       
       @state.type = type
@@ -451,19 +454,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__23! (T__23)
+    # lexer rule dot! (DOT)
     # (in OCCIANTLR.g)
-    def t__23!
+    def dot!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 15 )
 
-      type = T__23
+      type = DOT
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 21:9: '>'
-      match( 0x3e )
+      # at line 153:7: '.'
+      match( 0x2e )
 
       
       @state.type = type
@@ -475,19 +478,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__24! (T__24)
+    # lexer rule equals! (EQUALS)
     # (in OCCIANTLR.g)
-    def t__24!
+    def equals!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 16 )
 
-      type = T__24
+      type = EQUALS
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 22:9: 'self'
-      match( "self" )
+      # at line 154:10: '='
+      match( 0x3d )
 
       
       @state.type = type
@@ -499,19 +502,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__25! (T__25)
+    # lexer rule gt! (GT)
     # (in OCCIANTLR.g)
-    def t__25!
+    def gt!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 17 )
 
-      type = T__25
+      type = GT
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 23:9: 'category'
-      match( "category" )
+      # at line 155:6: '>'
+      match( 0x3e )
 
       
       @state.type = type
@@ -523,19 +526,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__26! (T__26)
+    # lexer rule hash! (HASH)
     # (in OCCIANTLR.g)
-    def t__26!
+    def hash!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 18 )
 
-      type = T__26
+      type = HASH
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 24:9: 'X-OCCI-Attribute'
-      match( "X-OCCI-Attribute" )
+      # at line 156:8: '#'
+      match( 0x23 )
 
       
       @state.type = type
@@ -547,19 +550,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__27! (T__27)
+    # lexer rule kind! (KIND)
     # (in OCCIANTLR.g)
-    def t__27!
+    def kind!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 19 )
 
-      type = T__27
+      type = KIND
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 25:9: 'X-OCCI-Location'
-      match( "X-OCCI-Location" )
+      # at line 157:8: 'kind'
+      match( "kind" )
 
       
       @state.type = type
@@ -571,19 +574,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__28! (T__28)
+    # lexer rule link! (LINK)
     # (in OCCIANTLR.g)
-    def t__28!
+    def link!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 20 )
 
-      type = T__28
+      type = LINK
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 26:9: '@'
-      match( 0x40 )
+      # at line 158:8: 'link'
+      match( "link" )
 
       
       @state.type = type
@@ -595,19 +598,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__29! (T__29)
+    # lexer rule location! (LOCATION)
     # (in OCCIANTLR.g)
-    def t__29!
+    def location!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 21 )
 
-      type = T__29
+      type = LOCATION
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 27:9: '%'
-      match( 0x25 )
+      # at line 159:11: 'location'
+      match( "location" )
 
       
       @state.type = type
@@ -619,19 +622,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__30! (T__30)
+    # lexer rule lt! (LT)
     # (in OCCIANTLR.g)
-    def t__30!
+    def lt!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 22 )
 
-      type = T__30
+      type = LT
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 28:9: '_'
-      match( 0x5f )
+      # at line 160:6: '<'
+      match( 0x3c )
 
       
       @state.type = type
@@ -643,19 +646,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__31! (T__31)
+    # lexer rule mixin! (MIXIN)
     # (in OCCIANTLR.g)
-    def t__31!
+    def mixin!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 23 )
 
-      type = T__31
+      type = MIXIN
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 29:9: '\\\\'
-      match( 0x5c )
+      # at line 161:9: 'mixin'
+      match( "mixin" )
 
       
       @state.type = type
@@ -667,19 +670,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__32! (T__32)
+    # lexer rule percent! (PERCENT)
     # (in OCCIANTLR.g)
-    def t__32!
+    def percent!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 24 )
 
-      type = T__32
+      type = PERCENT
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 30:9: '+'
-      match( 0x2b )
+      # at line 162:11: '%'
+      match( 0x25 )
 
       
       @state.type = type
@@ -691,19 +694,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__33! (T__33)
+    # lexer rule plus! (PLUS)
     # (in OCCIANTLR.g)
-    def t__33!
+    def plus!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 25 )
 
-      type = T__33
+      type = PLUS
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 31:9: '.'
-      match( 0x2e )
+      # at line 163:8: '+'
+      match( 0x2b )
 
       
       @state.type = type
@@ -715,19 +718,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__34! (T__34)
+    # lexer rule question! (QUESTION)
     # (in OCCIANTLR.g)
-    def t__34!
+    def question!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 26 )
 
-      type = T__34
+      type = QUESTION
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 32:9: '~'
-      match( 0x7e )
+      # at line 164:11: '?'
+      match( 0x3f )
 
       
       @state.type = type
@@ -739,19 +742,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__35! (T__35)
+    # lexer rule quote! (QUOTE)
     # (in OCCIANTLR.g)
-    def t__35!
+    def quote!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 27 )
 
-      type = T__35
+      type = QUOTE
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 33:9: '#'
-      match( 0x23 )
+      # at line 165:9: '\"'
+      match( 0x22 )
 
       
       @state.type = type
@@ -763,19 +766,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__36! (T__36)
+    # lexer rule rel! (REL)
     # (in OCCIANTLR.g)
-    def t__36!
+    def rel!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 28 )
 
-      type = T__36
+      type = REL
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 34:9: '?'
-      match( 0x3f )
+      # at line 166:7: 'rel'
+      match( "rel" )
 
       
       @state.type = type
@@ -787,19 +790,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__37! (T__37)
+    # lexer rule scheme! (SCHEME)
     # (in OCCIANTLR.g)
-    def t__37!
+    def scheme!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 29 )
 
-      type = T__37
+      type = SCHEME
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 35:9: '&'
-      match( 0x26 )
+      # at line 167:10: 'scheme'
+      match( "scheme" )
 
       
       @state.type = type
@@ -811,19 +814,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__38! (T__38)
+    # lexer rule self! (SELF)
     # (in OCCIANTLR.g)
-    def t__38!
+    def self!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 30 )
 
-      type = T__38
+      type = SELF
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 36:9: '/'
-      match( 0x2f )
+      # at line 168:8: 'self'
+      match( "self" )
 
       
       @state.type = type
@@ -835,19 +838,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__39! (T__39)
+    # lexer rule semicolon! (SEMICOLON)
     # (in OCCIANTLR.g)
-    def t__39!
+    def semicolon!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 31 )
 
-      type = T__39
+      type = SEMICOLON
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 37:9: '-'
-      match( 0x2d )
+      # at line 170:4: ';'
+      match( 0x3b )
 
       
       @state.type = type
@@ -859,19 +862,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__40! (T__40)
+    # lexer rule slash! (SLASH)
     # (in OCCIANTLR.g)
-    def t__40!
+    def slash!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 32 )
 
-      type = T__40
+      type = SLASH
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 38:9: 'action'
-      match( "action" )
+      # at line 171:9: '/'
+      match( 0x2f )
 
       
       @state.type = type
@@ -883,19 +886,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__41! (T__41)
+    # lexer rule squote! (SQUOTE)
     # (in OCCIANTLR.g)
-    def t__41!
+    def squote!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 33 )
 
-      type = T__41
+      type = SQUOTE
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 39:9: 'kind'
-      match( "kind" )
+      # at line 172:10: '\\''
+      match( 0x27 )
 
       
       @state.type = type
@@ -907,19 +910,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__42! (T__42)
+    # lexer rule term! (TERM)
     # (in OCCIANTLR.g)
-    def t__42!
+    def term!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 34 )
 
-      type = T__42
+      type = TERM
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 40:9: 'mixin'
-      match( "mixin" )
+      # at line 173:8: 'term'
+      match( "term" )
 
       
       @state.type = type
@@ -931,19 +934,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__43! (T__43)
+    # lexer rule tilde! (TILDE)
     # (in OCCIANTLR.g)
-    def t__43!
+    def tilde!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 35 )
 
-      type = T__43
+      type = TILDE
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 41:9: 'term'
-      match( "term" )
+      # at line 174:9: '~'
+      match( 0x7e )
 
       
       @state.type = type
@@ -955,19 +958,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__44! (T__44)
+    # lexer rule title! (TITLE)
     # (in OCCIANTLR.g)
-    def t__44!
+    def title!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 36 )
 
-      type = T__44
+      type = TITLE
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 42:9: '\\''
-      match( 0x27 )
+      # at line 175:9: 'title'
+      match( "title" )
 
       
       @state.type = type
@@ -979,19 +982,19 @@ module OCCIANTLR
 
     end
 
-    # lexer rule t__45! (T__45)
+    # lexer rule underscore! (UNDERSCORE)
     # (in OCCIANTLR.g)
-    def t__45!
+    def underscore!
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 37 )
 
-      type = T__45
+      type = UNDERSCORE
       channel = ANTLR3::DEFAULT_CHANNEL
 
       
       # - - - - main rule block - - - -
-      # at line 43:9: 'link'
-      match( "link" )
+      # at line 177:4: '_'
+      match( 0x5f )
 
       
       @state.type = type
@@ -1014,8 +1017,8 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 127:11: ( 'a' .. 'z' )+
-      # at file 127:11: ( 'a' .. 'z' )+
+      # at line 179:12: ( 'a' .. 'z' )+
+      # at file 179:12: ( 'a' .. 'z' )+
       match_count_1 = 0
       while true
         alt_1 = 2
@@ -1027,7 +1030,7 @@ module OCCIANTLR
         end
         case alt_1
         when 1
-          # at line 127:12: 'a' .. 'z'
+          # at line 179:13: 'a' .. 'z'
           match_range( 0x61, 0x7a )
 
         else
@@ -1062,8 +1065,8 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 128:11: ( 'A' .. 'Z' )+
-      # at file 128:11: ( 'A' .. 'Z' )+
+      # at line 180:12: ( 'A' .. 'Z' )+
+      # at file 180:12: ( 'A' .. 'Z' )+
       match_count_2 = 0
       while true
         alt_2 = 2
@@ -1075,7 +1078,7 @@ module OCCIANTLR
         end
         case alt_2
         when 1
-          # at line 128:12: 'A' .. 'Z'
+          # at line 180:13: 'A' .. 'Z'
           match_range( 0x41, 0x5a )
 
         else
@@ -1110,10 +1113,31 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 129:11: ( '0' .. '9' )
-      # at line 129:11: ( '0' .. '9' )
-      # at line 129:12: '0' .. '9'
-      match_range( 0x30, 0x39 )
+      # at line 181:12: ( '0' .. '9' )+
+      # at file 181:12: ( '0' .. '9' )+
+      match_count_3 = 0
+      while true
+        alt_3 = 2
+        look_3_0 = @input.peek( 1 )
+
+        if ( look_3_0.between?( 0x30, 0x39 ) )
+          alt_3 = 1
+
+        end
+        case alt_3
+        when 1
+          # at line 181:13: '0' .. '9'
+          match_range( 0x30, 0x39 )
+
+        else
+          match_count_3 > 0 and break
+          eee = EarlyExit(3)
+
+
+          raise eee
+        end
+        match_count_3 += 1
+      end
 
 
       
@@ -1137,18 +1161,18 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 130:11: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
-      # at file 130:11: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
-      match_count_3 = 0
+      # at line 182:12: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
+      # at file 182:12: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
+      match_count_4 = 0
       while true
-        alt_3 = 2
-        look_3_0 = @input.peek( 1 )
+        alt_4 = 2
+        look_4_0 = @input.peek( 1 )
 
-        if ( look_3_0.between?( 0x9, 0xa ) || look_3_0.between?( 0xc, 0xd ) || look_3_0 == 0x20 )
-          alt_3 = 1
+        if ( look_4_0.between?( 0x9, 0xa ) || look_4_0.between?( 0xc, 0xd ) || look_4_0 == 0x20 )
+          alt_4 = 1
 
         end
-        case alt_3
+        case alt_4
         when 1
           # at line 
           if @input.peek( 1 ).between?( 0x9, 0xa ) || @input.peek( 1 ).between?( 0xc, 0xd ) || @input.peek(1) == 0x20
@@ -1162,13 +1186,13 @@ module OCCIANTLR
 
 
         else
-          match_count_3 > 0 and break
-          eee = EarlyExit(3)
+          match_count_4 > 0 and break
+          eee = EarlyExit(4)
 
 
           raise eee
         end
-        match_count_3 += 1
+        match_count_4 += 1
       end
 
 
@@ -1193,7 +1217,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 131:11: '\\\\' ( '\"' | '\\'' )
+      # at line 183:12: '\\\\' ( QUOTE | '\\'' )
       match( 0x5c )
       if @input.peek(1) == 0x22 || @input.peek(1) == 0x27
         @input.consume
@@ -1223,176 +1247,176 @@ module OCCIANTLR
     # but instead use the next_token method, which will
     # build and emit the actual next token
     def token!
-      # at line 1:8: ( T__9 | T__10 | T__11 | T__12 | T__13 | T__14 | T__15 | T__16 | T__17 | T__18 | T__19 | T__20 | T__21 | T__22 | T__23 | T__24 | T__25 | T__26 | T__27 | T__28 | T__29 | T__30 | T__31 | T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | T__45 | LOALPHA | UPALPHA | DIGIT | WS | ESC )
-      alt_4 = 42
-      alt_4 = @dfa4.predict( @input )
-      case alt_4
+      # at line 1:8: ( CATEGORY_KEY | LINK_KEY | X_OCCI_ATTRIBUTE_KEY | X_OCCI_LOCATION_KEY | ACTION | ACTIONS | AMPERSAND | AT | ATTRIBUTES | BACKSLASH | CATEGORY | CLASS | COLON | DASH | DOT | EQUALS | GT | HASH | KIND | LINK | LOCATION | LT | MIXIN | PERCENT | PLUS | QUESTION | QUOTE | REL | SCHEME | SELF | SEMICOLON | SLASH | SQUOTE | TERM | TILDE | TITLE | UNDERSCORE | LOALPHA | UPALPHA | DIGIT | WS | ESC )
+      alt_5 = 42
+      alt_5 = @dfa5.predict( @input )
+      case alt_5
       when 1
-        # at line 1:10: T__9
-        t__9!
+        # at line 1:10: CATEGORY_KEY
+        category_key!
 
       when 2
-        # at line 1:15: T__10
-        t__10!
+        # at line 1:23: LINK_KEY
+        link_key!
 
       when 3
-        # at line 1:21: T__11
-        t__11!
+        # at line 1:32: X_OCCI_ATTRIBUTE_KEY
+        x_occi_attribute_key!
 
       when 4
-        # at line 1:27: T__12
-        t__12!
+        # at line 1:53: X_OCCI_LOCATION_KEY
+        x_occi_location_key!
 
       when 5
-        # at line 1:33: T__13
-        t__13!
+        # at line 1:73: ACTION
+        action!
 
       when 6
-        # at line 1:39: T__14
-        t__14!
+        # at line 1:80: ACTIONS
+        actions!
 
       when 7
-        # at line 1:45: T__15
-        t__15!
+        # at line 1:88: AMPERSAND
+        ampersand!
 
       when 8
-        # at line 1:51: T__16
-        t__16!
+        # at line 1:98: AT
+        at!
 
       when 9
-        # at line 1:57: T__17
-        t__17!
+        # at line 1:101: ATTRIBUTES
+        attributes!
 
       when 10
-        # at line 1:63: T__18
-        t__18!
+        # at line 1:112: BACKSLASH
+        backslash!
 
       when 11
-        # at line 1:69: T__19
-        t__19!
+        # at line 1:122: CATEGORY
+        category!
 
       when 12
-        # at line 1:75: T__20
-        t__20!
+        # at line 1:131: CLASS
+        class!
 
       when 13
-        # at line 1:81: T__21
-        t__21!
+        # at line 1:137: COLON
+        colon!
 
       when 14
-        # at line 1:87: T__22
-        t__22!
+        # at line 1:143: DASH
+        dash!
 
       when 15
-        # at line 1:93: T__23
-        t__23!
+        # at line 1:148: DOT
+        dot!
 
       when 16
-        # at line 1:99: T__24
-        t__24!
+        # at line 1:152: EQUALS
+        equals!
 
       when 17
-        # at line 1:105: T__25
-        t__25!
+        # at line 1:159: GT
+        gt!
 
       when 18
-        # at line 1:111: T__26
-        t__26!
+        # at line 1:162: HASH
+        hash!
 
       when 19
-        # at line 1:117: T__27
-        t__27!
+        # at line 1:167: KIND
+        kind!
 
       when 20
-        # at line 1:123: T__28
-        t__28!
+        # at line 1:172: LINK
+        link!
 
       when 21
-        # at line 1:129: T__29
-        t__29!
+        # at line 1:177: LOCATION
+        location!
 
       when 22
-        # at line 1:135: T__30
-        t__30!
+        # at line 1:186: LT
+        lt!
 
       when 23
-        # at line 1:141: T__31
-        t__31!
+        # at line 1:189: MIXIN
+        mixin!
 
       when 24
-        # at line 1:147: T__32
-        t__32!
+        # at line 1:195: PERCENT
+        percent!
 
       when 25
-        # at line 1:153: T__33
-        t__33!
+        # at line 1:203: PLUS
+        plus!
 
       when 26
-        # at line 1:159: T__34
-        t__34!
+        # at line 1:208: QUESTION
+        question!
 
       when 27
-        # at line 1:165: T__35
-        t__35!
+        # at line 1:217: QUOTE
+        quote!
 
       when 28
-        # at line 1:171: T__36
-        t__36!
+        # at line 1:223: REL
+        rel!
 
       when 29
-        # at line 1:177: T__37
-        t__37!
+        # at line 1:227: SCHEME
+        scheme!
 
       when 30
-        # at line 1:183: T__38
-        t__38!
+        # at line 1:234: SELF
+        self!
 
       when 31
-        # at line 1:189: T__39
-        t__39!
+        # at line 1:239: SEMICOLON
+        semicolon!
 
       when 32
-        # at line 1:195: T__40
-        t__40!
+        # at line 1:249: SLASH
+        slash!
 
       when 33
-        # at line 1:201: T__41
-        t__41!
+        # at line 1:255: SQUOTE
+        squote!
 
       when 34
-        # at line 1:207: T__42
-        t__42!
+        # at line 1:262: TERM
+        term!
 
       when 35
-        # at line 1:213: T__43
-        t__43!
+        # at line 1:267: TILDE
+        tilde!
 
       when 36
-        # at line 1:219: T__44
-        t__44!
+        # at line 1:273: TITLE
+        title!
 
       when 37
-        # at line 1:225: T__45
-        t__45!
+        # at line 1:279: UNDERSCORE
+        underscore!
 
       when 38
-        # at line 1:231: LOALPHA
+        # at line 1:290: LOALPHA
         loalpha!
 
       when 39
-        # at line 1:239: UPALPHA
+        # at line 1:298: UPALPHA
         upalpha!
 
       when 40
-        # at line 1:247: DIGIT
+        # at line 1:306: DIGIT
         digit!
 
       when 41
-        # at line 1:253: WS
+        # at line 1:312: WS
         ws!
 
       when 42
-        # at line 1:256: ESC
+        # at line 1:315: ESC
         esc!
 
       end
@@ -1400,90 +1424,91 @@ module OCCIANTLR
 
     
     # - - - - - - - - - - DFA definitions - - - - - - - - - - -
-    class DFA4 < ANTLR3::DFA
-      EOT = unpack( 1, -1, 1, 32, 2, -1, 1, 31, 2, -1, 5, 31, 1, 32, 2, 
-                    -1, 1, 32, 3, -1, 1, 50, 8, -1, 2, 31, 6, -1, 11, 31, 
-                    4, -1, 8, 31, 1, 73, 4, 31, 1, -1, 3, 31, 1, 82, 3, 
-                    31, 1, 86, 1, -1, 1, 31, 1, 88, 2, 31, 1, -1, 1, 92, 
-                    2, 31, 1, -1, 1, 95, 1, 31, 1, 97, 1, -1, 1, 31, 1, 
-                    -1, 2, 31, 2, -1, 1, 102, 1, 103, 1, -1, 1, 31, 1, -1, 
-                    2, 31, 1, 108, 3, -1, 3, 31, 1, 113, 2, -1, 1, 116, 
-                    1, 117, 1, 31, 5, -1, 1, 31, 1, 120, 1, -1 )
+    class DFA5 < ANTLR3::DFA
+      EOT = unpack( 1, -1, 3, 32, 1, 31, 2, -1, 1, 41, 1, 31, 6, -1, 2, 
+                    31, 1, -1, 1, 31, 4, -1, 2, 31, 3, -1, 1, 31, 9, -1, 
+                    2, 31, 2, -1, 11, 31, 1, -1, 8, 31, 1, 76, 4, 31, 1, 
+                    -1, 4, 31, 1, 86, 1, 87, 2, 31, 1, -1, 1, 31, 1, 91, 
+                    1, 92, 1, 31, 1, -1, 3, 31, 1, 98, 2, -1, 1, 31, 1, 
+                    100, 1, 31, 2, -1, 1, 102, 1, -1, 1, 105, 2, 31, 1, 
+                    -1, 1, 31, 1, -1, 1, 109, 2, -1, 1, 112, 1, -1, 3, 31, 
+                    4, -1, 1, 31, 1, 117, 1, 118, 1, 31, 2, -1, 1, 120, 
+                    1, -1 )
       EOF = unpack( 121, -1 )
-      MIN = unpack( 1, 9, 1, 97, 2, -1, 1, 99, 2, -1, 1, 97, 2, 101, 1, 
-                    105, 1, 99, 1, 105, 2, -1, 1, 45, 3, -1, 1, 34, 8, -1, 
-                    2, 105, 6, -1, 1, 104, 1, 108, 1, 97, 2, 116, 1, 114, 
-                    1, 108, 1, 99, 1, 110, 2, 116, 1, -1, 1, 79, 2, -1, 
-                    1, 110, 1, 120, 1, 101, 1, 102, 1, 115, 1, 101, 1, 108, 
-                    1, 109, 2, 97, 1, 107, 1, 114, 1, 105, 1, 67, 1, 100, 
-                    1, 105, 1, 109, 1, 97, 1, 115, 1, 103, 1, 101, 1, 97, 
-                    1, -1, 1, 116, 1, 97, 1, 105, 1, 111, 1, 67, 1, 97, 
-                    1, 110, 1, 101, 1, -1, 1, 97, 1, 111, 1, 97, 1, -1, 
-                    1, 105, 1, -1, 1, 98, 1, 110, 1, 73, 1, -1, 2, 97, 1, 
-                    -1, 1, 114, 1, -1, 1, 111, 1, 117, 1, 97, 1, 45, 2, 
-                    -1, 1, 121, 1, 110, 1, 116, 1, 97, 1, -1, 1, 65, 2, 
-                    97, 1, 101, 5, -1, 1, 115, 1, 97, 1, -1 )
-      MAX = unpack( 1, 126, 1, 97, 2, -1, 1, 101, 2, -1, 1, 108, 1, 105, 
-                    1, 101, 1, 111, 1, 116, 1, 105, 2, -1, 1, 45, 3, -1, 
-                    1, 39, 8, -1, 2, 105, 6, -1, 1, 104, 1, 108, 1, 97, 
-                    2, 116, 1, 114, 1, 108, 1, 99, 1, 110, 2, 116, 1, -1, 
-                    1, 79, 2, -1, 1, 110, 1, 120, 1, 101, 1, 102, 1, 115, 
-                    1, 101, 1, 108, 1, 109, 1, 122, 1, 97, 1, 107, 1, 114, 
-                    1, 105, 1, 67, 1, 100, 1, 105, 1, 109, 1, 122, 1, 115, 
-                    1, 103, 1, 101, 1, 122, 1, -1, 1, 116, 1, 122, 1, 105, 
-                    1, 111, 1, 67, 1, 122, 1, 110, 1, 101, 1, -1, 1, 122, 
-                    1, 111, 1, 122, 1, -1, 1, 105, 1, -1, 1, 98, 1, 110, 
-                    1, 73, 1, -1, 2, 122, 1, -1, 1, 114, 1, -1, 1, 111, 
-                    1, 117, 1, 122, 1, 45, 2, -1, 1, 121, 1, 110, 1, 116, 
-                    1, 122, 1, -1, 1, 76, 2, 122, 1, 101, 5, -1, 1, 115, 
-                    1, 122, 1, -1 )
-      ACCEPT = unpack( 2, -1, 1, 2, 1, 3, 1, -1, 1, 5, 1, 6, 6, -1, 1, 14, 
-                       1, 15, 1, -1, 1, 20, 1, 21, 1, 22, 1, -1, 1, 24, 
-                       1, 25, 1, 26, 1, 27, 1, 28, 1, 29, 1, 30, 1, 31, 
-                       2, -1, 1, 36, 1, 38, 1, 39, 1, 40, 1, 41, 1, 1, 11, 
-                       -1, 1, 13, 1, -1, 1, 42, 1, 23, 22, -1, 1, 9, 8, 
-                       -1, 1, 16, 3, -1, 1, 35, 1, -1, 1, 37, 3, -1, 1, 
-                       33, 2, -1, 1, 7, 1, -1, 1, 8, 4, -1, 1, 34, 1, 4, 
-                       4, -1, 1, 32, 4, -1, 1, 12, 1, 18, 1, 19, 1, 17, 
-                       1, 10, 2, -1, 1, 11 )
+      MIN = unpack( 1, 9, 1, 97, 1, 105, 1, 45, 1, 99, 2, -1, 1, 34, 1, 
+                    97, 6, -1, 2, 105, 1, -1, 1, 105, 4, -1, 1, 101, 1, 
+                    99, 3, -1, 1, 101, 8, -1, 1, 79, 2, 116, 2, -1, 1, 116, 
+                    1, 97, 2, 110, 1, 99, 1, 120, 1, 108, 1, 104, 1, 108, 
+                    1, 114, 1, 116, 1, 67, 1, 105, 1, 114, 1, 101, 1, 115, 
+                    1, 100, 1, 107, 1, 97, 1, 105, 1, 97, 1, 101, 1, 102, 
+                    1, 109, 1, 108, 1, 67, 1, 111, 1, 105, 1, 103, 1, 115, 
+                    2, 97, 1, 116, 1, 110, 1, -1, 1, 109, 2, 97, 1, 101, 
+                    1, 73, 1, 110, 1, 98, 1, 111, 1, 97, 2, -1, 1, 105, 
+                    1, 97, 1, 101, 2, -1, 1, 97, 1, 45, 1, 97, 1, 117, 1, 
+                    114, 1, -1, 1, 111, 1, -1, 1, 97, 1, -1, 1, 65, 1, 97, 
+                    1, -1, 1, 116, 1, 121, 1, 110, 4, -1, 1, 101, 2, 97, 
+                    1, 115, 2, -1, 1, 97, 1, -1 )
+      MAX = unpack( 1, 126, 1, 97, 1, 105, 1, 45, 1, 116, 2, -1, 1, 39, 
+                    1, 108, 6, -1, 1, 105, 1, 111, 1, -1, 1, 105, 4, -1, 
+                    2, 101, 3, -1, 1, 105, 8, -1, 1, 79, 2, 116, 2, -1, 
+                    1, 116, 1, 97, 2, 110, 1, 99, 1, 120, 1, 108, 1, 104, 
+                    1, 108, 1, 114, 1, 116, 1, 67, 1, 105, 1, 114, 1, 101, 
+                    1, 115, 1, 100, 1, 107, 1, 97, 1, 105, 1, 122, 1, 101, 
+                    1, 102, 1, 109, 1, 108, 1, 67, 1, 111, 1, 105, 1, 103, 
+                    1, 115, 2, 122, 1, 116, 1, 110, 1, -1, 1, 109, 2, 122, 
+                    1, 101, 1, 73, 1, 110, 1, 98, 1, 111, 1, 122, 2, -1, 
+                    1, 105, 1, 122, 1, 101, 2, -1, 1, 122, 1, 45, 1, 122, 
+                    1, 117, 1, 114, 1, -1, 1, 111, 1, -1, 1, 122, 1, -1, 
+                    1, 76, 1, 122, 1, -1, 1, 116, 1, 121, 1, 110, 4, -1, 
+                    1, 101, 2, 122, 1, 115, 2, -1, 1, 122, 1, -1 )
+      ACCEPT = unpack( 5, -1, 1, 7, 1, 8, 2, -1, 1, 13, 1, 14, 1, 15, 1, 
+                       16, 1, 17, 1, 18, 2, -1, 1, 22, 1, -1, 1, 24, 1, 
+                       25, 1, 26, 1, 27, 2, -1, 1, 31, 1, 32, 1, 33, 1, 
+                       -1, 1, 35, 1, 37, 1, 38, 1, 39, 1, 40, 1, 41, 1, 
+                       1, 1, 2, 3, -1, 1, 42, 1, 10, 34, -1, 1, 28, 9, -1, 
+                       1, 19, 1, 20, 3, -1, 1, 30, 1, 34, 5, -1, 1, 12, 
+                       1, -1, 1, 23, 1, -1, 1, 36, 2, -1, 1, 5, 3, -1, 1, 
+                       29, 1, 3, 1, 4, 1, 6, 4, -1, 1, 11, 1, 21, 1, -1, 
+                       1, 9 )
       SPECIAL = unpack( 121, -1 )
       TRANSITION = [
-        unpack( 2, 34, 1, -1, 2, 34, 18, -1, 1, 34, 1, -1, 1, 6, 1, 23, 
-                1, -1, 1, 17, 1, 25, 1, 30, 3, -1, 1, 20, 1, -1, 1, 27, 
-                1, 21, 1, 26, 10, 33, 1, 2, 1, 3, 1, 13, 1, 5, 1, 14, 1, 
-                24, 1, 16, 2, 32, 1, 1, 8, 32, 1, 12, 11, 32, 1, 15, 2, 
-                32, 1, -1, 1, 19, 2, -1, 1, 18, 1, -1, 1, 11, 1, 31, 1, 
-                7, 7, 31, 1, 28, 1, 10, 1, 29, 4, 31, 1, 9, 1, 4, 1, 8, 
-                6, 31, 3, -1, 1, 22 ),
+        unpack( 2, 34, 1, -1, 2, 34, 18, -1, 1, 34, 1, -1, 1, 22, 1, 14, 
+                1, -1, 1, 19, 1, 5, 1, 27, 3, -1, 1, 20, 1, -1, 1, 10, 1, 
+                11, 1, 26, 10, 33, 1, 9, 1, 25, 1, 17, 1, 12, 1, 13, 1, 
+                21, 1, 6, 2, 32, 1, 1, 8, 32, 1, 2, 11, 32, 1, 3, 2, 32, 
+                1, -1, 1, 7, 2, -1, 1, 30, 1, -1, 1, 4, 1, 31, 1, 8, 7, 
+                31, 1, 15, 1, 16, 1, 18, 4, 31, 1, 23, 1, 24, 1, 28, 6, 
+                31, 3, -1, 1, 29 ),
         unpack( 1, 35 ),
+        unpack( 1, 36 ),
+        unpack( 1, 37 ),
+        unpack( 1, 38, 16, -1, 1, 39 ),
         unpack(  ),
         unpack(  ),
-        unpack( 1, 36, 1, -1, 1, 37 ),
+        unpack( 1, 40, 4, -1, 1, 40 ),
+        unpack( 1, 42, 10, -1, 1, 43 ),
         unpack(  ),
         unpack(  ),
-        unpack( 1, 39, 10, -1, 1, 38 ),
-        unpack( 1, 41, 3, -1, 1, 40 ),
-        unpack( 1, 42 ),
-        unpack( 1, 44, 5, -1, 1, 43 ),
-        unpack( 1, 46, 16, -1, 1, 45 ),
+        unpack(  ),
+        unpack(  ),
+        unpack(  ),
+        unpack(  ),
+        unpack( 1, 44 ),
+        unpack( 1, 45, 5, -1, 1, 46 ),
+        unpack(  ),
         unpack( 1, 47 ),
         unpack(  ),
         unpack(  ),
+        unpack(  ),
+        unpack(  ),
         unpack( 1, 48 ),
+        unpack( 1, 49, 1, -1, 1, 50 ),
         unpack(  ),
         unpack(  ),
         unpack(  ),
-        unpack( 1, 49, 4, -1, 1, 49 ),
+        unpack( 1, 51, 3, -1, 1, 52 ),
         unpack(  ),
         unpack(  ),
-        unpack(  ),
-        unpack(  ),
-        unpack(  ),
-        unpack(  ),
-        unpack(  ),
-        unpack(  ),
-        unpack( 1, 51 ),
-        unpack( 1, 52 ),
         unpack(  ),
         unpack(  ),
         unpack(  ),
@@ -1493,6 +1518,8 @@ module OCCIANTLR
         unpack( 1, 53 ),
         unpack( 1, 54 ),
         unpack( 1, 55 ),
+        unpack(  ),
+        unpack(  ),
         unpack( 1, 56 ),
         unpack( 1, 57 ),
         unpack( 1, 58 ),
@@ -1501,10 +1528,7 @@ module OCCIANTLR
         unpack( 1, 61 ),
         unpack( 1, 62 ),
         unpack( 1, 63 ),
-        unpack(  ),
         unpack( 1, 64 ),
-        unpack(  ),
-        unpack(  ),
         unpack( 1, 65 ),
         unpack( 1, 66 ),
         unpack( 1, 67 ),
@@ -1513,66 +1537,66 @@ module OCCIANTLR
         unpack( 1, 70 ),
         unpack( 1, 71 ),
         unpack( 1, 72 ),
-        unpack( 26, 31 ),
+        unpack( 1, 73 ),
         unpack( 1, 74 ),
         unpack( 1, 75 ),
-        unpack( 1, 76 ),
+        unpack( 26, 31 ),
         unpack( 1, 77 ),
         unpack( 1, 78 ),
         unpack( 1, 79 ),
         unpack( 1, 80 ),
         unpack( 1, 81 ),
-        unpack( 26, 31 ),
+        unpack( 1, 82 ),
         unpack( 1, 83 ),
         unpack( 1, 84 ),
         unpack( 1, 85 ),
         unpack( 26, 31 ),
-        unpack(  ),
-        unpack( 1, 87 ),
         unpack( 26, 31 ),
+        unpack( 1, 88 ),
         unpack( 1, 89 ),
+        unpack(  ),
         unpack( 1, 90 ),
-        unpack( 1, 91 ),
+        unpack( 26, 31 ),
         unpack( 26, 31 ),
         unpack( 1, 93 ),
         unpack( 1, 94 ),
-        unpack(  ),
-        unpack( 26, 31 ),
+        unpack( 1, 95 ),
         unpack( 1, 96 ),
+        unpack( 1, 97 ),
         unpack( 26, 31 ),
         unpack(  ),
-        unpack( 1, 98 ),
         unpack(  ),
         unpack( 1, 99 ),
-        unpack( 1, 100 ),
+        unpack( 26, 31 ),
         unpack( 1, 101 ),
         unpack(  ),
-        unpack( 26, 31 ),
-        unpack( 26, 31 ),
         unpack(  ),
-        unpack( 1, 104 ),
-        unpack(  ),
-        unpack( 1, 105 ),
+        unpack( 26, 31 ),
+        unpack( 1, 103 ),
+        unpack( 18, 31, 1, 104, 7, 31 ),
         unpack( 1, 106 ),
-        unpack( 18, 31, 1, 107, 7, 31 ),
-        unpack( 1, 109 ),
+        unpack( 1, 107 ),
         unpack(  ),
+        unpack( 1, 108 ),
         unpack(  ),
-        unpack( 1, 110 ),
-        unpack( 1, 111 ),
-        unpack( 1, 112 ),
         unpack( 26, 31 ),
         unpack(  ),
-        unpack( 1, 114, 10, -1, 1, 115 ),
+        unpack( 1, 110, 10, -1, 1, 111 ),
+        unpack( 26, 31 ),
+        unpack(  ),
+        unpack( 1, 113 ),
+        unpack( 1, 114 ),
+        unpack( 1, 115 ),
+        unpack(  ),
+        unpack(  ),
+        unpack(  ),
+        unpack(  ),
+        unpack( 1, 116 ),
         unpack( 26, 31 ),
         unpack( 26, 31 ),
-        unpack( 1, 118 ),
-        unpack(  ),
-        unpack(  ),
-        unpack(  ),
-        unpack(  ),
-        unpack(  ),
         unpack( 1, 119 ),
+        unpack(  ),
+        unpack(  ),
         unpack( 26, 31 ),
         unpack(  )
       ].freeze
@@ -1583,12 +1607,12 @@ module OCCIANTLR
         end
       end
       
-      @decision = 4
+      @decision = 5
       
 
       def description
         <<-'__dfa_description__'.strip!
-          1:1: Tokens : ( T__9 | T__10 | T__11 | T__12 | T__13 | T__14 | T__15 | T__16 | T__17 | T__18 | T__19 | T__20 | T__21 | T__22 | T__23 | T__24 | T__25 | T__26 | T__27 | T__28 | T__29 | T__30 | T__31 | T__32 | T__33 | T__34 | T__35 | T__36 | T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | T__45 | LOALPHA | UPALPHA | DIGIT | WS | ESC );
+          1:1: Tokens : ( CATEGORY_KEY | LINK_KEY | X_OCCI_ATTRIBUTE_KEY | X_OCCI_LOCATION_KEY | ACTION | ACTIONS | AMPERSAND | AT | ATTRIBUTES | BACKSLASH | CATEGORY | CLASS | COLON | DASH | DOT | EQUALS | GT | HASH | KIND | LINK | LOCATION | LT | MIXIN | PERCENT | PLUS | QUESTION | QUOTE | REL | SCHEME | SELF | SEMICOLON | SLASH | SQUOTE | TERM | TILDE | TITLE | UNDERSCORE | LOALPHA | UPALPHA | DIGIT | WS | ESC );
         __dfa_description__
       end
     end
@@ -1598,7 +1622,7 @@ module OCCIANTLR
     
     def initialize_dfas
       super rescue nil
-      @dfa4 = DFA4.new( self, 4 )
+      @dfa5 = DFA5.new( self, 5 )
 
     end
   end # class Lexer < ANTLR3::Lexer
