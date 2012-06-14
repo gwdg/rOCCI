@@ -34,5 +34,14 @@ module OCCI
     def entities
       @resources + @links
     end
+
+    def empty?
+      @kinds.empty? && @mixins.empty? && @actions.empty? && @resources.empty? && @links.empty?
+    end
+
+    def to_json(options = { })
+      { :kinds => @kinds, :mixins => @mixins, :actions => @actions, :resources => @resources, :links => @links }.to_json
+    end
+
   end
 end
