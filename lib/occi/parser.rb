@@ -44,7 +44,7 @@ module OCCI
       OCCI::Log.debug('### Parsing request data to OCCI data structure ###')
       collection = OCCI::Collection.new
 
-      locations  = self.header_locations(header)
+      locations = self.header_locations(header)
       category ? collection = self.header_categories(header) : collection = self.header_entity(header) if locations.empty?
 
       case media_type
@@ -52,8 +52,8 @@ module OCCI
         when 'text/uri-list'
           body.each_line { |line| locations << URI.parse(line) }
         when 'text/plain', nil
-          locations << self.text_locations(body)
-          category ? collection = self.text_categories(body) : collection = self.text_entity(body) if locations.empty? && collection.empty?
+          locations.concat self.text_locations(body)
+            category ? collection = self.text_categories(body) : collection = self.text_entity(body) if locations.empty? && collection.empty?
         when 'application/occi+json', 'application/json'
           collection = self.json(body)
         when 'application/occi+xml', 'application/xml'
