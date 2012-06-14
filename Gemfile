@@ -9,6 +9,7 @@ gem "nokogiri"
 gem "builder"
 gem "activesupport"
 gem "rake"
+gem "httparty"
 
 # development related gems
 group :development do
