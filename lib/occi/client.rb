@@ -91,7 +91,9 @@ module OCCI
       self.class.get(endpoint + @compute.location)
     end
 
-    def post_compute_resource(attributes=OCCI::Core::Attributes.new, mixins=[], resources_to_link=[])
+    def post_compute_resource(attributes=OCCI::Core::Attributes.new, os = nil, size = nil, mixins=[], resources_to_link=[])
+      mixins << os if os
+      mixins << size if size
       post_resource(attributes, @compute, mixins, resources_to_link)
     end
 
