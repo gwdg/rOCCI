@@ -17,24 +17,11 @@ Installation
 
     gem install occi
 
-### Latest version
-
-Checkout latest version from GIT:
-
-    git clone git://github.com/gwdg/rOCCI.git
-
-Change to rOCCI folder
-
-    cd rOCCI
-
-Install dependencies for deployment
-
-    bundle install --deployment
-
 Usage
 -----
 
-First require the gem
+First require the gem, for Ruby 1.8.7 you also have to require rubygems
+    require 'rubygems'
     require 'occi'
 
 ### Client
@@ -43,7 +30,7 @@ The OCCI gem includes a Client to simplify the usage of an OCCI endpoint.
 
 To connect to an OCCI endpoint/server (e.g. running at http://localhost:3000/ ) use
 
-    client = OCCI::Client.new('http://localhost:3000')
+    client = OCCI::Client.new('http://occi.cloud.gwdg.de:3300')
 
 All available categories are automatically registered to the OCCI model during client initialization. You can get them via
 
@@ -143,6 +130,18 @@ Version 1.X of the OCCI gem has been developed by retr0h and served as a simple 
 
 Development
 -----------
+
+Checkout latest version from GIT:
+
+    git clone git://github.com/gwdg/rOCCI.git
+
+Change to rOCCI folder
+
+    cd rOCCI
+
+Install dependencies for deployment
+
+    bundle install --deployment
 
 ### Code Documentation
 
