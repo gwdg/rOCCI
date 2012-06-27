@@ -13,14 +13,14 @@ module OCCI
             hash[key] = self[key]
           end
         end
-        return hash
+        hash
       end
 
       def self.split(attributes)
         attribute = Attributes.new
         attributes.each do |name,value|
           puts name
-          key, dot, rest = name.partition('.')
+          key, _, rest = name.partition('.')
           if rest.empty?
             attribute[key] = value
           else
