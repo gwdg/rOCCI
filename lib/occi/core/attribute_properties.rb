@@ -23,7 +23,7 @@ module OCCI
             self[key].combine.each { |attr| array << key + '.' + attr }
           end
         end
-        return array
+        array
       end
 
       def combine_with_defaults
@@ -35,7 +35,7 @@ module OCCI
             self[key].combine_with_defaults.each { |k,v| hash[key + '.' + k] = v }
           end
         end
-        return hash
+        hash
       end
 
     end
