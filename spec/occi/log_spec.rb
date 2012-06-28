@@ -7,7 +7,8 @@ module OCCI
     describe "log messages" do
       it "should log a message to a pipe" do
         r, w = IO.pipe
-        OCCI::Log.new(w, OCCI::Log::INFO)
+        logger = OCCI::Log.new(w)
+        logger.level = OCCI::Log::INFO
         OCCI::Log.info("Test")
         r.readline.include?("Test")
       end
