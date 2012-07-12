@@ -22,7 +22,7 @@ module OCCI
 
     # @see info
     def self.debug(message)
-      ActiveSupport::Notifications.instrument("log", :level => Logger::DEBUG, :message => message)
+     ActiveSupport::Notifications.instrument("log", :level => Logger::DEBUG, :message => message)
     end
 
     # Log an +INFO+ message
