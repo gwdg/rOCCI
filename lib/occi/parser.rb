@@ -11,38 +11,13 @@ require 'occiantlr/OCCIANTLRParser'
 
 module OCCI
   class Parser
-# Declaring Class constants for OVF XML namespaces (defined in OVF specification ver.1.1)
+
+    # Declaring Class constants for OVF XML namespaces (defined in OVF specification ver.1.1)
     OVF   ="http://schemas.dmtf.org/ovf/envelope/1"
     RASD  ="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData"
     VSSD  ="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_VirtualSystemSettingData"
     OVFENV="http://schemas.dmtf.org/ovf/environment/1"
     CIM   ="http://schemas.dmtf.org/wbem/wscim/1/common"
-
-=begin
-          if content_type.includes?('multipart')
-            # TODO: implement multipart handling
-            # handle file upload
-            if params['file'] != nil
-              OCCI::Log.debug("Location of Image #{params['file'][:tempfile].path}")
-              $image_path = OCCI::Server.config[:one_image_tmp_dir] + '/' + params['file'][:filename]
-              FileUtils.cp(params['file'][:tempfile].path, $image_path)
-            end
-
-            # handle file upload in multipart requests
-            request.POST.values.each do |body|
-              if body.kind_of?(String)
-                parse_text(body)
-              elsif body.kind_of?(Hash)
-                if body['type'].include?('application/json')
-                  # try to parse body as JSON object
-                  parse_json(body.read)
-                elsif body['type'].include?('text/plain') # text/plain
-                  parse_text(body.read)
-                end unless body['type'].nil?
-              end
-            end
-          end
-=end
 
     # Parses an OCCI message and extracts OCCI relevant information
     # @param [String] media_type the media type of the OCCI message
@@ -68,8 +43,10 @@ module OCCI
           collection = self.json(body)
         when 'application/occi+xml', 'application/xml'
           collection = self.xml(body)
-        when 'application/ovf', 'application/ovf+xml', 'application/ova'
+        when 'application/ovf', 'application/ovf+xml'
           collection = self.ovf(body)
+        when 'application/ova'
+          collection = self.ova(body)
         else
           raise "Content Type not supported"
       end
@@ -108,8 +85,8 @@ module OCCI
       entity.mixins = categories.mixins.collect { |mixin| mixin.scheme + mixin.term } if categories.mixins.any?
       attribute_strings.each { |attr| entity.attributes!.merge!(OCCIANTLR::Parser.new('X-OCCI-Attribute: ' + attr).x_occi_attribute) }
       if entity_type == OCCI::Core::Link
-        entity.target = link.attributes.occi!.core!.target
-        entity.source = link.attributes.occi!.core!.source
+        entity.target = link.attributes!.occi!.core!.target
+        entity.source = link.attributes!.occi!.core!.source
         collection.links << OCCI::Core::Link.new(entity)
       elsif entity_type == OCCI::Core::Resource
         link_strings = header['HTTP_LINK'].to_s.split(',')
@@ -148,8 +125,8 @@ module OCCI
       entity.kind = categories.kinds.first.scheme + categories.kinds.first.term if categories.kinds.first
       entity.mixins = categories.mixins.collect { |mixin| mixin.scheme + mixin.term } if entity.mixins
       if entity_type == OCCI::Core::Link
-        entity.target = links.first.attributes.occi!.core!.target
-        entity.source = links.first.attributes.occi!.core!.source
+        entity.target = links.first.attributes!.occi!.core!.target
+        entity.source = links.first.attributes!.occi!.core!.source
         collection.links << OCCI::Core::Link.new(entity)
       elsif entity_type == OCCI::Core::Resource
         entity.links = links
@@ -163,8 +140,8 @@ module OCCI
       hash       = Hashie::Mash.new(JSON.parse(json))
       collection.kinds.concat hash.kinds.collect { |kind| OCCI::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) } if hash.kinds
       collection.mixins.concat hash.mixins.collect { |mixin| OCCI::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) } if hash.mixins
-      collection.resources.concat hash.resources.collect { |resource| OCCI::Core::Resource.new(resource.kind,resource.mixins,resource.attributes,resource.links) } if hash.resources
-      collection.links.concat hash.links.collect { |link| OCCI::Core::Link.new(link.kind,link.mixins,link.attributes) } if hash.links
+      collection.resources.concat hash.resources.collect { |resource| OCCI::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.links) } if hash.resources
+      collection.links.concat hash.links.collect { |link| OCCI::Core::Link.new(link.kind, link.mixins, link.attributes) } if hash.links
       collection
     end
 
@@ -173,8 +150,8 @@ module OCCI
       hash       = Hashie::Mash.new(Hash.from_xml(Nokogiri::XML(xml)))
       collection.kinds.concat hash.kinds.collect { |kind| OCCI::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) } if hash.kinds
       collection.mixins.concat hash.mixins.collect { |mixin| OCCI::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) } if hash.mixins
-      collection.resources.concat hash.resources.collect { |resource| OCCI::Core::Resource.new(resource.kind,resource.mixins,resource.attributes,resource.links) } if hash.resources
-      collection.links.concat hash.links.collect { |link| OCCI::Core::Link.new(link.kind,link.mixins,link.attributes) } if hash.links
+      collection.resources.concat hash.resources.collect { |resource| OCCI::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.links) } if hash.resources
+      collection.links.concat hash.links.collect { |link| OCCI::Core::Link.new(link.kind, link.mixins, link.attributes) } if hash.links
       collection
     end
 
@@ -203,45 +180,51 @@ module OCCI
 
     ###############End of Helper methods for OVF Parsing ##################################################################
 
-    def self.ovf(ova)
+    def self.ova(ova)
       tar   = Gem::Package::TarReader.new(StringIO.new(ova))
-      ovf   = nil
-      mf    = nil
-      cert  = nil
+      ovf = mf = cert = nil
       files = { }
       tar.each do |entry|
-        case entry.full_name
-          when /.*\.ovf/
-            ovf = entry.read
-          when /.*\.mf/
-            mf = entry.read
-          when /.*\.mf/
-            cert = entry.read
-          else
-            files[entry.full_name] = 'file:/' + Tempfile.new(entry.full_name).path
-        end
+        tempfile = Tempfile.new(entry.full_name)
+        tempfile.write(entry.read)
+        tempfile.close
+        files[entry.full_name] = tempfile.path
+        ovf = tempfile.path if entry.full_name.end_with? '.ovf'
+        mf = tempfile.path if entry.full_name.end_with? '.mf'
+        cert = tempfile.path if entry.full_name.end_with? '.cert'
       end
+
+      File.read(mf).each_line do |line|
+        name = line.scan(/SHA1\(([^\)]*)\)= (.*)/).flatten.first
+        sha1 = line.scan(/SHA1\(([^\)]*)\)= (.*)/).flatten.last
+        puts Digest::SHA1.hexdigest(files[name])
+        raise "SHA1 mismatch for file #{name}" if Digest::SHA1.hexdigest(File.read(files[name])) != sha1
+      end if mf
 
       raise 'no ovf file found' if ovf.nil?
 
+      self.ovf(File.read(ovf), files)
+    end
+
+    def self.ovf(ovf, files={ })
       collection = OCCI::Collection.new
       doc        = Nokogiri::XML(ovf)
-      references = { }
+      references = {}
 
       doc.xpath('envelope:Envelope/envelope:References/envelope:File', 'envelope' => "#{Parser::OVF}").each do |file|
         href = URI.parse(file.attributes['href'].to_s)
         if href.relative?
-          references[file.attributes['id']] = files[href.to_s]
+          references[file.attributes['id'].to_s] = files[href.to_s] if files[href.to_s]
         else
-          references[file.attributes['id']] = href
+          references[file.attributes['id'].to_s] = href.delete('file://')
         end
       end
 
       doc.xpath('envelope:Envelope/envelope:DiskSection/envelope:Disk', 'envelope' => "#{Parser::OVF}").each do |disk|
-        storage = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure/storage')
+        storage = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure#storage')
         if disk.attributes['fileRef']
-          storage.href                         = references[disk.attributes['fileRef']]
-          storage.attributes.occi!.core!.title = disk.attributes['diskId']
+          storage.href                         = references[disk.attributes['fileRef'].to_s]
+          storage.attributes.occi!.core!.title = disk.attributes['diskId'].to_s
         else
           #OCCI accepts storage size in GB
           #OVF ver 1.1: The capacity of a virtual disk shall be specified by the ovf:capacity attribute with an xs:long integer
@@ -259,74 +242,61 @@ module OCCI
           capacity_gb = self.calculate_capacity_gb(capacity)
           OCCI::Log.debug('capacity in gb ' + capacity_gb.to_s)
           storage.attributes.occi!.storage!.size = capacity_gb.to_s if capacity_gb
-          storage.attributes.occi!.core!.title = disk.attributes['diskId'] if disk.attributes['diskId']
+          storage.attributes.occi!.core!.title = disk.attributes['diskId'].to_s if disk.attributes['diskId']
         end
         collection.resources << storage
       end
 
       doc.xpath('envelope:Envelope/envelope:NetworkSection/envelope:Network', 'envelope' => "#{Parser::OVF}").each do |nw|
-        network                               = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure#network')
-        network.attributes!.occi!.core!.title = nw.attributes['name']
+        network                              = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure#network')
+        network.attributes.occi!.core!.title = nw.attributes['name'].to_s
         collection.resources << network
       end
 
       # Iteration through all the virtual hardware sections,and a sub-iteration on each Item defined in the Virtual Hardware section
       doc.xpath('envelope:Envelope/envelope:VirtualSystem', 'envelope' => "#{Parser::OVF}").each do |virtsys|
-        compute                                 = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure#compute')
-        compute.attributes!.occi!.core!.summary = virtsys.attributes['info']
+        compute = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure#compute')
 
         doc.xpath('envelope:Envelope/envelope:VirtualSystem/envelope:VirtualHardwareSection', 'envelope' => "#{Parser::OVF}").each do |virthwsec|
+          compute.attributes.occi!.core!.summary = virthwsec.xpath("item:Info/text()", 'item' => "#{Parser::RASD}").to_s
+
           virthwsec.xpath('envelope:Item', 'envelope' => "#{Parser::OVF}").each do |resource_alloc|
             resType = resource_alloc.xpath("item:ResourceType/text()", 'item' => "#{Parser::RASD}")
             case resType.to_s
               # 4 is the ResourceType for memory in the CIM_ResourceAllocationSettingData
               when "4" then
-                compute.attributes!.occi!.compute!.memory = resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}")
-                OCCI::Log.info("Retrieving memory attribute from OVF. Value is #{memory_value}")
+                compute.attributes.occi!.compute!.memory = resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}").to_s.to_i
               # 3 is the ResourceType for processor in the CIM_ResourceAllocationSettingData
               when "3" then
-                compute.attributes!.occi!.compute!.cores = resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}")
-                OCCI::Log.info("Retrieving cpu cores attribute from OVF. Value is #{cpu_core_value}")
+                compute.attributes.occi!.compute!.cores = resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}").to_s.to_i
               when "10" then
-                networkinterface = OCCI::Core::Link.new('http://schemas.ogf.org/occi/infrastructure#networkinterface')
-                networkinterface.attributes.occi!.core!.title = resource_alloc.xpath("item:ElementName/text()", 'item' => "#{Parser::RASD}")
-                id = resource_alloc.xpath("item:Connection/text()", 'item' => "#{Parser::RASD}")
-                networkinterface.attributes.occi!.core!.target = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }
+                networkinterface                               = OCCI::Core::Link.new('http://schemas.ogf.org/occi/infrastructure#networkinterface')
+                networkinterface.attributes.occi!.core!.title  = resource_alloc.xpath("item:ElementName/text()", 'item' => "#{Parser::RASD}").to_s
+                id                                             = resource_alloc.xpath("item:Connection/text()", 'item' => "#{Parser::RASD}").to_s
+                networkinterface.attributes.occi!.core!.target = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }.first.location
               when "17" then
                 storagelink                              = OCCI::Core::Link.new("http://schemas.ogf.org/occi/infrastructure#storagelink")
-                storagelink.attributes.occi!.core!.title = resource_alloc.xpath("item:ElementName/text()", 'item' => "#{Parser::RASD}")
+                storagelink.attributes.occi!.core!.title = resource_alloc.xpath("item:ElementName/text()", 'item' => "#{Parser::RASD}").to_s
                 # extract the mountpoint
-                host_resource                            = resource_alloc.xpath("item:HostResource/text()", 'item' => "#{Parser::RASD}")
+                host_resource                            = resource_alloc.xpath("item:HostResource/text()", 'item' => "#{Parser::RASD}").to_s
                 if host_resource.start_with? 'ovf:/disk/'
-                  id = host_resource.strip('ovf:/disk/')
-                  storagelink.attributes!.occi!.core!.target = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }
+                  id                                        = host_resource.delete('ovf:/disk/')
+                  storagelink.attributes.occi!.core!.target = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }.first.location
                 elsif host_resource.start_with? 'ovf:/disk/'
-                  id = host_resource.strip('ovf:/file/')
-                  storagelink.attributes!.occi!.core!.target = references[id]
+                  id                                        = host_resource.delete('ovf:/file/')
+                  storagelink.attributes.occi!.core!.target = references[id]
                 end
                 compute.links << storagelink
-                collection.links << storagelink
-              else
-                OCCI::Log.info("Retrieving cpu cores attribute from OVF. Value is #{resType.to_s}")
             end
-            #Add the cpu architecture
-            system_sec                                      = virthwsec.xpath('envelope:System', 'envelope' => "#{Parser::OVF}")
-            virtsys_type                                    = system_sec.xpath('vssd_:VirtualSystemType/text()', 'vssd_' => "#{Parser::VSSD}")
-            compute.attributes!.occi!.compute!.architecture = virtsys_type
+            ##Add the cpu architecture
+            #system_sec                                      = virthwsec.xpath('envelope:System', 'envelope' => "#{Parser::OVF}")
+            #virtsys_type                                    = system_sec.xpath('vssd_:VirtualSystemType/text()', 'vssd_' => "#{Parser::VSSD}")
+            #compute.attributes.occi!.compute!.architecture = virtsys_type
           end
-
-          # get the hostname from the ProductSection
-          doc.xpath('//envelope:ProductSection/envelope:Property', 'envelope' => "#{Parser::OVF}").each do |prod_prop|
-            key = prod_prop.attributes['key']
-            if  key.to_s == "hostname" then
-              compute.attributes!.occi!.compute!.hostname = prod_prop.attributes['value']
-            end
-          end
-          collection.resources << compute
         end
-        collection.resources.each { |resource| OCCI::Log.debug("#{resource.attributes}") }
-        collection
+        collection.resources << compute
       end
+      collection
     end
   end
 
