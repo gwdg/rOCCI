@@ -211,11 +211,11 @@ module OCCI
       files = { }
       tar.each do |entry|
         case entry.full_name
-          when ends_with? '.ovf'
+          when /.*\.ovf/
             ovf = entry.read
-          when ends_with? '.mf'
+          when /.*\.mf/
             mf = entry.read
-          when ends_with? '.cert'
+          when /.*\.mf/
             cert = entry.read
           else
             files[entry.full_name] = 'file:/' + Tempfile.new(entry.full_name).path
