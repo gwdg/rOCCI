@@ -15,14 +15,14 @@ module OCCI
 
       # @return [OCCI::Core::Kind] kind definition of Entity type
       def self.kind_definition
-        kind                                        = OCCI::Core::Kind.new('http://schemas.ogf.org/occi/core#','entity')
+        kind = OCCI::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'entity')
 
-        kind.title                                  = "Entity"
+        kind.title = "Entity"
 
-        kind.attributes.occi!.core!.id!.type        = "string"
-        kind.attributes.occi!.core!.id!.pattern     = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
-        kind.attributes.occi!.core!.id!.required    = false
-        kind.attributes.occi!.core!.id!.mutable     = false
+        kind.attributes.occi!.core!.id!.type     = "string"
+        kind.attributes.occi!.core!.id!.pattern  = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+        kind.attributes.occi!.core!.id!.required = false
+        kind.attributes.occi!.core!.id!.mutable  = false
 
         kind.attributes.occi!.core!.title!.type     = "string"
         kind.attributes.occi!.core!.title!.pattern  = ".*"
@@ -32,16 +32,34 @@ module OCCI
         kind
       end
 
+      # @param [String] kind
+      # @param [String] mixins
+      # @param [OCCI::Core::Attributes] attributes
       def initialize(kind, mixins=nil, attributes=nil)
         @kind       = kind
         @mixins     = mixins.to_a
         @attributes = OCCI::Core::Attributes.new(attributes)
+        self.id = UUIDTools::UUID.timestamp_create
       end
 
+      # set id for entity
+      # @param [UUIDTools::UUID] id
+      def id=(id)
+        @attributes.occi!.core!.id = id
+      end
+
+      # @return [UUIDTools::UUID] id of the entity
+      def id
+        @attributes.occi!.core!.id
+      end
+
+      # @return [String] location of the entity
       def location
-        '/' + @kind.term + '/' + @attributes.occi.core.id
+        '/' + @kind.term + '/' + @attributes.occi!.core!.id
       end
 
+      # check attributes against their definitions and set defaults
+      # @param [OCCI::Model] model representation of the OCCI model to check the attributes against
       def check(model)
         raise "No kind defined" unless @kind
         definitions = model.get_by_id(@kind).attributes
@@ -54,6 +72,9 @@ module OCCI
         @attributes = Entity.check(@attributes, definitions) if definitions
       end
 
+      # @param [OCCI::Core::Attributes] attributes
+      # @param [OCCI::Core::AttributeProperties] definitions
+      # @return [OCCI::Core::Attributes] attributes with their defaults set
       def self.check(attributes, definitions)
         attributes = OCCI::Core::Attributes.new(attributes)
         definitions.each_key do |key|
@@ -82,6 +103,8 @@ module OCCI
         return attributes
       end
 
+      # @param [Hash] options
+      # @return [Hashie::Mash] entity as Hashie::Mash to be parsed into a JSON object
       def as_json(options={ })
         entity = Hashie::Mash.new
         entity.kind = @kind if @kind
