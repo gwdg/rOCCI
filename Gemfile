@@ -4,7 +4,7 @@ source :rubygems
 gem "json"
 gem "antlr3"
 gem "hashie"
-gem "uuidtools"
+gem "uuidtools", ">=2.1.3"
 gem "nokogiri"
 gem "builder"
 gem "activesupport"
