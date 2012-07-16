@@ -39,7 +39,7 @@ module OCCI
         @kind       = kind
         @mixins     = mixins.to_a
         @attributes = OCCI::Core::Attributes.new(attributes)
-        self.id = UUIDTools::UUID.timestamp_create
+        self.id = UUIDTools::UUID.timestamp_create.to_s
       end
 
       # set id for entity
@@ -55,7 +55,7 @@ module OCCI
 
       # @return [String] location of the entity
       def location
-        '/' + @kind.term + '/' + @attributes.occi!.core!.id
+        '/' + @kind.split('#').last + '/' + @attributes.occi!.core!.id
       end
 
       # check attributes against their definitions and set defaults
