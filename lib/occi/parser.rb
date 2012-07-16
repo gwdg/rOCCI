@@ -1,12 +1,22 @@
+require 'rubygems'
 require 'json'
 require 'nokogiri'
 require 'hashie/mash'
+require 'rubygems/package'
+require 'zlib'
+require 'tempfile'
 require 'occi/collection'
 require 'occi/log'
 require 'occiantlr/OCCIANTLRParser'
 
 module OCCI
   class Parser
+# Declaring Class constants for OVF XML namespaces (defined in OVF specification ver.1.1)
+    OVF   ="http://schemas.dmtf.org/ovf/envelope/1"
+    RASD  ="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_ResourceAllocationSettingData"
+    VSSD  ="http://schemas.dmtf.org/wbem/wscim/1/cim-schema/2/CIM_VirtualSystemSettingData"
+    OVFENV="http://schemas.dmtf.org/ovf/environment/1"
+    CIM   ="http://schemas.dmtf.org/wbem/wscim/1/common"
 
 =begin
           if content_type.includes?('multipart')
@@ -35,11 +45,10 @@ module OCCI
 =end
 
     # Parses an OCCI message and extracts OCCI relevant information
-    # @param [OCCI::Model] model an OCCI Model according to wich the OCCI messages should be parsed
     # @param [String] media_type the media type of the OCCI message
     # @param [String] body the body of the OCCI message
-    # @param [OCCI::Core::Resource, OCCI::Core::Link] entity_type for text/plain and text/occi information if the entity is of type Resource or Link
     # @param [true, false] category for text/plain and text/occi media types information e.g. from the HTTP request location is needed to determine if the OCCI message includes a category or an entity
+    # @param [OCCI::Core::Resource,OCCI::Core::Link] entity_type entity type to use for parsing of text plain entities
     # @param [Hash] header optional header of the OCCI message
     # @return [Array<Array, OCCI::Collection>] list consisting of an array of locations and the OCCI object collection
     def self.parse(media_type, body, category=false, entity_type=OCCI::Core::Resource, header={ })
@@ -50,7 +59,6 @@ module OCCI
       category ? collection = self.header_categories(header) : collection = self.header_entity(header, entity_type) if locations.empty?
 
       case media_type
-        when 'text/occi'
         when 'text/uri-list'
           body.each_line { |line| locations << URI.parse(line) }
         when 'text/plain', nil
@@ -60,7 +68,7 @@ module OCCI
           collection = self.json(body)
         when 'application/occi+xml', 'application/xml'
           collection = self.xml(body)
-        when 'application/ovf+xml'
+        when 'application/ovf', 'application/ovf+xml', 'application/ova'
           collection = self.ovf(body)
         else
           raise "Content Type not supported"
@@ -170,26 +178,156 @@ module OCCI
       collection
     end
 
-    def self.ovf(ovf)
-      collection = OCCI::Collection.new
-      doc        = Nokogiri::XML(ovf)
-      doc.xpath('//ns1:DiskSection/ns1:Disk').each do |disk|
-        storage                                 = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure#storage')
-        storage.attributes!.occi!.storage!.size = disk.attributes['capacity']
-        collection.resources << storage
-      end
-      doc.xpath('//ns1:NetworkSection/ns1:Network').each do |net|
-        network      = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure#network')
-        collection.resources << network
-      end
-      doc.xpath('//ns1:VirtualSystem/ns1:VirtualHardwareSection/ns1:Item').each do |comp|
-        compute      = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure#compute')
-        collection.resources << compute
-      end
-      jj collection
-      collection
+
+    ####################Helper method for calculation of storage size based on allocation units configured###########
+    def self.calculate_capacity_bytes(capacity, alloc_units_bytes)
+      total_capacity_bytes = alloc_units_bytes * capacity.to_i
+      total_capacity_bytes
     end
 
+
+    def self.calculate_capacity_gb(capacity)
+      capacity_gb = capacity/(2**30)
+      capacity_gb
+    end
+
+
+    def self.alloc_units_bytes(alloc_units)
+      units = alloc_units.split('*')
+      #check units[1] is nil??
+      units[1].strip!
+      alloc_vars        = units[1].split('^')
+      alloc_units_bytes = (alloc_vars[0].to_i**alloc_vars[1].to_i)
+      alloc_units_bytes
+    end
+
+    ###############End of Helper methods for OVF Parsing ##################################################################
+
+    def self.ovf(ova)
+      tar   = Gem::Package::TarReader.new(StringIO.new(ova))
+      ovf   = nil
+      mf    = nil
+      cert  = nil
+      files = { }
+      tar.each do |entry|
+        case entry.full_name
+          when ends_with? '.ovf'
+            ovf = entry.read
+          when ends_with? '.mf'
+            mf = entry.read
+          when ends_with? '.cert'
+            cert = entry.read
+          else
+            files[entry.full_name] = 'file:/' + Tempfile.new(entry.full_name).path
+        end
+      end
+
+      raise 'no ovf file found' if ovf.nil?
+
+      collection = OCCI::Collection.new
+      doc        = Nokogiri::XML(ovf)
+      references = { }
+
+      doc.xpath('envelope:Envelope/envelope:References/envelope:File', 'envelope' => "#{Parser::OVF}").each do |file|
+        href = URI.parse(file.attributes['href'].to_s)
+        if href.relative?
+          references[file.attributes['id']] = files[href.to_s]
+        else
+          references[file.attributes['id']] = href
+        end
+      end
+
+      doc.xpath('envelope:Envelope/envelope:DiskSection/envelope:Disk', 'envelope' => "#{Parser::OVF}").each do |disk|
+        storage = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure/storage')
+        if disk.attributes['fileRef']
+          storage.href                         = references[disk.attributes['fileRef']]
+          storage.attributes.occi!.core!.title = disk.attributes['diskId']
+        else
+          #OCCI accepts storage size in GB
+          #OVF ver 1.1: The capacity of a virtual disk shall be specified by the ovf:capacity attribute with an xs:long integer
+          #value. The default unit odf allocation shall be bytes. The optional string attribute
+          #ovf:capacityAllocationUnits may be used to specify a particular unit of allocation.
+          alloc_units = disk.attributes['capacityAllocationUnits'].to_s
+          if alloc_units.empty?
+            # The capacity is defined in bytes , convert to GB and pass it to OCCI
+            capacity = disk.attributes['capacity'].to_s
+            capacity =capacity.to_i
+          else
+            alloc_unit_bytes = self.alloc_units_bytes(alloc_units)
+            capacity         = self.calculate_capacity_bytes(disk.attributes['capacity'].to_s, alloc_unit_bytes)
+          end
+          capacity_gb = self.calculate_capacity_gb(capacity)
+          OCCI::Log.debug('capacity in gb ' + capacity_gb.to_s)
+          storage.attributes.occi!.storage!.size = capacity_gb.to_s if capacity_gb
+          storage.attributes.occi!.core!.title = disk.attributes['diskId'] if disk.attributes['diskId']
+        end
+        collection.resources << storage
+      end
+
+      doc.xpath('envelope:Envelope/envelope:NetworkSection/envelope:Network', 'envelope' => "#{Parser::OVF}").each do |nw|
+        network                               = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure#network')
+        network.attributes!.occi!.core!.title = nw.attributes['name']
+        collection.resources << network
+      end
+
+      # Iteration through all the virtual hardware sections,and a sub-iteration on each Item defined in the Virtual Hardware section
+      doc.xpath('envelope:Envelope/envelope:VirtualSystem', 'envelope' => "#{Parser::OVF}").each do |virtsys|
+        compute                                 = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure#compute')
+        compute.attributes!.occi!.core!.summary = virtsys.attributes['info']
+
+        doc.xpath('envelope:Envelope/envelope:VirtualSystem/envelope:VirtualHardwareSection', 'envelope' => "#{Parser::OVF}").each do |virthwsec|
+          virthwsec.xpath('envelope:Item', 'envelope' => "#{Parser::OVF}").each do |resource_alloc|
+            resType = resource_alloc.xpath("item:ResourceType/text()", 'item' => "#{Parser::RASD}")
+            case resType.to_s
+              # 4 is the ResourceType for memory in the CIM_ResourceAllocationSettingData
+              when "4" then
+                compute.attributes!.occi!.compute!.memory = resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}")
+                OCCI::Log.info("Retrieving memory attribute from OVF. Value is #{memory_value}")
+              # 3 is the ResourceType for processor in the CIM_ResourceAllocationSettingData
+              when "3" then
+                compute.attributes!.occi!.compute!.cores = resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}")
+                OCCI::Log.info("Retrieving cpu cores attribute from OVF. Value is #{cpu_core_value}")
+              when "10" then
+                networkinterface = OCCI::Core::Link.new('http://schemas.ogf.org/occi/infrastructure#networkinterface')
+                networkinterface.attributes.occi!.core!.title = resource_alloc.xpath("item:ElementName/text()", 'item' => "#{Parser::RASD}")
+                id = resource_alloc.xpath("item:Connection/text()", 'item' => "#{Parser::RASD}")
+                networkinterface.attributes.occi!.core!.target = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }
+              when "17" then
+                storagelink                              = OCCI::Core::Link.new("http://schemas.ogf.org/occi/infrastructure#storagelink")
+                storagelink.attributes.occi!.core!.title = resource_alloc.xpath("item:ElementName/text()", 'item' => "#{Parser::RASD}")
+                # extract the mountpoint
+                host_resource                            = resource_alloc.xpath("item:HostResource/text()", 'item' => "#{Parser::RASD}")
+                if host_resource.start_with? 'ovf:/disk/'
+                  id = host_resource.strip('ovf:/disk/')
+                  storagelink.attributes!.occi!.core!.target = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }
+                elsif host_resource.start_with? 'ovf:/disk/'
+                  id = host_resource.strip('ovf:/file/')
+                  storagelink.attributes!.occi!.core!.target = references[id]
+                end
+                compute.links << storagelink
+                collection.links << storagelink
+              else
+                OCCI::Log.info("Retrieving cpu cores attribute from OVF. Value is #{resType.to_s}")
+            end
+            #Add the cpu architecture
+            system_sec                                      = virthwsec.xpath('envelope:System', 'envelope' => "#{Parser::OVF}")
+            virtsys_type                                    = system_sec.xpath('vssd_:VirtualSystemType/text()', 'vssd_' => "#{Parser::VSSD}")
+            compute.attributes!.occi!.compute!.architecture = virtsys_type
+          end
+
+          # get the hostname from the ProductSection
+          doc.xpath('//envelope:ProductSection/envelope:Property', 'envelope' => "#{Parser::OVF}").each do |prod_prop|
+            key = prod_prop.attributes['key']
+            if  key.to_s == "hostname" then
+              compute.attributes!.occi!.compute!.hostname = prod_prop.attributes['value']
+            end
+          end
+          collection.resources << compute
+        end
+        collection.resources.each { |resource| OCCI::Log.debug("#{resource.attributes}") }
+        collection
+      end
+    end
   end
 
 end
