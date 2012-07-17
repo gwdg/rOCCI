@@ -1,39 +1,59 @@
-require 'json'
+require 'active_support/json'
+require 'active_support/inflector'
 require 'hashie/mash'
 
 module OCCI
   module Core
-    class Category < Hashie::Mash
+    class Category
 
-      def initialize(category=nil, default = nil)
-        category.attributes = OCCI::Core::AttributeProperties.new(category.attributes) if category
-        super(category, default)
+      attr_accessor :scheme, :term, :title, :attributes
+
+      # @param [String ] scheme
+      # @param [String] term
+      # @param [String] title
+      # @param [OCCI::Core::AttributeProperties] attributes
+      def initialize(scheme, term, title=nil, attributes=nil)
+        @scheme     = scheme
+        @term       = term
+        @title      = title
+        @attributes = OCCI::Core::AttributeProperties.new(attributes)
       end
 
-      def convert_value(val, duping=false) #:nodoc:
-        case val
-          when self.class
-            val.dup
-          when ::Hash
-            val = val.dup if duping
-            self.class.subkey_class.new.merge(val) unless val.kind_of?(Hashie::Mash)
-            val
-          when Array
-            val.collect { |e| convert_value(e) }
-          else
-            val
-        end
-      end
-
+      # @return [String] Type identifier of the category
       def type_identifier
-        regular_reader("scheme") + regular_reader("term")
+        @scheme + @term
       end
 
-      def related_to?(category_id)
+      # converts and adds supplied attributes to attributes of the category
+      # @param [Hash] attributes
+      # @return [OCCI::Core::AttributeProperties] attributes hash converted to attribute properties
+      def attributes=(attributes)
+        @attributes = OCCI::Core::AttributeProperties.new(attributes)
+      end
+
+      # check if category is related to another category
+      # @param [String] category_id Type identifier of a related category
+      # @return [true,false] true if category is related to category_id else false
+      def related_to?(category_id, model)
         self.related.each do |rel_id|
-          return true if rel_id == category_id || OCCI::Model.get_by_id(rel_id).related_to?(category_id)
-        end if self.related
+          return true if rel_id == category_id || model.get_by_id(rel_id).related_to?(category_id, model)
+        end if self.class.method_defined? 'related'
         false
+      end
+
+      def as_json(options={ })
+        category = Hashie::Mash.new
+        category.scheme = @scheme if @scheme
+        category.term = @term if @term
+        category.title = @title if @title
+        category.attributes = @attributes if @attributes.any?
+        category
+      end
+
+      def to_text
+        text = @term + ';scheme=' + @scheme.inspect + ';class=' + self.class.name.demodulize.downcase.inspect
+        text << ';title=' + @title.inspect if @title
+        text
       end
 
     end

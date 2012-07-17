@@ -4,11 +4,12 @@ source :rubygems
 gem "json"
 gem "antlr3"
 gem "hashie"
-gem "uuidtools"
+gem "uuidtools", ">=2.1.3"
 gem "nokogiri"
 gem "builder"
 gem "activesupport"
 gem "rake"
+gem "httparty"
 
 # development related gems
 group :development do

@@ -1,5 +1,5 @@
 require 'hashie/mash'
-require 'occi/model'
+require 'active_support/json'
 require 'occi/core/entity'
 require 'occi/core/kind'
 
@@ -7,46 +7,48 @@ module OCCI
   module Core
     class Resource < Entity
 
-      def self.register
-        data = Hashie::Mash.new
-        data[:related] = %w{http://schemas.ogf.org/occi/core#entity}
-        data[:term] = "resource"
-        data[:scheme] = "http://schemas.ogf.org/occi/core#"
-        data[:title] = "Resource"
+      attr_accessor :links
+      attr_accessor :href
 
-        data.attributes!.occi!.core!.summary!.type = "string"
-        data.attributes!.occi!.core!.summary!.pattern = ".*"
-        data.attributes!.occi!.core!.summary!.required = false
-        data.attributes!.occi!.core!.summary!.mutable = true
-
-        kind = OCCI::Core::Kind.new(data)
-        OCCI::Model.register(kind)
+      def initialize(kind, mixins=nil, attributes=nil, links=nil)
+        @href = nil
+        @links = links.to_a
+        super(kind, mixins, attributes)
       end
 
-      def summary
-        self[:summary] ||= self.attributes!.occi!.core!.summary if self.attributes!.occi!.core
-        return self[:summary]
+      def self.kind_definition
+        kind = OCCI::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'resource')
+
+        kind.related = %w{http://schemas.ogf.org/occi/core#entity}
+        kind.title   = 'Resource'
+
+        kind.attributes.occi!.core!.summary!.type     = 'string'
+        kind.attributes.occi!.core!.summary!.pattern  = '.*'
+        kind.attributes.occi!.core!.summary!.required = false
+        kind.attributes.occi!.core!.summary!.mutable  = true
+
+        kind
       end
 
-      def summary=(summary)
-        self[:summary] = summary
-        self.attributes ||= OCCI::Core::Attributes.new
-        self.attributes!.occi!.core!.summary = summary
+      # set id for resource and update the the source of all links
+      # @param [UUIDTools::UUID] id
+      def id=(id)
+        super(id)
+        @links.each { |link| link.attributes.occi!.core!.source = self.location }
       end
 
-      def convert_value(val, duping=false) #:nodoc:
-        case val
-          when self.class
-            val.dup
-          when ::Hash
-            val = val.dup if duping
-            self.class.subkey_class.new.merge(val) unless val.kind_of?(Hashie::Mash)
-            val
-          when Array
-            val.collect { |e| convert_value(e) }
-          else
-            val
-        end
+      # update the source of all links before returning them
+      # @return [Array] links of resource
+      def links
+        @links.each { |link| link.attributes.occi!.core!.source = self.location }
+        @links
+      end
+
+      def as_json(options={ })
+        resource = Hashie::Mash.new
+        resource.links = @links if @links.any?
+        resource.merge! super
+        resource
       end
 
     end

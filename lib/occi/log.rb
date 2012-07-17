@@ -6,18 +6,30 @@ module OCCI
 
     include Logger::Severity
 
+    attr_reader :logger
+
     # creates a new OCCI logger
     # @param [IO,String] logdev The log device.  This is a filename (String) or IO object (typically +STDOUT+,
     #  +STDERR+, or an open file).
-    # @param [Constant] level Logging severity threshold (e.g. <tt>OCCI::Log::INFO</tt>).
-    def initialize(logdev, level)
-      @logger         = Logger.new(logdev)
-      @logger.level   = level
+    def initialize(logdev)
+      if logdev.kind_of? Logger
+        @logger = logdev
+      else
+        @logger = Logger.new(logdev)
+      end
 
       # subscribe to log messages and send to logger
       @log_subscriber = ActiveSupport::Notifications.subscribe("log") do |name, start, finish, id, payload|
         @logger.log(payload[:level], payload[:message])
       end
+    end
+
+    def level=(severity)
+      @logger.level = severity
+    end
+
+    def level
+      @logger.level
     end
 
     # @see info

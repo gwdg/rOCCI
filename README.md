@@ -17,25 +17,53 @@ Installation
 
     gem install occi
 
-### Latest version
-
-Checkout latest version from GIT:
-
-    git clone git://github.com/gwdg/rOCCI.git
-
-Change to rOCCI folder
-
-    cd rOCCI
-
-Install dependencies for deployment
-
-    bundle install --deployment
-
 Usage
 -----
 
-First require the gem
+First require the gem, for Ruby 1.8.7 you also have to require rubygems
+    require 'rubygems'
     require 'occi'
+
+### Client
+
+The OCCI gem includes a Client to simplify the usage of an OCCI endpoint.
+
+To connect to an OCCI endpoint/server (e.g. running at http://localhost:3000/ ) use
+
+    client = OCCI::Client.new('http://occi.cloud.gwdg.de:3300')
+
+All available categories are automatically registered to the OCCI model during client initialization. You can get them via
+
+    OCCI::Model.get
+
+To get all resources (as a list of OCCI::Resources) currently managed by the endpoint use
+
+    client.get_resources
+
+To get only compute, storage or network resources use get_compute_resources, ...
+
+To get the location of all resources use
+
+    client.get_resource_list
+
+Analogue for compute, storage, network via get_compute_list, ...
+
+To get a list of all OS / resource templates use
+
+    client.get_os_templates
+    client.get_resource_templates
+
+To get all attributes with their default values for a given category use
+
+    client.get_attributes(client.compute)
+
+To create a new compute resource use
+
+    os = client.get_os_templates.select { |template| template.term.include? 'my_os' }
+    size = client.get_resource_templates.select { |template| template.term.include? 'large' }
+    attributes = client.get_attributes([client.compute,os,size])
+    attributes['occi.core.title'] = "My VM"
+    client.post_compute(attributes,os,size)
 
 ### Logging
 
@@ -84,6 +112,10 @@ The OCCI gem includes all OCCI Core classes necessary to handly arbitrary OCCI o
 Changelog
 ---------
 
+### Version 2.2
+
+OCCI Client added. The client simplifies the execution of OCCI commands and provides shortcuts for often used steps.
+
 ### Version 2.1
 
 Several improvements to the gem structure and code documentation. First rSpec test were added. Readme has been extended to include instructions how the gem can be used.
@@ -98,6 +130,18 @@ Version 1.X of the OCCI gem has been developed by retr0h and served as a simple 
 
 Development
 -----------
+
+Checkout latest version from GIT:
+
+    git clone git://github.com/gwdg/rOCCI.git
+
+Change to rOCCI folder
+
+    cd rOCCI
+
+Install dependencies for deployment
+
+    bundle install --deployment
 
 ### Code Documentation
 
