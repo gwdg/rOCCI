@@ -216,7 +216,7 @@ module OCCI
         if href.relative?
           references[file.attributes['id'].to_s] = files[href.to_s] if files[href.to_s]
         else
-          references[file.attributes['id'].to_s] = href.delete('file://')
+          references[file.attributes['id'].to_s] = href.gsub('file://','')
         end
       end
 
@@ -282,12 +282,12 @@ module OCCI
                 # extract the mountpoint
                 host_resource                            = resource_alloc.xpath("item:HostResource/text()", 'item' => "#{Parser::RASD}").to_s
                 if host_resource.start_with? 'ovf:/disk/'
-                  id      = host_resource.delete('ovf:/disk/')
+                  id      = host_resource.gsub('ovf:/disk/','')
                   storage = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }.first
                   raise "Disk with id #{id} not found" unless storage
                   storagelink.attributes.occi!.core!.target = storage.location
                 elsif host_resource.start_with? 'ovf:/disk/'
-                  id                                        = host_resource.delete('ovf:/file/')
+                  id                                        = host_resource.gsub('ovf:/file/','')
                   storagelink.attributes.occi!.core!.target = references[id]
                 end
                 compute.links << storagelink
