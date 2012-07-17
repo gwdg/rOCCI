@@ -182,7 +182,7 @@ module OCCI
 
     def self.ova(ova)
       tar   = Gem::Package::TarReader.new(StringIO.new(ova))
-      ovf = mf = cert = nil
+      ovf   = mf = cert = nil
       files = { }
       tar.each do |entry|
         tempfile = Tempfile.new(entry.full_name)
@@ -209,7 +209,7 @@ module OCCI
     def self.ovf(ovf, files={ })
       collection = OCCI::Collection.new
       doc        = Nokogiri::XML(ovf)
-      references = {}
+      references = { }
 
       doc.xpath('envelope:Envelope/envelope:References/envelope:File', 'envelope' => "#{Parser::OVF}").each do |file|
         href = URI.parse(file.attributes['href'].to_s)
@@ -270,18 +270,22 @@ module OCCI
               when "3" then
                 compute.attributes.occi!.compute!.cores = resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}").to_s.to_i
               when "10" then
-                networkinterface                               = OCCI::Core::Link.new('http://schemas.ogf.org/occi/infrastructure#networkinterface')
-                networkinterface.attributes.occi!.core!.title  = resource_alloc.xpath("item:ElementName/text()", 'item' => "#{Parser::RASD}").to_s
-                id                                             = resource_alloc.xpath("item:Connection/text()", 'item' => "#{Parser::RASD}").to_s
-                networkinterface.attributes.occi!.core!.target = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }.first.location
+                networkinterface                              = OCCI::Core::Link.new('http://schemas.ogf.org/occi/infrastructure#networkinterface')
+                networkinterface.attributes.occi!.core!.title = resource_alloc.xpath("item:ElementName/text()", 'item' => "#{Parser::RASD}").to_s
+                id                                            = resource_alloc.xpath("item:Connection/text()", 'item' => "#{Parser::RASD}").to_s
+                network                                       = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }.first
+                raise "Network with id #{id} not found" unless network
+                networkinterface.attributes.occi!.core!.target = network.location
               when "17" then
                 storagelink                              = OCCI::Core::Link.new("http://schemas.ogf.org/occi/infrastructure#storagelink")
                 storagelink.attributes.occi!.core!.title = resource_alloc.xpath("item:ElementName/text()", 'item' => "#{Parser::RASD}").to_s
                 # extract the mountpoint
                 host_resource                            = resource_alloc.xpath("item:HostResource/text()", 'item' => "#{Parser::RASD}").to_s
                 if host_resource.start_with? 'ovf:/disk/'
-                  id                                        = host_resource.delete('ovf:/disk/')
-                  storagelink.attributes.occi!.core!.target = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }.first.location
+                  id      = host_resource.delete('ovf:/disk/')
+                  storage = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }.first
+                  raise "Disk with id #{id} not found" unless storage
+                  storagelink.attributes.occi!.core!.target = storage.location
                 elsif host_resource.start_with? 'ovf:/disk/'
                   id                                        = host_resource.delete('ovf:/file/')
                   storagelink.attributes.occi!.core!.target = references[id]
