@@ -8,7 +8,6 @@ module OCCI
     class Resource < Entity
 
       attr_accessor :links
-      attr_accessor :href
 
       def initialize(kind, mixins=nil, attributes=nil, links=nil)
         @href = nil
