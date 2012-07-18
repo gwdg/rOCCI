@@ -213,18 +213,22 @@ module OCCI
 
       doc.xpath('envelope:Envelope/envelope:References/envelope:File', 'envelope' => "#{Parser::OVF}").each do |file|
         href = URI.parse(file.attributes['href'].to_s)
+        hash = Hashie::Mash.new
         if href.relative?
-          references[file.attributes['id'].to_s] = files[href.to_s] if files[href.to_s]
+          references[file.attributes['id'].to_s] = 'file://' + files[href.to_s] if files[href.to_s]
         else
-          references[file.attributes['id'].to_s] = href.gsub('file://','')
+          references[file.attributes['id'].to_s] = href
         end
       end
 
       doc.xpath('envelope:Envelope/envelope:DiskSection/envelope:Disk', 'envelope' => "#{Parser::OVF}").each do |disk|
         storage = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure#storage')
         if disk.attributes['fileRef']
-          storage.href                         = references[disk.attributes['fileRef'].to_s]
-          storage.attributes.occi!.core!.title = disk.attributes['diskId'].to_s
+          storagelink                               = OCCI::Core::Link.new("http://schemas.ogf.org/occi/infrastructure#storagelink")
+          storagelink.attributes.occi!.core!.title  = disk.attributes['fileRef'].to_s
+          storagelink.attributes.occi!.core!.target = references[disk.attributes['fileRef'].to_s]
+          storage.attributes.occi!.core!.title      = disk.attributes['diskId'].to_s
+          storage.links << storagelink
         else
           #OCCI accepts storage size in GB
           #OVF ver 1.1: The capacity of a virtual disk shall be specified by the ovf:capacity attribute with an xs:long integer
@@ -282,12 +286,12 @@ module OCCI
                 # extract the mountpoint
                 host_resource                            = resource_alloc.xpath("item:HostResource/text()", 'item' => "#{Parser::RASD}").to_s
                 if host_resource.start_with? 'ovf:/disk/'
-                  id      = host_resource.gsub('ovf:/disk/','')
+                  id      = host_resource.gsub('ovf:/disk/', '')
                   storage = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }.first
                   raise "Disk with id #{id} not found" unless storage
                   storagelink.attributes.occi!.core!.target = storage.location
                 elsif host_resource.start_with? 'ovf:/disk/'
-                  id                                        = host_resource.gsub('ovf:/file/','')
+                  id                                        = host_resource.gsub('ovf:/file/', '')
                   storagelink.attributes.occi!.core!.target = references[id]
                 end
                 compute.links << storagelink
