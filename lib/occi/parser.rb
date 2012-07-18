@@ -288,7 +288,7 @@ module OCCI
                   id      = host_resource.gsub('ovf:/disk/', '')
                   storage = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }.first
                   raise "Disk with id #{id} not found" unless storage
-                  storagelink.attributes.occi!.core!.target = storage.location                                      = host_resource.gsub('ovf:/file/', '')
+                  storagelink.attributes.occi!.core!.target = storage.location
                 elsif host_resource.start_with? 'ovf:/file/'
                   id                                        = host_resource.gsub('ovf:/file/','')
                   storagelink.attributes.occi!.core!.target = references[id]
