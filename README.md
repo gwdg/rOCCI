@@ -99,11 +99,35 @@ the message header. As the text/plain and text/occi media type do not clearly di
 category and a message with an entity which has a kind, it has to be specified if the message contains a category (e
 .g. for user defined mixins)
 
-OCCI messages can be parsed for example like
+OCCI messages can be parsed to an OCCI collection for example like
 
     media_type = text/plain
     body = %Q|Category: compute; scheme="http://schemas.ogf.org/occi/infrastructure#"; class="kind"|
-    OCCI::Parser.parse(media_type,body)
+    collection=OCCI::Parser.parse(media_type,body)
+
+### Parsing OVF / OVA files
+
+Parsing of OVF/OVA files is partly supported and will be improved in future versions.
+
+The example in [DMTF DSP 2021](http://www.dmtf.org/sites/default/files/standards/documents/DSP2021_1.0.0.tar) is
+bundled with rOCCI and can be parsed to an OCCI collection with
+
+    require 'open-uri'
+    ova=open 'https://raw.github.com/gwdg/rOCCI/master/spec/occi/test.ova'
+    collection=OCCI::Parser.ova(ova.read)
+
+Currently only the following entries of OVF files are parsed
+
+* File in References
+* Disk in the DiskSection
+* Network in the NetworkSection
+* in the VirutalSystemSection:
+** Info
+** in the VirtualHardwareSection the items regarding
+*** Processor
+*** Memory
+*** Ethernet Adapter
+*** Parallel port
 
 ### Using the OCCI model
 
@@ -111,6 +135,13 @@ The OCCI gem includes all OCCI Core classes necessary to handly arbitrary OCCI o
 
 Changelog
 ---------
+
+### Version 2.3
+
+* OCCI objects are now initialized with a list of attributes instead of a hash. Thus it is easier to check which
+attributes are expected by a class and helps prevent errors.
+* Parsing of a subset of the OVF specification is supported. Further parts of the specification will be covered in
+future versions of rOCCI.
 
 ### Version 2.2
 
