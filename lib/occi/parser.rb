@@ -87,11 +87,11 @@ module OCCI
       if entity_type == OCCI::Core::Link
         entity.target = link.attributes!.occi!.core!.target
         entity.source = link.attributes!.occi!.core!.source
-        collection.links << OCCI::Core::Link.new(entity)
+        collection.links << OCCI::Core::Link.new(entity.kind,entity.mixins,entity.attributes)
       elsif entity_type == OCCI::Core::Resource
         link_strings = header['HTTP_LINK'].to_s.split(',')
         link_strings.each { |link| entity.links << OCCIANTLR::Parser.new('Link: ' + link).link }
-        collection.resources << OCCI::Core::Resource.new(entity)
+        collection.resources << OCCI::Core::Resource.new(entity.kind,entity.mixins,entity.attributes,entity.links)
       end
       collection
     end
@@ -127,10 +127,10 @@ module OCCI
       if entity_type == OCCI::Core::Link
         entity.target = links.first.attributes!.occi!.core!.target
         entity.source = links.first.attributes!.occi!.core!.source
-        collection.links << OCCI::Core::Link.new(entity)
+        collection.links << OCCI::Core::Link.new(entity.kind,entity.mixins,entity.attributes)
       elsif entity_type == OCCI::Core::Resource
         entity.links = links
-        collection.resources << OCCI::Core::Resource.new(entity)
+        collection.resources << OCCI::Core::Resource.new(entity.kind,entity.mixins,entity.attributes,entity.links)
       end unless entity.kind.nil?
       collection
     end
@@ -216,7 +216,7 @@ module OCCI
         if href.relative?
           references[file.attributes['id'].to_s] = 'file://' + files[href.to_s] if files[href.to_s]
         else
-          references[file.attributes['id'].to_s] = href
+          references[file.attributes['id'].to_s] = href.to_s
         end
       end
 
