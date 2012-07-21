@@ -6,7 +6,7 @@ module OCCI
   module Core
     class Category
 
-      attr_accessor :scheme, :term, :title, :attributes
+      attr_accessor :model, :scheme, :term, :title, :attributes
 
       # @param [String ] scheme
       # @param [String] term
@@ -34,9 +34,9 @@ module OCCI
       # check if category is related to another category
       # @param [String] category_id Type identifier of a related category
       # @return [true,false] true if category is related to category_id else false
-      def related_to?(category_id, model)
+      def related_to?(category_id)
         self.related.each do |rel_id|
-          return true if rel_id == category_id || model.get_by_id(rel_id).related_to?(category_id, model)
+          return true if rel_id == category_id || @model.get_by_id(rel_id).related_to?(category_id)
         end if self.class.method_defined? 'related'
         false
       end
