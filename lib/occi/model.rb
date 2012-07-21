@@ -58,6 +58,8 @@ module OCCI
       OCCI::Log.debug "### Registering category #{category.type_identifier}"
       @categories[category.type_identifier] = category
       @locations[category.location] = category.type_identifier unless category.kind_of? OCCI::Core::Action
+      # add model to category as back reference
+      category.model = self
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
@@ -99,7 +101,7 @@ module OCCI
         OCCI::Log.debug("### Filtering categories #{categories.collect { |c| c.type_identifier }.inspect}")
         while categories.any? do
           category = categories.pop
-          categories.concat @categories.each_value.select { |cat| cat.related_to?(category.type_identifier, self) }
+          categories.concat @categories.each_value.select { |cat| cat.related_to?(category.type_identifier) }
           collection.kinds << get_by_id(category.type_identifier) if category.kind_of? OCCI::Core::Kind
           collection.mixins << get_by_id(category.type_identifier) if category.kind_of? OCCI::Core::Mixin
           collection.actions << get_by_id(category.type_identifier) if category.kind_of? OCCI::Core::Action
