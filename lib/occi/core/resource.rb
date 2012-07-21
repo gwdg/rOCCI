@@ -10,11 +10,11 @@ module OCCI
       attr_accessor :links
 
       def initialize(kind, mixins=nil, attributes=nil, links=nil)
-        @href = nil
         @links = links.to_a
         super(kind, mixins, attributes)
       end
 
+      # @return [OCCI::Core::Kind] kind definition of Resource type
       def self.kind_definition
         kind = OCCI::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'resource')
 
