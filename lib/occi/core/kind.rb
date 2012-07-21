@@ -30,7 +30,8 @@ module OCCI
           when "http://schemas.ogf.org/occi/core#link"
             return OCCI::Core::Link.name
           else
-            OCCI::Model.get_by_id(self[:related].first).entity_type unless self[:term] == 'entity'
+            raise "no model back reference provided for kind #{self.typ_identifier}" unless @model
+            @model.get_by_id(self[:related].first).entity_type unless self[:term] == 'entity'
         end
       end
 
