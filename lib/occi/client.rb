@@ -44,17 +44,16 @@ module OCCI
     end
 
     def post_resource(attributes, kind, mixins, resources_to_link)
-      resource      = OCCI::Core::Resource.new
-      resource.kind = kind.type_identifier
+      resource      = OCCI::Core::Resource.new(kind.type_identifier)
       mixins = mixins.collect { |mixin| mixin.type_identifiers } unless mixins.first.kind_of? String
       resource.mixins = mixins
       attributes = OCCI::Core::Attributes.split(attributes) unless attributes.kind_of? OCCI::Core::Attributes
       resource.attributes = attributes
       resource.links      = []
       resources_to_link.each do |res|
-        link = OCCI::Link.new
-        link.kind = 'http://schemas.ogf.org/occi/infrastructure#storagelink' if @model.get_by_id(res.kind).related_to? 'http://schemas.ogf.org/occi/infrastructure#storage'
-        link.kind = 'http://schemas.ogf.org/occi/infrastructure#networkinterface' if @model.get_by_id(res.kind).related_to? 'http://schemas.ogf.org/occi/infrastructure#network'
+        kind = 'http://schemas.ogf.org/occi/infrastructure#storagelink' if @model.get_by_id(res.kind).related_to? 'http://schemas.ogf.org/occi/infrastructure#storage'
+        kind = 'http://schemas.ogf.org/occi/infrastructure#networkinterface' if @model.get_by_id(res.kind).related_to? 'http://schemas.ogf.org/occi/infrastructure#network'
+        link = OCCI::Link.new(kind)
         link.titlte "Link to #{res.title}"
         link.target = res.location
         resource.links << link
