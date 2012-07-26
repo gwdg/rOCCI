@@ -24,13 +24,6 @@ module OCCI
         @scheme + @term
       end
 
-      # converts and adds supplied attributes to attributes of the category
-      # @param [Hash] attributes
-      # @return [OCCI::Core::AttributeProperties] attributes hash converted to attribute properties
-      def attributes=(attributes)
-        @attributes = OCCI::Core::AttributeProperties.new(attributes)
-      end
-
       # check if category is related to another category
       # @param [String] category_id Type identifier of a related category
       # @return [true,false] true if category is related to category_id else false
