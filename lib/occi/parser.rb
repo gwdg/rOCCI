@@ -36,6 +36,8 @@ module OCCI
       case media_type
         when 'text/uri-list'
           body.each_line { |line| locations << URI.parse(line) }
+        when 'text/occi'
+          nil
         when 'text/plain', nil
           locations.concat self.text_locations(body)
           category ? collection = self.text_categories(body) : collection = self.text_entity(body, entity_type) if locations.empty? && collection.empty?
@@ -87,11 +89,11 @@ module OCCI
       if entity_type == OCCI::Core::Link
         entity.target = link.attributes!.occi!.core!.target
         entity.source = link.attributes!.occi!.core!.source
-        collection.links << OCCI::Core::Link.new(entity.kind,entity.mixins,entity.attributes)
+        collection.links << OCCI::Core::Link.new(entity.kind, entity.mixins, entity.attributes)
       elsif entity_type == OCCI::Core::Resource
         link_strings = header['HTTP_LINK'].to_s.split(',')
         link_strings.each { |link| entity.links << OCCIANTLR::Parser.new('Link: ' + link).link }
-        collection.resources << OCCI::Core::Resource.new(entity.kind,entity.mixins,entity.attributes,entity.links)
+        collection.resources << OCCI::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.links)
       end
       collection
     end
@@ -127,10 +129,10 @@ module OCCI
       if entity_type == OCCI::Core::Link
         entity.target = links.first.attributes!.occi!.core!.target
         entity.source = links.first.attributes!.occi!.core!.source
-        collection.links << OCCI::Core::Link.new(entity.kind,entity.mixins,entity.attributes)
+        collection.links << OCCI::Core::Link.new(entity.kind, entity.mixins, entity.attributes)
       elsif entity_type == OCCI::Core::Resource
         entity.links = links
-        collection.resources << OCCI::Core::Resource.new(entity.kind,entity.mixins,entity.attributes,entity.links)
+        collection.resources << OCCI::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.links)
       end unless entity.kind.nil?
       collection
     end
@@ -290,7 +292,7 @@ module OCCI
                   raise "Disk with id #{id} not found" unless storage
                   storagelink.attributes.occi!.core!.target = storage.location
                 elsif host_resource.start_with? 'ovf:/file/'
-                  id                                        = host_resource.gsub('ovf:/file/','')
+                  id                                        = host_resource.gsub('ovf:/file/', '')
                   storagelink.attributes.occi!.core!.target = references[id]
                 end
                 compute.links << storagelink
