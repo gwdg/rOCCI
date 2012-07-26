@@ -24,7 +24,7 @@ module OCCI
     # register OCCI Infrastructure categories
     def register_infrastructure
       OCCI::Log.info "### Registering OCCI Infrastructure categories ###"
-      register_files 'etc/model/infrastructure'
+      register_files  File.dirname(__FILE__) + '/../../etc/model/infrastructure'
     end
 
     # register OCCI categories from files
@@ -50,7 +50,7 @@ module OCCI
     end
 
     def reset()
-      @categories.each_value.each { |category| category.entities = [] if category.entities }
+      @categories.each_value.each { |category| category.entities = [] if category.respond_to? :entities }
     end
 
     # ---------------------------------------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ module OCCI
     #
     # @param [OCCI::Collection] filter
     # @return [OCCI::Collection] collection
-    def get(filter = [])
+    def get(filter = OCCI::Collection.new)
       collection = OCCI::Collection.new
       if filter.empty?
         @categories.each_value do |category|

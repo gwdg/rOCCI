@@ -21,12 +21,17 @@ module OCCI
         kind.related = %w{http://schemas.ogf.org/occi/core#entity}
         kind.title   = 'Resource'
 
-        kind.attributes.occi!.core!.summary!.type     = 'string'
-        kind.attributes.occi!.core!.summary!.pattern  = '.*'
-        kind.attributes.occi!.core!.summary!.required = false
-        kind.attributes.occi!.core!.summary!.mutable  = true
+        kind.attributes.occi!.core!.summary!.Type     = 'string'
+        kind.attributes.occi!.core!.summary!.Pattern  = '.*'
+        kind.attributes.occi!.core!.summary!.Required = false
+        kind.attributes.occi!.core!.summary!.Mutable  = true
 
         kind
+      end
+
+      def links=(links)
+        @checked = false
+        @links   = links
       end
 
       # set id for resource and update the the source of all links
@@ -34,6 +39,17 @@ module OCCI
       def id=(id)
         super(id)
         @links.each { |link| link.attributes.occi!.core!.source = self.location }
+      end
+
+      # @return [String] summary attribute of the resource
+      def summary
+        self.attributes.occi!.core!.summary
+      end
+
+      # set summary attribute of resource
+      # @param [String] summary
+      def summary=(summary)
+        self.attributes.occi!.core!.summary = summary
       end
 
       # update the source of all links before returning them

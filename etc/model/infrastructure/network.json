@@ -11,25 +11,25 @@
                 "occi":{
                     "network":{
                         "vlan":{
-                            "mutable":true,
-                            "required":false,
-                            "type":"number",
-                            "minimum":0,
-                            "maximum":4095,
-                            "default":0
+                            "Mutable":true,
+                            "Required":false,
+                            "Type":"number",
+                            "Minimum":0,
+                            "Maximum":4095,
+                            "Default":0
                         },
                         "label":{
-                            "mutable":true,
-                            "required":false,
-                            "type":"string",
-                            "pattern":".*"
+                            "Mutable":true,
+                            "Required":false,
+                            "Type":"string",
+                            "Pattern":".*"
                         },
                         "state":{
-                            "mutable":false,
-                            "required":false,
-                            "type":"string",
-                            "pattern":"active|inactive|error",
-                            "default":"inactive"
+                            "Mutable":false,
+                            "Required":false,
+                            "Type":"string",
+                            "Pattern":"active|inactive|error",
+                            "Default":"inactive"
                         }
                     }
                 }

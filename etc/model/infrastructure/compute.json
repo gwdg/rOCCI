@@ -11,45 +11,45 @@
                 "occi":{
                     "compute":{
                         "architecture":{
-                            "mutable":true,
-                            "required":false,
-                            "type":"string",
-                            "pattern":"x86|x64",
-                            "default":"x86"
+                            "Mutable":true,
+                            "Required":false,
+                            "Type":"string",
+                            "Pattern":"x86|x64",
+                            "Default":"x86"
                         },
                         "cores":{
-                            "mutable":true,
-                            "required":false,
-                            "type":"number",
-                            "minimum":1,
-                            "maximum":32767
+                            "Mutable":true,
+                            "Required":false,
+                            "Type":"number",
+                            "Minimum":1,
+                            "Maximum":32767
                         },
                         "hostname":{
-                            "mutable":true,
-                            "required":false,
-                            "type":"string",
-                            "pattern":"(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*"
+                            "Mutable":true,
+                            "Required":false,
+                            "Type":"string",
+                            "Pattern":"(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*"
                         },
                         "speed":{
-                            "mutable":true,
-                            "required":false,
-                            "type":"number",
-                            "minimum":0,
-                            "maximum":32767
+                            "Mutable":true,
+                            "Required":false,
+                            "Type":"number",
+                            "Minimum":0,
+                            "Maximum":32767
                         },
                         "memory":{
-                            "mutable":true,
-                            "required":false,
-                            "type":"number",
-                            "minimum":0,
-                            "maximum":32767
+                            "Mutable":true,
+                            "Required":false,
+                            "Type":"number",
+                            "Minimum":0,
+                            "Maximum":32767
                         },
                         "state":{
-                            "mutable":false,
-                            "required":false,
-                            "type":"string",
-                            "pattern":"inactive|active|suspended|error",
-                            "default":"inactive"
+                            "Mutable":false,
+                            "Required":false,
+                            "Type":"string",
+                            "Pattern":"inactive|active|suspended|error",
+                            "Default":"inactive"
                         }
                     }
                 }
@@ -75,11 +75,11 @@
             "title":"Stop Compute instance",
             "attributes":{
                 "method":{
-                    "mutable":true,
-                    "required":false,
-                    "type":"string",
-                    "pattern":"graceful|acpioff|poweroff",
-                    "default":"poweroff"
+                    "Mutable":true,
+                    "Required":false,
+                    "Type":"string",
+                    "Pattern":"graceful|acpioff|poweroff",
+                    "Default":"poweroff"
                 }
             }
         },
@@ -89,11 +89,11 @@
             "title":"Restart Compute instance",
             "attributes":{
                 "method":{
-                    "mutable":true,
-                    "required":false,
-                    "type":"string",
-                    "pattern":"graceful|warm|cold",
-                    "default":"cold"
+                    "Mutable":true,
+                    "Required":false,
+                    "Type":"string",
+                    "Pattern":"graceful|warm|cold",
+                    "Default":"cold"
                 }
             }
         },
@@ -103,11 +103,11 @@
             "title":"Suspend Compute instance",
             "attributes":{
                 "method":{
-                    "mutable":true,
-                    "required":false,
-                    "type":"string",
-                    "pattern":"hibernate|suspend",
-                    "default":"suspend"
+                    "Mutable":true,
+                    "Required":false,
+                    "Type":"string",
+                    "Pattern":"hibernate|suspend",
+                    "Default":"suspend"
                 }
             }
         }

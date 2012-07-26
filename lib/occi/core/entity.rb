@@ -11,7 +11,8 @@ module OCCI
   module Core
     class Entity
 
-      attr_accessor :kind, :mixins, :attributes
+      attr_accessor :mixins, :attributes, :actions
+      attr_reader :kind
 
       # @return [OCCI::Core::Kind] kind definition of Entity type
       def self.kind_definition
@@ -19,15 +20,15 @@ module OCCI
 
         kind.title = "Entity"
 
-        kind.attributes.occi!.core!.id!.type     = "string"
-        kind.attributes.occi!.core!.id!.pattern  = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
-        kind.attributes.occi!.core!.id!.required = false
-        kind.attributes.occi!.core!.id!.mutable  = false
+        kind.attributes.occi!.core!.id!.Type     = "string"
+        kind.attributes.occi!.core!.id!.Pattern  = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+        kind.attributes.occi!.core!.id!.Required = false
+        kind.attributes.occi!.core!.id!.Mutable  = false
 
-        kind.attributes.occi!.core!.title!.type     = "string"
-        kind.attributes.occi!.core!.title!.pattern  = ".*"
-        kind.attributes.occi!.core!.title!.required = false
-        kind.attributes.occi!.core!.title!.mutable  = true
+        kind.attributes.occi!.core!.title!.Type     = "string"
+        kind.attributes.occi!.core!.title!.Pattern  = ".*"
+        kind.attributes.occi!.core!.title!.Required = false
+        kind.attributes.occi!.core!.title!.Mutable  = true
 
         kind
       end
@@ -35,11 +36,24 @@ module OCCI
       # @param [String] kind
       # @param [String] mixins
       # @param [OCCI::Core::Attributes] attributes
-      def initialize(kind, mixins=nil, attributes=nil)
+      def initialize(kind, mixins=nil, attributes=nil, actions=nil)
+        @checked = false
+        raise "Kind #{kind} not of type String" unless kind.kind_of? String
         @kind       = kind
         @mixins     = mixins.to_a
         @attributes = OCCI::Core::Attributes.new(attributes)
-        self.id = UUIDTools::UUID.timestamp_create.to_s
+        @actions    = actions.to_a
+        self.id     = UUIDTools::UUID.timestamp_create.to_s
+      end
+
+      def mixins=(mixins)
+        @checked=false
+        @mixins =mixins
+      end
+
+      def attributes=(attributes)
+        @checked   =false
+        @attributes=attributes
       end
 
       # set id for entity
@@ -51,6 +65,17 @@ module OCCI
       # @return [UUIDTools::UUID] id of the entity
       def id
         @attributes.occi!.core!.id
+      end
+
+      # set title attribute for entity
+      # @param [String] title
+      def title=(title)
+        @attributes.occi!.core!.title = title
+      end
+
+      # @return [String] title attribute of entity
+      def title
+        @attributes.occi!.core!.title
       end
 
       # @return [String] location of the entity
@@ -79,28 +104,33 @@ module OCCI
         attributes = OCCI::Core::Attributes.new(attributes)
         definitions.each_key do |key|
           properties = definitions[key]
-          value      = attributes[key] ||= properties[:default]
-          if properties.include?(:type)
-            raise "required attribute #{key} not found" if value.nil? && properties.required
-            next if value.nil? && !properties.required
-            case properties.type
+          value      = attributes[key] ||= properties.Default
+          if properties.key? :Type
+            raise "required attribute #{key} not found" if value.nil? && properties.Required
+            next if value.nil? && !properties.Required
+            case properties.Type
               when 'number'
-                raise "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless value.kind_of?(Numeric)
-                raise "attribute #{key} with value #{value} not in range #{properties.minimum}-#{properties.maximum}" unless (properties.minimum..properties.maximum) === value if properties.minimum && properties.maximum
+                raise "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.Type}" unless value.kind_of?(Numeric)
+                raise "attribute #{key} with value #{value} not in range #{properties.Minimum}-#{properties.Maximum}" unless (properties.Minimum..properties.Maximum) === value if properties.Minimum && properties.Maximum
               when 'boolean'
-                raise "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless !!value == value
+                raise "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.Type}" unless !!value == value
               else
-                raise "attribute #{key} with value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless value.kind_of?(String)
-                raise "attribute #{key} with length #{value.length} not in range #{properties.minimum}-#{properties.maximum}" unless (properties.minimum..properties.maximum) === value.length if properties.minimum && properties.maximum
+                raise "attribute #{key} with value #{value} from class #{value.class.name} does not match attribute property type #{properties.Type}" unless value.kind_of?(String)
+                raise "attribute #{key} with length #{value.length} not in range #{properties.Minimum}-#{properties.Maximum}" unless (properties.Minimum..properties.Maximum) === value.length if properties.Minimum && properties.Maximum
             end
-            raise "attribute #{key} with value #{value} does not match pattern #{properties.pattern}" if value.to_s.scan(Regexp.new(properties.pattern)).empty? if properties.pattern
+            raise "attribute #{key} with value #{value} does not match pattern #{properties.Pattern}" if value.to_s.scan(Regexp.new(properties.Pattern)).empty? if properties.Pattern
             attributes[key] = value
           else
             attributes[key] = check(value, definitions[key])
           end
         end
         attributes.delete_if { |_, v| v.nil? } # remove empty attributes
-        return attributes
+        @checked = true
+        attributes
+      end
+
+      def checked?
+        @checked && @attributes.checked?
       end
 
       # @param [Hash] options
@@ -109,6 +139,7 @@ module OCCI
         entity = Hashie::Mash.new
         entity.kind = @kind if @kind
         entity.mixins = @mixins if @mixins.any?
+        entity.actions = @actions if @actions.any?
         entity.attributes = @attributes if @attributes.any?
         entity
       end

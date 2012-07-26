@@ -26,12 +26,12 @@ module OCCI
       def entity_type
         case type_identifier
           when "http://schemas.ogf.org/occi/core#resource"
-            return OCCI::Core::Resource.name
+            return OCCI::Core::Resource
           when "http://schemas.ogf.org/occi/core#link"
-            return OCCI::Core::Link.name
+            return OCCI::Core::Link
           else
             raise "no model back reference provided for kind #{self.typ_identifier}" unless @model
-            @model.get_by_id(self[:related].first).entity_type unless self[:term] == 'entity'
+            @model.get_by_id(self.related.first).entity_type unless self.term == 'entity'
         end
       end
 

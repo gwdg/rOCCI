@@ -11,23 +11,23 @@
                 "occi":{
                     "storagelink":{
                         "deviceid":{
-                            "mutable":true,
-                            "required":false,
-                            "type":"string",
-                            "pattern":".*"
+                            "Mutable":true,
+                            "Required":false,
+                            "Type":"string",
+                            "Pattern":".*"
                         },
                         "mountpoint":{
-                            "mutable":true,
-                            "required":false,
-                            "type":"string",
-                            "pattern":".*"
+                            "Mutable":true,
+                            "Required":false,
+                            "Type":"string",
+                            "Pattern":".*"
                         },
                         "state":{
-                            "mutable":false,
-                            "required":false,
-                            "type":"string",
-                            "pattern":"active|inactive",
-                            "default":"inactive"
+                            "Mutable":false,
+                            "Required":false,
+                            "Type":"string",
+                            "Pattern":"active|inactive",
+                            "Default":"inactive"
                         }
                     }
                 }

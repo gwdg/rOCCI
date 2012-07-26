@@ -11,18 +11,18 @@
                 "occi":{
                     "storage":{
                         "size":{
-                            "mutable":true,
-                            "required":false,
-                            "type":"number",
-                            "minimum":0,
-                            "maximum":32767
+                            "Mutable":true,
+                            "Required":false,
+                            "Type":"number",
+                            "Minimum":0,
+                            "Maximum":32767
                         },
                         "state":{
-                            "mutable":false,
-                            "required":false,
-                            "type":"string",
-                            "pattern":"online|offline|backup|snapshot|resize|degraded",
-                            "default":"offline"
+                            "Mutable":false,
+                            "Required":false,
+                            "Type":"string",
+                            "Pattern":"online|offline|backup|snapshot|resize|degraded",
+                            "Default":"offline"
                         }
                     }
                 }
@@ -64,10 +64,10 @@
             "title":"Resize Storage",
             "attributes":{
                 "size":{
-                    "mutable":true,
-                    "required":false,
-                    "type":"number",
-                    "default":"suspend"
+                    "Mutable":true,
+                    "Required":false,
+                    "Type":"number",
+                    "Default":"suspend"
                 }
             }
         }

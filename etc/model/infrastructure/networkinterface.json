@@ -11,25 +11,25 @@
                 "occi":{
                     "networkinterface":{
                         "interface":{
-                            "mutable":true,
-                            "required":false,
-                            "type":"string",
-                            "pattern":".*",
-                            "default":"eth0"
+                            "Mutable":true,
+                            "Required":false,
+                            "Type":"string",
+                            "Pattern":".*",
+                            "Default":"eth0"
                         },
                         "mac":{
-                            "mutable":true,
-                            "required":false,
-                            "type":"string",
-                            "pattern":"^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$",
-                            "default":"00:16:3e:00:00:00"
+                            "Mutable":true,
+                            "Required":false,
+                            "Type":"string",
+                            "Pattern":"^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$",
+                            "Default":"00:16:3e:00:00:00"
                         },
                         "state":{
-                            "mutable":false,
-                            "required":false,
-                            "type":"string",
-                            "pattern":"active|inactive",
-                            "default":"inactive"
+                            "Mutable":false,
+                            "Required":false,
+                            "Type":"string",
+                            "Pattern":"active|inactive",
+                            "Default":"inactive"
                         }
                     }
                 }
