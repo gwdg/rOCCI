@@ -7,7 +7,7 @@ module OCCI
       def combine
         hash = { }
         self.each_key do |key|
-          if self[key].kind_of? Hashie::Mash
+          if self[key].kind_of? OCCI::Core::Attributes
             self[key].combine.each_pair { |k, v| hash[key + '.' + k] = v }
           else
             hash[key] = self[key]
