@@ -39,27 +39,23 @@ module OCCI
       def initialize(kind, mixins=nil, attributes=nil, actions=nil)
         @checked = false
         raise "Kind #{kind} not of type String" unless kind.kind_of? String
-        @kind       = kind
-        @mixins     = mixins.to_a
-        @attributes = OCCI::Core::Attributes.new(attributes)
-        @actions    = actions.to_a
-        self.id     = UUIDTools::UUID.timestamp_create.to_s
+        @kind                      = kind
+        @mixins                    = mixins.to_a
+        @attributes                = OCCI::Core::Attributes.new(attributes)
+        @attributes.occi!.core!.id ||= UUIDTools::UUID.random_create
+        @actions                   = actions.to_a
       end
 
+      # @param [Array] mixins
       def mixins=(mixins)
         @checked=false
         @mixins =mixins
       end
 
+      # @param [OCCI::Core::Attributes] attributes
       def attributes=(attributes)
         @checked   =false
         @attributes=attributes
-      end
-
-      # set id for entity
-      # @param [UUIDTools::UUID] id
-      def id=(id)
-        @attributes.occi!.core!.id = id
       end
 
       # @return [UUIDTools::UUID] id of the entity
@@ -129,12 +125,13 @@ module OCCI
         attributes
       end
 
+      # @return [true,false]
       def checked?
         @checked && @attributes.checked?
       end
 
       # @param [Hash] options
-      # @return [Hashie::Mash] entity as Hashie::Mash to be parsed into a JSON object
+      # @return [Hashie::Mash] json representation
       def as_json(options={ })
         entity = Hashie::Mash.new
         entity.kind = @kind if @kind
@@ -142,6 +139,25 @@ module OCCI
         entity.actions = @actions if @actions.any?
         entity.attributes = @attributes if @attributes.any?
         entity
+      end
+
+      # @return [String] text representation
+      def to_text
+        scheme, term = self.kind.split('#')
+        text         = term + ';scheme=' + scheme.inspect + ';class="kind"' + "\n"
+        @mixins.each do |mixin|
+          scheme, term = mixin.split('#')
+          text << term + ';scheme=' + scheme.inspect + ';class="mixin"' + "\n"
+        end
+        @attributes.combine.each_pair do |name, value|
+          name = name.inspect if name.kind_of? String
+          text << 'X-OCCI-Attribute: ' + name + '=' + value + "\n"
+        end
+        @actions.each do |action|
+          _, term = mixin.split('#')
+          text << 'Link: <' + self.location + '?action=' + term + '>;rel=' + action.inspect + "\n"
+        end
+        text
       end
 
     end
