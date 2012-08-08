@@ -13,9 +13,7 @@
                         "size":{
                             "Mutable":true,
                             "Required":false,
-                            "Type":"number",
-                            "Minimum":0,
-                            "Maximum":32767
+                            "Type":"number"
                         },
                         "state":{
                             "Mutable":false,
@@ -66,8 +64,7 @@
                 "size":{
                     "Mutable":true,
                     "Required":false,
-                    "Type":"number",
-                    "Default":"suspend"
+                    "Type":"number"
                 }
             }
         }

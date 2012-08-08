@@ -14,15 +14,13 @@
                             "Mutable":true,
                             "Required":false,
                             "Type":"string",
-                            "Pattern":".*",
-                            "Default":"eth0"
+                            "Pattern":".*"
                         },
                         "mac":{
                             "Mutable":true,
                             "Required":false,
                             "Type":"string",
-                            "Pattern":"^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$",
-                            "Default":"00:16:3e:00:00:00"
+                            "Pattern":"^([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2})$"
                         },
                         "state":{
                             "Mutable":false,

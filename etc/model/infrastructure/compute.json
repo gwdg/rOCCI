@@ -14,15 +14,12 @@
                             "Mutable":true,
                             "Required":false,
                             "Type":"string",
-                            "Pattern":"x86|x64",
-                            "Default":"x86"
+                            "Pattern":"x86|x64"
                         },
                         "cores":{
                             "Mutable":true,
                             "Required":false,
-                            "Type":"number",
-                            "Minimum":1,
-                            "Maximum":32767
+                            "Type":"number"
                         },
                         "hostname":{
                             "Mutable":true,
@@ -33,16 +30,12 @@
                         "speed":{
                             "Mutable":true,
                             "Required":false,
-                            "Type":"number",
-                            "Minimum":0,
-                            "Maximum":32767
+                            "Type":"number"
                         },
                         "memory":{
                             "Mutable":true,
                             "Required":false,
-                            "Type":"number",
-                            "Minimum":0,
-                            "Maximum":32767
+                            "Type":"number"
                         },
                         "state":{
                             "Mutable":false,

@@ -15,8 +15,7 @@
                             "Required":false,
                             "Type":"number",
                             "Minimum":0,
-                            "Maximum":4095,
-                            "Default":0
+                            "Maximum":4095
                         },
                         "label":{
                             "Mutable":true,
