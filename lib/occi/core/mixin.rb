@@ -25,6 +25,8 @@ module OCCI
         '/mixins/' + @term + '/'
       end
 
+      # @param [Hash] options
+      # @return [Hashie::Mash] json representation
       def as_json(options={ })
         mixin = Hashie::Mash.new
         mixin.related = @related if @related.any?
@@ -33,6 +35,7 @@ module OCCI
         mixin
       end
 
+      # @return [String] text representation
       def to_text
         text = super
         text << ';rel=' + @related.join(' ').inspect if @related.any?

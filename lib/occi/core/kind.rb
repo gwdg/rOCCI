@@ -40,6 +40,8 @@ module OCCI
         '/' + @term + '/'
       end
 
+      # @param [Hash] options
+      # @return [Hashie::Mash] json representation
       def as_json(options={ })
         kind = Hashie::Mash.new
         kind.related = @related if @related.any?
@@ -48,6 +50,7 @@ module OCCI
         kind
       end
 
+      # @return [String] text representation
       def to_text
         text = super
         text << ';rel=' + @related.join(' ').inspect if @related.any?

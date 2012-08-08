@@ -34,6 +34,8 @@ module OCCI
         false
       end
 
+      # @param [Hash] options
+      # @return [Hashie::Mash] json representation
       def as_json(options={ })
         category = Hashie::Mash.new
         category.scheme = @scheme if @scheme
@@ -43,6 +45,7 @@ module OCCI
         category
       end
 
+      # @return [String] text representation
       def to_text
         text = @term + ';scheme=' + @scheme.inspect + ';class=' + self.class.name.demodulize.downcase.inspect
         text << ';title=' + @title.inspect if @title

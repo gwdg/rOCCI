@@ -4,7 +4,8 @@ module OCCI
   module Core
     class Attributes < Hashie::Mash
 
-      def combine
+    # @return [Array] key value pair of full attribute names with their corresponding values
+    def combine
         hash = { }
         self.each_key do |key|
           if self[key].kind_of? OCCI::Core::Attributes
@@ -16,7 +17,9 @@ module OCCI
         hash
       end
 
-      def self.split(attributes)
+    # @param [Hash] attributes key value pair of full attribute names with their corresponding values
+    # @return [OCCI::Core::Attributes]
+    def self.split(attributes)
         attribute = Attributes.new
         attributes.each do |name,value|
           puts name

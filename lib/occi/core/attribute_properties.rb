@@ -4,6 +4,8 @@ module OCCI
   module Core
     class AttributeProperties < Hashie::Mash
 
+      # @param [Hashie::Mash] attributes
+      # @param [Hash] default
       def initialize(attributes = nil, default = nil)
         if [:Type, :Required, :Mutable, :Pattern, :Default, :Minimum, :Maximum, :Description].any? { |k| attributes.key?(k) }
           attributes[:Type]   ||= "string"
@@ -14,12 +16,10 @@ module OCCI
         super(attributes, default)
       end
 
+      # @return [Array] list of full attribute names
       def combine
         array = []
         self.each_key do |key|
-          #puts "Key :#{key}"
-          #puts self[key].keys
-          #puts self[key].key? 'type'
           if self[key].key? 'Type'
             array << key
           else
@@ -30,6 +30,8 @@ module OCCI
         array
       end
 
+
+      # @return [Hash] key value pairs of attribute names with their defaults set
       def combine_with_defaults
         hash = { }
         self.each_key do |key|
@@ -56,6 +58,7 @@ module OCCI
         end
       end
 
+      # Overrides method of hashie mash to check if one of the attribute properties has been set
       def method_missing(method_name, *args, &blk)
         return self.[](method_name, &blk) if key?(method_name)
         match = method_name.to_s.match(/(.*?)([?=!]?)$/)
