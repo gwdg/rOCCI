@@ -9,11 +9,6 @@ module OCCI
 
       attr_accessor :links
 
-      def initialize(kind, mixins=nil, attributes=nil, links=nil)
-        @links = links.to_a
-        super(kind, mixins, attributes)
-      end
-
       # @return [OCCI::Core::Kind] kind definition of Resource type
       def self.kind_definition
         kind = OCCI::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'resource')
@@ -29,9 +24,17 @@ module OCCI
         kind
       end
 
-      def links=(links)
-        @checked = false
-        @links   = links
+      # @param [String] kind
+      # @param [Array] mixins
+      # @param [OCCI::Core::Attributes,Hash] attributes
+      # @param [Array] links
+      def initialize(kind, mixins=nil, attributes=nil, links=nil)
+        super(kind, mixins, attributes)
+        @links = []
+        links.to_a.each do |link|
+          link = OCCI::Core::Link.new(link.kind,link.mixins,link.attributes,link.actions,link.rel) unless link.kind_of? OCCI::Core::Link
+          @links << link
+        end
       end
 
       # set id for resource and update the the source of all links
@@ -52,18 +55,20 @@ module OCCI
         self.attributes.occi!.core!.summary = summary
       end
 
-      # update the source of all links before returning them
-      # @return [Array] links of resource
-      def links
-        @links.each { |link| link.attributes.occi!.core!.source = self.location }
-        @links
-      end
-
+      # @param [Hash] options
+      # @return [Hashie::Mash] link as Hashie::Mash to be parsed into a JSON object
       def as_json(options={ })
         resource = Hashie::Mash.new
         resource.links = @links if @links.any?
         resource.merge! super
         resource
+      end
+
+      # @return [String] text representation
+      def to_text
+        text = super
+        @links.each { |link| text << 'Link: ' + link.to_reference_text + "\n" }
+        text
       end
 
     end
