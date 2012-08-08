@@ -6,7 +6,7 @@ module OCCI
   module Core
     class Link < Entity
 
-      attr_reader :rel
+      attr_accessor :rel
 
       # @return [OCCI::Core::Kind] kind definition of Link type
       def self.kind_definition
@@ -28,9 +28,17 @@ module OCCI
         kind
       end
 
+      # @param [String] kind
+      # @param [String] mixins
+      # @param [OCCI::Core::Attributes] attributes
+      def initialize(kind, mixins=nil, attributes=nil, actions=nil, rel=nil)
+        super(kind,mixins,attributes,actions)
+        @rel        = rel
+      end
+
       # @return [String] target attribute of the link
       def target
-        self.attributes.occi!.core!.summary
+        self.attributes.occi!.core!.target
       end
 
       # set target attribute of link
@@ -50,14 +58,14 @@ module OCCI
         self.attributes.occi!.core!.source = source
       end
 
+      # @param [OCCI::Model] model
       def check(model)
-        target = model.get_by_id(self.target)
-        @rel = model.type_identifier if target.kind_of? OCCI::Core::Resource
+        raise "rel must be provided" unless @rel
         super(model)
       end
 
       # @param [Hash] options
-      # @return [Hashie::Mash] link as Hashie::Mash to be parsed into a JSON object
+      # @return [Hashie::Mash] json representation
       def as_json(options={ })
         link = Hashie::Mash.new
         link.kind = @kind if @kind
@@ -65,6 +73,17 @@ module OCCI
         link.mixins = @mixins if @mixins.any?
         link.attributes = @attributes if @attributes.any?
         link
+      end
+
+      # @return [String] text representation of link reference
+      def to_reference_text
+        OCCI::Log.debug "Test"
+        text = '<' + target + '>'
+        text << ';rel=' + @rel.inspect
+        text << ';self=' + self.location
+        text << ';category=' + @kind
+        @attributes.combine.each_pair { |name, value| text << name + '=' + value + ';' }
+        text
       end
 
     end
