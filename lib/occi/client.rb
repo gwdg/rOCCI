@@ -9,14 +9,46 @@ module OCCI
 
     attr_reader :endpoint
     attr_reader :model
+    attr_reader :auth_options
 
-    def initialize(endpoint)
+    def initialize(endpoint, auth_options=nil)
       @endpoint = endpoint
-      @model    = OCCI::Model.new(OCCI::Collection.new(get_model))
+      @auth_options = auth_options
+
+      @auth_options = @auth_options || {:type => "none"}
+
+      case @auth_options[:type]
+        when "basic"
+          # set up basic auth
+          raise ArgumentError, "Missing required options 'username' and 'password' for basic auth!" if @auth_options[:username].nil? or @auth_options[:password].nil?
+
+          self.class.basic_auth @auth_options[:username], @auth_options[:password]
+        when "digest"
+          # set up digest auth
+          raise ArgumentError, "Missing required options 'username' and 'password' for digest auth!" if @auth_options[:username].nil? or @auth_options[:password].nil?
+
+          self.class.digest_auth @auth_options[:username], @auth_options[:password]
+        when "x509"
+          # set up pem and optionally pem_password and ssl_ca_path
+          raise ArgumentError, "Missing required option 'pem_path' for x509 auth!" if @auth_options[:pem_path].nil? or @auth_options[:pem_path].empty?
+          raise ArgumentError, "The file specified in 'pem_path' does not exist!" unless File.exists? @auth_options[:pem_path]
+
+          self.class.pem File.read(@auth_options[:pem_path]), @auth_options[:pem_password]
+          self.class.ssl_ca_path @auth_options[:ssl_ca_path] unless @auth_options[:ssl_ca_path].nil? or @auth_options[:ssl_ca_path].empty?
+        when "none", nil
+          # do nothing
+        else
+          raise ArgumentError, "Unknown AUTH method [#{@auth_options[:type]}]!"  
+      end
+
+      @model    = OCCI::Model.new(get_model)
+      @storage_location = '/storage/'
+      @compute_location = '/compute/'
+      @network_location = '/network/'
     end
 
     def get_model
-      get(@endpoint + '/-/').body
+      get(@endpoint + '/-/')[1]
     end
 
     def post_mixin
@@ -36,11 +68,11 @@ module OCCI
     end
 
     def get_resources
-      OCCI::Collection.new(self.class.get(endpoint)).resources
+      get(@endpoint)[1]
     end
 
     def get_resources_list
-      self.class.get(@endpoint, :headers => { 'Accept' => 'text/uri-list' }).split("\n").compact
+      self.class.get(@endpoint, { :headers => { 'Accept' => 'text/uri-list' }, :format => 'text/plain' }).body.split("\n").compact
     end
 
     def post_resource(attributes, kind, mixins, resources_to_link)
@@ -64,7 +96,7 @@ module OCCI
     end
 
     def delete_resources
-      self.class.delete(@endpoint)
+      delete(@endpoint)
     end
 
     def trigger_action(url)
@@ -76,57 +108,65 @@ module OCCI
 
 
     def get_compute_list
-      self.class.get(@endpoint + @compute.location, { :headers => { 'Accept' => 'text/uri-list' }, :format => 'text/plain' }).split("\n").compact
+      self.class.get(@endpoint + @compute_location, { :headers => { 'Accept' => 'text/uri-list' }, :format => 'text/plain' }).body.split("\n").compact
     end
 
     def get_compute_resources
-      self.class.get(endpoint + @compute.location)
+      get(@endpoint + @compute_location)[1]
     end
 
     def post_compute_resource(attributes=OCCI::Core::Attributes.new, os = nil, size = nil, mixins=[], resources_to_link=[])
       mixins << os if os
       mixins << size if size
-      post_resource(attributes, @compute, mixins, resources_to_link)
+      post_resource(attributes, @model.get_by_location(@compute_location), mixins, resources_to_link)
     end
 
     def delete_compute_resource(id)
-      self.class.delete(@endpoint + @compute.location + id)
+      delete(@endpoint + @compute_location + id)
     end
 
     def delete_compute_resources
-      self.class.delete(@endpoint + @compute.location)
+      delete(@endpoint + @compute_location)
     end
 
     def get_storage_resources
-      self.class.get(@endpoint + @storage.location)
+      get(@endpoint + @storage_location)[1]
+    end
+
+    def get_storage_list
+      self.class.get(@endpoint + @storage_location, { :headers => { 'Accept' => 'text/uri-list' }, :format => 'text/plain' }).body.split("\n").compact
     end
 
     def post_storage_resource(attributes=OCCI::Core::Attributes.new, mixins=[], resources_to_link=[])
-      post_resource(attributes, @storage, mixins, resources_to_link)
+      post_resource(attributes, @model.get_by_location(@storage_location), mixins, resources_to_link)
     end
 
     def delete_storage_resource(id)
-      self.class.delete(@endpoint + @storage.location + id)
+      delete(@endpoint + @storage_location + id)
     end
 
     def delete_storage_resources
-      self.class.delete @endpoint + (@storage.location)
+      delete (@endpoint + @storage_location)
     end
 
     def get_network_resources
-      self.class.get(@endpoint + @network)
+      get(@endpoint + @network_location)[1]
+    end
+
+    def get_network_list
+      self.class.get(@endpoint + @network_location, { :headers => { 'Accept' => 'text/uri-list' }, :format => 'text/plain' }).body.split("\n").compact
     end
 
     def post_network_resource(attributes=OCCI::Core::Attributes.new, mixins=[], resources_to_link=[])
-      post_resource(attributes, @network, mixins, resources_to_link)
+      post_resource(attributes, @model.get_by_location(@network_location), mixins, resources_to_link)
     end
 
     def delete_network_resource(id)
-      self.class.delete(@endpoint + @network.location + id)
+      delete(@endpoint + @network_location + id)
     end
 
     def delete_network_resources
-      self.class.delete(@endpoint + @network.location)
+      delete(@endpoint + @network_location)
     end
 
     def get_os_templates
@@ -158,21 +198,21 @@ module OCCI
     private
 
     def get(path, collection=nil)
-      accept = head(path).headers['accept']
+      accept = self.class.head(path).headers['accept']
       if accept.include? 'application/occi+json'
         if collection
           response = self.class.get(path, :body => collection.to_json)
         else
           response = self.class.get(path)
         end
-        OCCI::Parser.parse(response.env['Content-Type'], response.body)
+        OCCI::Parser.parse(response.headers.content_type(), response.body)
       else
         if collection
           response = self.class.get(path, :headers => { 'Accept' => 'text/plain', 'Content-Type' => 'text/occi', 'Category ' => collection.categories.collect { |category| category.to_text }.join(','), 'X-OCCI-Attributes' => collection.entities.collect { |entity| entity.attributes.combine.collect { |k, v| k + '=' + v } }.join(',') })
         else
           response = self.class.get(path, :headers => { 'Accept' => 'text/plain' })
         end
-        OCCI::Parser.parse(response.env['Content-Type'], response.body, true)
+        OCCI::Parser.parse(response.headers.content_type(), response.body, true)
       end
     end
 
@@ -194,7 +234,7 @@ module OCCI
       end
     end
 
-    def delete(path, collection)
+    def delete(path)
       accept = self.class.head(path).headers['accept']
       self.class.delete(path)
     end
