@@ -142,7 +142,9 @@ module OCCI
     # @param [String] path
     # @return [Array] list of URIs
     def list(path='')
-      self.class.get(path, :headers => { "Accept" => 'text/uri-list' }).split("\n").compact
+      path = path.split('#').last + '/' if path.start_with? 'http://'
+      path     = path.reverse.chomp('/').reverse
+      self.class.get(@endpoint + path, :headers => { "Accept" => 'text/uri-list' }).body.split("\n").compact
     end
 
     # @param [OCCI::Core::Entity] entity
