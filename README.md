@@ -85,8 +85,8 @@ Before the parser may be used, the available categories have to be registered in
 
 For categories already specified by the OCCI WG a method exists in the OCCI Model class to register them:
 
-    OCCI::Model.register_core
-    OCCI::Model.register_infrastructure
+    model = OCCI::Model.new
+    model.register_infrastructure
 
 Further categories can either be registered from files which include OCCI collections in JSON formator or from parsed
  JSON objects (e.g. from the query interface of an OCCI service endpoint).
@@ -103,7 +103,7 @@ OCCI messages can be parsed to an OCCI collection for example like
 
     media_type = text/plain
     body = %Q|Category: compute; scheme="http://schemas.ogf.org/occi/infrastructure#"; class="kind"|
-    collection=OCCI::Parser.parse(media_type,body)
+    collection=OCCI::Parser.parse(media_type, body)
 
 ### Parsing OVF / OVA files
 
@@ -136,6 +136,10 @@ The OCCI gem includes all OCCI Core classes necessary to handly arbitrary OCCI o
 Changelog
 ---------
 
+### Version 2.4
+
+* Changed OCCI attribute properties from lowercase to first letter uppercase (e.g. type -> Type, default -> Default, ...)
+
 ### Version 2.3
 
 * OCCI objects are now initialized with a list of attributes instead of a hash. Thus it is easier to check which
@@ -145,19 +149,19 @@ future versions of rOCCI.
 
 ### Version 2.2
 
-OCCI Client added. The client simplifies the execution of OCCI commands and provides shortcuts for often used steps.
+* OCCI Client added. The client simplifies the execution of OCCI commands and provides shortcuts for often used steps.
 
 ### Version 2.1
 
-Several improvements to the gem structure and code documentation. First rSpec test were added. Readme has been extended to include instructions how the gem can be used.
+* Several improvements to the gem structure and code documentation. First rSpec test were added. Readme has been extended to include instructions how the gem can be used.
 
 ### Version 2.0
 
-Starting with version 2.0 Florian Feldhaus and Piotr Kasprzak took over the development of the OCCI gem. The codebase was taken from the rOCCI framework and improved to be bundled as a standalone gem.
+* Starting with version 2.0 Florian Feldhaus and Piotr Kasprzak took over the development of the OCCI gem. The codebase was taken from the rOCCI framework and improved to be bundled as a standalone gem.
 
 ### Version 1.X
 
-Version 1.X of the OCCI gem has been developed by retr0h and served as a simple way to access the first OpenNebula OCCI implementation.
+* Version 1.X of the OCCI gem has been developed by retr0h and served as a simple way to access the first OpenNebula OCCI implementation.
 
 Development
 -----------
