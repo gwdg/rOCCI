@@ -62,5 +62,9 @@ module OCCI
       text
     end
 
+    def inspect
+      JSON.pretty_generate(JSON.parse(to_json))
+    end
+
   end
 end
