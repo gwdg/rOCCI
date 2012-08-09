@@ -1,202 +1,305 @@
 require 'rubygems'
 require 'httparty'
 
+def compute
+  'http://schemas.ogf.org/occi/infrastructure#compute'
+end
+
+def storage
+  'http://schemas.ogf.org/occi/infrastructure#storage'
+end
+
+def network
+  'http://schemas.ogf.org/occi/infrastructure#network'
+end
+
+def resources
+  '/'
+end
+
 module OCCI
   class Client
     include HTTParty
-    format :json
-    headers 'Accept' => 'application/occi+json'
+    headers 'Accept' => 'application/occi+json,text/plain;q=0.5'
 
     attr_reader :endpoint
     attr_reader :model
+    attr_reader :auth_options
 
-    def initialize(endpoint)
-      @endpoint = endpoint
-      @model    = OCCI::Model.new(OCCI::Collection.new(get_model))
-    end
+    # @param [String] endpoint URI of the OCCI endpoint to connect to
+    # @param [Hash] authorization hash containing authorization information
+    # @param [IO,String] log_dev The log device.  This is a filename (String) or IO object (typically +STDOUT+#, +STDERR+, or an open file).
+    def initialize(endpoint, auth_options = { }, log_dev=STDOUT)
+      OCCI::Log.new(log_dev)
 
-    def get_model
-      get(@endpoint + '/-/').body
-    end
+      @auth_options = auth_options || { :type => "none" }
+      case @auth_options[:type]
+        when "basic"
+          # set up basic auth
+          raise ArgumentError, "Missing required options 'username' and 'password' for basic auth!" unless @auth_options[:username] and @auth_options[:password]
+          self.class.basic_auth @auth_options[:username], @auth_options[:password]
+        when "digest"
+          # set up digest auth
+          raise ArgumentError, "Missing required options 'username' and 'password' for digest auth!" unless @auth_options[:username] and @auth_options[:password]
+          self.class.digest_auth @auth_options[:username], @auth_options[:password]
+        when "x509"
+          # set up pem and optionally pem_password and ssl_ca_path
+          raise ArgumentError, "Missing required option 'user_cert' for x509 auth!" unless @auth_options[:user_cert]
+          raise ArgumentError, "The file specified in 'pem_path' does not exist!" unless File.exists? @auth_options[:user_cert]
 
-    def post_mixin
-
-    end
-
-    def post_resources_to_mixin
-
-    end
-
-    def delete_resources_from_mixin
-
-    end
-
-    def delete_mixin
-
-    end
-
-    def get_resources
-      OCCI::Collection.new(self.class.get(endpoint)).resources
-    end
-
-    def get_resources_list
-      self.class.get(@endpoint, :headers => { 'Accept' => 'text/uri-list' }).split("\n").compact
-    end
-
-    def post_resource(attributes, kind, mixins, resources_to_link)
-      resource      = OCCI::Core::Resource.new(kind.type_identifier)
-      mixins = mixins.collect { |mixin| mixin.type_identifiers } unless mixins.first.kind_of? String
-      resource.mixins = mixins
-      attributes = OCCI::Core::Attributes.split(attributes) unless attributes.kind_of? OCCI::Core::Attributes
-      resource.attributes = attributes
-      resource.links      = []
-      resources_to_link.each do |res|
-        kind = 'http://schemas.ogf.org/occi/infrastructure#storagelink' if @model.get_by_id(res.kind).related_to? 'http://schemas.ogf.org/occi/infrastructure#storage'
-        kind = 'http://schemas.ogf.org/occi/infrastructure#networkinterface' if @model.get_by_id(res.kind).related_to? 'http://schemas.ogf.org/occi/infrastructure#network'
-        link = OCCI::Link.new(kind)
-        link.titlte "Link to #{res.title}"
-        link.target = res.location
-        resource.links << link
+          self.class.pem File.read(@auth_options[:user_cert]), @auth_options[:user_cert_password]
+          self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil? or @auth_options[:ca_path].empty?
+        when "none", nil
+          # do nothing
+        else
+          raise ArgumentError, "Unknown AUTH method [#{@auth_options[:type]}]!"
       end
-      resource.check
-      collection = OCCI::Collection.new(:resources => [resource])
-      self.class.post(@endpoint + kind.location, { :body => collection.to_json, :headers => { 'Content-Type' => 'application/occi+json', 'Accept' => 'text/uri-list' }, :format => 'text/plain' }).body
+
+      raise 'endpoint not a valid URI' if (endpoint =~ URI::ABS_URI).nil?
+      @endpoint = endpoint.chomp('/') + '/'
+      refresh_model
+      select_media_type
     end
 
-    def delete_resources
-      self.class.delete(@endpoint)
+    # @return [OCCI::Model]
+    def refresh_model
+      model  = get '/-/'
+      @model = OCCI::Model.new(model)
     end
 
-    def trigger_action(url)
-      self.class.post(url)
+    # trigger action on resource location
+    # @param [OCCI::Core::Action] action
+    # @param [String,URI::Generic] location
+    def trigger(action, location)
+      collection = OCCI::Collection.new
+      collection.actions << action
+      post(location, collection)
     end
 
-    def trigger_action_on_resources(resources, action)
-    end
-
-
-    def get_compute_list
-      self.class.get(@endpoint + @compute.location, { :headers => { 'Accept' => 'text/uri-list' }, :format => 'text/plain' }).split("\n").compact
-    end
-
-    def get_compute_resources
-      self.class.get(endpoint + @compute.location)
-    end
-
-    def post_compute_resource(attributes=OCCI::Core::Attributes.new, os = nil, size = nil, mixins=[], resources_to_link=[])
-      mixins << os if os
-      mixins << size if size
-      post_resource(attributes, @compute, mixins, resources_to_link)
-    end
-
-    def delete_compute_resource(id)
-      self.class.delete(@endpoint + @compute.location + id)
-    end
-
-    def delete_compute_resources
-      self.class.delete(@endpoint + @compute.location)
-    end
-
-    def get_storage_resources
-      self.class.get(@endpoint + @storage.location)
-    end
-
-    def post_storage_resource(attributes=OCCI::Core::Attributes.new, mixins=[], resources_to_link=[])
-      post_resource(attributes, @storage, mixins, resources_to_link)
-    end
-
-    def delete_storage_resource(id)
-      self.class.delete(@endpoint + @storage.location + id)
-    end
-
-    def delete_storage_resources
-      self.class.delete @endpoint + (@storage.location)
-    end
-
-    def get_network_resources
-      self.class.get(@endpoint + @network)
-    end
-
-    def post_network_resource(attributes=OCCI::Core::Attributes.new, mixins=[], resources_to_link=[])
-      post_resource(attributes, @network, mixins, resources_to_link)
-    end
-
-    def delete_network_resource(id)
-      self.class.delete(@endpoint + @network.location + id)
-    end
-
-    def delete_network_resources
-      self.class.delete(@endpoint + @network.location)
-    end
-
+    # @return [OCCI::Collection] collection including all registered OS templates
     def get_os_templates
-      OCCI::Collection.new(self.class.get(@endpoint + '/-/', :headers => { 'Accept' => 'application/occi+json', 'Content-Type' => 'text/occi', 'Category' => 'os_tpl;scheme="http://schemas.ogf.org/occi/infrastructure#";class="mixin"' })).mixins.select { |mixin| mixin.term != 'os_tpl' }
+      filter        = OCCI::Collection.new
+      # use the os_tpl mixin as filter for the request
+      filter.mixins = @model.get.mixins.select { |mixin| mixin.term == 'os_tpl' }
+      collection    = get '/-/', filter
+      # remove os_tpl mixin from the mixins as it does not represent a template itself
+      collection.mixins.select { |mixin| mixin.term != 'os_tpl' }
     end
 
+    # @return [OCCI::Collection] collection including all registered resource templates
     def get_resource_templates
-      OCCI::Collection.new(self.class.get(@endpoint + '/-/', :headers => { 'Accept' => 'application/occi+json', 'Content-Type' => 'text/occi', 'Category' => 'resource_tpl;scheme="http://schemas.ogf.org/occi/infrastructure#";class="mixin"' })).mixins.select { |mixin| mixin.term != 'resource_tpl' }
+      filter        = OCCI::Collection.new
+      # use the resource_tpl mixin as filter for the request
+      filter.mixins = @model.get.mixins.select { |mixin| mixin.term == 'resource_tpl' }
+      collection    = get '/-/', filter
+      # remove os_tpl mixin from the mixins as it does not represent a template itself
+      collection.mixins.select { |mixin| mixin.term != 'resource_tpl' }
     end
 
-    def get_attributes(categories)
-      attributes = Hashie::Mash.new
-      [categories].flatten.each do |category|
-        category = @model.get_by_id(category) if category.kind_of? String
-        attributes.merge! category.attributes.combine_with_defaults
-      end
-      attributes
+    # @param [OCCI::Core::Resource] compute
+    # @param [URI,String] storage_location
+    # @param [OCCI::Core::Attributes] attributes
+    # @param [Array] mixins
+    # @return [OCCI::Core::Link]
+    def storagelink(compute, storage_location, attributes=OCCI::Core::Attributes.new, mixins=[])
+      kind         = 'http://schemas.ogf.org/occi/infrastructure#storagelink'
+      storage_kind = 'http://schemas.ogf.org/occi/infrastructure#storage'
+      storagelink  = link(kind, compute, storage_location, storage_kind, attributes, mixins)
+      storagelink
     end
 
-    def get_attribute_definitions(categories)
-      definitions = OCCI::Core::AttributeProperties.new
-      [categories].flatten.each do |category|
-        category = @model.get_by_id(category) if category.kind_of? String
-        definitions.merge! category.attributes
-      end
-      definitions
+    # @param [OCCI::Core::Resource] compute
+    # @param [URI,String] network_location
+    # @param [OCCI::Core::Attributes] attributes
+    # @param [Array] mixins
+    # @return [OCCI::Core::Link]
+    def networkinterface(compute, network_location, attributes=OCCI::Core::Attributes.new, mixins=[])
+      kind             = 'http://schemas.ogf.org/occi/infrastructure#networkinterface'
+      network_kind     = 'http://schemas.ogf.org/occi/infrastructure#network'
+      networkinterface = link(kind, compute, network_location, network_kind, attributes, mixins)
+      networkinterface
+    end
+
+    # @param [String] kind
+    # @param [OCCI::Core::Resource] source
+    # @param [URI,String] target_location
+    # @param [String] target_kind
+    # @param [OCCI::Core::Attributes] attributes
+    # @param [Array] mixins
+    # @return [OCCI::Core::Link]
+    def link(kind, source, target_location, target_kind, attributes=OCCI::Core::Attributes.new, mixins=[])
+      link            = OCCI::Core::Link.new(kind)
+      link.mixins     = mixins
+      link.attributes = attributes
+      link.target     = (target_location.kind_of? URI::Generic) ? target_location.path : target_location.to_s
+      link.rel        = target_kind
+      jj link
+      link.check @model
+      source.links << link
+      link
+    end
+
+    # @param [String] path
+    # @return [Array] list of URIs
+    def list(path='')
+      self.class.get(path, :headers => { "Accept" => 'text/uri-list' }).split("\n").compact
+    end
+
+    # @param [OCCI::Core::Entity] entity
+    # @return [URI] location of the entity
+    def create(entity)
+      raise "#{entity} not an entity" unless entity.kind_of? OCCI::Core::Entity
+      entity.check(model)
+      kind = @model.get_by_id(entity.kind)
+      raise "no kind found for #{entity}" unless kind
+      location   = @model.get_by_id(entity.kind).location
+      collection = OCCI::Collection.new
+      collection.resources << entity if entity.kind_of? OCCI::Core::Resource
+      collection.links << entity if entity.kind_of? OCCI::Core::Link
+      post location, collection
+    end
+
+    # @param [String] path
+    # @param [OCCI::Collection] filter
+    # @return [OCCI::Collection]
+    def get(path='', filter=nil)
+      path = path.split('#').last + '/' if path.start_with? 'http://'
+      path     = path.reverse.chomp('/').reverse
+      response = if filter
+                   categories = filter.categories.collect { |category| category.to_text }.join(',')
+                   attributes = filter.entities.collect { |entity| entity.attributes.combine.collect { |k, v| k + '=' + v } }.join(',')
+                   self.class.get(@endpoint + path,
+                                  :headers => { 'Accept'            => 'application/occi+json,text/plain;q=0.5',
+                                                'Content-Type'      => 'text/occi',
+                                                'Category'          => categories,
+                                                'X-OCCI-Attributes' => attributes })
+                 else
+                   self.class.get(@endpoint + path)
+                 end
+
+      response_message response
+
+      kind = @model.get_by_location path if @model
+      kind ? entity_type = kind.entity_type : entity_type = nil
+      _, collection = OCCI::Parser.parse(response.content_type, response.body, path.include?('/-/'), entity_type)
+      collection
+    end
+
+    # @param [String] path
+    # @param [OCCI::Collection] collection
+    # @return [URI] if an entity has been created its location is returned
+    def post(path, collection)
+      path     = path.reverse.chomp('/').reverse
+      response = if @media_type == 'application/occi+json'
+                   self.class.post(@endpoint + path,
+                                   :body    => collection.to_json,
+                                   :headers => { 'Accept' => 'text/uri-list', 'Content-Type' => 'application/occi+json' })
+                 else
+                   self.class.post(@endpoint + path,
+                                   :body    => collection.to_text,
+                                   :headers => { 'Accept' => 'text/uri-list', 'Content-Type' => 'text/plain' })
+                 end
+
+      response_message response
+
+      URI.parse(response.body)
+    end
+
+    # @param [String] path
+    # @param [OCCI::Collection] collection
+    # @return [OCCI::Collection]
+    def put(path, collection)
+      path     = path.reverse.chomp('/').reverse
+      response = if @media_type == 'application/occi+json'
+                   self.class.post(@endpoint + path, :body => collection.to_json, :headers => { 'Accept' => 'application/occi+json,text/plain;q=0.5', 'Content-Type' => 'application/occi+json' })
+                 else
+                   self.class.post(@endpoint + path, { :body => collection.to_text, :headers => { 'Accept' => 'application/occi+json,text/plain;q=0.5', 'Content-Type' => 'text/plain' } })
+                 end
+
+      response_message response
+
+      _, collection = OCCI::Parser.parse(response.content_type, response.body)
+      collection
+    end
+
+    # @param [String] path
+    # @param [OCCI::Collection] collection
+    # @return [true,false]
+    def delete(path, collection=nil)
+      path     = path.reverse.chomp('/').reverse
+      response = self.class.delete(@endpoint + path)
+      response_message response
+      false unless response.code.between? 200, 300
     end
 
     private
 
-    def get(path, collection=nil)
-      accept = head(path).headers['accept']
-      if accept.include? 'application/occi+json'
-        if collection
-          response = self.class.get(path, :body => collection.to_json)
-        else
-          response = self.class.get(path)
-        end
-        OCCI::Parser.parse(response.env['Content-Type'], response.body)
-      else
-        if collection
-          response = self.class.get(path, :headers => { 'Accept' => 'text/plain', 'Content-Type' => 'text/occi', 'Category ' => collection.categories.collect { |category| category.to_text }.join(','), 'X-OCCI-Attributes' => collection.entities.collect { |entity| entity.attributes.combine.collect { |k, v| k + '=' + v } }.join(',') })
-        else
-          response = self.class.get(path, :headers => { 'Accept' => 'text/plain' })
-        end
-        OCCI::Parser.parse(response.env['Content-Type'], response.body, true)
-      end
+    # @return [String]
+    def select_media_type
+      media_types = self.class.head(@endpoint).headers['accept']
+      OCCI::Log.debug("Available media types: #{media_types}")
+      @media_type = case media_types
+                      when /application\/occi\+json/
+                        'application/occi+json'
+                      else
+                        'text/plain'
+                    end
     end
 
-    def post(path, collection)
-      accept = self.class.head(path).headers['accept']
-      if accept.include? 'application/occi+json'
-        self.class.post(path, :body => collection.to_json)
-      else
-        self.class.post(path, { :body => collection.to_text, :headers => { 'Accept' => 'text/plain', 'Content-Type' => 'text/plain' } })
-      end
+    # @param [Integer] code
+    # @return [String] HTTP status reason
+    def reason_phrase(code)
+      hash = {
+          "100" => "Continue",
+          "101" => "Switching Protocols",
+          "200" => "OK",
+          "201" => "Created",
+          "202" => "Accepted",
+          "203" => "Non-Authoritative Information",
+          "204" => "No Content",
+          "205" => "Reset Content",
+          "206" => "Partial Content",
+          "300" => "Multiple Choices",
+          "301" => "Moved Permanently",
+          "302" => "Found",
+          "303" => "See Other",
+          "304" => "Not Modified",
+          "305" => "Use Proxy",
+          "307" => "Temporary Redirect",
+          "400" => "Bad Request",
+          "401" => "Unauthorized",
+          "402" => "Payment Required",
+          "403" => "Forbidden",
+          "404" => "Not Found",
+          "405" => "Method Not Allowed",
+          "406" => "Not Acceptable",
+          "407" => "Proxy Authentication Required",
+          "408" => "Request Time-out",
+          "409" => "Conflict",
+          "410" => "Gone",
+          "411" => "Length Required",
+          "412" => "Precondition Failed",
+          "413" => "Request Entity Too Large",
+          "414" => "Request-URI Too Large",
+          "415" => "Unsupported Media Type",
+          "416" => "Requested range not satisfiable",
+          "417" => "Expectation Failed",
+          "500" => "Internal Server Error",
+          "501" => "Not Implemented",
+          "502" => "Bad Gateway",
+          "503" => "Service Unavailable",
+          "504" => "Gateway Time-out",
+          "505" => "HTTP Version not supported"
+      }
+      hash[code.to_s]
     end
 
-    def put(path, collection)
-      accept = self.class.head(path).headers['accept']
-      if accept.include? 'application/occi+json'
-        self.class.put(path, :body => collection.to_json)
-      else
-        self.class.put(path, { :body => collection.to_text, :headers => { 'Accept' => 'text/plain', 'Content-Type' => 'text/plain' } })
+    # @param [HTTParty::Response] response
+    def response_message(response)
+      if defined?(IRB)
+        puts 'HTTP Response status: ' + response.code.to_s + ' ' + reason_phrase(response.code)
+        raise response.request.http_method.to_s + ' failed ' unless response.code.between? 200, 300
       end
-    end
-
-    def delete(path, collection)
-      accept = self.class.head(path).headers['accept']
-      self.class.delete(path)
     end
 
   end
