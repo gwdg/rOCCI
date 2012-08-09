@@ -41,14 +41,14 @@ module OCCI
           raise ArgumentError, "Unknown AUTH method [#{@auth_options[:type]}]!"  
       end
 
-      @model    = OCCI::Model.new(OCCI::Collection.new(get_model))
-      @storage = '/storage/'
-      @compute = '/compute/'
-      @network = '/network/'
+      @model    = OCCI::Model.new(get_model)
+      @storage_location = '/storage/'
+      @compute_location = '/compute/'
+      @network_location = '/network/'
     end
 
     def get_model
-      get(@endpoint + '/-/')[1].as_json
+      get(@endpoint + '/-/')[1]
     end
 
     def post_mixin
@@ -68,7 +68,7 @@ module OCCI
     end
 
     def get_resources
-      OCCI::Collection.new(self.class.get(endpoint)).resources
+      get(@endpoint)[1]
     end
 
     def get_resources_list
@@ -96,7 +96,7 @@ module OCCI
     end
 
     def delete_resources
-      self.class.delete(@endpoint)
+      delete(@endpoint)
     end
 
     def trigger_action(url)
@@ -108,65 +108,65 @@ module OCCI
 
 
     def get_compute_list
-      self.class.get(@endpoint + @compute, { :headers => { 'Accept' => 'text/uri-list' }, :format => 'text/plain' }).body.split("\n").compact
+      self.class.get(@endpoint + @compute_location, { :headers => { 'Accept' => 'text/uri-list' }, :format => 'text/plain' }).body.split("\n").compact
     end
 
     def get_compute_resources
-      self.class.get(endpoint + @compute)
+      get(@endpoint + @compute_location)[1]
     end
 
     def post_compute_resource(attributes=OCCI::Core::Attributes.new, os = nil, size = nil, mixins=[], resources_to_link=[])
       mixins << os if os
       mixins << size if size
-      post_resource(attributes, @compute, mixins, resources_to_link)
+      post_resource(attributes, @model.get_by_location(@compute_location), mixins, resources_to_link)
     end
 
     def delete_compute_resource(id)
-      self.class.delete(@endpoint + @compute + id)
+      delete(@endpoint + @compute_location + id)
     end
 
     def delete_compute_resources
-      self.class.delete(@endpoint + @compute)
+      delete(@endpoint + @compute_location)
     end
 
     def get_storage_resources
-      self.class.get(@endpoint + @storage)
+      get(@endpoint + @storage_location)[1]
     end
 
     def get_storage_list
-      self.class.get(@endpoint + @storage, { :headers => { 'Accept' => 'text/uri-list' }, :format => 'text/plain' }).body.split("\n").compact
+      self.class.get(@endpoint + @storage_location, { :headers => { 'Accept' => 'text/uri-list' }, :format => 'text/plain' }).body.split("\n").compact
     end
 
     def post_storage_resource(attributes=OCCI::Core::Attributes.new, mixins=[], resources_to_link=[])
-      post_resource(attributes, @storage, mixins, resources_to_link)
+      post_resource(attributes, @model.get_by_location(@storage_location), mixins, resources_to_link)
     end
 
     def delete_storage_resource(id)
-      self.class.delete(@endpoint + @storage + id)
+      delete(@endpoint + @storage_location + id)
     end
 
     def delete_storage_resources
-      self.class.delete @endpoint + (@storage)
+      delete (@endpoint + @storage_location)
     end
 
     def get_network_resources
-      self.class.get(@endpoint + @network)
+      get(@endpoint + @network_location)[1]
     end
 
     def get_network_list
-      self.class.get(@endpoint + @network, { :headers => { 'Accept' => 'text/uri-list' }, :format => 'text/plain' }).body.split("\n").compact
+      self.class.get(@endpoint + @network_location, { :headers => { 'Accept' => 'text/uri-list' }, :format => 'text/plain' }).body.split("\n").compact
     end
 
     def post_network_resource(attributes=OCCI::Core::Attributes.new, mixins=[], resources_to_link=[])
-      post_resource(attributes, @network, mixins, resources_to_link)
+      post_resource(attributes, @model.get_by_location(@network_location), mixins, resources_to_link)
     end
 
     def delete_network_resource(id)
-      self.class.delete(@endpoint + @network + id)
+      delete(@endpoint + @network_location + id)
     end
 
     def delete_network_resources
-      self.class.delete(@endpoint + @network)
+      delete(@endpoint + @network_location)
     end
 
     def get_os_templates
@@ -234,7 +234,7 @@ module OCCI
       end
     end
 
-    def delete(path, collection)
+    def delete(path)
       accept = self.class.head(path).headers['accept']
       self.class.delete(path)
     end
