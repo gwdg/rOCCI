@@ -41,7 +41,7 @@ module OCCI
       @kinds.empty? && @mixins.empty? && @actions.empty? && @resources.empty? && @links.empty?
     end
 
-    # @return [Hashie::Mash] returns collection as Hashie::Mash which can be converted to json
+    # @return [Hashie::Mash] json representation
     def as_json(options = { })
       collection = Hashie::Mash.new
       collection.kinds = @kinds.collect { |kind| kind.as_json } if @kinds.any?
@@ -52,13 +52,14 @@ module OCCI
       collection
     end
 
+    # @return [String] text representation
     def to_text
-      body = ""
-      body << self.categories.collect { |category| category.to_text }.join("\n")
-      body << "\n" if self.categories.any?
-      raise "Only one entity allowed for rendering to plain text" if body.entities.size > 1
-      body << self.entities.collect {|entity| entity.to_text}.join("\n")
-      body
+      text = ""
+      text << self.categories.collect { |category| category.to_text }.join("\n")
+      text << "\n" if self.categories.any?
+      raise "Only one entity allowed for rendering to plain text" if self.entities.size > 1
+      text << self.entities.collect {|entity| entity.to_text}.join("\n")
+      text
     end
 
   end
