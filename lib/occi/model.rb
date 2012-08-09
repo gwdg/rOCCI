@@ -6,11 +6,12 @@ module OCCI
     attr_accessor :categories
     attr_accessor :locations
 
+    # @param [OCCI::Core::Collection] collection
     def initialize(collection=nil)
       @categories = { }
       @locations  = { }
       register_core
-      register_collection collection if collection
+      register_collection collection if collection.kind_of? OCCI::Collection
     end
 
     # register OCCI Core categories enitity, resource and link
@@ -49,11 +50,12 @@ module OCCI
       collection.categories.each { |category| register category }
     end
 
+    # clear all entities from all categories
     def reset()
       @categories.each_value.each { |category| category.entities = [] if category.respond_to? :entities }
     end
 
-    # ---------------------------------------------------------------------------------------------------------------------
+    # @param [OCCI::Core::Category] category
     def register(category)
       OCCI::Log.debug "### Registering category #{category.type_identifier}"
       @categories[category.type_identifier] = category
@@ -62,7 +64,7 @@ module OCCI
       category.model = self
     end
 
-    # ---------------------------------------------------------------------------------------------------------------------
+    # @param [OCCI::Core::Category] category
     def unregister(category)
       OCCI::Log.debug "### Unregistering category #{category.type_identifier}"
       @categories.delete category.type_identifier
@@ -71,14 +73,16 @@ module OCCI
 
     # Returns the category corresponding to a given type identifier
     #
-    # @param [URI] type identifier of a category
+    # @param [URI] id type identifier of a category
+    # @return [OCCI::Core::Category]
     def get_by_id(id)
       @categories.fetch(id) { OCCI::Log.debug("Category with id #{id} not found"); nil }
     end
 
     # Returns the category corresponding to a given location
     #
-    # @param [URI] Location of a category
+    # @param [URI] location
+    # @return [OCCI::Core::Category]
     def get_by_location(location)
       id = @locations.fetch(location) { OCCI::Log.debug("Category with location #{location} not found"); nil }
       get_by_id id
