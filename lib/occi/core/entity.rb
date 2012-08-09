@@ -58,6 +58,12 @@ module OCCI
         @attributes=attributes
       end
 
+      # set id for entity
+      # @param [UUIDTools::UUID] id
+      def id=(id)
+        @attributes.occi!.core!.id = id
+      end
+
       # @return [UUIDTools::UUID] id of the entity
       def id
         @attributes.occi!.core!.id
