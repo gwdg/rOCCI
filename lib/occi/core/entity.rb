@@ -39,11 +39,11 @@ module OCCI
       def initialize(kind, mixins=nil, attributes=nil, actions=nil)
         @checked = false
         raise "Kind #{kind} not of type String" unless kind.kind_of? String
-        @kind                      = kind
-        @mixins                    = mixins.to_a
-        @attributes                = OCCI::Core::Attributes.new(attributes)
-        @attributes.occi!.core!.id ||= UUIDTools::UUID.random_create
-        @actions                   = actions.to_a
+        @kind                        = kind
+        @mixins                      = mixins.to_a
+        @attributes                  = OCCI::Core::Attributes.new(attributes)
+        @attributes.occi!.core![:id] ||= UUIDTools::UUID.random_create
+        @actions                     = actions.to_a
       end
 
       # @param [Array] mixins
