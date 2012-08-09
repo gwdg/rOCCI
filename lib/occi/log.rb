@@ -9,13 +9,13 @@ module OCCI
     attr_reader :logger
 
     # creates a new OCCI logger
-    # @param [IO,String] logdev The log device.  This is a filename (String) or IO object (typically +STDOUT+,
+    # @param [IO,String] log_dev The log device.  This is a filename (String) or IO object (typically +STDOUT+,
     #  +STDERR+, or an open file).
-    def initialize(logdev)
-      if logdev.kind_of? Logger
-        @logger = logdev
+    def initialize(log_dev)
+      if log_dev.kind_of? Logger
+        @logger = log_dev
       else
-        @logger = Logger.new(logdev)
+        @logger = Logger.new(log_dev)
       end
 
       # subscribe to log messages and send to logger
@@ -24,10 +24,12 @@ module OCCI
       end
     end
 
+    # @param [Logger::Severity] severity
     def level=(severity)
       @logger.level = severity
     end
 
+    # @return [Logger::Severity]
     def level
       @logger.level
     end
