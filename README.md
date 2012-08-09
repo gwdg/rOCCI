@@ -20,50 +20,84 @@ Installation
 Usage
 -----
 
+Use the Interactive Ruby Shell (IRB) to interact with an OCCI server. If you have the occi gem installed, you just have
+to start irb from the command line:
+
+    irb
+
+If you want to test newer versions of rOCCI, you have to tell irb from where it
+should load occi:
+
+    cd rOCCI
+    irb -I lib
+
 First require the gem, for Ruby 1.8.7 you also have to require rubygems
+
     require 'rubygems'
     require 'occi'
 
 ### Client
 
-The OCCI gem includes a Client to simplify the usage of an OCCI endpoint.
+The OCCI gem includes a Client to simplify the usage of an OCCI endpoint. If you want to use authentication then you
+should create a hash with information either on username and password for basic authentication or with a X.509 user
+certificate, the user certificate password and the path to the Root CAs which are used to verify the certificate of the
+OCCI server.
 
-To connect to an OCCI endpoint/server (e.g. running at http://localhost:3000/ ) use
+For Basic auth use
 
-    client = OCCI::Client.new('http://occi.cloud.gwdg.de:3300')
+    auth = Hashie::Mash.new
+    auth.type = 'basic'
+    auth.username = 'user'
+    auth.password = 'mypass'
+
+For Digest auth use
+
+    auth = Hashie::Mash.new
+    auth.type = 'digest'
+    auth.username = 'user'
+    auth.password = 'mypass'
+
+For X.509 auth use
+
+    auth = Hashie::Mash.new
+    auth.type = 'x509'
+    auth.user_cert = '/Path/To/My/usercert.pem'
+    auth.user_cert_password = 'MyPassword'
+    auth.ca_path = '/Path/To/root-certificates'
+
+To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )
+
+    client = OCCI::Client.new('http://occi.cloud.gwdg.de:3300',auth||=nil)
 
 All available categories are automatically registered to the OCCI model during client initialization. You can get them via
 
-    OCCI::Model.get
+    client.model
 
 To get all resources (as a list of OCCI::Resources) currently managed by the endpoint use
 
-    client.get_resources
+    client.get resources
 
 To get only compute, storage or network resources use get_compute_resources, ...
 
 To get the location of all resources use
 
-    client.get_resource_list
+    client.list resources
 
-Analogue for compute, storage, network via get_compute_list, ...
+Analogue for compute, storage, network.
 
 To get a list of all OS / resource templates use
 
     client.get_os_templates
     client.get_resource_templates
 
-To get all attributes with their default values for a given category use
-
-    client.get_attributes(client.compute)
-
 To create a new compute resource use
 
     os = client.get_os_templates.select { |template| template.term.include? 'my_os' }
     size = client.get_resource_templates.select { |template| template.term.include? 'large' }
-    attributes = client.get_attributes([client.compute,os,size])
-    attributes['occi.core.title'] = "My VM"
-    client.post_compute(attributes,os,size)
+    cmpt = OCCI::Core::Resource.new compute
+    cmpt.mixins << os << size
+    cmpt.attributes.occi!.core!.title = "My VM"
+    client.create cmpt
 
 ### Logging
 
@@ -135,6 +169,12 @@ The OCCI gem includes all OCCI Core classes necessary to handly arbitrary OCCI o
 
 Changelog
 ---------
+
+### version 2.5
+
+* improved OCCI Client
+* improved documentation
+* several bugfixes
 
 ### Version 2.4
 
