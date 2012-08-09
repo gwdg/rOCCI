@@ -42,7 +42,7 @@ module OCCI
         @kind                        = kind
         @mixins                      = mixins.to_a
         @attributes                  = OCCI::Core::Attributes.new(attributes)
-        @attributes.occi!.core![:id] ||= UUIDTools::UUID.random_create
+        @attributes.occi!.core![:id] ||= UUIDTools::UUID.random_create.to_s
         @actions                     = actions.to_a
       end
 
