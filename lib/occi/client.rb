@@ -45,7 +45,7 @@ module OCCI
         when "x509"
           # set up pem and optionally pem_password and ssl_ca_path
           raise ArgumentError, "Missing required option 'user_cert' for x509 auth!" unless @auth_options[:user_cert]
-          raise ArgumentError, "The file specified in 'pem_path' does not exist!" unless File.exists? @auth_options[:user_cert]
+          raise ArgumentError, "The file specified in 'user_cert' does not exist!" unless File.exists? @auth_options[:user_cert]
 
           self.class.pem File.read(@auth_options[:user_cert]), @auth_options[:user_cert_password]
           self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil? or @auth_options[:ca_path].empty?
