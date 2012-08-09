@@ -57,11 +57,15 @@ module OCCI
 
     private
 
+    # @param [Hash] header
+    # @return [Array] list of URIs
     def self.header_locations(header)
       x_occi_location_strings = header['HTTP_X_OCCI_LOCATION'].to_s.split(',')
       x_occi_location_strings.collect { |loc| OCCIANTLR::Parser.new('X-OCCI-Location: ' + loc).x_occi_location }
     end
 
+    # @param [Hash] header
+    # @return [OCCI::Collection]
     def self.header_categories(header)
       collection       = OCCI::Collection.new
       category_strings = header['HTTP_CATEGORY'].to_s.split(',')
@@ -74,6 +78,9 @@ module OCCI
       collection
     end
 
+    # @param [Hash] header
+    # @param [Class] entity_type
+    # @return [OCCI::Collection]
     def self.header_entity(header, entity_type)
       collection       = OCCI::Collection.new
       entity           = Hashie::Mash.new
@@ -92,16 +99,23 @@ module OCCI
         collection.links << OCCI::Core::Link.new(entity.kind, entity.mixins, entity.attributes)
       elsif entity_type == OCCI::Core::Resource
         link_strings = header['HTTP_LINK'].to_s.split(',')
-        link_strings.each { |link| entity.links << OCCIANTLR::Parser.new('Link: ' + link).link }
+        link_strings.each do |link_string|
+          link = OCCIANTLR::Parser.new('Link: ' + link_string).link
+          entity.links << OCCI::Core::Link.new(link.kind, link.mixins, link.attributes, link.actions, link.rel)
+        end
         collection.resources << OCCI::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.links)
       end
       collection
     end
 
+    # @param [String] text
+    # @return [Array] list of URIs
     def self.text_locations(text)
       text.lines.collect { |line| OCCIANTLR::Parser.new(line).x_occi_location if line.include? 'X-OCCI-Location' }.compact
     end
 
+    # @param [String] text
+    # @return [OCCI::Collection]
     def self.text_categories(text)
       collection = OCCI::Collection.new
       text.each_line do |line|
@@ -114,6 +128,9 @@ module OCCI
       collection
     end
 
+    # @param [String] text
+    # @param [Class] entity_type
+    # @return [OCCI::Collection]
     def self.text_entity(text, entity_type)
       collection = OCCI::Collection.new
       entity     = Hashie::Mash.new
@@ -131,12 +148,14 @@ module OCCI
         entity.source = links.first.attributes!.occi!.core!.source
         collection.links << OCCI::Core::Link.new(entity.kind, entity.mixins, entity.attributes)
       elsif entity_type == OCCI::Core::Resource
-        entity.links = links
+        entity.links = links.collect { |link| OCCI::Core::Link.new(link.kind, link.mixins, link.attributes, link.actions, link.rel) }
         collection.resources << OCCI::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.links)
       end unless entity.kind.nil?
       collection
     end
 
+    # @param [String] json
+    # @return [OCCI::Collection]
     def self.json(json)
       collection = OCCI::Collection.new
       hash       = Hashie::Mash.new(JSON.parse(json))
@@ -147,6 +166,8 @@ module OCCI
       collection
     end
 
+    # @param [String] xml
+    # @return [OCCI::Collection]
     def self.xml(xml)
       collection = OCCI::Collection.new
       hash       = Hashie::Mash.new(Hash.from_xml(Nokogiri::XML(xml)))
@@ -159,6 +180,7 @@ module OCCI
 
 
     ####################Helper method for calculation of storage size based on allocation units configured###########
+
     def self.calculate_capacity_bytes(capacity, alloc_units_bytes)
       total_capacity_bytes = alloc_units_bytes * capacity.to_i
       total_capacity_bytes
@@ -182,6 +204,8 @@ module OCCI
 
     ###############End of Helper methods for OVF Parsing ##################################################################
 
+    # @param [String] ova
+    # @return [OCCI::Collection]
     def self.ova(ova)
       tar   = Gem::Package::TarReader.new(StringIO.new(ova))
       ovf   = mf = cert = nil
@@ -208,6 +232,8 @@ module OCCI
       self.ovf(File.read(ovf), files)
     end
 
+    # @param [String] ovf
+    # @param [Hash] files key value pairs of file names and paths to the file
     def self.ovf(ovf, files={ })
       collection = OCCI::Collection.new
       doc        = Nokogiri::XML(ovf)
