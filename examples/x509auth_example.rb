@@ -2,6 +2,9 @@ require 'rubygems'
 require 'occi'
 require 'pp'
 
+use_os_temlate = false # true
+OS_TEMPLATE = 'monitoring' # name of the VM template in ON
+
 USER_CERT           = ENV['HOME'] + '/.globus/usercert.pem'
 USER_CERT_PASSWORD = 'mypassphrase'
 CA_PATH             = '/etc/grid-security/certificates'
@@ -43,11 +46,26 @@ puts "\n\nPrinting resource templates"
 pp client.get_resource_templates
 
 puts "\n\nCreate compute resources"
-cmpt = OCCI::Core::Resource.new compute
-cmpt.mixins << 'http://my.occi.service//occi/infrastructure/resource_tpl#medium'
 
-client.storagelink cmpt, client.list(storage)[0]
-client.networkinterface cmpt, client.list(network)[0]
+cmpt = OCCI::Core::Resource.new compute
+
+unless use_os_temlate
+  cmpt.mixins << 'http://my.occi.service//occi/infrastructure/resource_tpl#medium'
+
+  puts "\nUsing"
+  pp storage_loc = client.list(storage)[0]
+  pp network_loc = client.list(network)[0]
+
+  client.storagelink cmpt, storage_loc
+  client.networkinterface cmpt, network_loc
+else
+  puts "\nUsing"
+  pp os = client.get_os_templates.select { |template| template.term.include? OS_TEMPLATE }
+  pp size = client.get_resource_templates.select { |template| template.term.include? 'medium' }
+  
+  cmpt.mixins << os << size
+  cmpt.attributes.occi!.core!.title = "My rOCCI VM"
+end
 
 cmpt_loc = client.create cmpt
 pp "Location of new compute resource: #{cmpt_loc}"
