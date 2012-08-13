@@ -1,0 +1,313 @@
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
+  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
+
+  <title>rOCCI</title>
+  <meta name="description" content="A Ruby OCCI Framework">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <header>
+      <h1 class="title">rOCCI</h1>
+    </header>
+    <div id="container">
+      <p class="tagline">A Ruby OCCI Framework</p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/gwdg/rOCCI/tarball/master" class="download-button tar"><span>Download</span></a>
+          <a href="https://github.com/gwdg/rOCCI/zipball/master" class="download-button zip"><span>Download</span></a>
+          <a href="https://github.com/gwdg/rOCCI" class="code">View rOCCI on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <h1>rOCCI - A Ruby OCCI Framework</h1>
+
+<p><a href="http://travis-ci.org/gwdg/rOCCI"><img src="https://secure.travis-ci.org/gwdg/rOCCI.png" alt="Build Status"></a></p>
+
+<h2>Requirements</h2>
+
+<p>The following setup is recommended</p>
+
+<ul>
+<li>usage of the Ruby Version Manger</li>
+<li>Ruby 1.9.3</li>
+<li>RubyGems installed</li>
+</ul><h2>Installation</h2>
+
+<pre><code>gem install occi
+</code></pre>
+
+<h2>Usage</h2>
+
+<p>Use the Interactive Ruby Shell (IRB) to interact with an OCCI server. If you have the occi gem installed, you just have
+to start irb from the command line:</p>
+
+<pre><code>irb
+</code></pre>
+
+<p>If you want to test newer versions of rOCCI, you have to tell irb from where it
+should load occi:</p>
+
+<pre><code>cd rOCCI
+irb -I lib
+</code></pre>
+
+<p>First require the gem, for Ruby 1.8.7 you also have to require rubygems</p>
+
+<pre><code>require 'rubygems'
+require 'occi'
+</code></pre>
+
+<h3>Client</h3>
+
+<p>The OCCI gem includes a Client to simplify the usage of an OCCI endpoint. If you want to use authentication then you
+should create a hash with information either on username and password for basic authentication or with a X.509 user
+certificate, the user certificate password and the path to the Root CAs which are used to verify the certificate of the
+OCCI server.</p>
+
+<p>For Basic auth use</p>
+
+<pre><code>auth = Hashie::Mash.new
+auth.type = 'basic'
+auth.username = 'user'
+auth.password = 'mypass'
+</code></pre>
+
+<p>For Digest auth use</p>
+
+<pre><code>auth = Hashie::Mash.new
+auth.type = 'digest'
+auth.username = 'user'
+auth.password = 'mypass'
+</code></pre>
+
+<p>For X.509 auth use</p>
+
+<pre><code>auth = Hashie::Mash.new
+auth.type = 'x509'
+auth.user_cert = '/Path/To/My/usercert.pem'
+auth.user_cert_password = 'MyPassword'
+auth.ca_path = '/Path/To/root-certificates'
+</code></pre>
+
+<p>To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )</p>
+
+<pre><code>client = OCCI::Client.new('http://occi.cloud.gwdg.de:3300',auth||=nil)
+</code></pre>
+
+<p>All available categories are automatically registered to the OCCI model during client initialization. You can get them via</p>
+
+<pre><code>client.model
+</code></pre>
+
+<p>To get all resources (as a list of OCCI::Resources) currently managed by the endpoint use</p>
+
+<pre><code>client.get resources
+</code></pre>
+
+<p>To get only compute, storage or network resources use get_compute_resources, ...</p>
+
+<p>To get the location of all resources use</p>
+
+<pre><code>client.list resources
+</code></pre>
+
+<p>Analogue for compute, storage, network.</p>
+
+<p>To get a list of all OS / resource templates use</p>
+
+<pre><code>client.get_os_templates
+client.get_resource_templates
+</code></pre>
+
+<p>To create a new compute resource use</p>
+
+<pre><code>os = client.get_os_templates.select { |template| template.term.include? 'my_os' }
+size = client.get_resource_templates.select { |template| template.term.include? 'large' }
+cmpt = OCCI::Core::Resource.new compute
+cmpt.mixins &lt;&lt; os &lt;&lt; size
+cmpt.attributes.occi!.core!.title = "My VM"
+client.create cmpt
+</code></pre>
+
+<h3>Logging</h3>
+
+<p>The OCCI gem includes its own logging mechanism using a message queue. By default, no one is listening to that queue.
+A new OCCI Logger can be initialized by specifying the log destination (either a filename or an IO object like
+STDOUT) and the log level.</p>
+
+<pre><code>OCCI::Log.new(STDOUT,OCCI::Log::INFO)
+</code></pre>
+
+<p>You can create multiple Loggers to receive the log output.</p>
+
+<p>You can always, even if there is no logger defined, log output using the class methods of OCCI::Log e.g.</p>
+
+<pre><code>OCCI::Log.info("Test message")
+</code></pre>
+
+<h3>Registering categories in the OCCI Model</h3>
+
+<p>Before the parser may be used, the available categories have to be registered in the OCCI Model.</p>
+
+<p>For categories already specified by the OCCI WG a method exists in the OCCI Model class to register them:</p>
+
+<pre><code>model = OCCI::Model.new
+model.register_infrastructure
+</code></pre>
+
+<p>Further categories can either be registered from files which include OCCI collections in JSON formator or from parsed
+ JSON objects (e.g. from the query interface of an OCCI service endpoint).</p>
+
+<h3>Parsing OCCI messages</h3>
+
+<p>The OCCI gem includes a Parser to easily parse OCCI messages. With a given media type (e.g. json,
+xml or plain text) the parser analyses the content of the message body and, if supplied,
+the message header. As the text/plain and text/occi media type do not clearly distinguish between a message with a
+category and a message with an entity which has a kind, it has to be specified if the message contains a category (e
+.g. for user defined mixins)</p>
+
+<p>OCCI messages can be parsed to an OCCI collection for example like</p>
+
+<pre><code>media_type = text/plain
+body = %Q|Category: compute; scheme="http://schemas.ogf.org/occi/infrastructure#"; class="kind"|
+collection=OCCI::Parser.parse(media_type, body)
+</code></pre>
+
+<h3>Parsing OVF / OVA files</h3>
+
+<p>Parsing of OVF/OVA files is partly supported and will be improved in future versions.</p>
+
+<p>The example in <a href="http://www.dmtf.org/sites/default/files/standards/documents/DSP2021_1.0.0.tar">DMTF DSP 2021</a> is
+bundled with rOCCI and can be parsed to an OCCI collection with</p>
+
+<pre><code>require 'open-uri'
+ova=open 'https://raw.github.com/gwdg/rOCCI/master/spec/occi/test.ova'
+collection=OCCI::Parser.ova(ova.read)
+</code></pre>
+
+<p>Currently only the following entries of OVF files are parsed</p>
+
+<ul>
+<li>File in References</li>
+<li>Disk in the DiskSection</li>
+<li>Network in the NetworkSection</li>
+<li>in the VirutalSystemSection:
+** Info
+** in the VirtualHardwareSection the items regarding
+*** Processor
+*** Memory
+*** Ethernet Adapter
+*** Parallel port</li>
+</ul><h3>Using the OCCI model</h3>
+
+<p>The OCCI gem includes all OCCI Core classes necessary to handly arbitrary OCCI objects.</p>
+
+<h2>Changelog</h2>
+
+<h3>version 2.5</h3>
+
+<ul>
+<li>improved OCCI Client</li>
+<li>improved documentation</li>
+<li>several bugfixes</li>
+</ul><h3>Version 2.4</h3>
+
+<ul>
+<li>Changed OCCI attribute properties from lowercase to first letter uppercase (e.g. type -&gt; Type, default -&gt; Default, ...)</li>
+</ul><h3>Version 2.3</h3>
+
+<ul>
+<li>OCCI objects are now initialized with a list of attributes instead of a hash. Thus it is easier to check which
+attributes are expected by a class and helps prevent errors.</li>
+<li>Parsing of a subset of the OVF specification is supported. Further parts of the specification will be covered in
+future versions of rOCCI.</li>
+</ul><h3>Version 2.2</h3>
+
+<ul>
+<li>OCCI Client added. The client simplifies the execution of OCCI commands and provides shortcuts for often used steps.</li>
+</ul><h3>Version 2.1</h3>
+
+<ul>
+<li>Several improvements to the gem structure and code documentation. First rSpec test were added. Readme has been extended to include instructions how the gem can be used.</li>
+</ul><h3>Version 2.0</h3>
+
+<ul>
+<li>Starting with version 2.0 Florian Feldhaus and Piotr Kasprzak took over the development of the OCCI gem. The codebase was taken from the rOCCI framework and improved to be bundled as a standalone gem.</li>
+</ul><h3>Version 1.X</h3>
+
+<ul>
+<li>Version 1.X of the OCCI gem has been developed by retr0h and served as a simple way to access the first OpenNebula OCCI implementation.</li>
+</ul><h2>Development</h2>
+
+<p>Checkout latest version from GIT:</p>
+
+<pre><code>git clone git://github.com/gwdg/rOCCI.git
+</code></pre>
+
+<p>Change to rOCCI folder</p>
+
+<pre><code>cd rOCCI
+</code></pre>
+
+<p>Install dependencies for deployment</p>
+
+<pre><code>bundle install --deployment
+</code></pre>
+
+<h3>Code Documentation</h3>
+
+<p><a href="http://rubydoc.info/github/gwdg/rOCCI/">Code Documentation for rOCCI by YARD</a></p>
+
+<h3>Continuous integration</h3>
+
+<p><a href="http://travis-ci.org/gwdg/rOCCI/">Continuous integration for rOCCI by Travis-CI</a></p>
+
+<h3>Contribute</h3>
+
+<ol>
+<li>Fork it.</li>
+<li>Create a branch (git checkout -b my_markup)</li>
+<li>Commit your changes (git commit -am "My changes")</li>
+<li>Push to the branch (git push origin my_markup)</li>
+<li>Create an Issue with a link to your branch</li>
+</ol>
+        </article>
+      </div>
+    </div>
+    <footer>
+      <div class="owner">
+      <p><a href="https://github.com/gwdg" class="avatar"><img src="https://secure.gravatar.com/avatar/a07f5ea1ba64627f16b2ebe47fc24410?s=30&amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-140.png" width="48" height="48"/></a> <a href="https://github.com/gwdg">gwdg</a> maintains <a href="https://github.com/gwdg/rOCCI">rOCCI</a></p>
+
+
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br/>theme by <a href="http://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/gwdg/rOCCI/tarball/master" class="tar">tar</a><a href="https://github.com/gwdg/rOCCI/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+
+  
+</body>
+</html>
