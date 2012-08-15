@@ -40,10 +40,10 @@ module OCCI
         @checked = false
         raise "Kind #{kind} not of type String" unless kind.kind_of? String
         @kind                        = kind
-        @mixins                      = mixins.to_a
+        @mixins                      = mixins.to_a.flatten
         @attributes                  = OCCI::Core::Attributes.new(attributes)
         @attributes.occi!.core![:id] ||= UUIDTools::UUID.random_create.to_s
-        @actions                     = actions.to_a
+        @actions                     = actions.to_a.flatten
       end
 
       # @param [Array] mixins
