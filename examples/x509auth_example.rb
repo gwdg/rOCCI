@@ -83,8 +83,12 @@ else
   pp os = client.get_os_templates.select { |template| template.term.include? OS_TEMPLATE }
   pp size = client.get_resource_templates.select { |template| template.term.include? 'medium' }
   
+  puts "\nGetting identifiers"
+  pp os_id = os.first.type_identifier
+  pp size_id = size.first.type_identifier
+
   ## attach chosen resources to the compute resource
-  cmpt.mixins << os.first << size.first
+  cmpt.mixins << os_id << size_id
   ## we can change some of the values manually
   cmpt.attributes.occi!.core!.title = "My rOCCI VM"
 end
