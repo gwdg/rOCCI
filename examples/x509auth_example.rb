@@ -105,7 +105,7 @@ pp client.list compute
 ## using Hashie simplifies access to its attributes
 puts "\n\nPrinting information about compute resource #{cmpt_loc}"
 cmpt_data = client.get cmpt_loc.to_s.split('/')[3] + '/' + cmpt_loc.to_s.split('/')[4]
-cmpt_hashie = Hashie::Mash.new(JSON.parse(cmpt_data.to_json))
+pp cmpt_hashie = Hashie::Mash.new(JSON.parse(cmpt_data.to_json))
 
 ## wait until the resource is "active"
 while cmpt_hashie.resources.first.attributes.occi.compute.state == "inactive"
