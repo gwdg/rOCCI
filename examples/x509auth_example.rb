@@ -83,8 +83,12 @@ else
   pp os = client.get_os_templates.select { |template| template.term.include? OS_TEMPLATE }
   pp size = client.get_resource_templates.select { |template| template.term.include? 'medium' }
   
+  puts "\nGetting identifiers"
+  pp os_id = os.first.type_identifier
+  pp size_id = size.first.type_identifier
+
   ## attach chosen resources to the compute resource
-  cmpt.mixins << os << size
+  cmpt.mixins << os_id << size_id
   ## we can change some of the values manually
   cmpt.attributes.occi!.core!.title = "My rOCCI VM"
 end
@@ -101,7 +105,7 @@ pp client.list compute
 ## using Hashie simplifies access to its attributes
 puts "\n\nPrinting information about compute resource #{cmpt_loc}"
 cmpt_data = client.get cmpt_loc.to_s.split('/')[3] + '/' + cmpt_loc.to_s.split('/')[4]
-cmpt_hashie = Hashie::Mash.new(JSON.parse(cmpt_data.to_json))
+pp cmpt_hashie = Hashie::Mash.new(JSON.parse(cmpt_data.to_json))
 
 ## wait until the resource is "active"
 while cmpt_hashie.resources.first.attributes.occi.compute.state == "inactive"
