@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'occi'
 require 'pp'
-require 'hashie/mash'
 
 ## options
 use_os_temlate = true # use OS_TEMPLATE or NETWORK + STORAGE + INSTANCE TYPE
@@ -102,20 +101,18 @@ puts "\n\nPrinting locations of compute resources (should now contain #{cmpt_loc
 pp client.list compute
 
 ## get detailed information about the new compute resource
-## using Hashie simplifies access to its attributes
 puts "\n\nPrinting information about compute resource #{cmpt_loc}"
 cmpt_data = client.get cmpt_loc.to_s.split('/')[3] + '/' + cmpt_loc.to_s.split('/')[4]
-pp cmpt_hashie = Hashie::Mash.new(JSON.parse(cmpt_data.to_json))
+pp cmpt_data
 
 ## wait until the resource is "active"
-while cmpt_hashie.resources.first.attributes.occi.compute.state == "inactive"
+while cmpt_data.resources.first.attributes.occi.compute.state == "inactive"
   puts "\nCompute resource #{cmpt_loc} is inactive, waiting ..."
   sleep 1
   cmpt_data = client.get cmpt_loc.to_s.split('/')[3] + '/' + cmpt_loc.to_s.split('/')[4]
-  cmpt_hashie = Hashie::Mash.new(JSON.parse(cmpt_data.to_json))
 end
 
-puts "\nCompute resource #{cmpt_loc} is #{cmpt_hashie.resources.first.attributes.occi.compute.state}"
+puts "\nCompute resource #{cmpt_loc} is #{cmpt_data.resources.first.attributes.occi.compute.state}"
 
 ## delete the resource and exit
 if clean_up_compute
