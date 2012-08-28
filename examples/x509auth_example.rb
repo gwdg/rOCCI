@@ -13,48 +13,59 @@ USER_CERT_PASSWORD = 'mypassphrase'
 CA_PATH             = '/etc/grid-security/certificates'
 
 ## get an OCCI::Client instance
-client = OCCI::Client.new('https://localhost:3300',
+client = OCCI::Client.get_client('https://localhost:3300',
                           { :type               => "x509",
                             :user_cert          => USER_CERT,
                             :user_cert_password => USER_CERT_PASSWORD,
                             :ca_path            => CA_PATH })
 
-## get detailed information about all available resources
-## then query each resource category in turn
-puts "\n\nPrinting all resources"
-pp client.get resources
-
-puts "\n\nPrinting storage resources"
-pp client.get storage
-
-puts "\n\nPrinting network resources"
-pp client.get network
-
-puts "\n\nPrinting compute resources"
-pp client.get compute
-
 ## get links of all available resources
 ## then get links for each category in turn
-puts "\n\nPrinting locations of all resources"
-pp client.list resources
+puts "\n\nListing all resources"
+client.get_resource_types.each do |type|
+  puts "\n\n#{type.capitalize}"
+  pp client.list client.get_resource_type_identifier(type)
+end
 
-puts "\n\nPrinting locations of storage resources"
-pp client.list storage
+puts "\n\nListing storage resources"
+pp client.list client.get_resource_type_identifier("storage")
 
-puts "\n\nPrinting locations of compute resources"
-pp client.list compute
+puts "\n\nListing network resources"
+pp client.list client.get_resource_type_identifier("network")
 
-puts "\n\nPrinting locations of network resources"
-pp client.list network
+puts "\n\nListing compute resources"
+pp client.list client.get_resource_type_identifier("compute")
 
-## get detailed information about available OS templates (== VM templates in ON)
-## and resource templates (== INSTANCE TYPES, e.g. small, medium, large etc.)
-puts "\n\nPrinting OS templates"
-pp client.get_os_templates
+puts "\n\nListing OS template resources"
+pp client.list client.get_resource_type_identifier("os_tpl")
 
-puts "\n\nPrinting resource templates"
-pp client.get_resource_templates
+puts "\n\nListing resource template resources"
+pp client.list client.get_resource_type_identifier("resource_tpl")
 
+## get detailed information about all available resources
+## then query each resource category in turn
+puts "\n\nDescribing all resources"
+client.get_resource_types.each do |type|
+  puts "\n\n#{type.capitalize}"
+  pp client.describe client.get_resource_type_identifier(type)
+end
+
+puts "\n\nDescribing storage resources"
+pp client.describe client.get_resource_type_identifier("storage")
+
+puts "\n\nDescribing compute resources"
+pp client.describe client.get_resource_type_identifier("compute")
+
+puts "\n\nDescribing network resources"
+pp client.describe client.get_resource_type_identifier("network")
+
+puts "\n\nDescribing OS template resources"
+pp client.describe client.get_resource_type_identifier("os_tpl")
+
+puts "\n\nDescribing resource template resources"
+pp client.describe client.get_resource_type_identifier("resource_tpl")
+
+=begin
 ## create a compute resource using the chosen method
 puts "\n\nCreate compute resources"
 
@@ -97,11 +108,11 @@ cmpt_loc = client.create cmpt
 pp "Location of new compute resource: #{cmpt_loc}"
 
 ## get links of all available compute resouces again
-puts "\n\nPrinting locations of compute resources (should now contain #{cmpt_loc})"
+puts "\n\nListing locations of compute resources (should now contain #{cmpt_loc})"
 pp client.list compute
 
 ## get detailed information about the new compute resource
-puts "\n\nPrinting information about compute resource #{cmpt_loc}"
+puts "\n\nListing information about compute resource #{cmpt_loc}"
 cmpt_data = client.get cmpt_loc.to_s.split('/')[3] + '/' + cmpt_loc.to_s.split('/')[4]
 pp cmpt_data
 
@@ -119,3 +130,4 @@ if clean_up_compute
   puts "\n\nDeleting compute resource #{cmpt_loc}"
   pp client.delete cmpt_loc.to_s.split('/')[3] + '/' + cmpt_loc.to_s.split('/')[4]
 end
+=end
