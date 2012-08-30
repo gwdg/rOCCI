@@ -18,9 +18,7 @@ module OCCI
     RESOURCES = { 
 			:compute => "http://schemas.ogf.org/occi/infrastructure#compute",
 			:storage => "http://schemas.ogf.org/occi/infrastructure#storage",
-			:network => "http://schemas.ogf.org/occi/infrastructure#network",
-      :os_tpl => "http://schemas.ogf.org/occi/infrastructure#os_tpl",
-      :resource_tpl => "http://schemas.ogf.org/occi/infrastructure#resource_tpl"
+			:network => "http://schemas.ogf.org/occi/infrastructure#network"
 		}
 
 		# hash mapping HTTP response codes to human-readable messages
@@ -76,9 +74,11 @@ module OCCI
 		end
 
     # @param [String] Resource name or resource identifier
-    # @return [OCCI::Core::Resource] Resource instance
+    # @return [OCCI::Core::Entity] Resource instance
     def get_instance(resource_type)
       
+      OCCI::Log.debug("Instantiating #{resource_type} ...")
+
       if RESOURCES.has_value? resource_type
         OCCI::Core::Resource.new resource_type
       elsif RESOURCES.has_key? resource_type.to_sym
@@ -91,12 +91,78 @@ module OCCI
 
     # @return [Array] List of available resource types in a human-readable format
     def get_resource_types
+      OCCI::Log.debug("Getting resource types ...")
       RESOURCES.keys.map! { |k| k.to_s }
     end
 
     # @return [Array] List of available resource types in a OCCI ID format
     def get_resource_type_identifiers
+      OCCI::Log.debug("Getting resource identifiers ...")
       RESOURCES.values
+    end
+
+    # @param [String]
+    # @param [String]
+    # @param [Boolean]
+    # @return [String, OCCI:Collection]
+    def find_mixin(name, type = nil, describe = false)
+
+      OCCI::Log.debug("Looking for mixin #{name} + #{type} + #{describe}")
+
+      unless describe
+        name = "#" + name
+        unless type
+          @mixins.flatten(2).select { |mixin| mixin.to_s.reverse.start_with? name.reverse }.first
+        else
+          raise "Unknown mixin type! [#{type}]" unless @mixins.has_key? type.to_sym
+          
+          @mixins[type.to_sym].select { |mixin| mixin.to_s.reverse.start_with? name.reverse }.first
+        end
+      else
+        unless type
+          found = get_os_templates.select { |mixin| mixin.term == name }.first
+
+          unless found
+            found = get_resource_templates.select { |template| template.term == name }.first
+          end
+
+          found
+        else
+          raise "Unknown mixin type! [#{type}]" unless @mixins.has_key? type.to_sym
+
+          case
+            when type == "os_tpl"
+              get_os_templates.select { |mixin| mixin.term == name }.first
+            when type == "resource_tpl"
+              get_resource_templates.select { |template| template.term == name }.first
+            else
+              nil
+          end
+        end
+      end
+    end
+
+    # @param [String] Type of mixins to return
+    # @return [Array] List of available mixins
+    def get_mixins(type = nil)
+      unless type.nil?
+        raise "Unknown mixin type! #{type}" unless @mixins.has_key? type.to_sym
+
+        @mixins[type.to_sym]
+      else
+        mixins = []
+
+        get_mixin_types.each do |type|
+          mixins.concat @mixins[type.to_sym]
+        end
+
+        mixins
+      end
+    end
+
+    # @return [Array] List of available mixin types
+    def get_mixin_types
+      @mixins.keys.map! { |k| k.to_s }
     end
 
     # @param [String] Human-readable name of the resource
@@ -125,15 +191,8 @@ module OCCI
 
       list = []
 
-      case uri_part 
-        when "os_tpl", "resource_tpl"
-          @mixins[uri_part.to_sym].each do |mixin|
-            list << mixin unless mixin.nil?
-          end
-        else
-          path = uri_part + '/'
-          list = self.class.get(@endpoint + path, :headers => { "Accept" => 'text/uri-list' }).body.split("\n").compact
-      end
+      path = uri_part + '/'
+      list = self.class.get(@endpoint + path, :headers => { "Accept" => 'text/uri-list' }).body.split("\n").compact
 
       list
 		end
@@ -147,15 +206,7 @@ module OCCI
 
       descriptions = nil
 
-      if @mixins[:os_tpl].include? resource_type_identifier
-        descriptions = get_os_templates.mixins.select { |mixin| mixin.term == uri_part }
-      elsif @mixins[:resource_tpl].include? resource_type_identifier
-        descriptions = get_os_templates.mixins.select { |mixin| mixin.term == uri_part }
-      elsif resource_type_identifier == RESOURCES[:os_tpl]
-        descriptions = get_os_templates
-      elsif resource_type_identifier == RESOURCES[:resource_tpl]
-        descriptions = get_resource_templates
-      elsif RESOURCES.has_value? resource_type_identifier
+      if RESOURCES.has_value? resource_type_identifier
         descriptions = get(uri_part + '/')
       elsif resource_type_identifier.start_with? @endpoint
         descriptions = get(resource_type_identifier)
@@ -166,10 +217,23 @@ module OCCI
       descriptions
 		end
 
-    # @param [OCCI::Core::Resource]
+    # @param [OCCI::Core::Entity]
     # @return [String]
-		def create
+		def create(entity)
 			raise "Endpoint is not connected!" unless @connected
+      raise "#{entity} not an entity" unless entity.kind_of? OCCI::Core::Entity
+      
+      entity.check(@model)
+      kind = @model.get_by_id(entity.kind)
+      raise "No kind found for #{entity}" unless kind
+      
+      location   = @model.get_by_id(entity.kind).location
+      collection = OCCI::Collection.new
+      
+      collection.resources << entity if entity.kind_of? OCCI::Core::Resource
+      collection.links << entity if entity.kind_of? OCCI::Core::Link
+      
+      post location, collection
 		end
 
     # @param [String]
