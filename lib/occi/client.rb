@@ -209,7 +209,7 @@ module OCCI
       if RESOURCES.has_value? resource_type_identifier
         descriptions = get(uri_part + '/')
       elsif resource_type_identifier.start_with? @endpoint
-        descriptions = get(resource_type_identifier)
+        descriptions = get(sanitize_resource_link(resource_type_identifier))
       else
         raise "Unkown resource type identifier! [#{resource_type_identifier}]"
       end
@@ -237,14 +237,25 @@ module OCCI
 		end
 
     # @param [String]
-		def delete
+    # @return [Boolean]
+		def delete(resource_identifier)
 			raise "Endpoint is not connected!" unless @connected
+      raise "Unknown resource identifier! #{resource_identifier}" unless resource_identifier.start_with? @endpoint
+
+      del(sanitize_resource_link(resource_identifier))      
 		end
 
-    # @param []
     # @param [String]
-		def trigger
+    # @param [String]
+    # @return [String]
+		def trigger(resource_identifier, action)
 			raise "Endpoint is not connected!" unless @connected
+      raise "Unknown resource identifier! #{resource_identifier}" unless resource_identifier.start_with? @endpoint
+
+      collection = OCCI::Collection.new
+      collection.actions << action
+      
+      post sanitize_resource_link(resource_identifier), collection
 		end
 
     def refresh
@@ -398,15 +409,15 @@ module OCCI
 
     # @param [String] path
     # @param [OCCI::Collection] collection
-    # @return [String]
-    def delete(path, collection=nil)
+    # @return [Boolean]
+    def del(path, collection=nil)
       path     = path.reverse.chomp('/').reverse
       response = self.class.delete(@endpoint + path)
 
       response_msg = response_message response
       raise "HTTP DELETE failed! #{response_msg}" unless response.code.between? 200, 300
 
-      response_msg
+      true
     end
 
     # @param [String] kind
@@ -435,6 +446,14 @@ module OCCI
  			raise 'Endpoint not a valid URI' if (endpoint =~ URI::ABS_URI).nil?
       @endpoint = endpoint.chomp('/') + '/'
  		end
+
+    # @param [String]
+    # @return [String]
+    def sanitize_resource_link(resource_link)
+      raise "Resource link #{resource_link} is not valid!" unless resource_link.start_with? @endpoint
+
+      resource_link.gsub @endpoint, '/'
+    end
 
  		def set_model
 

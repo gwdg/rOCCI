@@ -124,21 +124,20 @@ end
 cmpt_loc = client.create cmpt
 pp "Location of new compute resource: #{cmpt_loc}"
 
-=begin
 ## get links of all available compute resouces again
 puts "\n\nListing locations of compute resources (should now contain #{cmpt_loc})"
-pp client.list compute
+pp client.list client.get_resource_type_identifier("compute")
 
 ## get detailed information about the new compute resource
 puts "\n\nListing information about compute resource #{cmpt_loc}"
-cmpt_data = client.get cmpt_loc.to_s.split('/')[3] + '/' + cmpt_loc.to_s.split('/')[4]
+cmpt_data = client.describe cmpt_loc
 pp cmpt_data
 
 ## wait until the resource is "active"
 while cmpt_data.resources.first.attributes.occi.compute.state == "inactive"
   puts "\nCompute resource #{cmpt_loc} is inactive, waiting ..."
   sleep 1
-  cmpt_data = client.get cmpt_loc.to_s.split('/')[3] + '/' + cmpt_loc.to_s.split('/')[4]
+  cmpt_data = client.describe cmpt_loc
 end
 
 puts "\nCompute resource #{cmpt_loc} is #{cmpt_data.resources.first.attributes.occi.compute.state}"
@@ -146,6 +145,5 @@ puts "\nCompute resource #{cmpt_loc} is #{cmpt_data.resources.first.attributes.o
 ## delete the resource and exit
 if clean_up_compute
   puts "\n\nDeleting compute resource #{cmpt_loc}"
-  pp client.delete cmpt_loc.to_s.split('/')[3] + '/' + cmpt_loc.to_s.split('/')[4]
+  pp client.delete cmpt_loc
 end
-=end
