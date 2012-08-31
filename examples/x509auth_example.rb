@@ -14,10 +14,10 @@ CA_PATH             = '/etc/grid-security/certificates'
 
 ## get an OCCI::Client instance
 client = OCCI::Client.get_client('https://localhost:3300',
-                          { :type               => "x509",
-                            :user_cert          => USER_CERT,
-                            :user_cert_password => USER_CERT_PASSWORD,
-                            :ca_path            => CA_PATH })
+                                 { :type               => "x509",
+                                   :user_cert          => USER_CERT,
+                                   :user_cert_password => USER_CERT_PASSWORD,
+                                   :ca_path            => CA_PATH })
 
 puts "\n\nListing all available resource types:"
 client.get_resource_types.each do |type|
@@ -98,7 +98,7 @@ unless use_os_temlate
   ## select instance type medium
   cmpt.mixins << client.find_mixin('medium', "resource_tpl")
 
-  ## list network/storage locations and select the appropriate ones (the first ones in this case) 
+  ## list network/storage locations and select the appropriate ones (the first ones in this case)
   puts "\nUsing:"
   pp storage_loc = client.list(client.get_resource_type_identifier("storage"))[0]
   pp network_loc = client.list(client.get_resource_type_identifier("network"))[0]
@@ -109,7 +109,7 @@ unless use_os_temlate
   client.networkinterface cmpt, network_loc
 else
   ## with OS template, we have to find the template by name
-  ## optionally we can change its "size" by choosing an instance type 
+  ## optionally we can change its "size" by choosing an instance type
   puts "\nUsing:"
   pp os = client.find_mixin(OS_TEMPLATE, "os_tpl")
   pp size = client.find_mixin('medium', "resource_tpl")

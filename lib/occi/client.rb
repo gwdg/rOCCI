@@ -2,27 +2,27 @@ require 'rubygems'
 require 'httparty'
 
 module OCCI
-	class Client
+  class Client
 
-		# HTTParty for raw HTTP requests
-		include HTTParty
-		headers 'Accept' => 'application/occi+json,text/plain;q=0.5'
+    # HTTParty for raw HTTP requests
+    include HTTParty
+    headers 'Accept' => 'application/occi+json,text/plain;q=0.5'
 
-		# a few attributes which should be visible outside the client
-		attr_reader :endpoint
-		attr_reader :auth_options
-		attr_reader :media_type
-		attr_reader :connected
+    # a few attributes which should be visible outside the client
+    attr_reader :endpoint
+    attr_reader :auth_options
+    attr_reader :media_type
+    attr_reader :connected
 
     # hash mapping human-readable resource names to OCCI identifiers
-    RESOURCES = { 
-			:compute => "http://schemas.ogf.org/occi/infrastructure#compute",
-			:storage => "http://schemas.ogf.org/occi/infrastructure#storage",
-			:network => "http://schemas.ogf.org/occi/infrastructure#network"
-		}
+    RESOURCES = {
+      :compute => "http://schemas.ogf.org/occi/infrastructure#compute",
+      :storage => "http://schemas.ogf.org/occi/infrastructure#storage",
+      :network => "http://schemas.ogf.org/occi/infrastructure#network"
+    }
 
-		# hash mapping HTTP response codes to human-readable messages
-		HTTP_CODES = {
+    # hash mapping HTTP response codes to human-readable messages
+    HTTP_CODES = {
       "100" => "Continue",
       "101" => "Switching Protocols",
       "200" => "OK",
@@ -65,24 +65,24 @@ module OCCI
       "505" => "HTTP Version not supported"
     }
 
-		# @param [String] Endpoint URI
-		# @param [Hash] Auth options, x509|basic|digest|none
-		# @param [IO, File] Target for logging messages
+    # @param [String] Endpoint URI
+    # @param [Hash] Auth options, x509|basic|digest|none
+    # @param [IO, File] Target for logging messages
     # @return [OCCI::Client] OCCI client instance
-		def self.get_client(endpoint = "http://localhost:3000/", auth_options = {:type => "none"}, log_dev=STDOUT)
-			self.new endpoint, auth_options, log_dev, true
-		end
+    def self.get_client(endpoint = "http://localhost:3000/", auth_options = {:type => "none"}, log_dev=STDOUT)
+      self.new endpoint, auth_options, log_dev, true
+    end
 
     # @param [String] Resource name or resource identifier
     # @return [OCCI::Core::Entity] Resource instance
     def get_instance(resource_type)
-      
+
       OCCI::Log.debug("Instantiating #{resource_type} ...")
 
       if RESOURCES.has_value? resource_type
         OCCI::Core::Resource.new resource_type
       elsif RESOURCES.has_key? resource_type.to_sym
-        OCCI::Core::Resource.new get_resource_type_identifier(resource_type) 
+        OCCI::Core::Resource.new get_resource_type_identifier(resource_type)
       else
         raise "Unknown resource type! [#{resource_type}]"
       end
@@ -115,7 +115,7 @@ module OCCI
           @mixins.flatten(2).select { |mixin| mixin.to_s.reverse.start_with? name.reverse }.first
         else
           raise "Unknown mixin type! [#{type}]" unless @mixins.has_key? type.to_sym
-          
+
           @mixins[type.to_sym].select { |mixin| mixin.to_s.reverse.start_with? name.reverse }.first
         end
       else
@@ -131,12 +131,12 @@ module OCCI
           raise "Unknown mixin type! [#{type}]" unless @mixins.has_key? type.to_sym
 
           case
-            when type == "os_tpl"
-              get_os_templates.select { |mixin| mixin.term == name }.first
-            when type == "resource_tpl"
-              get_resource_templates.select { |template| template.term == name }.first
-            else
-              nil
+          when type == "os_tpl"
+            get_os_templates.select { |mixin| mixin.term == name }.first
+          when type == "resource_tpl"
+            get_resource_templates.select { |template| template.term == name }.first
+          else
+            nil
           end
         end
       end
@@ -181,10 +181,10 @@ module OCCI
       RESOURCES.key(resource_type_identifier).to_s
     end
 
-    # @param [String] 
+    # @param [String]
     # @return [Array]
-		def list(resource_type_identifier)
-			raise "Endpoint is not connected!" unless @connected
+    def list(resource_type_identifier)
+      raise "Endpoint is not connected!" unless @connected
       raise "Unkown resource type identifier! [#{resource_type_identifier}]" unless RESOURCES.has_value? resource_type_identifier
 
       uri_part = resource_type_identifier.split('#').last
@@ -195,12 +195,12 @@ module OCCI
       list = self.class.get(@endpoint + path, :headers => { "Accept" => 'text/uri-list' }).body.split("\n").compact
 
       list
-		end
+    end
 
     # @param [String]
     # @return [OCCI::Collection]
-		def describe(resource_type_identifier)
-			raise "Endpoint is not connected!" unless @connected
+    def describe(resource_type_identifier)
+      raise "Endpoint is not connected!" unless @connected
 
       uri_part = resource_type_identifier.split('#').last
 
@@ -215,48 +215,48 @@ module OCCI
       end
 
       descriptions
-		end
+    end
 
     # @param [OCCI::Core::Entity]
     # @return [String]
-		def create(entity)
-			raise "Endpoint is not connected!" unless @connected
+    def create(entity)
+      raise "Endpoint is not connected!" unless @connected
       raise "#{entity} not an entity" unless entity.kind_of? OCCI::Core::Entity
-      
+
       entity.check(@model)
       kind = @model.get_by_id(entity.kind)
       raise "No kind found for #{entity}" unless kind
-      
+
       location   = @model.get_by_id(entity.kind).location
       collection = OCCI::Collection.new
-      
+
       collection.resources << entity if entity.kind_of? OCCI::Core::Resource
       collection.links << entity if entity.kind_of? OCCI::Core::Link
-      
+
       post location, collection
-		end
+    end
 
     # @param [String]
     # @return [Boolean]
-		def delete(resource_identifier)
-			raise "Endpoint is not connected!" unless @connected
+    def delete(resource_identifier)
+      raise "Endpoint is not connected!" unless @connected
       raise "Unknown resource identifier! #{resource_identifier}" unless resource_identifier.start_with? @endpoint
 
-      del(sanitize_resource_link(resource_identifier))      
-		end
+      del(sanitize_resource_link(resource_identifier))
+    end
 
     # @param [String]
     # @param [String]
     # @return [String]
-		def trigger(resource_identifier, action)
-			raise "Endpoint is not connected!" unless @connected
+    def trigger(resource_identifier, action)
+      raise "Endpoint is not connected!" unless @connected
       raise "Unknown resource identifier! #{resource_identifier}" unless resource_identifier.start_with? @endpoint
 
       collection = OCCI::Collection.new
       collection.actions << action
-      
+
       post sanitize_resource_link(resource_identifier), collection
-		end
+    end
 
     def refresh
       set_model
@@ -271,7 +271,7 @@ module OCCI
       kind         = 'http://schemas.ogf.org/occi/infrastructure#storagelink'
       storage_kind = 'http://schemas.ogf.org/occi/infrastructure#storage'
       storagelink  = link(kind, compute, storage_location, storage_kind, attributes, mixins)
-      
+
       storagelink
     end
 
@@ -284,61 +284,61 @@ module OCCI
       kind             = 'http://schemas.ogf.org/occi/infrastructure#networkinterface'
       network_kind     = 'http://schemas.ogf.org/occi/infrastructure#network'
       networkinterface = link(kind, compute, network_location, network_kind, attributes, mixins)
-      
+
       networkinterface
     end
 
-		private
+    private
 
-		# @param [String]
-		# @param [Hash]
-		# @param [IO, File]
-		def initialize(endpoint = "http://localhost:3000/", auth_options = {:type => "none"}, log_dev=STDOUT, auto_connect = false)
-			# set OCCI:Log output to log_dev
-			OCCI::Log.new(log_dev)
+    # @param [String]
+    # @param [Hash]
+    # @param [IO, File]
+    def initialize(endpoint = "http://localhost:3000/", auth_options = {:type => "none"}, log_dev=STDOUT, auto_connect = false)
+      # set OCCI:Log output to log_dev
+      OCCI::Log.new(log_dev)
 
-			@connected = auto_connect
+      @connected = auto_connect
 
-			# pass auth options to HTTParty
-			change_auth auth_options
+      # pass auth options to HTTParty
+      change_auth auth_options
 
-			# check the validity and canonize the endpoint URI 
-			prepare_endpoint endpoint
+      # check the validity and canonize the endpoint URI
+      prepare_endpoint endpoint
 
-			# get model information from the endpoint
-			# and create OCCI::Model instance
-			set_model
+      # get model information from the endpoint
+      # and create OCCI::Model instance
+      set_model
 
-			# get accepted media types from HTTParty
-			set_media_type
-		end
+      # get accepted media types from HTTParty
+      set_media_type
+    end
 
-		# @param [Hash]
-		def change_auth(auth_options)
-			@auth_options = auth_options
+    # @param [Hash]
+    def change_auth(auth_options)
+      @auth_options = auth_options
 
-			case @auth_options[:type]
-        when "basic"
-          # set up basic auth
-          raise ArgumentError, "Missing required options 'username' and 'password' for basic auth!" unless @auth_options[:username] and @auth_options[:password]
-          self.class.basic_auth @auth_options[:username], @auth_options[:password]
-        when "digest"
-          # set up digest auth
-          raise ArgumentError, "Missing required options 'username' and 'password' for digest auth!" unless @auth_options[:username] and @auth_options[:password]
-          self.class.digest_auth @auth_options[:username], @auth_options[:password]
-        when "x509"
-          # set up pem and optionally pem_password and ssl_ca_path
-          raise ArgumentError, "Missing required option 'user_cert' for x509 auth!" unless @auth_options[:user_cert]
-          raise ArgumentError, "The file specified in 'user_cert' does not exist!" unless File.exists? @auth_options[:user_cert]
+      case @auth_options[:type]
+      when "basic"
+        # set up basic auth
+        raise ArgumentError, "Missing required options 'username' and 'password' for basic auth!" unless @auth_options[:username] and @auth_options[:password]
+        self.class.basic_auth @auth_options[:username], @auth_options[:password]
+      when "digest"
+        # set up digest auth
+        raise ArgumentError, "Missing required options 'username' and 'password' for digest auth!" unless @auth_options[:username] and @auth_options[:password]
+        self.class.digest_auth @auth_options[:username], @auth_options[:password]
+      when "x509"
+        # set up pem and optionally pem_password and ssl_ca_path
+        raise ArgumentError, "Missing required option 'user_cert' for x509 auth!" unless @auth_options[:user_cert]
+        raise ArgumentError, "The file specified in 'user_cert' does not exist!" unless File.exists? @auth_options[:user_cert]
 
-          self.class.pem File.read(@auth_options[:user_cert]), @auth_options[:user_cert_password]
-          self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil? or @auth_options[:ca_path].empty?
-        when "none", nil
-          # do nothing
-        else
-          raise ArgumentError, "Unknown AUTH method [#{@auth_options[:type]}]!"
+        self.class.pem File.read(@auth_options[:user_cert]), @auth_options[:user_cert_password]
+        self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil? or @auth_options[:ca_path].empty?
+      when "none", nil
+        # do nothing
+      else
+        raise ArgumentError, "Unknown AUTH method [#{@auth_options[:type]}]!"
       end
-		end
+    end
 
     # @param [String] path
     # @param [OCCI::Collection] filter
@@ -346,16 +346,16 @@ module OCCI
     def get(path='', filter=nil)
       path     = path.reverse.chomp('/').reverse
       response = if filter
-                   categories = filter.categories.collect { |category| category.to_text }.join(',')
-                   attributes = filter.entities.collect { |entity| entity.attributes.combine.collect { |k, v| k + '=' + v } }.join(',')
-                   self.class.get(@endpoint + path,
-                                  :headers => { 'Accept'            => 'application/occi+json,text/plain;q=0.5',
-                                                'Content-Type'      => 'text/occi',
-                                                'Category'          => categories,
-                                                'X-OCCI-Attributes' => attributes })
-                 else
-                   self.class.get(@endpoint + path)
-                 end
+        categories = filter.categories.collect { |category| category.to_text }.join(',')
+        attributes = filter.entities.collect { |entity| entity.attributes.combine.collect { |k, v| k + '=' + v } }.join(',')
+        self.class.get(@endpoint + path,
+                       :headers => { 'Accept'            => 'application/occi+json,text/plain;q=0.5',
+                                     'Content-Type'      => 'text/occi',
+                                     'Category'          => categories,
+                                     'X-OCCI-Attributes' => attributes })
+      else
+        self.class.get(@endpoint + path)
+      end
 
       response_msg = response_message response
       raise "HTTP GET failed! #{response_msg}" unless response.code.between? 200, 300
@@ -363,7 +363,7 @@ module OCCI
       kind = @model.get_by_location path if @model
       kind ? entity_type = kind.entity_type : entity_type = nil
       _, collection = OCCI::Parser.parse(response.content_type, response.body, path.include?('/-/'), entity_type)
-      
+
       collection
     end
 
@@ -373,14 +373,14 @@ module OCCI
     def post(path, collection)
       path     = path.reverse.chomp('/').reverse
       response = if @media_type == 'application/occi+json'
-                   self.class.post(@endpoint + path,
-                                   :body    => collection.to_json,
-                                   :headers => { 'Accept' => 'text/uri-list', 'Content-Type' => 'application/occi+json' })
-                 else
-                   self.class.post(@endpoint + path,
-                                   :body    => collection.to_text,
-                                   :headers => { 'Accept' => 'text/uri-list', 'Content-Type' => 'text/plain' })
-                 end
+        self.class.post(@endpoint + path,
+                        :body    => collection.to_json,
+                        :headers => { 'Accept' => 'text/uri-list', 'Content-Type' => 'application/occi+json' })
+      else
+        self.class.post(@endpoint + path,
+                        :body    => collection.to_text,
+                        :headers => { 'Accept' => 'text/uri-list', 'Content-Type' => 'text/plain' })
+      end
 
       response_msg = response_message response
       raise "HTTP POST failed! #{response_msg}" unless response.code.between? 200, 300
@@ -394,16 +394,16 @@ module OCCI
     def put(path, collection)
       path     = path.reverse.chomp('/').reverse
       response = if @media_type == 'application/occi+json'
-                   self.class.post(@endpoint + path, :body => collection.to_json, :headers => { 'Accept' => 'application/occi+json,text/plain;q=0.5', 'Content-Type' => 'application/occi+json' })
-                 else
-                   self.class.post(@endpoint + path, { :body => collection.to_text, :headers => { 'Accept' => 'application/occi+json,text/plain;q=0.5', 'Content-Type' => 'text/plain' } })
-                 end
+        self.class.post(@endpoint + path, :body => collection.to_json, :headers => { 'Accept' => 'application/occi+json,text/plain;q=0.5', 'Content-Type' => 'application/occi+json' })
+      else
+        self.class.post(@endpoint + path, { :body => collection.to_text, :headers => { 'Accept' => 'application/occi+json,text/plain;q=0.5', 'Content-Type' => 'text/plain' } })
+      end
 
       response_msg = response_message response
       raise "HTTP PUT failed! #{response_msg}" unless response.code.between? 200, 300
 
       _, collection = OCCI::Parser.parse(response.content_type, response.body)
-      
+
       collection
     end
 
@@ -440,12 +440,12 @@ module OCCI
       link
     end
 
-		# @param [String]
-		# @return [String]
- 		def prepare_endpoint(endpoint)
- 			raise 'Endpoint not a valid URI' if (endpoint =~ URI::ABS_URI).nil?
+    # @param [String]
+    # @return [String]
+    def prepare_endpoint(endpoint)
+      raise 'Endpoint not a valid URI' if (endpoint =~ URI::ABS_URI).nil?
       @endpoint = endpoint.chomp('/') + '/'
- 		end
+    end
 
     # @param [String]
     # @return [String]
@@ -455,10 +455,10 @@ module OCCI
       resource_link.gsub @endpoint, '/'
     end
 
- 		def set_model
+    def set_model
 
       #
- 			model  = get('/-/')
+      model  = get('/-/')
       @model = OCCI::Model.new(model)
 
       @mixins = {
@@ -470,12 +470,12 @@ module OCCI
       get_os_templates.each do |os_tpl|
         @mixins[:os_tpl] << os_tpl.type_identifier unless os_tpl.nil? or os_tpl.type_identifier.nil?
       end
-      
+
       #
-      get_resource_templates.each do |res_tpl| 
+      get_resource_templates.each do |res_tpl|
         @mixins[:resource_tpl] << res_tpl.type_identifier unless res_tpl.nil? or res_tpl.type_identifier.nil?
       end
- 		end
+    end
 
     # @return [OCCI::Collection] collection including all registered OS templates
     def get_os_templates
@@ -497,16 +497,16 @@ module OCCI
       collection.mixins.select { |mixin| mixin.term != 'resource_tpl' }
     end
 
- 		# @return [String]
+    # @return [String]
     def set_media_type
       media_types = self.class.head(@endpoint).headers['accept']
       OCCI::Log.debug("Available media types: #{media_types}")
       @media_type = case media_types
-                      when /application\/occi\+json/
-                        'application/occi+json'
-                      else
-                        'text/plain'
-                    end
+      when /application\/occi\+json/
+        'application/occi+json'
+      else
+        'text/plain'
+      end
     end
 
     # @param [HTTParty::Response] response
@@ -520,5 +520,5 @@ module OCCI
       HTTP_CODES[code.to_s]
     end
 
-	end
+  end
 end
