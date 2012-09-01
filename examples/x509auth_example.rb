@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'occi'
 require 'pp'
+require 'logger'
 
 ## options
 use_os_temlate = true # use OS_TEMPLATE or NETWORK + STORAGE + INSTANCE TYPE
@@ -8,16 +9,18 @@ OS_TEMPLATE = 'monitoring' # name of the VM template in ON
 
 clean_up_compute = true # issue DELETE <RESOURCE> after we are done
 
-USER_CERT           = ENV['HOME'] + '/.globus/usercert.pem'
+USER_CERT           = ENV['HOME'] + '/.globus/usercred.pem'
 USER_CERT_PASSWORD = 'mypassphrase'
 CA_PATH             = '/etc/grid-security/certificates'
 
 ## get an OCCI::Client instance
-client = OCCI::Client.get_client('https://localhost:3300',
+client = OCCI::Client.new('https://localhost:3300',
                                  { :type               => "x509",
                                    :user_cert          => USER_CERT,
                                    :user_cert_password => USER_CERT_PASSWORD,
-                                   :ca_path            => CA_PATH })
+                                   :ca_path            => CA_PATH },
+                                 { :out                => STDERR,
+                                   :level              => Logger::DEBUG})
 
 puts "\n\nListing all available resource types:"
 client.get_resource_types.each do |type|
@@ -66,30 +69,28 @@ samples.each do |mixin|
 end
 
 ## get links of all available resources
-## then get links for each category in turn
 puts "\n\nListing storage resources"
-pp client.list client.get_resource_type_identifier("storage")
+pp client.list "storage"
 
 puts "\n\nListing network resources"
-pp client.list client.get_resource_type_identifier("network")
+pp client.list "network"
 
 puts "\n\nListing compute resources"
-pp client.list client.get_resource_type_identifier("compute")
+pp client.list "compute"
 
 ## get detailed information about all available resources
-## then query each resource category in turn
 puts "\n\nDescribing storage resources"
-pp client.describe client.get_resource_type_identifier("storage")
+pp client.describe "storage"
 
 puts "\n\nDescribing compute resources"
-pp client.describe client.get_resource_type_identifier("compute")
+pp client.describe "compute"
 
 puts "\n\nDescribing network resources"
-pp client.describe client.get_resource_type_identifier("network")
+pp client.describe "network"
 
-## create a compute resource using the chosen method
+## create a compute resource using the chosen method (os_tpl|strg+ntwrk)
 puts "\n\nCreate compute resources"
-cmpt = client.get_instance client.get_resource_type_identifier("compute")
+cmpt = client.get_instance "compute"
 
 unless use_os_temlate
   ## without OS template, we have to manually select and attach
@@ -100,8 +101,8 @@ unless use_os_temlate
 
   ## list network/storage locations and select the appropriate ones (the first ones in this case)
   puts "\nUsing:"
-  pp storage_loc = client.list(client.get_resource_type_identifier("storage"))[0]
-  pp network_loc = client.list(client.get_resource_type_identifier("network"))[0]
+  pp storage_loc = client.list("storage")[0]
+  pp network_loc = client.list("network")[0]
 
   ## create links and attach them to the compure resource
   puts "\n Connecting to our compute:"
@@ -126,7 +127,7 @@ pp "Location of new compute resource: #{cmpt_loc}"
 
 ## get links of all available compute resouces again
 puts "\n\nListing locations of compute resources (should now contain #{cmpt_loc})"
-pp client.list client.get_resource_type_identifier("compute")
+pp client.list "compute"
 
 ## get detailed information about the new compute resource
 puts "\n\nListing information about compute resource #{cmpt_loc}"
