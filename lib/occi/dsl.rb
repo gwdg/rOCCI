@@ -100,7 +100,7 @@ module OCCI
 		private
 
 		def check
-			raise "You have to issue 'connect' first!" unless @client
+			raise "You have to issue 'connect' first!" if @client.nil?
       raise "Client is disconnected!" unless @client.connected
 		end
 
