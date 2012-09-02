@@ -1,106 +1,106 @@
 module OCCI
-	module DSL
+  module DSL
 
-		def connect(*args)
-			@client = OCCI::Client.new(*args)
+    def connect(*args)
+      @client = OCCI::Client.new(*args)
 
-			true
-		end
+      true
+    end
 
-		def list(*args)
+    def list(*args)
       check
 
-			@client.list(*args)
-		end
+      @client.list(*args)
+    end
 
-		def describe(*args)
-			check
+    def describe(*args)
+      check
 
-			@client.describe(*args)
-		end		
+      @client.describe(*args)
+    end
 
     def create(*args)
-    	check
+      check
 
-    	@client.create(*args)
-		end
+      @client.create(*args)
+    end
 
-		def delete(*args)
-			check
+    def delete(*args)
+      check
 
-			@client.delete(*args)
-		end
+      @client.delete(*args)
+    end
 
-		def trigger(*args)
-			check
+    def trigger(*args)
+      check
 
-			@client.trigger(*args)
-		end
+      @client.trigger(*args)
+    end
 
-		def refresh
-			check
+    def refresh
+      check
 
-			@client.refresh
-		end
+      @client.refresh
+    end
 
-		def storagelink(*args)
-			check
+    def storagelink(*args)
+      check
 
-			@client.storagelink(*args)
-		end
+      @client.storagelink(*args)
+    end
 
-		def networkinterface(*args)
-			check
+    def networkinterface(*args)
+      check
 
-			@client.networkinterface(*args)
-		end
+      @client.networkinterface(*args)
+    end
 
-		###
+    ###
 
-		def resource_types
-			check
+    def resource_types
+      check
 
-			@client.get_resource_types
-		end
+      @client.get_resource_types
+    end
 
-		def resource_type_identifiers
-			check
+    def resource_type_identifiers
+      check
 
-			@client.get_resource_type_identifiers
-		end
+      @client.get_resource_type_identifiers
+    end
 
-		def mixin_types
-			check
+    def mixin_types
+      check
 
-			@client.get_mixin_types
-		end
+      @client.get_mixin_types
+    end
 
-		def mixinz(*args)
-			check
+    def mixinz(*args)
+      check
 
-			@client.get_mixins(*args)
-		end
+      @client.get_mixins(*args)
+    end
 
-		###
+    ###
 
-		def instance(*args)
-			check
+    def instance(*args)
+      check
 
-			@client.get_instance(*args)
-		end
+      @client.get_instance(*args)
+    end
 
-		def mixin(*args)
-			check
+    def mixin(*args)
+      check
 
-			@client.find_mixin(*args)
-		end
+      @client.find_mixin(*args)
+    end
 
-		private
+    private
 
-		def check
-			raise "You have to issue 'connect' first!" if @client.nil?
+    def check
+      raise "You have to issue 'connect' first!" if @client.nil?
       raise "Client is disconnected!" unless @client.connected
-		end
+    end
 
-	end
+  end
 end
