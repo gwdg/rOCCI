@@ -41,7 +41,7 @@ mixin_types.each do |mixin_type|
 end
 
 puts "\n\nListing all available mixins:"
-mixins.each do |mixin|
+mixinz.each do |mixin|
   puts "\n#{mixin}"
 end
 

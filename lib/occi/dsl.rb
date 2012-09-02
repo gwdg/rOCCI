@@ -1,5 +1,3 @@
-require 'rubygems'
-
 module OCCI
 	module DSL
 
@@ -71,13 +69,13 @@ module OCCI
 			@client.get_resource_type_identifiers
 		end
 
-		def mixin_tyoes
+		def mixin_types
 			check
 
 			@client.get_mixin_types
 		end
 
-		def mixins(*args)
+		def mixinz(*args)
 			check
 
 			@client.get_mixins(*args)
