@@ -1,6 +1,3 @@
-require 'logger'
-require 'active_support/notifications'
-
 module OCCI
   class Log
 
