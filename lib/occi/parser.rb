@@ -1,14 +1,3 @@
-require 'rubygems'
-require 'json'
-require 'nokogiri'
-require 'hashie/mash'
-require 'rubygems/package'
-require 'zlib'
-require 'tempfile'
-require 'occi/collection'
-require 'occi/log'
-require 'occiantlr/OCCIANTLRParser'
-
 module OCCI
   class Parser
 
