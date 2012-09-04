@@ -17,12 +17,14 @@
 require 'rubygems'
 require 'occi'
 require 'pp'
-require 'logger'
+
+require 'occi/client/occiopts'
 
 include OCCI::DSL
 
 begin
-  puts "This is an OCCI client utility."
+  options = OcciOpts.parse ARGV
+  puts "This is an OCCI client utility. #{options}"
 rescue Exception => ex
   puts "An error occurred!"
   exit!
