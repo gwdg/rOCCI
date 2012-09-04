@@ -4,7 +4,7 @@ require 'logger'
 
 # load and include rOCCI client DSL
 require 'occi'
-include OCCI::DSL
+extend OCCI::DSL
 
 ## options
 use_os_temlate = true # use OS_TEMPLATE or NETWORK + STORAGE + INSTANCE TYPE
@@ -40,8 +40,13 @@ mixin_types.each do |mixin_type|
   puts "\n#{mixin_type}"
 end
 
+puts "\n\nListing all available mixin type identifiers:"
+mixin_type_identifiers.each do |mixin_typeid|
+  puts "\n#{mixin_typeid}"
+end
+
 puts "\n\nListing all available mixins:"
-mixinz.each do |mixin|
+mixins.each do |mixin|
   puts "\n#{mixin}"
 end
 
@@ -93,7 +98,7 @@ pp describe "network"
 
 ## create a compute resource using the chosen method (os_tpl|strg+ntwrk)
 puts "\n\nCreate compute resources"
-cmpt = instance "compute"
+cmpt = resource "compute"
 
 unless use_os_temlate
   ## without OS template, we have to manually select and attach

@@ -16,6 +16,7 @@ module OCCI
     attr_reader :connected
 
     # hash mapping human-readable resource names to OCCI identifiers
+    # TODO: get resources dynamically from the model
     RESOURCES = {
       :compute => "http://schemas.ogf.org/occi/infrastructure#compute",
       :storage => "http://schemas.ogf.org/occi/infrastructure#storage",
@@ -94,7 +95,7 @@ module OCCI
 
     # @param [String] Resource name or resource identifier
     # @return [OCCI::Core::Entity] Resource instance
-    def get_instance(resource_type)
+    def get_resource(resource_type)
 
       OCCI::Log.debug("Instantiating #{resource_type} ...")
 
@@ -199,6 +200,17 @@ module OCCI
     # @return [Array] List of available mixin types
     def get_mixin_types
       @mixins.keys.map! { |k| k.to_s }
+    end
+
+    # @return [Array] List of available mixin type identifiers
+    def get_mixin_type_identifiers
+      identifiers = []
+
+      get_mixin_types.each do |mixin_type|
+        identifiers << 'http://schemas.ogf.org/occi/infrastructure#' + mixin_type
+      end
+
+      identifiers
     end
 
     # @param [String] Human-readable name of the resource

@@ -37,6 +37,11 @@ client.get_mixin_types.each do |mixin_type|
   puts "\n#{mixin_type}"
 end
 
+puts "\n\nListing all available mixin type identifiers:"
+client.get_mixin_type_identifiers.each do |mixin_typeid|
+  puts "\n#{mixin_typeid}"
+end
+
 puts "\n\nListing all available mixins:"
 client.get_mixins.each do |mixin|
   puts "\n#{mixin}"
@@ -90,7 +95,7 @@ pp client.describe "network"
 
 ## create a compute resource using the chosen method (os_tpl|strg+ntwrk)
 puts "\n\nCreate compute resources"
-cmpt = client.get_instance "compute"
+cmpt = client.get_resource "compute"
 
 unless use_os_temlate
   ## without OS template, we have to manually select and attach

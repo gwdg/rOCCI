@@ -69,13 +69,19 @@ module OCCI
       @client.get_resource_type_identifiers
     end
 
+    def mixin_type_identifiers
+      check
+
+      @client.get_mixin_type_identifiers
+    end
+
     def mixin_types
       check
 
       @client.get_mixin_types
     end
 
-    def mixinz(*args)
+    def mixins(*args)
       check
 
       @client.get_mixins(*args)
@@ -83,10 +89,10 @@ module OCCI
 
     ###
 
-    def instance(*args)
+    def resource(*args)
       check
 
-      @client.get_instance(*args)
+      @client.get_resource(*args)
     end
 
     def mixin(*args)
