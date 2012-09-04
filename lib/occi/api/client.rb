@@ -14,6 +14,7 @@ module OCCI
     attr_reader :auth_options
     attr_reader :media_type
     attr_reader :connected
+    attr_reader :model
 
     # hash mapping human-readable resource names to OCCI identifiers
     # TODO: get resources dynamically from the model
