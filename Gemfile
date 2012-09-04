@@ -10,6 +10,7 @@ gem "builder"
 gem "activesupport"
 gem "rake"
 gem "httparty"
+gem "highline"
 
 # development related gems
 group :development do
