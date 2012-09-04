@@ -6,7 +6,6 @@ module OCCI
 
     # HTTParty for raw HTTP requests
     include HTTParty
-    debug_output $stderr
     headers 'Accept' => 'application/occi+json,text/plain;q=0.5'
 
     # a few attributes which should be visible outside the client
@@ -73,7 +72,7 @@ module OCCI
     # @param [Hash] Logging options
     # @param [Boolean] Enable autoconnect?
     # @return [OCCI:Client] Client instance
-    def initialize(endpoint = "http://localhost:3000/", auth_options = {:type => "none"}, log_options = { :out => STDERR, :level => OCCI::Log::WARN }, auto_connect = true, media_type=nil)
+    def initialize(endpoint = "http://localhost:3000/", auth_options = {:type => "none"}, log_options = { :out => STDERR, :level => OCCI::Log::WARN, :logger => nil}, auto_connect = true, media_type = nil)
       # set OCCI::Log
       set_logger log_options
 
@@ -385,8 +384,12 @@ module OCCI
     # @param [Hash]
     def set_logger(log_options)
 
-      logger = OCCI::Log.new(log_options[:out])
-      logger.level = log_options[:level] if log_options[:level]
+      if log_options[:logger].nil? or not (log_options[:logger].kind_of? OCCI::Log)
+        logger = OCCI::Log.new(log_options[:out])
+        logger.level = log_options[:level]
+      end
+
+      self.class.debug_output $stderr if log_options[:level] == OCCI::Log::DEBUG
 
     end
 
@@ -426,7 +429,8 @@ module OCCI
         categories = filter.categories.collect { |category| category.to_text }.join(',')
         attributes = filter.entities.collect { |entity| entity.attributes.combine.collect { |k, v| k + '=' + v } }.join(',')
         self.class.get(@endpoint + path,
-                       :headers => { 'Content-Type'      => 'text/occi',
+                       :headers => { 'Accept' => self.class.headers['Accept'],
+                                     'Content-Type'      => 'text/occi',
                                      'Category'          => categories,
                                      'X-OCCI-Attributes' => attributes })
       else
