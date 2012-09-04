@@ -1,12 +1,12 @@
 require 'rubygems'
 require 'httparty'
-require 'logger'
 
 module OCCI
   class Client
 
     # HTTParty for raw HTTP requests
     include HTTParty
+    debug_output $stderr
     headers 'Accept' => 'application/occi+json,text/plain;q=0.5'
 
     # a few attributes which should be visible outside the client
@@ -72,22 +72,31 @@ module OCCI
     # @param [Hash] Logging options
     # @param [Boolean] Enable autoconnect?
     # @return [OCCI:Client] Client instance
-    def initialize(endpoint = "http://localhost:3000/", auth_options = {:type => "none"}, log_options = { :out => STDERR, :level => Logger::WARN }, auto_connect = true)
+    def initialize(endpoint = "http://localhost:3000/", auth_options = {:type => "none"}, log_options = { :out => STDERR, :level => OCCI::Log::WARN }, auto_connect = true, media_type=nil)
+      # set OCCI::Log
+      set_logger log_options
+
       # pass auth options to HTTParty
       change_auth auth_options
 
       # check the validity and canonize the endpoint URI
       prepare_endpoint endpoint
 
-      # get model information from the endpoint
-      # and create OCCI::Model instance
-      set_model
-
       # get accepted media types from HTTParty
       set_media_type
 
-      # set OCCI::Log
-      set_logger log_options
+      # force media_type if provided
+      if media_type
+        self.class.headers 'Accept' => media_type
+        @media_type = media_type
+      end
+
+      OCCI::Log.debug("Media Type: #{@media_type}")
+      OCCI::Log.debug("Headers: #{self.class.headers}")
+
+      # get model information from the endpoint
+      # and create OCCI::Model instance
+      set_model
 
       # auto-connect?
       @connected = auto_connect
@@ -416,8 +425,7 @@ module OCCI
         categories = filter.categories.collect { |category| category.to_text }.join(',')
         attributes = filter.entities.collect { |entity| entity.attributes.combine.collect { |k, v| k + '=' + v } }.join(',')
         self.class.get(@endpoint + path,
-                       :headers => { 'Accept'            => 'application/occi+json,text/plain;q=0.5',
-                                     'Content-Type'      => 'text/occi',
+                       :headers => { 'Content-Type'      => 'text/occi',
                                      'Category'          => categories,
                                      'X-OCCI-Attributes' => attributes })
       else
@@ -461,9 +469,9 @@ module OCCI
     def put(path, collection)
       path     = path.reverse.chomp('/').reverse
       response = if @media_type == 'application/occi+json'
-        self.class.post(@endpoint + path, :body => collection.to_json, :headers => { 'Accept' => 'application/occi+json,text/plain;q=0.5', 'Content-Type' => 'application/occi+json' })
+        self.class.post(@endpoint + path, :body => collection.to_json, :headers => { 'Content-Type' => 'application/occi+json' })
       else
-        self.class.post(@endpoint + path, { :body => collection.to_text, :headers => { 'Accept' => 'application/occi+json,text/plain;q=0.5', 'Content-Type' => 'text/plain' } })
+        self.class.post(@endpoint + path, { :body => collection.to_text, :headers => { 'Content-Type' => 'text/plain' } })
       end
 
       response_msg = response_message response
