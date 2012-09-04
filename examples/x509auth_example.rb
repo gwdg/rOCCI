@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'occi'
 require 'pp'
-require 'logger'
 
 ## options
 use_os_temlate = true # use OS_TEMPLATE or NETWORK + STORAGE + INSTANCE TYPE
@@ -20,7 +19,7 @@ client = OCCI::Client.new('https://localhost:3300',
                                    :user_cert_password => USER_CERT_PASSWORD,
                                    :ca_path            => CA_PATH },
                                  { :out                => STDERR,
-                                   :level              => Logger::DEBUG})
+                                   :level              => OCCI::Log::DEBUG})
 
 puts "\n\nListing all available resource types:"
 client.get_resource_types.each do |type|

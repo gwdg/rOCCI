@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'pp'
-require 'logger'
 
 # load and include rOCCI client DSL
 require 'occi'
@@ -23,7 +22,7 @@ connect('https://localhost:3300',
           :user_cert_password => USER_CERT_PASSWORD,
           :ca_path            => CA_PATH },
         { :out                => STDERR,
-          :level              => Logger::DEBUG})
+          :level              => OCCI::Log::DEBUG})
 
 puts "\n\nListing all available resource types:"
 resource_types.each do |type|
