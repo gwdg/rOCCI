@@ -379,7 +379,7 @@ module OCCI
       networkinterface
     end
 
-    private
+    #private
 
     # @param [Hash]
     def set_logger(log_options)
@@ -443,7 +443,7 @@ module OCCI
 
       kind = @model.get_by_location path if @model
       kind ? entity_type = kind.entity_type : entity_type = nil
-      _, collection = OCCI::Parser.parse(response.content_type, response.body, path.include?('/-/'), entity_type)
+      _, collection = OCCI::Parser.parse(response.content_type, response.body, path.include?('-/'), entity_type)
 
       collection
     end
