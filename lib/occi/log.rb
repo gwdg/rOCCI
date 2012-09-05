@@ -1,7 +1,7 @@
 module OCCI
   class Log
 
-    include Logger::Severity
+    include ::Logger::Severity
 
     attr_reader :logger
 
