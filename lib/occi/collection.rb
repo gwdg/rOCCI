@@ -1,6 +1,3 @@
-require 'hashie/mash'
-require 'active_support/json'
-
 module OCCI
   class Collection
     attr_accessor :kinds

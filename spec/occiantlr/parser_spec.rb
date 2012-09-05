@@ -13,17 +13,17 @@ module OCCI
           scheme                          = 'http://schemas.ogf.org/occi/core#'
           class_type                      = 'kind'
           title                           = 'Storage Resource How\'s your quotes escaping?\"'
-          rel                             = 'http://schemas.ogf.org/occi/core#resource'
+          rel                             = ['http://schemas.ogf.org/occi/core#resource#']
           location                        = '/storage/'
           attributes                      = Hashie::Mash.new
-          attributes.occi!.storage!.size  = ATTRIBUTE
+          attributes.occi!.storage!.size  = { :mutable => false, :required => false, :type => "string" }
           attributes.occi!.storage!.state = ATTRIBUTE
-          attributes_string               = 'occi.storage.size occi.storage.state'
+          attributes_string               = 'occi.storage.size{immutable} occi.storage.state'
           actions                         = Array.new
           actions << 'http://schemas.ogf.org/occi/infrastructure/storage/action#resize'
           actions << 'http://schemas.ogf.org/occi/infrastructure/storage/action#online'
 
-          category_string = %Q{Category: #{term}; scheme="#{scheme}"; class="#{class_type}"; title="#{title}"; rel="#{rel}"; location="#{location}"; attributes="#{attributes_string}"; actions="#{actions.join(' ')}"}
+          category_string = %Q{Category: #{term}; scheme="#{scheme}"; class="#{class_type}"; title="#{title}"; rel="#{rel.first}"; location="#{location}"; attributes="#{attributes_string}"; actions="#{actions.join(' ')}"}
 
           category = OCCIANTLR::Parser.new(category_string).category
           kind     = category[:kinds].first

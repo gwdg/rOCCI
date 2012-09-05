@@ -1,10 +1,9 @@
 require 'logger'
-require 'active_support/notifications'
 
 module OCCI
   class Log
 
-    include Logger::Severity
+    include ::Logger::Severity
 
     attr_reader :logger
 

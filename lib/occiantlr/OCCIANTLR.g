@@ -47,7 +47,7 @@ category returns [hash]
 	 category_title returns [value]		: SEMICOLON WS? TITLE EQUALS QUOTE title QUOTE
 	 				  	  { value = $title.text };
 	 category_rel returns [value]		: SEMICOLON WS? REL EQUALS QUOTE uri QUOTE
-					  	  { value = $uri.text };
+					  	  { value = [$uri.text] };
 	 category_location returns [value]	: SEMICOLON WS? LOCATION EQUALS QUOTE uri QUOTE
 	 				  	  { value = $uri.text };
 	 category_attributes  returns [hash] 	@init{hash = Hashie::Mash.new}
@@ -107,7 +107,7 @@ x_occi_location returns [location]
 	: X_OCCI_LOCATION_KEY COLON WS? uri SEMICOLON? { location = URI.parse($uri.text) } ;
 
 uri			: ( LOALPHA | UPALPHA | DIGIT | AT | COLON | PERCENT | UNDERSCORE | BACKSLASH | PLUS | DOT | TILDE | HASH | QUESTION | AMPERSAND | SLASH | EQUALS | DASH | X_OCCI_ATTRIBUTE_KEY | X_OCCI_LOCATION_KEY | reserved_words)+;
-term			: ( LOALPHA | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | reserved_words )*;
+term			: ( LOALPHA | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )*;
 scheme 		        : uri; 
 class_type		: ( KIND | MIXIN | ACTION );
 title			: ( ESC | ~( BACKSLASH | QUOTE | SQUOTE ) | SQUOTE )*;
@@ -118,7 +118,8 @@ attribute returns [hash] @init { hash = Hashie::Mash.new }
 attribute_name returns [hash] @init { hash = Hashie::Mash.new }
                         : comp_first=attribute_component { cur_hash = hash; comp = $comp_first.text }
 			  ( '.' comp_next=attribute_component { cur_hash[comp.to_sym] = Hashie::Mash.new; cur_hash = cur_hash[comp.to_sym]; comp = $comp_next.text })*
-			  { cur_hash[comp.to_sym] = ATTRIBUTE };
+			  { cur_hash[comp.to_sym] = ATTRIBUTE } 
+			  ('{' ('mutable' { cur_hash[comp.to_sym][:mutable] = true })? ('immutable' { cur_hash[comp.to_sym][:mutable] = false })? ('required' { cur_hash[comp.to_sym][:required] = true })? '}' )?;
 attribute_component	: ( LOALPHA | reserved_words) ( LOALPHA | DIGIT | DASH | UNDERSCORE | reserved_words  )*;
 attribute_value returns [value]	: ( string { value = $string.text } | number { value = $number.text.to_i } );
 string			: quoted_string;
@@ -174,7 +175,9 @@ TERM	:	'term';
 TILDE	:	'~';
 TITLE	:	'title';
 UNDERSCORE
-	:	'_';
+	:	'_';	
+LBRACKET : '(';
+RBRACKET : ')';
 
 LOALPHA : 	('a'..'z')+;
 UPALPHA	: 	('A'..'Z')+;

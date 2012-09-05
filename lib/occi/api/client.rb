@@ -379,7 +379,7 @@ module OCCI
       networkinterface
     end
 
-    private
+    #private
 
     # @param [Hash]
     def set_logger(log_options)
@@ -428,11 +428,13 @@ module OCCI
       response = if filter
         categories = filter.categories.collect { |category| category.to_text }.join(',')
         attributes = filter.entities.collect { |entity| entity.attributes.combine.collect { |k, v| k + '=' + v } }.join(',')
-        self.class.get(@endpoint + path,
-                       :headers => { 'Accept' => self.class.headers['Accept'],
-                                     'Content-Type'      => 'text/occi',
-                                     'Category'          => categories,
-                                     'X-OCCI-Attributes' => attributes })
+        
+        headers = self.class.headers.clone
+        headers['Content-Type'] = 'text/occi'
+        headers['Category'] = categories unless categories.empty?
+        headers['X-OCCI-Attributes'] = attributes unless attributes.empty?
+
+        self.class.get(@endpoint + path, :headers => headers)
       else
         self.class.get(@endpoint + path)
       end
@@ -442,7 +444,7 @@ module OCCI
 
       kind = @model.get_by_location path if @model
       kind ? entity_type = kind.entity_type : entity_type = nil
-      _, collection = OCCI::Parser.parse(response.content_type, response.body, path.include?('/-/'), entity_type)
+      _, collection = OCCI::Parser.parse(response.content_type, response.body, path.include?('-/'), entity_type)
 
       collection
     end

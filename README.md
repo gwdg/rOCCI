@@ -77,7 +77,11 @@ To get all resources (as a list of OCCI::Resources) currently managed by the end
 
     client.get resources
 
-To get only compute, storage or network resources use get_compute_resources, ...
+To get only compute, storage or network resources use
+
+    client.get compute
+    client.get storage
+    client.get network
 
 To get the location of all resources use
 
