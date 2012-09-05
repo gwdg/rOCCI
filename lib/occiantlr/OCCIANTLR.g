@@ -7,7 +7,7 @@ options {
 @header { 
 	require 'uri' 
 	require 'hashie'
-	ATTRIBUTE = { :mutable => true, :required => false, :type => "string" }
+	ATTRIBUTE = { :Mutable => true, :Required => false, :Type => "string" }
 }
 
 /*
@@ -119,7 +119,7 @@ attribute_name returns [hash] @init { hash = Hashie::Mash.new }
                         : comp_first=attribute_component { cur_hash = hash; comp = $comp_first.text }
 			  ( '.' comp_next=attribute_component { cur_hash[comp.to_sym] = Hashie::Mash.new; cur_hash = cur_hash[comp.to_sym]; comp = $comp_next.text })*
 			  { cur_hash[comp.to_sym] = ATTRIBUTE } 
-			  ('{' ('mutable' { cur_hash[comp.to_sym][:mutable] = true })? ('immutable' { cur_hash[comp.to_sym][:mutable] = false })? ('required' { cur_hash[comp.to_sym][:required] = true })? '}' )?;
+			  ('{' ('mutable' { cur_hash[comp.to_sym][:Mutable] = true })? ('immutable' { cur_hash[comp.to_sym][:Mutable] = false })? ('required' { cur_hash[comp.to_sym][:Required] = true })? '}' )?;
 attribute_component	: ( LOALPHA | reserved_words) ( LOALPHA | DIGIT | DASH | UNDERSCORE | reserved_words  )*;
 attribute_value returns [value]	: ( string { value = $string.text } | number { value = $number.text.to_i } );
 string			: quoted_string;

@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: OCCIANTLR.g
-# Generated at: 2012-09-05 21:22:48
+# Generated at: 2012-09-05 23:28:21
 # 
 
 # ~~~> start load path setup
@@ -62,7 +62,7 @@ end
  
 	require 'uri' 
 	require 'hashie'
-	ATTRIBUTE = { :mutable => true, :required => false, :type => "string" }
+	ATTRIBUTE = { :Mutable => true, :Required => false, :Type => "string" }
 
 # - - - - - - end action @parser::header - - - - - - -
 
@@ -1914,7 +1914,7 @@ module OCCIANTLR
             # at line 122:12: 'mutable'
             match( T__49, TOKENS_FOLLOWING_T__49_IN_attribute_name_1109 )
             # --> action
-             cur_hash[comp.to_sym][:mutable] = true 
+             cur_hash[comp.to_sym][:Mutable] = true 
             # <-- action
 
           end
@@ -1930,7 +1930,7 @@ module OCCIANTLR
             # at line 122:68: 'immutable'
             match( T__50, TOKENS_FOLLOWING_T__50_IN_attribute_name_1116 )
             # --> action
-             cur_hash[comp.to_sym][:mutable] = false 
+             cur_hash[comp.to_sym][:Mutable] = false 
             # <-- action
 
           end
@@ -1946,7 +1946,7 @@ module OCCIANTLR
             # at line 122:127: 'required'
             match( T__51, TOKENS_FOLLOWING_T__51_IN_attribute_name_1123 )
             # --> action
-             cur_hash[comp.to_sym][:required] = true 
+             cur_hash[comp.to_sym][:Required] = true 
             # <-- action
 
           end
