@@ -428,11 +428,12 @@ module OCCI
       response = if filter
         categories = filter.categories.collect { |category| category.to_text }.join(',')
         attributes = filter.entities.collect { |entity| entity.attributes.combine.collect { |k, v| k + '=' + v } }.join(',')
+        headers = self.class.headers.clone
+        headers['Content-Type'] = 'text/occi'
+        headers['Category'] = categories unless categories.empty?
+        headers['X-OCCI-Attributes'] = attributes unless attributes.empty?
         self.class.get(@endpoint + path,
-                       :headers => { 'Accept' => self.class.headers['Accept'],
-                                     'Content-Type'      => 'text/occi',
-                                     'Category'          => categories,
-                                     'X-OCCI-Attributes' => attributes })
+                       :headers => headers)
       else
         self.class.get(@endpoint + path)
       end
