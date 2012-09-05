@@ -25,7 +25,6 @@ require 'occi/log'
 require 'occi/client'
 require 'occi/collection'
 require 'occi/core'
-require 'occi/infrastructure'
 
 require 'occiantlr/OCCIANTLRLexer'
 require 'occiantlr/OCCIANTLRParser'

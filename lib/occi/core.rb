@@ -5,7 +5,7 @@ require 'occi/core/action'
 require 'occi/core/entity'
 require 'occi/core/link'
 require 'occi/core/resource'
-require 'occi/core/attribute'
+#require 'occi/core/attribute'
 require 'occi/core/attributes'
 
 module OCCI
