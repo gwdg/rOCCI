@@ -23,7 +23,6 @@ class OcciOpts
     options.auth[:username] = "anonymous"
     
     options.media_type = "application/occi+json,text/plain;q=0.5"
-    options.mixins = {}
 
     opts = OptionParser.new do |opts|
       opts.banner = "Usage: occi [OPTIONS]"
@@ -73,6 +72,7 @@ class OcciOpts
 
         raise "Unknown mixin format! Use TYPE#NAME!" unless parts.length == 2
 
+        options.mixins = {} if options.mixins.nil?
         options.mixins[parts[0]] = [] if options.mixins[parts[0]].nil?
         options.mixins[parts[0]] << parts[1]
       end
@@ -122,7 +122,7 @@ class OcciOpts
     end
 
     if options.action == :create
-      mandatory << :mixin
+      mandatory << :mixins
     end
 
     mandatory.concat [:resource, :action]
