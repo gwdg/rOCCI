@@ -46,19 +46,21 @@ begin
   OCCI::Log.info "Establishing a connection to #{options.endpoint} ..."
   connect options.endpoint, options.auth, options.log, true, options.media_type
 
-  OCCI::Log.info "Executing action #{options.do} on #{options.resource} ..."
-  case options.do
-  when "list"
+  OCCI::Log.info "Executing action #{options.action.to_s} on #{options.resource} ..."
+  case options.action
+  when :list
 
     if resource_types.include? options.resource or resource_type_identifiers.include? options.resource
       pp list options.resource
     elsif mixin_types.include? options.resource
       pp mixins options.resource
+    elsif mixin_type_identifiers.include? options.resource
+      pp mixins options.resource.split('#').last
     else 
       pp "Unknown resource #{options.resource}, there is nothing to list here!"
     end
 
-  when "describe"
+  when :describe
 
     if resource_types.include? options.resource or resource_type_identifiers.include? options.resource or options.resource.start_with? options.endpoint
       pp describe options.resource
@@ -67,13 +69,24 @@ begin
         mxn = mxn.split("#").last
         pp mixin(mxn, options.resource, true)
       end
+    elsif mixin_type_identifiers.include? options.resource
+      mixins(options.resource.split('#').last).each do |mxn|
+        mxn = mxn.split("#").last
+        pp mixin(mxn, options.resource, true)
+      end
+    elsif mixins.include? options.resource
+      mxn_type,mxn = options.resource.split("/").last.split('#')
+      pp mixin(mxn, mxn_type, true)
+    elsif mixin_types.include? options.resource.split('#').first
+      mxn_type,mxn = options.resource.split('#')
+      pp mixin(mxn, mxn_type, true)
     else
       pp "Unknown resource #{options.resource}, there is nothing to describe here!"
     end
 
-  when "create"
+  when :create
     raise "Not yet implemented!"
-  when "delete"
+  when :delete
     result = delete options.resource
 
     if result
@@ -81,10 +94,10 @@ begin
     else
       OCCI::Log.warn "Failed to remove resource #{options.resource}!"
     end
-  when "trigger"
+  when :trigger
     raise "Not yet implemented!"
   else
-    raise "Unknown action [#{options.do}]!"
+    raise "Unknown action [#{options.action}]!"
   end
 
 rescue OpenSSL::SSL::SSLError => ssl_ex

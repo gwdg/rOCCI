@@ -6,12 +6,23 @@ class OcciOpts
   def self.parse(args)
 
     options = OpenStruct.new
+    
     options.debug = false
     options.verbose = false
-    options.log = {:out => STDERR, :level => OCCI::Log::WARN}
+    
+    options.log = {}
+    options.log[:out] = STDERR
+    options.log[:level] = OCCI::Log::WARN
+    
     options.endpoint = "https://localhost:3300/"
-    options.auth = {:type => "none", :user_cert => ENV['HOME'] + "/.globus/usercred.pem", :ca_path => "/etc/grid-security/certificates"}
-    options.media_type = nil
+    
+    options.auth = {}
+    options.auth[:type] = "none"
+    options.auth[:user_cert] = ENV['HOME'] + "/.globus/usercred.pem"
+    options.auth[:ca_path] = "/etc/grid-security/certificates"
+    options.auth[:username] = "anonymous"
+    
+    options.media_type = "application/occi+json,text/plain;q=0.5"
     options.mixins = {}
 
     opts = OptionParser.new do |opts|
@@ -24,15 +35,15 @@ class OcciOpts
         options.endpoint = endpoint
       end
 
-      opts.on("--auth METHOD", ["x509", "basic", "digest", "none"], "Auth. method to be used, defaults to '#{options.auth[:type]}'") do |auth|
-        options.auth[:type] = auth
+      opts.on("--auth METHOD", [:x509, :basic, :digest, :none], "Authentication method, defaults to '#{options.auth[:type]}'") do |auth|
+        options.auth[:type] = auth.to_s
       end
 
-      opts.on("--username USER", String, "") do |username|
+      opts.on("--username USER", String, "Username for basic or digest authentication, defaults to '#{options.auth[:username]}'") do |username|
         options.auth[:username] = username
       end
 
-      opts.on("--password PASSWORD", String, "") do |password|
+      opts.on("--password PASSWORD", String, "Password for basic, digest or x509 authentication") do |password|
         options.auth[:password] = password
         options.auth[:user_cert_password] = password
       end
@@ -45,27 +56,16 @@ class OcciOpts
         options.auth[:user_cert] = user_cred
       end
 
-      opts.on("--media-type MEDIA_TYPE", [:json, :xml, :plain, :none], "Force media type, defaults to 'none'") do |media_type|
-        
-        case media_type
-        when :json
-          options.media_type = "application/occi+json,text/plain;q=0.5"
-        when :xml
-          options.media_type = "application/occi+xml,text/plain;q=0.5"
-        when :plain
-          options.media_type = "text/plain;q=0.5"
-        else
-          options.media_type = nil
-        end
-
+      opts.on("--media-type MEDIA_TYPE", ["application/occi+json,text/plain;q=0.5", "application/occi+xml,text/plain;q=0.5", "text/plain;q=0.5"], "Media type for client <-> server communication, defaults to '#{options.media_type}'") do |media_type|
+        options.media_type = media_type
       end
 
       opts.on("--resource RESOURCE", String, "Resource to be queried (e.g. network, compute, storage etc.), required") do |resource|
         options.resource = resource
       end
 
-      opts.on("--do ACTION", String, "Action to be performed on the resource (e.g. list, describe, delete etc.), required") do |job|
-        options.do = job
+      opts.on("--action ACTION", [:list, :describe, :create, :delete, :trigger], "Action to be performed on the resource, required") do |action|
+        options.action = action
       end
 
       opts.on("--mixin NAME", String, "Type and name of the mixin as TYPE#NAME (e.g. os_tpl#monitoring, resource_tpl#medium)") do |mixin|
@@ -75,6 +75,10 @@ class OcciOpts
 
         options.mixins[parts[0]] = [] if options.mixins[parts[0]].nil?
         options.mixins[parts[0]] << parts[1]
+      end
+
+      opts.on("--trigger-action TRIGGER_ACTION", String, "Action to be triggered on the resource") do |trigger_action|
+        options.trigger_action = trigger_action
       end
 
       opts.on("--log-to OUTPUT", [:STDOUT, :stdout, :STDERR, :stderr], "Log to the specified device, defaults to 'STDERR'") do |log_to|
@@ -111,7 +115,18 @@ class OcciOpts
       exit!
     end
 
-    mandatory = [:resource, :do]
+    mandatory = []
+
+    if options.action == :trigger
+      mandatory << :trigger_action
+    end
+
+    if options.action == :create
+      mandatory << :mixin
+    end
+
+    mandatory.concat [:resource, :action]
+    
     options_hash = options.marshal_dump
 
     missing = mandatory.select{ |param| options_hash[param].nil? }
