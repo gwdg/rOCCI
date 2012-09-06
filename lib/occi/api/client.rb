@@ -560,12 +560,12 @@ module OCCI
 
     # @return [OCCI::Collection] collection including all registered OS templates
     def get_os_templates
-      @model.get.mixins.select { |mixin| mixin.related.select { |rel| rel.end_with? 'os_tpl' } }
+      @model.get.mixins.select { |mixin| mixin.related.select { |rel| rel.end_with? 'os_tpl' }.any? }
     end
 
     # @return [OCCI::Collection] collection including all registered resource templates
     def get_resource_templates
-      @model.get.mixins.select { |mixin| mixin.related.select { |rel| rel.end_with? 'resource_tpl' } }
+      @model.get.mixins.select { |mixin| mixin.related.select { |rel| rel.end_with? 'resource_tpl' }.any? }
     end
 
     # @return [String]
