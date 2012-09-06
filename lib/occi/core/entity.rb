@@ -157,6 +157,7 @@ module OCCI
         end
         @attributes.combine.each_pair do |name, value|
           name = name.inspect if name.kind_of? String
+          value = value.inspect if value.kind_of? String
           text << 'X-OCCI-Attribute: ' + name + '=' + value + "\n"
         end
         @actions.each do |action|
