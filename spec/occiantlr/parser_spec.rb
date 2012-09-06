@@ -8,7 +8,7 @@ module OCCI
     describe Parser do
       describe "#Category" do
         it "is parsed successful" do
-          ATTRIBUTE                       = { :mutable => true, :required => false, :type => "string" }
+          ATTRIBUTE                       = { :Mutable => true, :Required => false, :Type => "string" }
           term                            = 'entity'
           scheme                          = 'http://schemas.ogf.org/occi/core#'
           class_type                      = 'kind'
@@ -16,7 +16,7 @@ module OCCI
           rel                             = ['http://schemas.ogf.org/occi/core#resource#']
           location                        = '/storage/'
           attributes                      = Hashie::Mash.new
-          attributes.occi!.storage!.size  = { :mutable => false, :required => false, :type => "string" }
+          attributes.occi!.storage!.size  = { :Mutable => false, :Required => false, :Type => "string" }
           attributes.occi!.storage!.state = ATTRIBUTE
           attributes_string               = 'occi.storage.size{immutable} occi.storage.state'
           actions                         = Array.new

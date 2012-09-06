@@ -150,10 +150,10 @@ module OCCI
       # @return [String] text representation
       def to_text
         scheme, term = self.kind.split('#')
-        text         = term + ';scheme=' + scheme.inspect + ';class="kind"' + "\n"
+        text         = 'Category: ' + term + ';scheme=' + scheme.inspect + ';class="kind"' + "\n"
         @mixins.each do |mixin|
           scheme, term = mixin.split('#')
-          text << term + ';scheme=' + scheme.inspect + ';class="mixin"' + "\n"
+          text << 'Category: ' + term + ';scheme=' + scheme.inspect + ';class="mixin"' + "\n"
         end
         @attributes.combine.each_pair do |name, value|
           name = name.inspect if name.kind_of? String

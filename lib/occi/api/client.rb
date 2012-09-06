@@ -561,22 +561,12 @@ module OCCI
 
     # @return [OCCI::Collection] collection including all registered OS templates
     def get_os_templates
-      filter        = OCCI::Collection.new
-      # use the os_tpl mixin as filter for the request
-      filter.mixins = @model.get.mixins.select { |mixin| mixin.term == 'os_tpl' }
-      collection    = get('/-/', filter)
-      # remove os_tpl mixin from the mixins as it does not represent a template itself
-      collection.mixins.select { |mixin| mixin.term != 'os_tpl' }
+      @model.get.mixins.select { |mixin| mixin.related.select { |rel| rel.end_with? 'os_tpl' } }
     end
 
     # @return [OCCI::Collection] collection including all registered resource templates
     def get_resource_templates
-      filter        = OCCI::Collection.new
-      # use the resource_tpl mixin as filter for the request
-      filter.mixins = @model.get.mixins.select { |mixin| mixin.term == 'resource_tpl' }
-      collection    = get('/-/', filter)
-      # remove os_tpl mixin from the mixins as it does not represent a template itself
-      collection.mixins.select { |mixin| mixin.term != 'resource_tpl' }
+      @model.get.mixins.select { |mixin| mixin.related.select { |rel| rel.end_with? 'resource_tpl' } }
     end
 
     # @return [String]
