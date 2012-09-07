@@ -57,7 +57,7 @@ begin
     elsif mixin_type_identifiers.include? options.resource
       pp mixins options.resource.split('#').last
     else 
-      pp "Unknown resource #{options.resource}, there is nothing to list here!"
+      puts "Unknown resource #{options.resource}, there is nothing to list here!"
     end
 
   when :describe
@@ -81,18 +81,45 @@ begin
       mxn_type,mxn = options.resource.split('#')
       pp mixin(mxn, mxn_type, true)
     else
-      pp "Unknown resource #{options.resource}, there is nothing to describe here!"
+      puts "Unknown resource #{options.resource}, there is nothing to describe here!"
     end
 
   when :create
-    raise "Not yet implemented!"
+    
+    if resource_types.include? options.resource or resource_type_identifiers.include? options.resource
+      raise "Not yet implemented!" unless options.resource.include? "compute"
+      
+      res = resource options.resource
+
+      OCCI::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
+      OCCI::Log.debug "with mixins:#{options.mixin}"
+      
+      options.mixin.keys.each do |type|
+        OCCI::Log.debug "Adding mixins of type #{type} to #{options.resource}"
+        options.mixin[type].each do |name|
+          mxn = mixin name, type
+
+          raise "Unknown mixin #{type}##{name}, stopping here!" if mxn.nil?
+          OCCI::Log.debug "Adding mixin #{mxn} to #{options.resource}"
+          res.mixins << mxn
+        end
+      end
+
+      #TODO: set other attributes
+      res.attributes.occi!.core!.title = options.resource_title
+
+      puts create res
+    else
+      puts "Unknown resource #{options.resource}, there is nothing to create here!"
+    end
+
   when :delete
     result = delete options.resource
 
     if result
-      OCCI::Log.info "Resource #{options.resource} successfully removed!"
+      puts "Resource #{options.resource} successfully removed!"
     else
-      OCCI::Log.warn "Failed to remove resource #{options.resource}!"
+      puts "Failed to remove resource #{options.resource}!"
     end
   when :trigger
     raise "Not yet implemented!"

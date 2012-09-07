@@ -22,7 +22,7 @@ class OcciOpts
     options.auth[:ca_path] = "/etc/grid-security/certificates"
     options.auth[:username] = "anonymous"
     
-    options.media_type = "application/occi+json,text/plain;q=0.5"
+    options.media_type = "application/occi+json"
 
     opts = OptionParser.new do |opts|
       opts.banner = "Usage: occi [OPTIONS]"
@@ -55,12 +55,16 @@ class OcciOpts
         options.auth[:user_cert] = user_cred
       end
 
-      opts.on("--media-type MEDIA_TYPE", ["application/occi+json,text/plain;q=0.5", "application/occi+xml,text/plain;q=0.5", "text/plain;q=0.5"], "Media type for client <-> server communication, defaults to '#{options.media_type}'") do |media_type|
+      opts.on("--media-type MEDIA_TYPE", ["application/occi+json", "application/occi+xml", "text/plain"], "Media type for client <-> server communication, defaults to '#{options.media_type}'") do |media_type|
         options.media_type = media_type
       end
 
       opts.on("--resource RESOURCE", String, "Resource to be queried (e.g. network, compute, storage etc.), required") do |resource|
         options.resource = resource
+      end
+
+      opts.on("--resource-title TITLE", String, "Resource title for new resources") do |resource_title|
+        options.resource_title = resource_title
       end
 
       opts.on("--action ACTION", [:list, :describe, :create, :delete, :trigger], "Action to be performed on the resource, required") do |action|
@@ -122,7 +126,7 @@ class OcciOpts
     end
 
     if options.action == :create
-      mandatory << :mixin
+      mandatory << :mixin << :resource_title
     end
 
     mandatory.concat [:resource, :action]
