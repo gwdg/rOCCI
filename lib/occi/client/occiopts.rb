@@ -72,9 +72,9 @@ class OcciOpts
 
         raise "Unknown mixin format! Use TYPE#NAME!" unless parts.length == 2
 
-        options.mixins = {} if options.mixins.nil?
-        options.mixins[parts[0]] = [] if options.mixins[parts[0]].nil?
-        options.mixins[parts[0]] << parts[1]
+        options.mixin = {} if options.mixin.nil?
+        options.mixin[parts[0]] = [] if options.mixin[parts[0]].nil?
+        options.mixin[parts[0]] << parts[1]
       end
 
       opts.on("--trigger-action TRIGGER_ACTION", String, "Action to be triggered on the resource") do |trigger_action|
@@ -122,7 +122,7 @@ class OcciOpts
     end
 
     if options.action == :create
-      mandatory << :mixins
+      mandatory << :mixin
     end
 
     mandatory.concat [:resource, :action]
