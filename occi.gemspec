@@ -11,7 +11,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["florian.feldhaus@gwdg.de", "piotr.kasprzak@gwdg.de"]
   gem.description   = %q{OCCI is a collection of classes to simplify the implementation of the Open Cloud Computing API in Ruby}
   gem.summary       = %q{OCCI toolkit}
-  gem.homepage      = 'https://github.com/gwdg/occi'
+  gem.homepage      = 'https://github.com/gwdg/rOCCI'
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.files         = `git ls-files`.split("\n")
