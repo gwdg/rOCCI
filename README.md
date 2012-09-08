@@ -22,6 +22,10 @@ Usage
 ### Client
 The OCCI gem includes a client you can use directly from shell with the following auth methods: x509 (with --password, --user-cred and --ca-path), basic (with --username and --password), digest (with --username and --password), none. If you won't set a password using --password, the client will run in an interactive mode and ask for it later on.
 
+To find out more about available options and defaults use
+
+    occi --help
+
 To list available resources use
 
     occi --endpoint https://<ENDPOINT>:<PORT>/ --action list --resource compute --auth x509
@@ -44,6 +48,11 @@ To list available OS templates or Resource templates use
 
     occi --endpoint https://<ENDPOINT>:<PORT>/ --action list --resource os_tpl --auth x509
     occi --endpoint https://<ENDPOINT>:<PORT>/ --action list --resource resource_tpl --auth x509
+
+To describe a specific OS template or Resource template use
+
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource os_tpl#debian6 --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource resource_tpl#small --auth x509
 
 To create a compute resource with mixins use
 
@@ -142,6 +151,12 @@ To get a description of a specific resource use
     describe "https://<ENDPOINT>:<PORT>/storage/<OCCI_ID>"
     describe "https://<ENDPOINT>:<PORT>/network/<OCCI_ID>"
 
+To delete a specific resource use
+
+    delete "https://<ENDPOINT>:<PORT>/compute/<OCCI_ID>"
+    delete "https://<ENDPOINT>:<PORT>/storage/<OCCI_ID>"
+    delete "https://<ENDPOINT>:<PORT>/network/<OCCI_ID>"
+
 #### API
 If you need low level access to parts of the OCCI client or need to use more than one instance
 at a time, you should use the OCCI client API directly.
@@ -205,6 +220,12 @@ To get a description of a specific resource use
     client.describe "https://<ENDPOINT>:<PORT>/compute/<OCCI_ID>"
     client.describe "https://<ENDPOINT>:<PORT>/storage/<OCCI_ID>"
     client.describe "https://<ENDPOINT>:<PORT>/network/<OCCI_ID>"
+
+To delete a specific resource use
+
+    client.delete "https://<ENDPOINT>:<PORT>/compute/<OCCI_ID>"
+    client.delete "https://<ENDPOINT>:<PORT>/storage/<OCCI_ID>"
+    client.delete "https://<ENDPOINT>:<PORT>/network/<OCCI_ID>"
 
 #### Logging
 
