@@ -87,6 +87,7 @@ module OCCI
         entity.source = link.attributes!.occi!.core!.source
         collection.links << OCCI::Core::Link.new(entity.kind, entity.mixins, entity.attributes)
       elsif entity_type == OCCI::Core::Resource
+        entity.links = []
         link_strings = header['HTTP_LINK'].to_s.split(',')
         link_strings.each do |link_string|
           link = OCCIANTLR::Parser.new('Link: ' + link_string).link
