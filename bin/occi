@@ -17,13 +17,130 @@
 require 'rubygems'
 require 'occi'
 require 'pp'
-require 'logger'
+require 'highline/import'
+require 'openssl'
 
-include OCCI::DSL
+# OcciOpts is not part of the occi required above
+require 'occi/client/occiopts'
+
+extend OCCI::DSL
+
+# get arguments and validate/parse them to an ostruct
+options = OcciOpts.parse ARGV
+
+# initiate the Logger
+logger = OCCI::Log.new(options.log[:out])
+logger.level = options.log[:level]
+options.log[:logger] = logger
+
+OCCI::Log.info "Starting OCCI client ..."
+OCCI::Log.debug "Options: #{options}"
+
+# running with an empty password?
+if options.auth[:password].nil? or options.auth[:user_cert_password].nil?
+  options.auth[:password] = options.auth[:user_cert_password] = ask("Enter password: ") { |q| q.echo = false } unless options.auth[:type] == "none"
+end
 
 begin
-  puts "This is an OCCI client utility."
+
+  OCCI::Log.info "Establishing a connection to #{options.endpoint} ..."
+  connect options.endpoint, options.auth, options.log, true, options.media_type
+
+  OCCI::Log.info "Executing action #{options.action.to_s} on #{options.resource} ..."
+  case options.action
+  when :list
+
+    if resource_types.include? options.resource or resource_type_identifiers.include? options.resource
+      pp list options.resource
+    elsif mixin_types.include? options.resource
+      pp mixins options.resource
+    elsif mixin_type_identifiers.include? options.resource
+      pp mixins options.resource.split('#').last
+    else 
+      puts "Unknown resource #{options.resource}, there is nothing to list here!"
+    end
+
+  when :describe
+
+    if resource_types.include? options.resource or resource_type_identifiers.include? options.resource or options.resource.start_with? options.endpoint
+      pp describe options.resource
+    elsif mixin_types.include? options.resource
+      mixins(options.resource).each do |mxn|
+        mxn = mxn.split("#").last
+        pp mixin(mxn, options.resource, true)
+      end
+    elsif mixin_type_identifiers.include? options.resource
+      mixins(options.resource.split('#').last).each do |mxn|
+        mxn = mxn.split("#").last
+        pp mixin(mxn, options.resource, true)
+      end
+    elsif mixins.include? options.resource
+      mxn_type,mxn = options.resource.split("/").last.split('#')
+      pp mixin(mxn, mxn_type, true)
+    elsif mixin_types.include? options.resource.split('#').first
+      mxn_type,mxn = options.resource.split('#')
+      pp mixin(mxn, mxn_type, true)
+    else
+      puts "Unknown resource #{options.resource}, there is nothing to describe here!"
+    end
+
+  when :create
+    
+    if resource_types.include? options.resource or resource_type_identifiers.include? options.resource
+      raise "Not yet implemented!" unless options.resource.include? "compute"
+      
+      res = resource options.resource
+
+      OCCI::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
+      OCCI::Log.debug "with mixins:#{options.mixin}"
+      
+      options.mixin.keys.each do |type|
+        OCCI::Log.debug "Adding mixins of type #{type} to #{options.resource}"
+        options.mixin[type].each do |name|
+          mxn = mixin name, type
+
+          raise "Unknown mixin #{type}##{name}, stopping here!" if mxn.nil?
+          OCCI::Log.debug "Adding mixin #{mxn} to #{options.resource}"
+          res.mixins << mxn
+        end
+      end
+
+      #TODO: set other attributes
+      res.attributes.occi!.core!.title = options.resource_title
+
+      puts create res
+    else
+      puts "Unknown resource #{options.resource}, there is nothing to create here!"
+    end
+
+  when :delete
+    result = delete options.resource
+
+    if result
+      puts "Resource #{options.resource} successfully removed!"
+    else
+      puts "Failed to remove resource #{options.resource}!"
+    end
+  when :trigger
+    raise "Not yet implemented!"
+  else
+    raise "Unknown action [#{options.action}]!"
+  end
+
+rescue OpenSSL::SSL::SSLError => ssl_ex
+  OCCI::Log.error "An SSL Auth Error occurred! Please, make sure your credentials are valid and the endpoind is trusted! Message: #{ssl_ex.message}"
+  raise ssl_ex if options.debug
+  exit!
+rescue OpenSSL::PKey::RSAError => key_ex
+  OCCI::Log.error "An X509 Error occurred! Please, check your credentials! Message: #{key_ex.message}"
+  raise key_ex if options.debug
+  exit!
 rescue Exception => ex
-  puts "An error occurred!"
+  OCCI::Log.error "An error occurred! Message: #{ex.message}"
+  raise ex if options.debug
   exit!
 end
+
+OCCI::Log.info "OCCI client is shutting down ..."
+
+exit!(true)
