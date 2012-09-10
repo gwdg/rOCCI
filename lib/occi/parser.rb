@@ -91,6 +91,7 @@ module OCCI
         link_strings = header['HTTP_LINK'].to_s.split(',')
         link_strings.each do |link_string|
           link = OCCIANTLR::Parser.new('Link: ' + link_string).link
+          link.attributes!.occi!.core!.target = link.target
           entity.links << OCCI::Core::Link.new(link.kind, link.mixins, link.attributes, link.actions, link.rel)
         end
         collection.resources << OCCI::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.links)
@@ -138,7 +139,7 @@ module OCCI
         entity.source = links.first.attributes!.occi!.core!.source
         collection.links << OCCI::Core::Link.new(entity.kind, entity.mixins, entity.attributes)
       elsif entity_type == OCCI::Core::Resource
-        entity.links = links.collect { |link| OCCI::Core::Link.new(link.kind, link.mixins, link.attributes, link.actions, link.rel) }
+        entity.links = links.collect { |link| link.attributes!.occi!.core!.target = link.target; OCCI::Core::Link.new(link.kind, link.mixins, link.attributes, link.actions, link.rel) }
         collection.resources << OCCI::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.links)
       end unless entity.kind.nil?
       collection
