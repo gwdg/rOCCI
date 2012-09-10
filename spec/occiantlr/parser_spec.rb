@@ -44,9 +44,9 @@ module OCCI
           self_location                                = '/link/networkinterface/456'
           kind                                     = 'http://schemas.ogf.org/occi/infrastructure#networkinterface'
           attributes                                   = Hashie::Mash.new
-          attributes.occi!.networkinterface!.interface = '"eth0"'
-          attributes.occi!.networkinterface!.mac       = '"00:11:22:33:44:55"'
-          attributes.occi!.networkinterface!.state     = '"active"'
+          attributes.occi!.networkinterface!.interface = 'eth0'
+          attributes.occi!.networkinterface!.mac       = '00:11:22:33:44:55'
+          attributes.occi!.networkinterface!.state     = 'active'
           attributes_string                            = %Q{occi.networkinterface.interface="eth0";occi.networkinterface.mac="00:11:22:33:44:55";occi.networkinterface.state="active"}
           link_string                                  = %Q{Link: <#{target}>; rel="#{rel}"; self="#{self_location}"; category="#{kind}"; #{attributes_string}}
 
@@ -62,7 +62,7 @@ module OCCI
       describe "#X-OCCI-Attribute" do
         it "is parsed successful" do
           attribute                             = Hashie::Mash.new
-          attribute.occi!.compute!.architecture = '"x86_64"'
+          attribute.occi!.compute!.architecture = 'x86_64'
 
           x_occi_attributes_string = %Q{X-OCCI-Attribute: occi.compute.architecture="x86_64"}
 
