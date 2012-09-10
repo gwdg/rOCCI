@@ -42,19 +42,19 @@ module OCCI
           target                                       = '/network/123'
           rel                                          = 'http://schemas.ogf.org/occi/infrastructure#network'
           self_location                                = '/link/networkinterface/456'
-          category                                     = 'http://schemas.ogf.org/occi/infrastructure#networkinterface'
+          kind                                     = 'http://schemas.ogf.org/occi/infrastructure#networkinterface'
           attributes                                   = Hashie::Mash.new
           attributes.occi!.networkinterface!.interface = '"eth0"'
           attributes.occi!.networkinterface!.mac       = '"00:11:22:33:44:55"'
           attributes.occi!.networkinterface!.state     = '"active"'
           attributes_string                            = %Q{occi.networkinterface.interface="eth0";occi.networkinterface.mac="00:11:22:33:44:55";occi.networkinterface.state="active"}
-          link_string                                  = %Q{Link: <#{target}>; rel="#{rel}"; self="#{self_location}"; category="#{category}"; #{attributes_string}}
+          link_string                                  = %Q{Link: <#{target}>; rel="#{rel}"; self="#{self_location}"; category="#{kind}"; #{attributes_string}}
 
           link = OCCIANTLR::Parser.new(link_string).link
           link[:target].should == target
           link[:rel].should == rel
           link[:self].should == self_location
-          link[:category].should == category
+          link[:kind].should == kind
           link[:attributes].should == attributes
         end
       end
