@@ -45,6 +45,7 @@ DEPENDENCIES
   builder
   hashie
   httparty
+  i18n
   json
   nokogiri
   rake

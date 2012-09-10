@@ -25,6 +25,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'nokogiri'
   gem.add_dependency 'activesupport'
   gem.add_dependency 'httparty'
+  gem.add_dependency 'i18n'
 
   gem.required_ruby_version     = ">= 1.8.7"
 end

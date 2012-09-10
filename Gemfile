@@ -10,6 +10,7 @@ gem "builder"
 gem "activesupport"
 gem "rake"
 gem "httparty"
+gem "i18n"
 
 # development related gems
 group :development do
