@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: OCCIANTLR.g
-# Generated at: 2012-09-05 23:28:22
+# Generated at: 2012-09-10 16:19:48
 # 
 
 # ~~~> start load path setup
@@ -252,7 +252,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 131:4: 'Category'
+      # at line 130:4: 'Category'
       match( "Category" )
 
       
@@ -276,7 +276,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 133:4: 'Link'
+      # at line 132:4: 'Link'
       match( "Link" )
 
       
@@ -300,7 +300,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 135:4: 'X-OCCI-Attribute'
+      # at line 134:4: 'X-OCCI-Attribute'
       match( "X-OCCI-Attribute" )
 
       
@@ -324,7 +324,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 137:4: 'X-OCCI-Location'
+      # at line 136:4: 'X-OCCI-Location'
       match( "X-OCCI-Location" )
 
       
@@ -348,7 +348,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 141:10: 'action'
+      # at line 140:10: 'action'
       match( "action" )
 
       
@@ -372,7 +372,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 142:11: 'actions'
+      # at line 141:11: 'actions'
       match( "actions" )
 
       
@@ -396,7 +396,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 144:4: '&'
+      # at line 143:4: '&'
       match( 0x26 )
 
       
@@ -420,7 +420,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 145:6: '@'
+      # at line 144:6: '@'
       match( 0x40 )
 
       
@@ -444,7 +444,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 147:4: 'attributes'
+      # at line 146:4: 'attributes'
       match( "attributes" )
 
       
@@ -468,7 +468,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 149:4: '\\\\'
+      # at line 148:4: '\\\\'
       match( 0x5c )
 
       
@@ -492,7 +492,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 150:11: 'category'
+      # at line 149:11: 'category'
       match( "category" )
 
       
@@ -516,7 +516,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 151:9: 'class'
+      # at line 150:9: 'class'
       match( "class" )
 
       
@@ -540,7 +540,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 152:9: ':'
+      # at line 151:9: ':'
       match( 0x3a )
 
       
@@ -564,7 +564,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 153:8: '-'
+      # at line 152:8: '-'
       match( 0x2d )
 
       
@@ -588,7 +588,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 154:7: '.'
+      # at line 153:7: '.'
       match( 0x2e )
 
       
@@ -612,7 +612,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 155:10: '='
+      # at line 154:10: '='
       match( 0x3d )
 
       
@@ -636,7 +636,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 156:6: '>'
+      # at line 155:6: '>'
       match( 0x3e )
 
       
@@ -660,7 +660,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 157:8: '#'
+      # at line 156:8: '#'
       match( 0x23 )
 
       
@@ -684,7 +684,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 158:8: 'kind'
+      # at line 157:8: 'kind'
       match( "kind" )
 
       
@@ -708,7 +708,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 159:8: 'link'
+      # at line 158:8: 'link'
       match( "link" )
 
       
@@ -732,7 +732,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 160:11: 'location'
+      # at line 159:11: 'location'
       match( "location" )
 
       
@@ -756,7 +756,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 161:6: '<'
+      # at line 160:6: '<'
       match( 0x3c )
 
       
@@ -780,7 +780,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 162:9: 'mixin'
+      # at line 161:9: 'mixin'
       match( "mixin" )
 
       
@@ -804,7 +804,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 163:11: '%'
+      # at line 162:11: '%'
       match( 0x25 )
 
       
@@ -828,7 +828,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 164:8: '+'
+      # at line 163:8: '+'
       match( 0x2b )
 
       
@@ -852,7 +852,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 165:11: '?'
+      # at line 164:11: '?'
       match( 0x3f )
 
       
@@ -876,7 +876,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 166:9: '\"'
+      # at line 165:9: '\"'
       match( 0x22 )
 
       
@@ -900,7 +900,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 167:7: 'rel'
+      # at line 166:7: 'rel'
       match( "rel" )
 
       
@@ -924,7 +924,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 168:10: 'scheme'
+      # at line 167:10: 'scheme'
       match( "scheme" )
 
       
@@ -948,7 +948,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 169:8: 'self'
+      # at line 168:8: 'self'
       match( "self" )
 
       
@@ -972,7 +972,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 171:4: ';'
+      # at line 170:4: ';'
       match( 0x3b )
 
       
@@ -996,7 +996,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 172:9: '/'
+      # at line 171:9: '/'
       match( 0x2f )
 
       
@@ -1020,7 +1020,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 173:10: '\\''
+      # at line 172:10: '\\''
       match( 0x27 )
 
       
@@ -1044,7 +1044,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 174:8: 'term'
+      # at line 173:8: 'term'
       match( "term" )
 
       
@@ -1068,7 +1068,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 175:9: '~'
+      # at line 174:9: '~'
       match( 0x7e )
 
       
@@ -1092,7 +1092,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 176:9: 'title'
+      # at line 175:9: 'title'
       match( "title" )
 
       
@@ -1116,7 +1116,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 178:4: '_'
+      # at line 177:4: '_'
       match( 0x5f )
 
       
@@ -1140,7 +1140,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 179:12: '('
+      # at line 178:12: '('
       match( 0x28 )
 
       
@@ -1164,7 +1164,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 180:12: ')'
+      # at line 179:12: ')'
       match( 0x29 )
 
       
@@ -1188,8 +1188,8 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 182:12: ( 'a' .. 'z' )+
-      # at file 182:12: ( 'a' .. 'z' )+
+      # at line 181:12: ( 'a' .. 'z' )+
+      # at file 181:12: ( 'a' .. 'z' )+
       match_count_1 = 0
       while true
         alt_1 = 2
@@ -1201,7 +1201,7 @@ module OCCIANTLR
         end
         case alt_1
         when 1
-          # at line 182:13: 'a' .. 'z'
+          # at line 181:13: 'a' .. 'z'
           match_range( 0x61, 0x7a )
 
         else
@@ -1236,8 +1236,8 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 183:12: ( 'A' .. 'Z' )+
-      # at file 183:12: ( 'A' .. 'Z' )+
+      # at line 182:12: ( 'A' .. 'Z' )+
+      # at file 182:12: ( 'A' .. 'Z' )+
       match_count_2 = 0
       while true
         alt_2 = 2
@@ -1249,7 +1249,7 @@ module OCCIANTLR
         end
         case alt_2
         when 1
-          # at line 183:13: 'A' .. 'Z'
+          # at line 182:13: 'A' .. 'Z'
           match_range( 0x41, 0x5a )
 
         else
@@ -1284,8 +1284,8 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 184:12: ( '0' .. '9' )+
-      # at file 184:12: ( '0' .. '9' )+
+      # at line 183:12: ( '0' .. '9' )+
+      # at file 183:12: ( '0' .. '9' )+
       match_count_3 = 0
       while true
         alt_3 = 2
@@ -1297,7 +1297,7 @@ module OCCIANTLR
         end
         case alt_3
         when 1
-          # at line 184:13: '0' .. '9'
+          # at line 183:13: '0' .. '9'
           match_range( 0x30, 0x39 )
 
         else
@@ -1332,8 +1332,8 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 185:12: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
-      # at file 185:12: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
+      # at line 184:12: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
+      # at file 184:12: ( '\\t' | ' ' | '\\r' | '\\n' | '\\u000C' )+
       match_count_4 = 0
       while true
         alt_4 = 2
@@ -1388,7 +1388,7 @@ module OCCIANTLR
 
       
       # - - - - main rule block - - - -
-      # at line 186:12: '\\\\' ( QUOTE | '\\'' )
+      # at line 185:12: '\\\\' ( QUOTE | '\\'' )
       match( 0x5c )
       if @input.peek(1) == 0x22 || @input.peek(1) == 0x27
         @input.consume

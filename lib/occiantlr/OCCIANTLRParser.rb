@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: OCCIANTLR.g
-# Generated at: 2012-09-05 23:28:21
+# Generated at: 2012-09-10 16:19:48
 # 
 
 # ~~~> start load path setup
@@ -119,7 +119,7 @@ module OCCIANTLR
                      :link_attributes, :x_occi_attribute, :x_occi_location, 
                      :uri, :term, :scheme, :class_type, :title, :attribute, 
                      :attribute_name, :attribute_component, :attribute_value, 
-                     :string, :number, :reserved_words, :quoted_string, 
+                     :number, :reserved_words, :quoted_string, :string, 
                      :digits ].freeze
 
 
@@ -935,7 +935,7 @@ module OCCIANTLR
 
         end
         # --> action
-         hash[:category] = link_category20 
+         hash[:kind] = link_category20 
         # <-- action
         @state.following.push( TOKENS_FOLLOWING_link_attributes_IN_link_value_558 )
         link_attributes21 = link_attributes
@@ -2066,18 +2066,18 @@ module OCCIANTLR
     # parser rule attribute_value
     # 
     # (in OCCIANTLR.g)
-    # 124:1: attribute_value returns [value] : ( string | number ) ;
+    # 124:1: attribute_value returns [value] : ( quoted_string | number ) ;
     # 
     def attribute_value
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 28 )
       value = nil
-      string30 = nil
+      quoted_string30 = nil
       number31 = nil
 
       begin
-        # at line 124:35: ( string | number )
-        # at line 124:35: ( string | number )
+        # at line 124:35: ( quoted_string | number )
+        # at line 124:35: ( quoted_string | number )
         alt_42 = 2
         look_42_0 = @input.peek( 1 )
 
@@ -2090,16 +2090,16 @@ module OCCIANTLR
         end
         case alt_42
         when 1
-          # at line 124:37: string
-          @state.following.push( TOKENS_FOLLOWING_string_IN_attribute_value_1183 )
-          string30 = string
+          # at line 124:37: quoted_string
+          @state.following.push( TOKENS_FOLLOWING_quoted_string_IN_attribute_value_1183 )
+          quoted_string30 = quoted_string
           @state.following.pop
           # --> action
-           value = ( string30 && @input.to_s( string30.start, string30.stop ) ) 
+           value = quoted_string30 
           # <-- action
 
         when 2
-          # at line 124:71: number
+          # at line 124:85: number
           @state.following.push( TOKENS_FOLLOWING_number_IN_attribute_value_1189 )
           number31 = number
           @state.following.pop
@@ -2122,27 +2122,46 @@ module OCCIANTLR
       return value
     end
 
-    StringReturnValue = define_return_scope 
+    NumberReturnValue = define_return_scope 
 
     # 
-    # parser rule string
+    # parser rule number
     # 
     # (in OCCIANTLR.g)
-    # 125:1: string : quoted_string ;
+    # 125:1: number : ( digits ( DOT digits )? ) ;
     # 
-    def string
+    def number
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 29 )
-      return_value = StringReturnValue.new
+      return_value = NumberReturnValue.new
 
       # $rule.start = the first token seen before matching
       return_value.start = @input.look
 
       begin
-        # at line 125:12: quoted_string
-        @state.following.push( TOKENS_FOLLOWING_quoted_string_IN_string_1202 )
-        quoted_string
+        # at line 125:12: ( digits ( DOT digits )? )
+        # at line 125:12: ( digits ( DOT digits )? )
+        # at line 125:14: digits ( DOT digits )?
+        @state.following.push( TOKENS_FOLLOWING_digits_IN_number_1204 )
+        digits
         @state.following.pop
+        # at line 125:21: ( DOT digits )?
+        alt_43 = 2
+        look_43_0 = @input.peek( 1 )
+
+        if ( look_43_0 == DOT )
+          alt_43 = 1
+        end
+        case alt_43
+        when 1
+          # at line 125:23: DOT digits
+          match( DOT, TOKENS_FOLLOWING_DOT_IN_number_1208 )
+          @state.following.push( TOKENS_FOLLOWING_digits_IN_number_1210 )
+          digits
+          @state.following.pop
+
+        end
+
         # - - - - - - - rule clean up - - - - - - - -
         return_value.stop = @input.look( -1 )
 
@@ -2159,75 +2178,19 @@ module OCCIANTLR
       return return_value
     end
 
-    NumberReturnValue = define_return_scope 
-
-    # 
-    # parser rule number
-    # 
-    # (in OCCIANTLR.g)
-    # 126:1: number : ( digits ( DOT digits )? ) ;
-    # 
-    def number
-      # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 30 )
-      return_value = NumberReturnValue.new
-
-      # $rule.start = the first token seen before matching
-      return_value.start = @input.look
-
-      begin
-        # at line 126:12: ( digits ( DOT digits )? )
-        # at line 126:12: ( digits ( DOT digits )? )
-        # at line 126:14: digits ( DOT digits )?
-        @state.following.push( TOKENS_FOLLOWING_digits_IN_number_1213 )
-        digits
-        @state.following.pop
-        # at line 126:21: ( DOT digits )?
-        alt_43 = 2
-        look_43_0 = @input.peek( 1 )
-
-        if ( look_43_0 == DOT )
-          alt_43 = 1
-        end
-        case alt_43
-        when 1
-          # at line 126:23: DOT digits
-          match( DOT, TOKENS_FOLLOWING_DOT_IN_number_1217 )
-          @state.following.push( TOKENS_FOLLOWING_digits_IN_number_1219 )
-          digits
-          @state.following.pop
-
-        end
-
-        # - - - - - - - rule clean up - - - - - - - -
-        return_value.stop = @input.look( -1 )
-
-      rescue ANTLR3::Error::RecognitionError => re
-        report_error(re)
-        recover(re)
-
-      ensure
-        # -> uncomment the next line to manually enable rule tracing
-        # trace_out( __method__, 30 )
-
-      end
-      
-      return return_value
-    end
-
 
     # 
     # parser rule reserved_words
     # 
     # (in OCCIANTLR.g)
-    # 127:1: reserved_words : ( ACTION | ACTIONS | ATTRIBUTES | CATEGORY | CLASS | KIND | LINK | LOCATION | MIXIN | REL | SCHEME | SELF | TERM | TITLE ) ;
+    # 126:1: reserved_words : ( ACTION | ACTIONS | ATTRIBUTES | CATEGORY | CLASS | KIND | LINK | LOCATION | MIXIN | REL | SCHEME | SELF | TERM | TITLE ) ;
     # 
     def reserved_words
       # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 31 )
+      # trace_in( __method__, 30 )
 
       begin
-        # at line 128:4: ( ACTION | ACTIONS | ATTRIBUTES | CATEGORY | CLASS | KIND | LINK | LOCATION | MIXIN | REL | SCHEME | SELF | TERM | TITLE )
+        # at line 127:4: ( ACTION | ACTIONS | ATTRIBUTES | CATEGORY | CLASS | KIND | LINK | LOCATION | MIXIN | REL | SCHEME | SELF | TERM | TITLE )
         if @input.peek(1) == SCHEME || @input.peek( 1 ).between?( CLASS, ACTIONS ) || @input.peek( 1 ).between?( SELF, CATEGORY ) || @input.peek( 1 ).between?( KIND, ACTION ) || @input.peek( 1 ).between?( LINK, TERM )
           @input.consume
           @state.error_recovery = false
@@ -2244,7 +2207,7 @@ module OCCIANTLR
 
       ensure
         # -> uncomment the next line to manually enable rule tracing
-        # trace_out( __method__, 31 )
+        # trace_out( __method__, 30 )
 
       end
       
@@ -2256,18 +2219,57 @@ module OCCIANTLR
     # parser rule quoted_string
     # 
     # (in OCCIANTLR.g)
-    # 188:1: quoted_string : ( QUOTE ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )* QUOTE ) ;
+    # 187:1: quoted_string returns [text] : QUOTE string QUOTE ;
     # 
     def quoted_string
       # -> uncomment the next line to manually enable rule tracing
-      # trace_in( __method__, 32 )
+      # trace_in( __method__, 31 )
+      text = nil
+      string32 = nil
 
       begin
-        # at line 189:4: ( QUOTE ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )* QUOTE )
-        # at line 189:4: ( QUOTE ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )* QUOTE )
-        # at line 189:6: QUOTE ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )* QUOTE
-        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1683 )
-        # at line 189:12: ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )*
+        # at line 188:4: QUOTE string QUOTE
+        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1676 )
+        @state.following.push( TOKENS_FOLLOWING_string_IN_quoted_string_1678 )
+        string32 = string
+        @state.following.pop
+        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1680 )
+        # --> action
+        text = ( string32 && @input.to_s( string32.start, string32.stop ) )
+        # <-- action
+
+      rescue ANTLR3::Error::RecognitionError => re
+        report_error(re)
+        recover(re)
+
+      ensure
+        # -> uncomment the next line to manually enable rule tracing
+        # trace_out( __method__, 31 )
+
+      end
+      
+      return text
+    end
+
+    StringReturnValue = define_return_scope 
+
+    # 
+    # parser rule string
+    # 
+    # (in OCCIANTLR.g)
+    # 189:1: string : ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )* ;
+    # 
+    def string
+      # -> uncomment the next line to manually enable rule tracing
+      # trace_in( __method__, 32 )
+      return_value = StringReturnValue.new
+
+      # $rule.start = the first token seen before matching
+      return_value.start = @input.look
+
+      begin
+        # at line 189:11: ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )*
+        # at line 189:11: ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )*
         while true # decision 44
           alt_44 = 2
           look_44_0 = @input.peek( 1 )
@@ -2293,8 +2295,8 @@ module OCCIANTLR
             break # out of loop for decision 44
           end
         end # loop for decision 44
-        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1713 )
-
+        # - - - - - - - rule clean up - - - - - - - -
+        return_value.stop = @input.look( -1 )
 
       rescue ANTLR3::Error::RecognitionError => re
         report_error(re)
@@ -2306,7 +2308,7 @@ module OCCIANTLR
 
       end
       
-      return 
+      return return_value
     end
 
 
@@ -2335,7 +2337,7 @@ module OCCIANTLR
           case alt_45
           when 1
             # at line 190:10: DIGIT
-            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_digits_1722 )
+            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_digits_1725 )
 
           else
             match_count_45 > 0 and break
@@ -2777,17 +2779,17 @@ module OCCIANTLR
     TOKENS_FOLLOWING_DASH_IN_attribute_component_1158 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
     TOKENS_FOLLOWING_UNDERSCORE_IN_attribute_component_1162 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
     TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1166 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_string_IN_attribute_value_1183 = Set[ 1 ]
+    TOKENS_FOLLOWING_quoted_string_IN_attribute_value_1183 = Set[ 1 ]
     TOKENS_FOLLOWING_number_IN_attribute_value_1189 = Set[ 1 ]
-    TOKENS_FOLLOWING_quoted_string_IN_string_1202 = Set[ 1 ]
-    TOKENS_FOLLOWING_digits_IN_number_1213 = Set[ 1, 32 ]
-    TOKENS_FOLLOWING_DOT_IN_number_1217 = Set[ 10, 26 ]
-    TOKENS_FOLLOWING_digits_IN_number_1219 = Set[ 1 ]
-    TOKENS_FOLLOWING_set_IN_reserved_words_1232 = Set[ 1 ]
-    TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1683 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
-    TOKENS_FOLLOWING_set_IN_quoted_string_1685 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
-    TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1713 = Set[ 1 ]
-    TOKENS_FOLLOWING_DIGIT_IN_digits_1722 = Set[ 1, 26 ]
+    TOKENS_FOLLOWING_digits_IN_number_1204 = Set[ 1, 32 ]
+    TOKENS_FOLLOWING_DOT_IN_number_1208 = Set[ 10, 26 ]
+    TOKENS_FOLLOWING_digits_IN_number_1210 = Set[ 1 ]
+    TOKENS_FOLLOWING_set_IN_reserved_words_1223 = Set[ 1 ]
+    TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1676 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
+    TOKENS_FOLLOWING_string_IN_quoted_string_1678 = Set[ 10 ]
+    TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1680 = Set[ 1 ]
+    TOKENS_FOLLOWING_set_IN_string_1691 = Set[ 1, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
+    TOKENS_FOLLOWING_DIGIT_IN_digits_1725 = Set[ 1, 26 ]
 
   end # class Parser < ANTLR3::Parser
 

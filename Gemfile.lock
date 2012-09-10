@@ -47,6 +47,7 @@ DEPENDENCIES
   hashie
   highline
   httparty
+  i18n
   json
   nokogiri
   rake

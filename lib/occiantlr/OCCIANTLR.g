@@ -73,7 +73,7 @@ link returns [hash]
 			: link_target { hash[:target] = $link_target.value }
 			  link_rel { hash[:rel] = $link_rel.value }
 			  link_self? { hash[:self] = $link_self.value }
-			  link_category? { hash[:category] = $link_category.value }
+			  link_category? { hash[:kind] = $link_category.value }
 			  link_attributes { hash[:attributes] = $link_attributes.hash }
 			  SEMICOLON?
 			  ;
@@ -121,8 +121,7 @@ attribute_name returns [hash] @init { hash = Hashie::Mash.new }
 			  { cur_hash[comp.to_sym] = ATTRIBUTE } 
 			  ('{' ('mutable' { cur_hash[comp.to_sym][:Mutable] = true })? ('immutable' { cur_hash[comp.to_sym][:Mutable] = false })? ('required' { cur_hash[comp.to_sym][:Required] = true })? '}' )?;
 attribute_component	: ( LOALPHA | reserved_words) ( LOALPHA | DIGIT | DASH | UNDERSCORE | reserved_words  )*;
-attribute_value returns [value]	: ( string { value = $string.text } | number { value = $number.text.to_i } );
-string			: quoted_string;
+attribute_value returns [value]	: ( quoted_string { value = $quoted_string.text } | number { value = $number.text.to_i } );
 number			: ( digits ( DOT digits )? );
 reserved_words
 	:	( ACTION | ACTIONS | ATTRIBUTES | CATEGORY | CLASS | KIND | LINK | LOCATION | MIXIN | REL | SCHEME | SELF | TERM | TITLE );
@@ -185,6 +184,7 @@ DIGIT   : 	('0'..'9')+;
 WS      : 	( '\t' | ' ' | '\r' | '\n'| '\u000C' )+;
 ESC     : 	'\\' ( QUOTE | '\'' );
 
-quoted_string
-	:	( QUOTE ( ESC | ~( '\\' | QUOTE | '\'' ) | '\'' )* QUOTE);	
+quoted_string returns [text]
+	:	QUOTE string QUOTE {text = $string.text};	
+string : 	( ESC | ~( '\\' | QUOTE | '\'' ) | '\'' )*; 
 digits	:	DIGIT+;	
