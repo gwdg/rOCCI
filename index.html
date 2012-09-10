@@ -1,42 +1,36 @@
 <!doctype html>
-<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
-<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>rOCCI by gwdg</title>
 
-  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
-  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script type="text/javascript" src="javascripts/script.js"></script>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">rOCCI</h1>
+        <p class="header">A Ruby OCCI Framework</p>
 
-  <title>rOCCI</title>
-  <meta name="description" content="A Ruby OCCI Framework">
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/gwdg/rOCCI/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/gwdg/rOCCI/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/gwdg/rOCCI">View On GitHub</a></li>
+        </ul>
 
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/gwdg">gwdg</a></p>
 
-</head>
 
-<body>
-
-  <div class="wrapper">
-    <header>
-      <h1 class="title">rOCCI</h1>
-    </header>
-    <div id="container">
-      <p class="tagline">A Ruby OCCI Framework</p>
-      <div id="main" role="main">
-        <div class="download-bar">
-        <div class="inner">
-          <a href="https://github.com/gwdg/rOCCI/tarball/master" class="download-button tar"><span>Download</span></a>
-          <a href="https://github.com/gwdg/rOCCI/zipball/master" class="download-button zip"><span>Download</span></a>
-          <a href="https://github.com/gwdg/rOCCI" class="code">View rOCCI on GitHub</a>
-        </div>
-        <span class="blc"></span><span class="trc"></span>
-        </div>
-        <article class="markdown-body">
-          <h1>rOCCI - A Ruby OCCI Framework</h1>
+      </header>
+      <section>
+        <h1>rOCCI - A Ruby OCCI Framework</h1>
 
 <p><a href="http://travis-ci.org/gwdg/rOCCI"><img src="https://secure.travis-ci.org/gwdg/rOCCI.png" alt="Build Status"></a></p>
 
@@ -45,7 +39,7 @@
 <p>The following setup is recommended</p>
 
 <ul>
-<li>usage of the Ruby Version Manger</li>
+<li>usage of the Ruby Version Manager</li>
 <li>Ruby 1.9.3</li>
 <li>RubyGems installed</li>
 </ul><h2>Installation</h2>
@@ -55,31 +49,61 @@
 
 <h2>Usage</h2>
 
-<p>Use the Interactive Ruby Shell (IRB) to interact with an OCCI server. If you have the occi gem installed, you just have
-to start irb from the command line:</p>
-
-<pre><code>irb
-</code></pre>
-
-<p>If you want to test newer versions of rOCCI, you have to tell irb from where it
-should load occi:</p>
-
-<pre><code>cd rOCCI
-irb -I lib
-</code></pre>
-
-<p>First require the gem, for Ruby 1.8.7 you also have to require rubygems</p>
-
-<pre><code>require 'rubygems'
-require 'occi'
-</code></pre>
-
 <h3>Client</h3>
 
-<p>The OCCI gem includes a Client to simplify the usage of an OCCI endpoint. If you want to use authentication then you
-should create a hash with information either on username and password for basic authentication or with a X.509 user
-certificate, the user certificate password and the path to the Root CAs which are used to verify the certificate of the
-OCCI server.</p>
+<p>The OCCI gem includes a client you can use directly from shell with the following auth methods: x509 (with --password, --user-cred and --ca-path), basic (with --username and --password), digest (with --username and --password), none. If you won't set a password using --password, the client will run in an interactive mode and ask for it later on.</p>
+
+<p>To find out more about available options and defaults use</p>
+
+<pre><code>occi --help
+</code></pre>
+
+<p>To list available resources use</p>
+
+<pre><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action list --resource compute --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action list --resource storage --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action list --resource network --auth x509
+</code></pre>
+
+<p>To describe available resources use</p>
+
+<pre><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource compute --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource storage --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource network --auth x509
+</code></pre>
+
+<p>To describe specific resources use</p>
+
+<pre><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/compute/&lt;OCCI_ID&gt; --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/storage/&lt;OCCI_ID&gt; --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/network/&lt;OCCI_ID&gt; --auth x509
+</code></pre>
+
+<p>To list available OS templates or Resource templates use</p>
+
+<pre><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action list --resource os_tpl --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action list --resource resource_tpl --auth x509
+</code></pre>
+
+<p>To describe a specific OS template or Resource template use</p>
+
+<pre><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource os_tpl#debian6 --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource resource_tpl#small --auth x509
+</code></pre>
+
+<p>To create a compute resource with mixins use</p>
+
+<pre><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action create --resource compute --mixin os_tpl#debian6 --mixin resource_tpl#small --resource-title "My rOCCI VM" --auth x509
+</code></pre>
+
+<p>To delete a compute resource use</p>
+
+<pre><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action delete --resource https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/compute/&lt;OCCI_ID&gt; --auth x509
+</code></pre>
+
+<h3>Client scripting</h3>
+
+<h4>Auth</h4>
 
 <p>For Basic auth use</p>
 
@@ -106,9 +130,96 @@ auth.user_cert_password = 'MyPassword'
 auth.ca_path = '/Path/To/root-certificates'
 </code></pre>
 
+<h4>DSL</h4>
+
+<p>In your scripts, you can use the OCCI client DSL.</p>
+
+<p>To include the DSL definitions in your script use</p>
+
+<pre><code>extend OCCI::DSL
+</code></pre>
+
 <p>To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )</p>
 
-<pre><code>client = OCCI::Client.new('http://occi.cloud.gwdg.de:3300',auth||=nil)
+<pre><code>connect('http://localhost:3300',auth||=nil)
+</code></pre>
+
+<p>To get the list of available resource types or mixin types use</p>
+
+<pre><code>resource_types
+mixin_types
+</code></pre>
+
+<p>To get compute, storage or network descriptions use</p>
+
+<pre><code>describe "compute"
+describe "storage"
+describe "network"
+</code></pre>
+
+<p>To get the location of compute, storage or network resources use</p>
+
+<pre><code>list "compute"
+list "storage"
+list "network"
+</code></pre>
+
+<p>To get the identifiers of specific mixins in specific mixin types use</p>
+
+<pre><code>mixin "my_template", "os_tpl"
+mixin "small", "resource_tpl"
+</code></pre>
+
+<p>To get the identifiers of specific mixins with unknown types use</p>
+
+<pre><code>mixin "medium"
+</code></pre>
+
+<p>To get mixin descriptions use</p>
+
+<pre><code>mixin "medium", nil, true
+mixin "my_template", "os_tpl", true
+</code></pre>
+
+<p>To get a list of names of all / OS templates / Resource templates mixins use</p>
+
+<pre><code>mixins
+mixins "os_tpl"
+mixins "resource_tpl"
+</code></pre>
+
+<p>To create a new compute resource use</p>
+
+<pre><code>os = mixin 'my_os', 'os_tpl'
+size = mixin 'large', 'resource_tpl'
+cmpt = resource "compute"
+cmpt.mixins &lt;&lt; os &lt;&lt; size
+cmpt.attributes.occi!.core!.title = "My VM"
+create cmpt
+</code></pre>
+
+<p>To get a description of a specific resource use</p>
+
+<pre><code>describe "https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/compute/&lt;OCCI_ID&gt;"
+describe "https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/storage/&lt;OCCI_ID&gt;"
+describe "https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/network/&lt;OCCI_ID&gt;"
+</code></pre>
+
+<p>To delete a specific resource use</p>
+
+<pre><code>delete "https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/compute/&lt;OCCI_ID&gt;"
+delete "https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/storage/&lt;OCCI_ID&gt;"
+delete "https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/network/&lt;OCCI_ID&gt;"
+</code></pre>
+
+<h4>API</h4>
+
+<p>If you need low level access to parts of the OCCI client or need to use more than one instance
+at a time, you should use the OCCI client API directly.</p>
+
+<p>To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )</p>
+
+<pre><code>client = OCCI::Client.new('http://localhost:3300',auth||=nil)
 </code></pre>
 
 <p>All available categories are automatically registered to the OCCI model during client initialization. You can get them via</p>
@@ -116,37 +227,75 @@ auth.ca_path = '/Path/To/root-certificates'
 <pre><code>client.model
 </code></pre>
 
-<p>To get all resources (as a list of OCCI::Resources) currently managed by the endpoint use</p>
+<p>To get the list of available resource types or mixin types use</p>
 
-<pre><code>client.get resources
+<pre><code>client.get_resource_types
+client.get_mixin_types
 </code></pre>
 
-<p>To get only compute, storage or network resources use get_compute_resources, ...</p>
+<p>To get compute, storage or network descriptions use</p>
 
-<p>To get the location of all resources use</p>
-
-<pre><code>client.list resources
+<pre><code>client.describe "compute"
+client.describe "storage"
+client.describe "network"
 </code></pre>
 
-<p>Analogue for compute, storage, network.</p>
+<p>To get the location of compute, storage or network resources use</p>
 
-<p>To get a list of all OS / resource templates use</p>
+<pre><code>client.list "compute"
+client.list "storage"
+client.list "network"
+</code></pre>
 
-<pre><code>client.get_os_templates
-client.get_resource_templates
+<p>To get the identifiers of specific mixins in specific mixin types use</p>
+
+<pre><code>client.find_mixin "my_template", "os_tpl"
+client.find_mixin "small", "resource_tpl"
+</code></pre>
+
+<p>To get the identifiers of specific mixins with unknown types use</p>
+
+<pre><code>client.find_mixin "medium"
+</code></pre>
+
+<p>To get mixin descriptions use</p>
+
+<pre><code>client.find_mixin "medium", nil, true
+client.find_mixin "my_template", "os_tpl", true
+</code></pre>
+
+<p>To get a list of names of all / OS templates / Resource templates mixins use</p>
+
+<pre><code>client.get_mixins
+client.get_mixins "os_tpl"
+client.get_mixins "resource_tpl"
 </code></pre>
 
 <p>To create a new compute resource use</p>
 
-<pre><code>os = client.get_os_templates.select { |template| template.term.include? 'my_os' }
-size = client.get_resource_templates.select { |template| template.term.include? 'large' }
-cmpt = OCCI::Core::Resource.new compute
+<pre><code>os = client.find_mixin 'my_os', 'os_tpl'
+size = client.find_mixin 'large', 'resource_tpl'
+cmpt = client.get_resource "compute"
 cmpt.mixins &lt;&lt; os &lt;&lt; size
 cmpt.attributes.occi!.core!.title = "My VM"
 client.create cmpt
 </code></pre>
 
-<h3>Logging</h3>
+<p>To get a description of a specific resource use</p>
+
+<pre><code>client.describe "https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/compute/&lt;OCCI_ID&gt;"
+client.describe "https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/storage/&lt;OCCI_ID&gt;"
+client.describe "https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/network/&lt;OCCI_ID&gt;"
+</code></pre>
+
+<p>To delete a specific resource use</p>
+
+<pre><code>client.delete "https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/compute/&lt;OCCI_ID&gt;"
+client.delete "https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/storage/&lt;OCCI_ID&gt;"
+client.delete "https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/network/&lt;OCCI_ID&gt;"
+</code></pre>
+
+<h4>Logging</h4>
 
 <p>The OCCI gem includes its own logging mechanism using a message queue. By default, no one is listening to that queue.
 A new OCCI Logger can be initialized by specifying the log destination (either a filename or an IO object like
@@ -162,7 +311,7 @@ STDOUT) and the log level.</p>
 <pre><code>OCCI::Log.info("Test message")
 </code></pre>
 
-<h3>Registering categories in the OCCI Model</h3>
+<h4>Registering categories in the OCCI Model</h4>
 
 <p>Before the parser may be used, the available categories have to be registered in the OCCI Model.</p>
 
@@ -175,7 +324,7 @@ model.register_infrastructure
 <p>Further categories can either be registered from files which include OCCI collections in JSON formator or from parsed
  JSON objects (e.g. from the query interface of an OCCI service endpoint).</p>
 
-<h3>Parsing OCCI messages</h3>
+<h4>Parsing OCCI messages</h4>
 
 <p>The OCCI gem includes a Parser to easily parse OCCI messages. With a given media type (e.g. json,
 xml or plain text) the parser analyses the content of the message body and, if supplied,
@@ -185,12 +334,12 @@ category and a message with an entity which has a kind, it has to be specified i
 
 <p>OCCI messages can be parsed to an OCCI collection for example like</p>
 
-<pre><code>media_type = text/plain
+<pre><code>media_type = 'text/plain'
 body = %Q|Category: compute; scheme="http://schemas.ogf.org/occi/infrastructure#"; class="kind"|
 collection=OCCI::Parser.parse(media_type, body)
 </code></pre>
 
-<h3>Parsing OVF / OVA files</h3>
+<h4>Parsing OVF / OVA files</h4>
 
 <p>Parsing of OVF/OVA files is partly supported and will be improved in future versions.</p>
 
@@ -288,26 +437,12 @@ future versions of rOCCI.</li>
 <li>Push to the branch (git push origin my_markup)</li>
 <li>Create an Issue with a link to your branch</li>
 </ol>
-        </article>
-      </div>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
     </div>
-    <footer>
-      <div class="owner">
-      <p><a href="https://github.com/gwdg" class="avatar"><img src="https://secure.gravatar.com/avatar/a07f5ea1ba64627f16b2ebe47fc24410?s=30&amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-140.png" width="48" height="48"/></a> <a href="https://github.com/gwdg">gwdg</a> maintains <a href="https://github.com/gwdg/rOCCI">rOCCI</a></p>
-
-
-      </div>
-      <div class="creds">
-        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br/>theme by <a href="http://twitter.com/jonrohan/">Jon Rohan</a></small>
-      </div>
-    </footer>
-  </div>
-  <div class="current-section">
-    <a href="#top">Scroll to top</a>
-    <a href="https://github.com/gwdg/rOCCI/tarball/master" class="tar">tar</a><a href="https://github.com/gwdg/rOCCI/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
-    <p class="name"></p>
-  </div>
-
-  
-</body>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
 </html>
