@@ -73,7 +73,7 @@ link returns [hash]
 			: link_target { hash[:target] = $link_target.value }
 			  link_rel { hash[:rel] = $link_rel.value }
 			  link_self? { hash[:self] = $link_self.value }
-			  link_category? { hash[:category] = $link_category.value }
+			  link_category? { hash[:kind] = $link_category.value }
 			  link_attributes { hash[:attributes] = $link_attributes.hash }
 			  SEMICOLON?
 			  ;

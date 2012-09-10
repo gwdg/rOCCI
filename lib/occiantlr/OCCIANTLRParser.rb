@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: OCCIANTLR.g
-# Generated at: 2012-09-05 23:28:21
+# Generated at: 2012-09-10 12:15:56
 # 
 
 # ~~~> start load path setup
@@ -935,7 +935,7 @@ module OCCIANTLR
 
         end
         # --> action
-         hash[:category] = link_category20 
+         hash[:kind] = link_category20 
         # <-- action
         @state.following.push( TOKENS_FOLLOWING_link_attributes_IN_link_value_558 )
         link_attributes21 = link_attributes
