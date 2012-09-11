@@ -161,7 +161,7 @@ module OCCI
           text << 'X-OCCI-Attribute: ' + name + '=' + value + "\n"
         end
         @actions.each do |action|
-          _, term = mixin.split('#')
+          _, term = action.split('#')
           text << 'Link: <' + self.location + '?action=' + term + '>;rel=' + action.inspect + "\n"
         end
         text
@@ -184,7 +184,7 @@ module OCCI
         header['X-OCCI-Attribute'] = attributes.join(',') if attributes.any?
         links = []
         @actions.each do |action|
-          _, term = mixin.split('#')
+          _, term = action.split('#')
           links << self.location + '?action=' + term + '>;rel=' + action.inspect
         end
         header['Link'] = links.join(',') if links.any?
