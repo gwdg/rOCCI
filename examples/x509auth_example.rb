@@ -3,23 +3,24 @@ require 'occi'
 require 'pp'
 
 ## options
-use_os_temlate = true # use OS_TEMPLATE or NETWORK + STORAGE + INSTANCE TYPE
-OS_TEMPLATE = 'monitoring' # name of the VM template in ON
+use_os_temlate = true         # use OS_TEMPLATE or NETWORK + STORAGE + INSTANCE TYPE
+OS_TEMPLATE    = 'monitoring' # name of the VM template in ON
 
-clean_up_compute = true # issue DELETE <RESOURCE> after we are done
+clean_up_compute = true       # issue DELETE <RESOURCE> after we are done
 
-USER_CERT           = ENV['HOME'] + '/.globus/usercred.pem'
+USER_CERT          = ENV['HOME'] + '/.globus/usercred.pem'
 USER_CERT_PASSWORD = 'mypassphrase'
-CA_PATH             = '/etc/grid-security/certificates'
+CA_PATH            = '/etc/grid-security/certificates'
+ENDPOINT           = 'https://localhost:3300'
 
 ## get an OCCI::Client instance
-client = OCCI::Client.new('https://localhost:3300',
-                                 { :type               => "x509",
-                                   :user_cert          => USER_CERT,
-                                   :user_cert_password => USER_CERT_PASSWORD,
-                                   :ca_path            => CA_PATH },
-                                 { :out                => STDERR,
-                                   :level              => OCCI::Log::DEBUG})
+client = OCCI::Client.new(ENDPOINT,
+        { :type               => "x509",
+          :user_cert          => USER_CERT,
+          :user_cert_password => USER_CERT_PASSWORD,
+          :ca_path            => CA_PATH },
+        { :out   => STDERR,
+          :level => OCCI::Log::DEBUG })
 
 puts "\n\nListing all available resource types:"
 client.get_resource_types.each do |type|

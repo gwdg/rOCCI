@@ -8,7 +8,7 @@ Requirements
 
 The following setup is recommended
 
-* usage of the Ruby Version Manger
+* usage of the Ruby Version Manager
 * Ruby 1.9.3
 * RubyGems installed
 
@@ -19,29 +19,52 @@ Installation
 
 Usage
 -----
-
-Use the Interactive Ruby Shell (IRB) to interact with an OCCI server. If you have the occi gem installed, you just have
-to start irb from the command line:
-
-    irb
-
-If you want to test newer versions of rOCCI, you have to tell irb from where it
-should load occi:
-
-    cd rOCCI
-    irb -I lib
-
-First require the gem, for Ruby 1.8.7 you also have to require rubygems
-
-    require 'rubygems'
-    require 'occi'
-
 ### Client
+The OCCI gem includes a client you can use directly from shell with the following auth methods: x509 (with --password, --user-cred and --ca-path), basic (with --username and --password), digest (with --username and --password), none. If you won't set a password using --password, the client will run in an interactive mode and ask for it later on.
 
-The OCCI gem includes a Client to simplify the usage of an OCCI endpoint. If you want to use authentication then you
-should create a hash with information either on username and password for basic authentication or with a X.509 user
-certificate, the user certificate password and the path to the Root CAs which are used to verify the certificate of the
-OCCI server.
+To find out more about available options and defaults use
+
+    occi --help
+
+To list available resources use
+
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action list --resource compute --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action list --resource storage --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action list --resource network --auth x509
+
+To describe available resources use
+
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource compute --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource storage --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource network --auth x509
+
+To describe specific resources use
+
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource https://<ENDPOINT>:<PORT>/compute/<OCCI_ID> --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource https://<ENDPOINT>:<PORT>/storage/<OCCI_ID> --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource https://<ENDPOINT>:<PORT>/network/<OCCI_ID> --auth x509
+
+To list available OS templates or Resource templates use
+
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action list --resource os_tpl --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action list --resource resource_tpl --auth x509
+
+To describe a specific OS template or Resource template use
+
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource os_tpl#debian6 --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource resource_tpl#small --auth x509
+
+To create a compute resource with mixins use
+
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action create --resource compute --mixin os_tpl#debian6 --mixin resource_tpl#small --resource-title "My rOCCI VM" --auth x509
+
+To delete a compute resource use
+
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action delete --resource https://<ENDPOINT>:<PORT>/compute/<OCCI_ID> --auth x509
+
+### Client scripting
+
+#### Auth
 
 For Basic auth use
 
@@ -49,7 +72,7 @@ For Basic auth use
     auth.type = 'basic'
     auth.username = 'user'
     auth.password = 'mypass'
-
+ 
 For Digest auth use
 
     auth = Hashie::Mash.new
@@ -58,52 +81,153 @@ For Digest auth use
     auth.password = 'mypass'
 
 For X.509 auth use
-
+ 
     auth = Hashie::Mash.new
     auth.type = 'x509'
     auth.user_cert = '/Path/To/My/usercert.pem'
     auth.user_cert_password = 'MyPassword'
     auth.ca_path = '/Path/To/root-certificates'
 
+#### DSL
+In your scripts, you can use the OCCI client DSL.
+
+To include the DSL definitions in your script use
+
+    extend OCCI::DSL
+
 To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )
 
-    client = OCCI::Client.new('http://occi.cloud.gwdg.de:3300',auth||=nil)
+    connect('http://localhost:3300',auth||=nil)
+
+To get the list of available resource types or mixin types use
+
+    resource_types
+    mixin_types
+
+To get compute, storage or network descriptions use
+
+    describe "compute"
+    describe "storage"
+    describe "network"
+
+To get the location of compute, storage or network resources use
+
+    list "compute"
+    list "storage"
+    list "network"
+
+To get the identifiers of specific mixins in specific mixin types use
+
+    mixin "my_template", "os_tpl"
+    mixin "small", "resource_tpl"
+
+To get the identifiers of specific mixins with unknown types use
+
+    mixin "medium"
+
+To get mixin descriptions use
+
+    mixin "medium", nil, true
+    mixin "my_template", "os_tpl", true
+
+To get a list of names of all / OS templates / Resource templates mixins use
+
+    mixins
+    mixins "os_tpl"
+    mixins "resource_tpl"
+
+To create a new compute resource use
+
+    os = mixin 'my_os', 'os_tpl'
+    size = mixin 'large', 'resource_tpl'
+    cmpt = resource "compute"
+    cmpt.mixins << os << size
+    cmpt.attributes.occi!.core!.title = "My VM"
+    create cmpt
+
+To get a description of a specific resource use
+
+    describe "https://<ENDPOINT>:<PORT>/compute/<OCCI_ID>"
+    describe "https://<ENDPOINT>:<PORT>/storage/<OCCI_ID>"
+    describe "https://<ENDPOINT>:<PORT>/network/<OCCI_ID>"
+
+To delete a specific resource use
+
+    delete "https://<ENDPOINT>:<PORT>/compute/<OCCI_ID>"
+    delete "https://<ENDPOINT>:<PORT>/storage/<OCCI_ID>"
+    delete "https://<ENDPOINT>:<PORT>/network/<OCCI_ID>"
+
+#### API
+If you need low level access to parts of the OCCI client or need to use more than one instance
+at a time, you should use the OCCI client API directly.
+
+To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )
+
+    client = OCCI::Client.new('http://localhost:3300',auth||=nil)
 
 All available categories are automatically registered to the OCCI model during client initialization. You can get them via
 
     client.model
 
-To get all resources (as a list of OCCI::Resources) currently managed by the endpoint use
+To get the list of available resource types or mixin types use
 
-    client.get resources
+    client.get_resource_types
+    client.get_mixin_types
 
-To get only compute, storage or network resources use
+To get compute, storage or network descriptions use
 
-    client.get compute
-    client.get storage
-    client.get network
+    client.describe "compute"
+    client.describe "storage"
+    client.describe "network"
 
-To get the location of all resources use
+To get the location of compute, storage or network resources use
 
-    client.list resources
+    client.list "compute"
+    client.list "storage"
+    client.list "network"
 
-Analogue for compute, storage, network.
+To get the identifiers of specific mixins in specific mixin types use
 
-To get a list of all OS / resource templates use
+    client.find_mixin "my_template", "os_tpl"
+    client.find_mixin "small", "resource_tpl"
 
-    client.get_os_templates
-    client.get_resource_templates
+To get the identifiers of specific mixins with unknown types use
+
+    client.find_mixin "medium"
+
+To get mixin descriptions use
+
+    client.find_mixin "medium", nil, true
+    client.find_mixin "my_template", "os_tpl", true
+
+To get a list of names of all / OS templates / Resource templates mixins use
+
+    client.get_mixins
+    client.get_mixins "os_tpl"
+    client.get_mixins "resource_tpl"
 
 To create a new compute resource use
 
-    os = client.get_os_templates.select { |template| template.term.include? 'my_os' }
-    size = client.get_resource_templates.select { |template| template.term.include? 'large' }
-    cmpt = OCCI::Core::Resource.new compute
+    os = client.find_mixin 'my_os', 'os_tpl'
+    size = client.find_mixin 'large', 'resource_tpl'
+    cmpt = client.get_resource "compute"
     cmpt.mixins << os << size
     cmpt.attributes.occi!.core!.title = "My VM"
     client.create cmpt
 
-### Logging
+To get a description of a specific resource use
+
+    client.describe "https://<ENDPOINT>:<PORT>/compute/<OCCI_ID>"
+    client.describe "https://<ENDPOINT>:<PORT>/storage/<OCCI_ID>"
+    client.describe "https://<ENDPOINT>:<PORT>/network/<OCCI_ID>"
+
+To delete a specific resource use
+
+    client.delete "https://<ENDPOINT>:<PORT>/compute/<OCCI_ID>"
+    client.delete "https://<ENDPOINT>:<PORT>/storage/<OCCI_ID>"
+    client.delete "https://<ENDPOINT>:<PORT>/network/<OCCI_ID>"
+
+#### Logging
 
 The OCCI gem includes its own logging mechanism using a message queue. By default, no one is listening to that queue.
 A new OCCI Logger can be initialized by specifying the log destination (either a filename or an IO object like
@@ -117,7 +241,7 @@ You can always, even if there is no logger defined, log output using the class m
 
     OCCI::Log.info("Test message")
 
-### Registering categories in the OCCI Model
+#### Registering categories in the OCCI Model
 
 Before the parser may be used, the available categories have to be registered in the OCCI Model.
 
@@ -129,7 +253,7 @@ For categories already specified by the OCCI WG a method exists in the OCCI Mode
 Further categories can either be registered from files which include OCCI collections in JSON formator or from parsed
  JSON objects (e.g. from the query interface of an OCCI service endpoint).
 
-### Parsing OCCI messages
+#### Parsing OCCI messages
 
 The OCCI gem includes a Parser to easily parse OCCI messages. With a given media type (e.g. json,
 xml or plain text) the parser analyses the content of the message body and, if supplied,
@@ -139,11 +263,11 @@ category and a message with an entity which has a kind, it has to be specified i
 
 OCCI messages can be parsed to an OCCI collection for example like
 
-    media_type = text/plain
+    media_type = 'text/plain'
     body = %Q|Category: compute; scheme="http://schemas.ogf.org/occi/infrastructure#"; class="kind"|
     collection=OCCI::Parser.parse(media_type, body)
 
-### Parsing OVF / OVA files
+#### Parsing OVF / OVA files
 
 Parsing of OVF/OVA files is partly supported and will be improved in future versions.
 
