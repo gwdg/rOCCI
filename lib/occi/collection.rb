@@ -59,6 +59,13 @@ module OCCI
       text
     end
 
+    def to_header
+      header = Hashie::Mash.new
+      header[:Category] = self.categories.collect {|category| category.to_text}.join(',') if self.categories.any?
+      header = self.entities.first.to_header if self.entities.any?
+      header
+    end
+
     def inspect
       JSON.pretty_generate(JSON.parse(to_json))
     end

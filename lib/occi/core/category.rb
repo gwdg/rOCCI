@@ -52,6 +52,11 @@ module OCCI
         text
       end
 
+      def to_header
+        header = Hashie::Mash.new
+        header[:Category] = self.to_text
+      end
+
       def inspect
         JSON.pretty_generate(JSON.parse(to_json))
       end

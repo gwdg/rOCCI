@@ -167,6 +167,29 @@ module OCCI
         text
       end
 
+      def to_header
+        scheme, term      = self.kind.split('#')
+        header            = Hashie::Mash.new
+        header[:Category] = term + ';scheme=' + scheme.inspect + ';class="kind"'
+        @mixins.each do |mixin|
+          scheme, term      = mixin.split('#')
+          header[:Category] += ',' + term + ';scheme=' + scheme.inspect + ';class="mixin"'
+        end
+        attributes = []
+        @attributes.combine.each_pair do |name, value|
+          name = name.inspect if name.kind_of? String
+          value = value.inspect if value.kind_of? String
+          attributes << name + '=' + value
+        end
+        header[:X-OCCI-Attribute] = attributes.join(',')
+        @actions.each do |action|
+          _, term = mixin.split('#')
+          links << self.location + '?action=' + term + '>;rel=' + action.inspect
+        end
+        header[:Link] = links.join(',')
+        header
+      end
+
       def inspect
         JSON.pretty_generate(JSON.parse(to_json))
       end
