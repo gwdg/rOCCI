@@ -181,13 +181,13 @@ module OCCI
           value = value.inspect if value.kind_of? String
           attributes << name + '=' + value
         end
-        header['X-OCCI-Attribute'] = attributes.join(',')
+        header['X-OCCI-Attribute'] = attributes.join(',') if attributes.any?
         links = []
         @actions.each do |action|
           _, term = mixin.split('#')
           links << self.location + '?action=' + term + '>;rel=' + action.inspect
         end
-        header['Link'] = links.join(',') if links
+        header['Link'] = links.join(',') if links.any?
         header
       end
 
