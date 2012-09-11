@@ -170,10 +170,10 @@ module OCCI
       def to_header
         scheme, term      = self.kind.split('#')
         header            = Hashie::Mash.new
-        header[:Category] = term + ';scheme=' + scheme.inspect + ';class="kind"'
+        header['Category'] = term + ';scheme=' + scheme.inspect + ';class="kind"'
         @mixins.each do |mixin|
           scheme, term      = mixin.split('#')
-          header[:Category] += ',' + term + ';scheme=' + scheme.inspect + ';class="mixin"'
+          header['Category'] += ',' + term + ';scheme=' + scheme.inspect + ';class="mixin"'
         end
         attributes = []
         @attributes.combine.each_pair do |name, value|
@@ -181,12 +181,13 @@ module OCCI
           value = value.inspect if value.kind_of? String
           attributes << name + '=' + value
         end
-        header[:X-OCCI-Attribute] = attributes.join(',')
+        header['X-OCCI-Attribute'] = attributes.join(',')
+        links = []
         @actions.each do |action|
           _, term = mixin.split('#')
           links << self.location + '?action=' + term + '>;rel=' + action.inspect
         end
-        header[:Link] = links.join(',')
+        header['Link'] = links.join(',') if links
         header
       end
 
