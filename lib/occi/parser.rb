@@ -90,7 +90,7 @@ module OCCI
         entity.links = []
         link_strings = header['HTTP_LINK'].to_s.split(',')
         link_strings.each do |link_string|
-          link = OCCIANTLR::Parser.new('Link: ' + link_string).link
+          link                                = OCCIANTLR::Parser.new('Link: ' + link_string).link
           link.attributes!.occi!.core!.target = link.target
           entity.links << OCCI::Core::Link.new(link.kind, link.mixins, link.attributes, link.actions, link.rel)
         end
@@ -233,7 +233,11 @@ module OCCI
       doc.xpath('envelope:Envelope/envelope:References/envelope:File', 'envelope' => "#{Parser::OVF}").each do |file|
         href = URI.parse(file.attributes['href'].to_s)
         if href.relative?
-          references[file.attributes['id'].to_s] = 'file://' + files[href.to_s] if files[href.to_s]
+          if files[href.to_s]
+            references[file.attributes['id'].to_s] = 'file://' + files[href.to_s]
+          else
+            references[file.attributes['id'].to_s] = 'file://' + href.to_s
+          end
         else
           references[file.attributes['id'].to_s] = href.to_s
         end
@@ -242,7 +246,7 @@ module OCCI
       doc.xpath('envelope:Envelope/envelope:DiskSection/envelope:Disk', 'envelope' => "#{Parser::OVF}").each do |disk|
         storage = OCCI::Core::Resource.new('http://schemas.ogf.org/occi/infrastructure#storage')
         if disk.attributes['fileRef']
-          storagelink                               = OCCI::Core::Link.new("http://schemas.ogf.org/occi/infrastructure#storagelink")
+          storagelink = OCCI::Core::Link.new("http://schemas.ogf.org/occi/infrastructure#storagelink")
           storagelink.attributes.occi!.core!.title  = disk.attributes['fileRef'].to_s
           storagelink.attributes.occi!.core!.target = references[disk.attributes['fileRef'].to_s]
           storage.attributes.occi!.core!.title      = disk.attributes['diskId'].to_s
@@ -304,7 +308,7 @@ module OCCI
                 # extract the mountpoint
                 host_resource                            = resource_alloc.xpath("item:HostResource/text()", 'item' => "#{Parser::RASD}").to_s
                 if host_resource.start_with? 'ovf:/disk/'
-                  id      = host_resource.gsub('ovf:/disk/', '')
+                  id = host_resource.gsub('ovf:/disk/', '')
                   storage = collection.resources.select { |resource| resource.attributes.occi!.core!.title == id }.first
                   raise "Disk with id #{id} not found" unless storage
                   storagelink.attributes.occi!.core!.target = storage.location
