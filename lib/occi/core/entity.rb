@@ -150,7 +150,7 @@ module OCCI
       # @return [String] text representation
       def to_text
         scheme, term = self.kind.split('#')
-        text         = 'Category: ' + term + ';scheme=' + scheme.inspect + ';class="kind"' + "\n"
+        text         = 'Category: ' + term + ';scheme=' + scheme.inspect + '#;class="kind"' + "\n"
         @mixins.each do |mixin|
           scheme, term = mixin.split('#')
           text << 'Category: ' + term + ';scheme=' + scheme.inspect + ';class="mixin"' + "\n"
@@ -170,7 +170,7 @@ module OCCI
       def to_header
         scheme, term      = self.kind.split('#')
         header            = Hashie::Mash.new
-        header['Category'] = term + ';scheme=' + scheme.inspect + ';class="kind"'
+        header['Category'] = term + ';scheme=' + scheme.inspect + '#;class="kind"'
         @mixins.each do |mixin|
           scheme, term      = mixin.split('#')
           header['Category'] += ',' + term + ';scheme=' + scheme.inspect + ';class="mixin"'
