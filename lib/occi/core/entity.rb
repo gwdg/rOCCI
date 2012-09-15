@@ -156,7 +156,6 @@ module OCCI
           text << 'Category: ' + term + ';scheme=' + scheme.inspect + ';class="mixin"' + "\n"
         end
         @attributes.combine.each_pair do |name, value|
-          name = name.inspect
           value = value.inspect
           text << 'X-OCCI-Attribute: ' + name + '=' + value + "\n"
         end
@@ -177,7 +176,6 @@ module OCCI
         end
         attributes = []
         @attributes.combine.each_pair do |name, value|
-          name = name.inspect
           attributes << name + '=' + value.inspect
         end
         header['X-OCCI-Attribute'] = attributes.join(',') if attributes.any?
