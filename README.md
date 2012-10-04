@@ -1,7 +1,7 @@
 rOCCI - A Ruby OCCI Framework
 =================================
 
-[![Build Status](https://secure.travis-ci.org/gwdg/rOCCI.png)](http://travis-ci.org/gwdg/rOCCI)
+[![Build Status](https://secure.travis-ci.org/gwdg/rOCCI.png)](http://travis-ci.org/gwdg/rOcci)
 
 Requirements
 ------------
@@ -93,7 +93,7 @@ In your scripts, you can use the OCCI client DSL.
 
 To include the DSL definitions in your script use
 
-    extend OCCI::DSL
+    extend Occi::DSL
 
 To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )
 
@@ -163,7 +163,7 @@ at a time, you should use the OCCI client API directly.
 
 To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )
 
-    client = OCCI::Client.new('http://localhost:3300',auth||=nil)
+    client = Occi::Client.new('http://localhost:3300',auth||=nil)
 
 All available categories are automatically registered to the OCCI model during client initialization. You can get them via
 
@@ -233,13 +233,13 @@ The OCCI gem includes its own logging mechanism using a message queue. By defaul
 A new OCCI Logger can be initialized by specifying the log destination (either a filename or an IO object like
 STDOUT) and the log level.
 
-    OCCI::Log.new(STDOUT,OCCI::Log::INFO)
+    Occi::Log.new(STDOUT,Occi::Log::INFO)
 
 You can create multiple Loggers to receive the log output.
 
 You can always, even if there is no logger defined, log output using the class methods of OCCI::Log e.g.
 
-    OCCI::Log.info("Test message")
+    Occi::Log.info("Test message")
 
 #### Registering categories in the OCCI Model
 
@@ -247,7 +247,7 @@ Before the parser may be used, the available categories have to be registered in
 
 For categories already specified by the OCCI WG a method exists in the OCCI Model class to register them:
 
-    model = OCCI::Model.new
+    model = Occi::Model.new
     model.register_infrastructure
 
 Further categories can either be registered from files which include OCCI collections in JSON formator or from parsed
@@ -265,7 +265,7 @@ OCCI messages can be parsed to an OCCI collection for example like
 
     media_type = 'text/plain'
     body = %Q|Category: compute; scheme="http://schemas.ogf.org/occi/infrastructure#"; class="kind"|
-    collection=OCCI::Parser.parse(media_type, body)
+    collection=Occi::Parser.parse(media_type, body)
 
 #### Parsing OVF / OVA files
 
@@ -276,7 +276,7 @@ bundled with rOCCI and can be parsed to an OCCI collection with
 
     require 'open-uri'
     ova=open 'https://raw.github.com/gwdg/rOCCI/master/spec/occi/test.ova'
-    collection=OCCI::Parser.ova(ova.read)
+    collection=Occi::Parser.ova(ova.read)
 
 Currently only the following entries of OVF files are parsed
 
