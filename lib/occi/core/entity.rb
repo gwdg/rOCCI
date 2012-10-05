@@ -185,8 +185,7 @@ module Occi
         end
         attributes = []
         @attributes.combine.each_pair do |name, value|
-          value = value.inspect
-          attributes << name + '=' + value
+          attributes << name + '=' + value.inspect
         end
         header['X-OCCI-Attribute'] = attributes.join(',') if attributes.any?
         header['X-OCCI-Attribute'] = 'occi.core.id=' + self.id.inspect
