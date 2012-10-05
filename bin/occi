@@ -20,21 +20,21 @@ require 'pp'
 require 'highline/import'
 require 'openssl'
 
-# OcciOpts is not part of the occi required above
+# OcciOpts is not part of the Occi required above
 require 'occi/client/occiopts'
 
-extend OCCI::DSL
+extend Occi::DSL
 
 # get arguments and validate/parse them to an ostruct
 options = OcciOpts.parse ARGV
 
 # initiate the Logger
-logger = OCCI::Log.new(options.log[:out])
+logger = Occi::Log.new(options.log[:out])
 logger.level = options.log[:level]
 options.log[:logger] = logger
 
-OCCI::Log.info "Starting OCCI client ..."
-OCCI::Log.debug "Options: #{options}"
+Occi::Log.info "Starting OCCI client ..."
+Occi::Log.debug "Options: #{options}"
 
 # running with an empty password?
 if options.auth[:password].nil? or options.auth[:user_cert_password].nil?
@@ -43,13 +43,12 @@ end
 
 begin
 
-  OCCI::Log.info "Establishing a connection to #{options.endpoint} ..."
+  Occi::Log.info "Establishing a connection to #{options.endpoint} ..."
   connect options.endpoint, options.auth, options.log, true, options.media_type
 
-  OCCI::Log.info "Executing action #{options.action.to_s} on #{options.resource} ..."
+  Occi::Log.info "Executing action #{options.action.to_s} on #{options.resource} ..."
   case options.action
   when :list
-
     if resource_types.include? options.resource or resource_type_identifiers.include? options.resource
       pp list options.resource
     elsif mixin_types.include? options.resource
@@ -91,16 +90,16 @@ begin
       
       res = resource options.resource
 
-      OCCI::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
-      OCCI::Log.debug "with mixins:#{options.mixin}"
+      Occi::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
+      Occi::Log.debug "with mixins:#{options.mixin}"
       
       options.mixin.keys.each do |type|
-        OCCI::Log.debug "Adding mixins of type #{type} to #{options.resource}"
+        Occi::Log.debug "Adding mixins of type #{type} to #{options.resource}"
         options.mixin[type].each do |name|
           mxn = mixin name, type
 
           raise "Unknown mixin #{type}##{name}, stopping here!" if mxn.nil?
-          OCCI::Log.debug "Adding mixin #{mxn} to #{options.resource}"
+          Occi::Log.debug "Adding mixin #{mxn} to #{options.resource}"
           res.mixins << mxn
         end
       end
@@ -128,19 +127,19 @@ begin
   end
 
 rescue OpenSSL::SSL::SSLError => ssl_ex
-  OCCI::Log.error "An SSL Auth Error occurred! Please, make sure your credentials are valid and the endpoind is trusted! Message: #{ssl_ex.message}"
+  Occi::Log.error "An SSL Auth Error occurred! Please, make sure your credentials are valid and the endpoind is trusted! Message: #{ssl_ex.message}"
   raise ssl_ex if options.debug
   exit!
 rescue OpenSSL::PKey::RSAError => key_ex
-  OCCI::Log.error "An X509 Error occurred! Please, check your credentials! Message: #{key_ex.message}"
+  Occi::Log.error "An X509 Error occurred! Please, check your credentials! Message: #{key_ex.message}"
   raise key_ex if options.debug
   exit!
 rescue Exception => ex
-  OCCI::Log.error "An error occurred! Message: #{ex.message}"
+  Occi::Log.error "An error occurred! Message: #{ex.message}"
   raise ex if options.debug
   exit!
 end
 
-OCCI::Log.info "OCCI client is shutting down ..."
+Occi::Log.info "OCCI client is shutting down ..."
 
 exit!(true)

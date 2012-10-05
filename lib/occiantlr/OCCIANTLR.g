@@ -7,7 +7,7 @@ options {
 @header { 
 	require 'uri' 
 	require 'hashie'
-	ATTRIBUTE = { :Mutable => true, :Required => false, :Type => "string" }
+	ATTRIBUTE = { :mutable => true, :required => false, :type => "string" }
 }
 
 /*
@@ -73,15 +73,16 @@ link returns [hash]
 			: link_target { hash[:target] = $link_target.value }
 			  link_rel { hash[:rel] = $link_rel.value }
 			  link_self? { hash[:self] = $link_self.value }
-			  link_category? { hash[:kind] = $link_category.value }
+			  link_category? { hash[:categories] = $link_category.array }
 			  link_attributes { hash[:attributes] = $link_attributes.hash }
 			  SEMICOLON?
 			  ;
 	link_target returns [value]	: WS? LT uri GT { value = $uri.text };
 	link_rel  returns [value]	: SEMICOLON WS? REL EQUALS QUOTE uri QUOTE { value = $uri.text };
 	link_self  returns [value]	: SEMICOLON WS? SELF EQUALS QUOTE uri QUOTE { value = $uri.text };
-	link_category  returns [value]	: SEMICOLON WS? CATEGORY EQUALS QUOTE uri QUOTE { value = $uri.text };
-	link_attributes  returns [hash] @init { hash = Hashie::Mash.new }
+	link_category  returns [array] @init {array = Array.new}
+	                                : SEMICOLON WS? CATEGORY EQUALS QUOTE kind=uri { array << $kind.text } (WS mixin=uri { array << $mixin.text })* QUOTE;
+	link_attributes  returns [hash] @init {hash = Hashie::Mash.new}
 					: (SEMICOLON WS? attribute { hash.merge!($attribute.hash) } )*;
 
 /*
@@ -119,7 +120,7 @@ attribute_name returns [hash] @init { hash = Hashie::Mash.new }
                         : comp_first=attribute_component { cur_hash = hash; comp = $comp_first.text }
 			  ( '.' comp_next=attribute_component { cur_hash[comp.to_sym] = Hashie::Mash.new; cur_hash = cur_hash[comp.to_sym]; comp = $comp_next.text })*
 			  { cur_hash[comp.to_sym] = ATTRIBUTE } 
-			  ('{' ('mutable' { cur_hash[comp.to_sym][:Mutable] = true })? ('immutable' { cur_hash[comp.to_sym][:Mutable] = false })? ('required' { cur_hash[comp.to_sym][:Required] = true })? '}' )?;
+			  ('{' ('mutable' { cur_hash[comp.to_sym][:mutable] = true })? ('immutable' { cur_hash[comp.to_sym][:mutable] = false })? ('required' { cur_hash[comp.to_sym][:required] = true })? '}' )?;
 attribute_component	: ( LOALPHA | reserved_words) ( LOALPHA | DIGIT | DASH | UNDERSCORE | reserved_words  )*;
 attribute_value returns [value]	: ( quoted_string { value = $quoted_string.text } | number { value = $number.text.to_i } );
 number			: ( digits ( DOT digits )? );
