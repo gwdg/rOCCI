@@ -1,5 +1,5 @@
 require 'rspec'
-require 'Occi'
+require 'occi'
 
 module Occi
   describe Client do

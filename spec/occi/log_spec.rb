@@ -1,5 +1,5 @@
 require "rspec"
-require 'Occi/log'
+require 'occi/log'
 
 module Occi
   describe Log do

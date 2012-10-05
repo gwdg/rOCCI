@@ -1,5 +1,5 @@
 require "rspec"
-require 'Occi/parser'
+require 'occi/parser'
 
 describe "Parser" do
 

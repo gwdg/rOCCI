@@ -1,7 +1,7 @@
 require 'rspec'
 require 'hashie'
 
-require 'Occiantlr/OCCIANTLRParser'
+require 'occiantlr/OCCIANTLRParser'
 
 module Occi
   module ANTLR

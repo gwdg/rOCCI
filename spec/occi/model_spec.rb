@@ -1,5 +1,5 @@
 require "rspec"
-require 'Occi/model'
+require 'occi/model'
 
 describe "Model" do
 
