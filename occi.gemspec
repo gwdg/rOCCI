@@ -2,15 +2,15 @@
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
-require 'Occi/version'
+require 'occi/version'
 
 Gem::Specification.new do |gem|
   gem.name          = "Occi"
   gem.version       = Occi::VERSION
   gem.authors       = ["Florian Feldhaus","Piotr Kasprzak"]
   gem.email         = ["florian.feldhaus@gwdg.de", "piotr.kasprzak@gwdg.de"]
-  gem.description   = %q{Occi is a collection of classes to simplify the implementation of the Open Cloud Computing API in Ruby}
-  gem.summary       = %q{Occi toolkit}
+  gem.description   = %q{OCCI is a collection of classes to simplify the implementation of the Open Cloud Computing API in Ruby}
+  gem.summary       = %q{OCCI toolkit}
   gem.homepage      = 'https://github.com/gwdg/rOcci'
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
@@ -27,8 +27,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'httparty'
   gem.add_dependency 'highline'
   gem.add_dependency 'i18n'
-  gem.add_dependency 'zlib'
-  gem.add_dependency 'tempfile'
 
   gem.required_ruby_version     = ">= 1.8.7"
 end
