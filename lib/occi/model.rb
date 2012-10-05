@@ -1,6 +1,3 @@
-require 'hashie/mash'
-require 'Occi/log'
-
 module Occi
   class Model < Occi::Collection
 
