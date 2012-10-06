@@ -1,5 +1,3 @@
-require 'occi/core/category'
-
 module Occi
   module Core
     class Action < Occi::Core::Category
@@ -11,6 +9,7 @@ module Occi
         text
       end
 
+      # @return [Hash] hash containing the HTTP headers of the text/occi rendering
       def to_header
         header = super
         header["Category"] << ';attributes=' + @attributes.combine.join(' ').inspect if @attributes.any?

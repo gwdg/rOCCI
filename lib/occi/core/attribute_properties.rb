@@ -4,6 +4,8 @@ module Occi
   module Core
     class AttributeProperties < Hashie::Mash
 
+      # @param [Hash] properties
+      # @param [Hash] default
       def initialize(properties=nil,default=nil)
         properties ||= {}
         properties[:type] ||= 'string'
@@ -13,6 +15,8 @@ module Occi
         super properties, default
       end
 
+      # @param [Hash] properties
+      # @return [Occi::Core::AttributeProperties] parsed Attribute Properties
       def self.parse(properties)
         properties ||= Hashie::Mash.new
         if [:Type, :Required, :Mutable, :Default, :Description, :Pattern, :type, :required, :mutable, :default, :description, :pattern].any? { |k| properties.key?(k) and not properties[k].kind_of? Hash }
@@ -38,6 +42,7 @@ module Occi
         end
       end
 
+      # @return [String] json representation
       def inspect
         JSON.pretty_generate(JSON.parse(to_json))
       end

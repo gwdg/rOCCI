@@ -23,6 +23,10 @@ module Occi
       # @param [String] kind
       # @param [String] mixins
       # @param [Occi::Core::Attributes] attributes
+      # @param [Array] actions
+      # @param [String] rel
+      # @param [String,Occi::Core::Entity] target
+      # @param [String,Occi::Core::Entity] source
       def initialize(kind, mixins=[], attributes={ }, actions=[], rel=nil, target=nil, source=nil)
         super(kind, mixins, attributes, actions)
         @rel = rel if rel
@@ -91,6 +95,7 @@ module Occi
         string
       end
 
+      # @return [String] text representation of link
       def to_text_link
         'Link: ' + self.to_string
       end

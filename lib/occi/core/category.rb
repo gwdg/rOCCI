@@ -19,6 +19,10 @@ module Occi
         @attributes = Occi::Core::AttributeProperties.parse attributes
       end
 
+      # @param [String] scheme
+      # @param [String] term
+      # @param [Array] related
+      # @return [Class] ruby class with scheme as namespace, term as name and related kind as super class
       def self.get_class(scheme, term, related=['http://schemas.ogf.org/occi/core#entity'])
         if related.to_a.first == 'http://schemas.ogf.org/occi/core#entity' or related.to_a.first.nil?
           parent = Occi::Core::Entity
@@ -82,10 +86,12 @@ module Occi
         category
       end
 
+      # @return [String] short text representation of the category
       def to_string_short
         @term + ';scheme=' + @scheme.inspect + ';class=' + self.class.name.demodulize.downcase.inspect
       end
 
+      # @return [String] full text representation of the category
       def to_string
         string = self.to_string_short
         string << ';title=' + @title.inspect if @title
@@ -97,14 +103,18 @@ module Occi
         'Category: ' + self.to_string
       end
 
+      # @return [Hash] hash containing the HTTP headers of the text/occi rendering
       def to_header
         { :Category => self.to_string }
       end
 
+      # @return [String] json representation
       def inspect
         JSON.pretty_generate(JSON.parse(to_json))
       end
 
+
+      # @return [NilClass] category itself does not have a location
       def location
         nil # not implemented
       end

@@ -34,6 +34,7 @@ module Occi
         end
       end
 
+      # @return [String] json representation
       def inspect
         JSON.pretty_generate(JSON.parse(to_json))
       end

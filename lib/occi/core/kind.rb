@@ -30,6 +30,7 @@ module Occi
         kind
       end
 
+      # @return [String] string representation of the kind
       def to_string
         string = super
         string << ';rel=' + @related.join(' ').inspect if @related.any?

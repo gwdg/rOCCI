@@ -5,6 +5,7 @@ module Occi
       attr_accessor :mixins, :attributes, :actions, :id
       attr_reader :kind
 
+      # @return [String]
       def self.type_identifier
         self.kind.type_identifier
       end
@@ -24,6 +25,8 @@ module Occi
         kind
       end
 
+      # @param [Array] args list of arguments
+      # @return [Object] new instance of this class
       def self.new(*args)
         args[0]      ||= self.kind.type_identifier
         scheme, term = args[0].split '#'
@@ -173,6 +176,7 @@ module Occi
         text
       end
 
+      # @return [Hash] hash containing the HTTP headers of the text/occi rendering
       def to_header
         scheme, term = self.kind.split('#')
         scheme << '#'
@@ -197,10 +201,12 @@ module Occi
         header
       end
 
+      # @return [String] json representation
       def inspect
         JSON.pretty_generate(JSON.parse(to_json))
       end
 
+      # @return [String] string representation of entity is its location
       def to_s
         self.location
       end
