@@ -92,6 +92,8 @@ module Occi
       collection.mixins = @mixins.collect { |mixin| mixin.as_json } if @mixins.any?
       collection.actions = @actions.collect { |action_category| action_category.as_json } if actions.any?
       collection.resources = @resources.collect { |resource| resource.as_json } if @resources.any?
+      @links.concat(@resources.collect { |resource| resource.links.select { |link| link.kind_of? Occi::Core::Link } }.flatten)
+      @links.uniq!
       collection.links = @links.collect { |link| link.as_json } if @links.any?
       collection.action = @action.as_json if @action
       collection
