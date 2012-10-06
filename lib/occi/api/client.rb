@@ -258,10 +258,14 @@ module Occi
         descriptions = get('/')
       elsif @model.get_by_id resource_type_identifier
         # we got type identifier
-        # split the type identifier
-        location     = @model.get_by_id(resource_type_identifier).location
-        # make the request
-        descriptions = get(location)
+        # get all available resources of this type
+        locations     = list resource_type_identifier
+        # make the requests
+        descriptions = []
+
+        locations.each do |location|
+          descriptions << get(sanitize_resource_link(location))
+        end
       elsif resource_type_identifier.start_with? @endpoint
         # we got resource link
         # make the request
