@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'hashie/mash'
 
 require 'active_support/json'
