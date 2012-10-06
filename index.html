@@ -32,7 +32,7 @@
       <section>
         <h1>rOCCI - A Ruby OCCI Framework</h1>
 
-<p><a href="http://travis-ci.org/gwdg/rOCCI"><img src="https://secure.travis-ci.org/gwdg/rOCCI.png" alt="Build Status"></a></p>
+<p><a href="http://travis-ci.org/gwdg/rOcci"><img src="https://secure.travis-ci.org/gwdg/rOCCI.png" alt="Build Status"></a> <a href="https://gemnasium.com/gwdg/rOCCI"><img src="https://gemnasium.com/gwdg/rOCCI.png" alt="Dependency Status"></a></p>
 
 <h2>Requirements</h2>
 
@@ -136,7 +136,7 @@ auth.ca_path = '/Path/To/root-certificates'
 
 <p>To include the DSL definitions in your script use</p>
 
-<pre><code>extend OCCI::DSL
+<pre><code>extend Occi::DSL
 </code></pre>
 
 <p>To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )</p>
@@ -219,7 +219,7 @@ at a time, you should use the OCCI client API directly.</p>
 
 <p>To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )</p>
 
-<pre><code>client = OCCI::Client.new('http://localhost:3300',auth||=nil)
+<pre><code>client = Occi::Client.new('http://localhost:3300',auth||=nil)
 </code></pre>
 
 <p>All available categories are automatically registered to the OCCI model during client initialization. You can get them via</p>
@@ -301,14 +301,14 @@ client.delete "https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/network/&lt;OCCI_ID&gt;"
 A new OCCI Logger can be initialized by specifying the log destination (either a filename or an IO object like
 STDOUT) and the log level.</p>
 
-<pre><code>OCCI::Log.new(STDOUT,OCCI::Log::INFO)
+<pre><code>Occi::Log.new(STDOUT,Occi::Log::INFO)
 </code></pre>
 
 <p>You can create multiple Loggers to receive the log output.</p>
 
 <p>You can always, even if there is no logger defined, log output using the class methods of OCCI::Log e.g.</p>
 
-<pre><code>OCCI::Log.info("Test message")
+<pre><code>Occi::Log.info("Test message")
 </code></pre>
 
 <h4>Registering categories in the OCCI Model</h4>
@@ -317,7 +317,7 @@ STDOUT) and the log level.</p>
 
 <p>For categories already specified by the OCCI WG a method exists in the OCCI Model class to register them:</p>
 
-<pre><code>model = OCCI::Model.new
+<pre><code>model = Occi::Model.new
 model.register_infrastructure
 </code></pre>
 
@@ -336,7 +336,7 @@ category and a message with an entity which has a kind, it has to be specified i
 
 <pre><code>media_type = 'text/plain'
 body = %Q|Category: compute; scheme="http://schemas.ogf.org/occi/infrastructure#"; class="kind"|
-collection=OCCI::Parser.parse(media_type, body)
+collection=Occi::Parser.parse(media_type, body)
 </code></pre>
 
 <h4>Parsing OVF / OVA files</h4>
@@ -348,7 +348,7 @@ bundled with rOCCI and can be parsed to an OCCI collection with</p>
 
 <pre><code>require 'open-uri'
 ova=open 'https://raw.github.com/gwdg/rOCCI/master/spec/occi/test.ova'
-collection=OCCI::Parser.ova(ova.read)
+collection=Occi::Parser.ova(ova.read)
 </code></pre>
 
 <p>Currently only the following entries of OVF files are parsed</p>
