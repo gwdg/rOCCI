@@ -22,7 +22,9 @@ class OcciOpts
     options.auth[:ca_path] = "/etc/grid-security/certificates"
     options.auth[:username] = "anonymous"
     
-    options.media_type = "application/occi+json"
+    # TODO: change media type back to occi+json after the rOCCI-server update
+    #options.media_type = "application/occi+json"
+    options.media_type = "text/plain"
 
     opts = OptionParser.new do |opts|
       opts.banner = "Usage: occi [OPTIONS]"
