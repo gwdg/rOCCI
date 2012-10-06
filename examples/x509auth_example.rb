@@ -111,8 +111,8 @@ unless use_os_temlate
 
   ## create links and attach them to the compure resource
   puts "\n Connecting to our compute:"
-  client.storagelink cmpt, storage_loc
-  client.networkinterface cmpt, network_loc
+  cmpt.storagelink storage_loc
+  cmpt.networkinterface network_loc
 else
   ## with OS template, we have to find the template by name
   ## optionally we can change its "size" by choosing an instance type
