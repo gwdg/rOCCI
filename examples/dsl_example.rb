@@ -3,7 +3,7 @@ require 'pp'
 
 # load and include rOCCI client DSL
 require 'occi'
-extend OCCI::DSL
+extend Occi::DSL
 
                               ## options
 use_os_temlate = true         # use OS_TEMPLATE or NETWORK + STORAGE + INSTANCE TYPE
@@ -23,7 +23,7 @@ connect(ENDPOINT,
           :user_cert_password => USER_CERT_PASSWORD,
           :ca_path            => CA_PATH },
         { :out   => STDERR,
-          :level => OCCI::Log::DEBUG })
+          :level => Occi::Log::DEBUG })
 
 puts "\n\nListing all available resource types:"
 resource_types.each do |type|

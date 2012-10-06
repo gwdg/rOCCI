@@ -1,9 +1,0 @@
-{
-    "mixins":[
-        {
-            "term":"resource_tpl",
-            "scheme":"http://schemas.ogf.org/occi/infrastructure#",
-            "title":"Resource Template"
-        }
-    ]
-}

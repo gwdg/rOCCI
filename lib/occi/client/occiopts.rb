@@ -12,7 +12,7 @@ class OcciOpts
     
     options.log = {}
     options.log[:out] = STDERR
-    options.log[:level] = OCCI::Log::WARN
+    options.log[:level] = Occi::Log::WARN
     
     options.endpoint = "https://localhost:3300/"
     
@@ -91,12 +91,12 @@ class OcciOpts
 
       opts.on_tail("--debug", "Enable debugging messages") do |debug|
         options.debug = debug
-        options.log[:level] = OCCI::Log::DEBUG
+        options.log[:level] = Occi::Log::DEBUG
       end
 
       opts.on_tail("--verbose", "Be more verbose, less intrusive than debug mode") do |verbose|
         options.verbose = verbose
-        options.log[:level] = OCCI::Log::INFO unless options.log[:level] == OCCI::Log::DEBUG
+        options.log[:level] = Occi::Log::INFO unless options.log[:level] == Occi::Log::DEBUG
       end
 
       opts.on_tail("-h", "--help", "Show this message") do
@@ -105,7 +105,7 @@ class OcciOpts
       end
 
       opts.on_tail("--version", "Show version") do
-        puts OCCI::VERSION
+        puts Occi::VERSION
         exit!(true)
       end
 

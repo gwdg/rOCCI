@@ -1,43 +1,22 @@
-require 'active_support/json'
-require 'occi/core/category'
-require 'occi/core/action'
-require 'occi/core/attribute_properties'
-
-module OCCI
+module Occi
   module Core
-    class Kind < OCCI::Core::Category
+    class Kind < Occi::Core::Category
 
-      attr_accessor :entities, :related, :actions
+      attr_accessor :entities, :related, :actions, :location, :entity_type
 
       # @param [String ] scheme
       # @param [String] term
       # @param [String] title
-      # @param [OCCI::Core::AttributeProperties] attributes
+      # @param [Hash] attributes
       # @param [Array] related
       # @param [Array] actions
-      def initialize(scheme, term, title=nil, attributes=nil, related=nil, actions=nil)
-        @entities = []
-        @related  = related.to_a
-        @actions  = actions.to_a
+      def initialize(scheme, term, title=nil, attributes={}, related=[], actions=[],location=nil)
         super(scheme, term, title, attributes)
-      end
-
-      # @return [String] name of the OCCI core class the entity is related to
-      def entity_type
-        case type_identifier
-          when "http://schemas.ogf.org/occi/core#resource"
-            return OCCI::Core::Resource
-          when "http://schemas.ogf.org/occi/core#link"
-            return OCCI::Core::Link
-          else
-            raise "no model back reference provided for kind #{self.typ_identifier}" unless @model
-            @model.get_by_id(self.related.first).entity_type unless self.term == 'entity'
-        end
-      end
-
-      # @return [String] string containing location URI of kind
-      def location
-        '/' + @term + '/'
+        @related  = related.to_a.flatten
+        @actions  = actions.to_a.flatten
+        @location = location ||= '/' + term + '/'
+        @entities = []
+        @entity_type = self.class.get_class scheme, term, related
       end
 
       # @param [Hash] options
@@ -46,18 +25,18 @@ module OCCI
         kind = Hashie::Mash.new
         kind.related = @related if @related.any?
         kind.actions = @actions if @actions.any?
+        kind.location = @location if @location
         kind.merge! super
         kind
       end
 
-      # @return [String] text representation
-      def to_text
-        text = super
-        text << ';rel=' + @related.join(' ').inspect if @related.any?
-        text << ';location=' + self.location.inspect
-        text << ';attributes=' + @attributes.combine.join(' ').inspect if @attributes.any?
-        text << ';actions=' + @actions.join(' ').inspect if @actions.any?
-        text
+      def to_string
+        string = super
+        string << ';rel=' + @related.join(' ').inspect if @related.any?
+        string << ';location=' + self.location.inspect
+        string << ';attributes=' + @attributes.combine.keys.join(' ').inspect if @attributes.any?
+        string << ';actions=' + @actions.join(' ').inspect if @actions.any?
+        string
       end
 
     end

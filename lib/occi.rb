@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'hashie/mash'
 
 require 'active_support/json'
@@ -19,13 +20,37 @@ require 'zlib'
 require 'tempfile'
 
 require 'occi/version'
+require 'occi/collection'
 require 'occi/parser'
 require 'occi/model'
 require 'occi/log'
 require 'occi/api/dsl'
 require 'occi/api/client'
-require 'occi/collection'
 require 'occi/core'
+require 'occi/infrastructure'
 
 require 'occiantlr/OCCIANTLRLexer'
 require 'occiantlr/OCCIANTLRParser'
+
+module Occi
+  def kind
+    nil
+  end
+
+  def kinds
+    []
+  end
+
+  def mixins
+    []
+  end
+
+  def actions
+    []
+  end
+
+  # @return [Array] list of Occi::Core::Categories
+  def categories
+    self.kinds + self.mixins + self.actions
+  end
+end
