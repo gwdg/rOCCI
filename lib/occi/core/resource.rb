@@ -28,8 +28,8 @@ module OCCI
       # @param [Array] mixins
       # @param [OCCI::Core::Attributes,Hash] attributes
       # @param [Array] links
-      def initialize(kind, mixins=nil, attributes=nil, links=nil)
-        super(kind, mixins, attributes)
+      def initialize(kind, mixins=[], attributes={ }, actions=[], links=[])
+        super(kind, mixins, attributes, actions)
         @links = []
         links.to_a.each do |link|
           link = OCCI::Core::Link.new(link.kind,link.mixins,link.attributes,link.actions,link.rel) unless link.kind_of? OCCI::Core::Link

@@ -6,7 +6,7 @@ module OCCI
   module Core
     class Link < Entity
 
-      attr_accessor :rel
+      attr_accessor :rel, :source, :target
 
       # @return [OCCI::Core::Kind] kind definition of Link type
       def self.kind_definition
@@ -30,32 +30,40 @@ module OCCI
 
       # @param [String] kind
       # @param [String] mixins
-      # @param [OCCI::Core::Attributes] attributes
-      def initialize(kind, mixins=nil, attributes=nil, actions=nil, rel=nil)
+      # @param [Occi::Core::Attributes] attributes
+      # @param [Array] actions
+      # @param [String] rel
+      # @param [String,OCCI::Core::Entity] target
+      # @param [String,OCCI::Core::Entity] source
+      def initialize(kind, mixins=[], attributes={ }, actions=[], rel=nil, target=nil, source=nil)
         super(kind,mixins,attributes,actions)
-        @rel        = rel
+        @rel = rel if rel
+        self.source = source if source
+        self.target = target
       end
 
       # @return [String] target attribute of the link
       def target
-        self.attributes.occi!.core!.target
+        @target ||= self.attributes.occi.core.target if @attributes.occi.core if @attributes.occi
+        @target
       end
 
       # set target attribute of link
       # @param [String] target
-      def target=(target)
-        self.attributes.occi!.core!.target = target
+      def target=(resource)
+        @target = resource
       end
 
       # @return [String] source attribute of the link
       def source
-        self.attributes.occi!.core!.source
+        @source ||= self.attributes.occi.core.source if @attributes.occi.core if @attributes.occi
+        @source
       end
 
       # set source attribute of link
       # @param [String] source
-      def source=(source)
-        self.attributes.occi!.core!.source = source
+      def source=(resource)
+        @source = resource
       end
 
       # @param [OCCI::Model] model
@@ -67,11 +75,10 @@ module OCCI
       # @param [Hash] options
       # @return [Hashie::Mash] json representation
       def as_json(options={ })
-        link = Hashie::Mash.new
-        link.kind = @kind if @kind
+        link = super
         link.rel = @rel if @rel
-        link.mixins = @mixins if @mixins.any?
-        link.attributes = @attributes if @attributes.any?
+        link.source = self.source.to_s if self.source.kind_of? String if self.source
+        link.target = self.target.to_s if self.target
         link
       end
 
