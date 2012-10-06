@@ -195,6 +195,13 @@ module Occi
       collection.mixins.concat hash.mixins.collect { |mixin| Occi::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) } if hash.mixins
       collection.resources.concat hash.resources.collect { |resource| Occi::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.actions, resource.links) } if hash.resources
       collection.links.concat hash.links.collect { |link| Occi::Core::Link.new(link.kind, link.mixins, link.attributes) }
+
+      if collection.resources.size == 1 & collection.links.size > 0
+        if collection.resources.first.links.empty?
+          collection.resources.first.links = collection.links
+        end
+      end
+
       # replace link locations with link objects in all resources
       collection.resources.each do |resource|
         resource.links.collect! do |resource_link|
