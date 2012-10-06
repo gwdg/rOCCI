@@ -1,28 +1,21 @@
-require 'active_support/json'
-require 'occi/core/category'
-
-module OCCI
+module Occi
   module Core
-    class Mixin < OCCI::Core::Category
+    class Mixin < Occi::Core::Category
 
-      attr_accessor :entities, :related, :actions
+      attr_accessor :entities, :related, :actions, :location
 
       # @param [String ] scheme
       # @param [String] term
       # @param [String] title
-      # @param [OCCI::Core::AttributeProperties] attributes
+      # @param [Hash] attributes
       # @param [Array] related
       # @param [Array] actions
-      def initialize(scheme, term, title=nil, attributes=nil, related=nil, actions=nil)
-        @entities = []
-        @related  = related.to_a
-        @actions  = actions.to_a
+      def initialize(scheme, term, title=nil, attributes={}, related=[], actions=[],location=nil)
         super(scheme, term, title, attributes)
-      end
-
-      # @return [String] string containing location URI of mixin
-      def location
-        '/mixins/' + @term + '/'
+        @related  = related.to_a.flatten
+        @actions  = actions.to_a.flatten
+        @location = location ||= '/' + term + '/'
+        @entities = []
       end
 
       # @param [Hash] options
@@ -31,18 +24,19 @@ module OCCI
         mixin = Hashie::Mash.new
         mixin.related = @related if @related.any?
         mixin.actions = @actions if @actions.any?
+        mixin.location = @location if @location
         mixin.merge! super
         mixin
       end
 
       # @return [String] text representation
-      def to_text
-        text = super
-        text << ';rel=' + @related.join(' ').inspect if @related.any?
-        text << ';location=' + self.location.inspect
-        text << ';attributes=' + @attributes.combine.join(' ').inspect if @attributes.any?
-        text << ';actions=' + @actions.join(' ').inspect if @actions.any?
-        text
+      def to_string
+        string = super
+        string << ';rel=' + @related.join(' ').inspect if @related.any?
+        string << ';location=' + self.location.inspect
+        string << ';attributes=' + @attributes.combine.keys.join(' ').inspect if @attributes.any?
+        string << ';actions=' + @actions.join(' ').inspect if @actions.any?
+        string
       end
 
     end

@@ -5,17 +5,21 @@ require 'occi/core/action'
 require 'occi/core/entity'
 require 'occi/core/link'
 require 'occi/core/resource'
-#require 'occi/core/attribute'
 require 'occi/core/attributes'
+require 'occi/core/attribute_properties'
 
-module OCCI
+module Occi
   module Core
-    # @return [Array] list of OCCI::Core::Categories
-    def self.categories
-      categories = []
-      categories << OCCI::Core::Entity.kind
-      categories << OCCI::Core::Link.kind
-      categories << OCCI::Core::Resource.kind
+
+    extend Occi
+
+    def self.kinds
+      [
+          Occi::Core::Entity.kind,
+          Occi::Core::Link.kind,
+          Occi::Core::Resource.kind
+      ]
     end
+
   end
 end

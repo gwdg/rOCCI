@@ -14,13 +14,13 @@ CA_PATH            = '/etc/grid-security/certificates'
 ENDPOINT           = 'https://localhost:3300'
 
 ## get an OCCI::Client instance
-client = OCCI::Client.new(ENDPOINT,
+client = Occi::Client.new(ENDPOINT,
         { :type               => "x509",
           :user_cert          => USER_CERT,
           :user_cert_password => USER_CERT_PASSWORD,
           :ca_path            => CA_PATH },
         { :out   => STDERR,
-          :level => OCCI::Log::DEBUG })
+          :level => Occi::Log::DEBUG })
 
 puts "\n\nListing all available resource types:"
 client.get_resource_types.each do |type|

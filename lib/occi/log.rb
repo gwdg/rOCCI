@@ -1,6 +1,6 @@
 require 'logger'
 
-module OCCI
+module Occi
   class Log
 
     include ::Logger::Severity

@@ -1,79 +1,73 @@
 require 'rubygems'
 require 'httparty'
 
-module OCCI
+module Occi
   class Client
 
     # HTTParty for raw HTTP requests
     include HTTParty
-    headers 'Accept' => 'application/occi+json,text/plain;q=0.5'
+    # TODO: uncomment the following line as JSON is properly implemented in OpenStack
+    # headers 'Accept' => 'application/occi+json,text/plain;q=0.8,text/occi;q=0.2'
+    headers 'Accept' => 'text/plain,text/occi;q=0.2'
 
     # a few attributes which should be visible outside the client
     attr_reader :endpoint
     attr_reader :auth_options
-    attr_reader :media_type
+    attr_accessor :media_type
     attr_reader :connected
-    attr_reader :model
-
-    # hash mapping human-readable resource names to OCCI identifiers
-    # TODO: get resources dynamically from the model
-    RESOURCES = {
-      :compute => "http://schemas.ogf.org/occi/infrastructure#compute",
-      :storage => "http://schemas.ogf.org/occi/infrastructure#storage",
-      :network => "http://schemas.ogf.org/occi/infrastructure#network"
-    }
+    attr_accessor :model
 
     # hash mapping HTTP response codes to human-readable messages
     HTTP_CODES = {
-      "100" => "Continue",
-      "101" => "Switching Protocols",
-      "200" => "OK",
-      "201" => "Created",
-      "202" => "Accepted",
-      "203" => "Non-Authoritative Information",
-      "204" => "No Content",
-      "205" => "Reset Content",
-      "206" => "Partial Content",
-      "300" => "Multiple Choices",
-      "301" => "Moved Permanently",
-      "302" => "Found",
-      "303" => "See Other",
-      "304" => "Not Modified",
-      "305" => "Use Proxy",
-      "307" => "Temporary Redirect",
-      "400" => "Bad Request",
-      "401" => "Unauthorized",
-      "402" => "Payment Required",
-      "403" => "Forbidden",
-      "404" => "Not Found",
-      "405" => "Method Not Allowed",
-      "406" => "Not Acceptable",
-      "407" => "Proxy Authentication Required",
-      "408" => "Request Time-out",
-      "409" => "Conflict",
-      "410" => "Gone",
-      "411" => "Length Required",
-      "412" => "Precondition Failed",
-      "413" => "Request Entity Too Large",
-      "414" => "Request-URI Too Large",
-      "415" => "Unsupported Media Type",
-      "416" => "Requested range not satisfiable",
-      "417" => "Expectation Failed",
-      "500" => "Internal Server Error",
-      "501" => "Not Implemented",
-      "502" => "Bad Gateway",
-      "503" => "Service Unavailable",
-      "504" => "Gateway Time-out",
-      "505" => "HTTP Version not supported"
+        "100" => "Continue",
+        "101" => "Switching Protocols",
+        "200" => "OK",
+        "201" => "Created",
+        "202" => "Accepted",
+        "203" => "Non-Authoritative Information",
+        "204" => "No Content",
+        "205" => "Reset Content",
+        "206" => "Partial Content",
+        "300" => "Multiple Choices",
+        "301" => "Moved Permanently",
+        "302" => "Found",
+        "303" => "See Other",
+        "304" => "Not Modified",
+        "305" => "Use Proxy",
+        "307" => "Temporary Redirect",
+        "400" => "Bad Request",
+        "401" => "Unauthorized",
+        "402" => "Payment Required",
+        "403" => "Forbidden",
+        "404" => "Not Found",
+        "405" => "Method Not Allowed",
+        "406" => "Not Acceptable",
+        "407" => "Proxy Authentication Required",
+        "408" => "Request Time-out",
+        "409" => "Conflict",
+        "410" => "Gone",
+        "411" => "Length Required",
+        "412" => "Precondition Failed",
+        "413" => "Request Entity Too Large",
+        "414" => "Request-URI Too Large",
+        "415" => "Unsupported Media Type",
+        "416" => "Requested range not satisfiable",
+        "417" => "Expectation Failed",
+        "500" => "Internal Server Error",
+        "501" => "Not Implemented",
+        "502" => "Bad Gateway",
+        "503" => "Service Unavailable",
+        "504" => "Gateway Time-out",
+        "505" => "HTTP Version not supported"
     }
 
     # @param [String] Endpoint URI
     # @param [Hash] Auth options
     # @param [Hash] Logging options
     # @param [Boolean] Enable autoconnect?
-    # @return [OCCI:Client] Client instance
-    def initialize(endpoint = "http://localhost:3000/", auth_options = {:type => "none"}, log_options = { :out => STDERR, :level => OCCI::Log::WARN, :logger => nil}, auto_connect = true, media_type = nil)
-      # set OCCI::Log
+    # @return [Occi:Client] Client instance
+    def initialize(endpoint = "http://localhost:3000/", auth_options = { :type => "none" }, log_options = { :out => STDERR, :level => Occi::Log::WARN, :logger => nil }, auto_connect = true, media_type = nil)
+      # set Occi::Log
       set_logger log_options
 
       # pass auth options to HTTParty
@@ -91,11 +85,11 @@ module OCCI
         @media_type = media_type
       end
 
-      OCCI::Log.debug("Media Type: #{@media_type}")
-      OCCI::Log.debug("Headers: #{self.class.headers}")
+      Occi::Log.debug("Media Type: #{@media_type}")
+      Occi::Log.debug("Headers: #{self.class.headers}")
 
       # get model information from the endpoint
-      # and create OCCI::Model instance
+      # and create Occi::Model instance
       set_model
 
       # auto-connect?
@@ -103,17 +97,17 @@ module OCCI
     end
 
     # @param [String] Resource name or resource identifier
-    # @return [OCCI::Core::Entity] Resource instance
+    # @return [Occi::Core::Entity] Resource instance
     def get_resource(resource_type)
 
-      OCCI::Log.debug("Instantiating #{resource_type} ...")
+      Occi::Log.debug("Instantiating #{resource_type} ...")
 
-      if RESOURCES.has_value? resource_type
+      if @model.get_by_id resource_type
         # we got a resource type identifier
-        OCCI::Core::Resource.new resource_type
-      elsif RESOURCES.has_key? resource_type.to_sym
+        Occi::Core::Resource.new resource_type
+      elsif @model.kinds.select { |kind| kind.term == resource_type }.any?
         # we got a resource type name
-        OCCI::Core::Resource.new get_resource_type_identifier(resource_type)
+        Occi::Core::Resource.new @model.kinds.select { |kind| kind.term == resource_type }.first.type_identifier
       else
         raise "Unknown resource type! [#{resource_type}]"
       end
@@ -122,23 +116,23 @@ module OCCI
 
     # @return [Array] List of available resource types in a human-readable format
     def get_resource_types
-      OCCI::Log.debug("Getting resource types ...")
-      RESOURCES.keys.map! { |k| k.to_s }
+      Occi::Log.debug("Getting resource types ...")
+      @model.kinds.collect { |kind| kind.term }
     end
 
-    # @return [Array] List of available resource types in a OCCI ID format
+    # @return [Array] List of available resource types in a Occi ID format
     def get_resource_type_identifiers
-      OCCI::Log.debug("Getting resource identifiers ...")
-      RESOURCES.values
+      Occi::Log.debug("Getting resource identifiers ...")
+      @model.kinds.collect { |kind| kind.type_identifier }
     end
 
     # @param [String] Name of the mixin
     # @param [String] Type of the mixin
     # @param [Boolean] Should we describe the mixin or return its link?
-    # @return [String, OCCI:Collection] Link or mixin description
+    # @return [String, Occi:Collection] Link or mixin description
     def find_mixin(name, type = nil, describe = false)
 
-      OCCI::Log.debug("Looking for mixin #{name} + #{type} + #{describe}")
+      Occi::Log.debug("Looking for mixin #{name} + #{type} + #{describe}")
 
       # is type valid?
       unless type.nil?
@@ -173,12 +167,12 @@ module OCCI
         else
           # get the first match from either os_tpls or resource_tpls
           case
-          when type == "os_tpl"
-            get_os_templates.select { |mixin| mixin.term == name }.first
-          when type == "resource_tpl"
-            get_resource_templates.select { |template| template.term == name }.first
-          else
-            nil
+            when type == "os_tpl"
+              get_os_templates.select { |mixin| mixin.term == name }.first
+            when type == "resource_tpl"
+              get_resource_templates.select { |template| template.term == name }.first
+            else
+              nil
           end
         end
       end
@@ -222,85 +216,70 @@ module OCCI
       identifiers
     end
 
-    # @param [String] Human-readable name of the resource
-    # @return [String] OCCI resource identifier
-    def get_resource_type_identifier(resource_type)
-      raise "Unknown resource type! [#{resource_type}]" unless RESOURCES.has_key? resource_type.to_sym
-
-      RESOURCES[resource_type.to_sym]
-    end
-
-    # @param [String] OCCI resource identifier
-    # @return [String] Human-readable name of the resource
-    def get_resource_type(resource_type_identifier)
-      raise "Unknown resource type identifier! [#{resource_type_identifier}]" unless RESOURCES.has_value? resource_type_identifier
-
-      RESOURCES.key(resource_type_identifier).to_s
-    end
-
-    # @param [String] OCCI resource type identifier or just type
+    # @param [String] Occi resource type identifier or just type
     # @return [Array] List of links
-    def list(resource_type_identifier)
+    def list(resource_type_identifier=nil)
+      if resource_type_identifier
+        # convert type to type identifier
+        resource_type_identifier = @model.kinds.select { |kind| kind.term == resource_type_identifier }.first.type_identifier if @model.kinds.select { |kind| kind.term == resource_type_identifier }.any?
 
-      # convert type to type identifier
-      unless resource_type_identifier.start_with? "http://" or resource_type_identifier.start_with? "https://"
-        resource_type_identifier = get_resource_type_identifier resource_type_identifier
+        # check some basic pre-conditions
+        raise "Endpoint is not connected!" unless @connected
+        raise "Unkown resource type identifier! [#{resource_type_identifier}]" unless @model.get_by_id resource_type_identifier
+
+        # split the type identifier and get the most important part
+        uri_part = resource_type_identifier.split('#').last
+
+        list = []
+
+        # request uri-list from the server
+        path = uri_part + '/'
+      else
+        path = '/'
       end
-
-      # check some basic pre-conditions
-      raise "Endpoint is not connected!" unless @connected
-      raise "Unkown resource type identifier! [#{resource_type_identifier}]" unless RESOURCES.has_value? resource_type_identifier
-
-      # split the type identifier and get the most important part
-      uri_part = resource_type_identifier.split('#').last
-
-      list = []
-
-      # request uri-list from the server
-      path = uri_part + '/'
       list = self.class.get(@endpoint + path, :headers => { "Accept" => 'text/uri-list' }).body.split("\n").compact
 
       list
     end
 
     # @param [String] OCCI resource type identifier or just type
-    # @return [OCCI::Collection] List of descriptions
-    def describe(resource_identifier)
+    # @return [Occi::Collection] List of descriptions
+    def describe(resource_type_identifier=nil)
 
       # convert type to type identifier
-      unless resource_identifier.start_with? "http://" or resource_identifier.start_with? "https://"
-        resource_identifier = get_resource_type_identifier resource_identifier
-      end
+      resource_type_identifier = @model.kinds.select { |kind| kind.term == resource_type_identifier }.first.type_identifier if @model.kinds.select { |kind| kind.term == resource_type_identifier }.any?
 
       # check some basic pre-conditions
       raise "Endpoint is not connected!" unless @connected
 
       descriptions = nil
 
-      if RESOURCES.has_value? resource_identifier
+      if resource_type_identifier.nil?
+        descriptions = get('/')
+      elsif @model.get_by_id resource_type_identifier
         # we got type identifier
         # split the type identifier
-        uri_part = resource_identifier.split('#').last
+        location     = @model.get_by_id(resource_type_identifier).location
         # make the request
-        descriptions = get(uri_part + '/')
-      elsif resource_identifier.start_with? @endpoint
+        descriptions = get(location)
+      elsif resource_type_identifier.start_with? @endpoint
         # we got resource link
         # make the request
-        descriptions = get(sanitize_resource_link(resource_identifier))
+        descriptions = get(sanitize_resource_link(resource_type_identifier))
       else
-        raise "Unkown resource identifier! [#{resource_identifier}]"
+        raise "Unkown resource type identifier! [#{resource_type_identifier}]"
       end
 
       descriptions
     end
 
-    # @param [OCCI::Core::Entity] Entity to be created on the server
-    # @return [String] Link (URI) or the new resource
+    # @param [Occi::Core::Entity] Entity to be created on the server
+    # @return [String] URI of the new resource
     def create(entity)
 
       # check some basic pre-conditions
       raise "Endpoint is not connected!" unless @connected
-      raise "#{entity} not an entity" unless entity.kind_of? OCCI::Core::Entity
+      raise "#{entity} not an entity" unless entity.kind_of? Occi::Core::Entity
 
       # is this entity valid?
       entity.check(@model)
@@ -309,43 +288,81 @@ module OCCI
 
       # get location for this kind of entity
       location   = @model.get_by_id(entity.kind).location
-      collection = OCCI::Collection.new
+      collection = Occi::Collection.new
 
       # is this entity a Resource or a Link?
-      collection.resources << entity if entity.kind_of? OCCI::Core::Resource
-      collection.links << entity if entity.kind_of? OCCI::Core::Link
+      collection.resources << entity if entity.kind_of? Occi::Core::Resource
+      collection.links << entity if entity.kind_of? Occi::Core::Link
 
       # make the request
       post location, collection
     end
 
+    # @param [String] Location of a OVF/OVA file
+    # @return [String] URI of the new resource
+    def deploy(location)
+      media_types = self.class.head(@endpoint).headers['accept'].to_s
+      raise "File #{location} does not exist" unless File.exist? location
+      file        = File.read(location)
+      if location.include? '.ovf'
+        if media_types.include? 'application/ovf'
+          headers                 = self.class.headers.clone
+          headers['Content-Type'] = 'application/ovf'
+          self.class.post(@endpoint + '/compute/',
+                          :body    => file,
+                          :headers => headers)
+        end
+      elsif location.include? '.ova'
+        if media_types.include? ' application/ova '
+          headers                 = self.class.headers.clone
+          headers['Content-Type'] = 'application/ova'
+          self.class.post(@endpoint + '/compute/',
+                          :body    => file,
+                          :headers => headers)
+        end
+      end
+    end
+
     # @param [String] Resource link (URI)
     # @return [Boolean] Success?
-    def delete(resource_identifier)
-      # TODO: delete should work for entire resource types
+    def delete(resource_type_identifier)
+      # convert type to type identifier
+      if @model.kinds.select { |kind| kind.term == resource_type_identifier }.any?
+        type_identifier          = @model.kinds.select { |kind| kind.term == resource_type_identifier }.first.type_identifier
+        location                 = @model.get_by_id(type_identifier).location
+        resource_type_identifier = @endpoint + location
+      end
+
       # check some basic pre-conditions
       raise "Endpoint is not connected!" unless @connected
-      raise "Unknown resource identifier! #{resource_identifier}" unless resource_identifier.start_with? @endpoint
+      raise "Unknown resource identifier! #{resource_type_identifier}" unless resource_type_identifier.start_with? @endpoint
 
       # make the request
-      del(sanitize_resource_link(resource_identifier))
+      del(sanitize_resource_link(resource_type_identifier))
     end
 
     # @param [String] Resource link (URI)
     # @param [String] Type of action
     # @return [String] Resource link (URI)
-    def trigger(resource_identifier, action)
+    def trigger(resource_type_identifier, action)
       # TODO: not tested
+      if @model.kinds.select { |kind| kind.term == resource_type }.any?
+        type_identifier          = @model.kinds.select { |kind| kind.term == resource_type_identifier }.first.type_identifier
+        location                 = @model.get_by_id(type_identifier).location
+        resource_type_identifier = @endpoint + location
+      end
       # check some basic pre-conditions
       raise "Endpoint is not connected!" unless @connected
-      raise "Unknown resource identifier! #{resource_identifier}" unless resource_identifier.start_with? @endpoint
+      raise "Unknown resource identifier! #{resource_type_identifier}" unless resource_type_identifier.start_with? @endpoint
 
       # encapsulate the acion in a collection
-      collection = OCCI::Collection.new
-      collection.actions << action
+      collection   = Occi::Collection.new
+      scheme, term = action.split(' #')
+      collection.actions << Occi::Core::Action.new(scheme + '#', term)
 
       # make the request
-      post sanitize_resource_link(resource_identifier), collection
+      path = sanitize_resource_link(resource_type_identifier) + '?action=' + term
+      post path, collection
     end
 
     def refresh
@@ -353,12 +370,12 @@ module OCCI
       set_model
     end
 
-    # @param [OCCI::Core::Resource] Compute instance
+    # @param [Occi::Core::Resource] Compute instance
     # @param [URI,String] Storage location (URI)
-    # @param [OCCI::Core::Attributes] Attributes
+    # @param [Occi::Core::Attributes] Attributes
     # @param [Array] Mixins
-    # @return [OCCI::Core::Link] Link instance
-    def storagelink(compute, storage_location, attributes=OCCI::Core::Attributes.new, mixins=[])
+    # @return [Occi::Core::Link] Link instance
+    def storagelink(compute, storage_location, attributes=Occi::Core::Attributes.new, mixins=[])
       kind         = 'http://schemas.ogf.org/occi/infrastructure#storagelink'
       storage_kind = 'http://schemas.ogf.org/occi/infrastructure#storage'
       storagelink  = link(kind, compute, storage_location, storage_kind, attributes, mixins)
@@ -366,12 +383,12 @@ module OCCI
       storagelink
     end
 
-    # @param [OCCI::Core::Resource] Compute instance
+    # @param [Occi::Core::Resource] Compute instance
     # @param [URI,String] Network location (URI)
-    # @param [OCCI::Core::Attributes] Attributes
+    # @param [Occi::Core::Attributes] Attributes
     # @param [Array] Mixins
-    # @return [OCCI::Core::Link] Link instance
-    def networkinterface(compute, network_location, attributes=OCCI::Core::Attributes.new, mixins=[])
+    # @return [Occi::Core::Link] Link instance
+    def networkinterface(compute, network_location, attributes=Occi::Core::Attributes.new, mixins=[])
       kind             = 'http://schemas.ogf.org/occi/infrastructure#networkinterface'
       network_kind     = 'http://schemas.ogf.org/occi/infrastructure#network'
       networkinterface = link(kind, compute, network_location, network_kind, attributes, mixins)
@@ -384,12 +401,12 @@ module OCCI
     # @param [Hash]
     def set_logger(log_options)
 
-      if log_options[:logger].nil? or not (log_options[:logger].kind_of? OCCI::Log)
-        logger = OCCI::Log.new(log_options[:out])
+      if log_options[:logger].nil? or not (log_options[:logger].kind_of? Occi::Log)
+        logger       = Occi::Log.new(log_options[:out])
         logger.level = log_options[:level]
       end
 
-      self.class.debug_output $stderr if log_options[:level] == OCCI::Log::DEBUG
+      self.class.debug_output $stderr if log_options[:level] == Occi::Log::DEBUG
 
     end
 
@@ -398,71 +415,74 @@ module OCCI
       @auth_options = auth_options
 
       case @auth_options[:type]
-      when "basic"
-        # set up basic auth
-        raise ArgumentError, "Missing required options 'username' and 'password' for basic auth!" unless @auth_options[:username] and @auth_options[:password]
-        self.class.basic_auth @auth_options[:username], @auth_options[:password]
-      when "digest"
-        # set up digest auth
-        raise ArgumentError, "Missing required options 'username' and 'password' for digest auth!" unless @auth_options[:username] and @auth_options[:password]
-        self.class.digest_auth @auth_options[:username], @auth_options[:password]
-      when "x509"
-        # set up pem and optionally pem_password and ssl_ca_path
-        raise ArgumentError, "Missing required option 'user_cert' for x509 auth!" unless @auth_options[:user_cert]
-        raise ArgumentError, "The file specified in 'user_cert' does not exist!" unless File.exists? @auth_options[:user_cert]
+        when "basic"
+          # set up basic auth
+          raise ArgumentError, "Missing required options 'username' and 'password' for basic auth!" unless @auth_options[:username] and @auth_options[:password]
+          self.class.basic_auth @auth_options[:username], @auth_options[:password]
+        when "digest"
+          # set up digest auth
+          raise ArgumentError, "Missing required options 'username' and 'password' for digest auth!" unless @auth_options[:username] and @auth_options[:password]
+          self.class.digest_auth @auth_options[:username], @auth_options[:password]
+        when "x509"
+          # set up pem and optionally pem_password and ssl_ca_path
+          raise ArgumentError, "Missing required option 'user_cert' for x509 auth!" unless @auth_options[:user_cert]
+          raise ArgumentError, "The file specified in 'user_cert' does not exist!" unless File.exists? @auth_options[:user_cert]
 
-        self.class.pem File.read(@auth_options[:user_cert]), @auth_options[:user_cert_password]
-        self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil? or @auth_options[:ca_path].empty?
-      when "none", nil
-        # do nothing
-      else
-        raise ArgumentError, "Unknown AUTH method [#{@auth_options[:type]}]!"
+          self.class.pem File.read(@auth_options[:user_cert]), @auth_options[:user_cert_password]
+          self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil? or @auth_options[:ca_path].empty?
+        when "none", nil
+          # do nothing
+        else
+          raise ArgumentError, "Unknown AUTH method [#{@auth_options[:type]}]!"
       end
     end
 
     # @param [String]
-    # @param [OCCI::Collection]
-    # @return [OCCI::Collection]
+    # @param [Occi::Collection]
+    # @return [Occi::Collection]
     def get(path='', filter=nil)
       path     = path.reverse.chomp('/').reverse
       response = if filter
-        categories = filter.categories.collect { |category| category.to_text }.join(',')
-        attributes = filter.entities.collect { |entity| entity.attributes.combine.collect { |k, v| k + '=' + v } }.join(',')
-        
-        headers = self.class.headers.clone
-        headers['Content-Type'] = 'text/occi'
-        headers['Category'] = categories unless categories.empty?
-        headers['X-OCCI-Attributes'] = attributes unless attributes.empty?
+                   categories = filter.categories.collect { |category| category.to_text }.join(',')
+                   attributes = filter.entities.collect { |entity| entity.attributes.combine.collect { |k, v| k + '=' + v } }.join(',')
 
-        self.class.get(@endpoint + path, :headers => headers)
-      else
-        self.class.get(@endpoint + path)
-      end
+                   headers                 = self.class.headers.clone
+                   headers['Content-Type'] = 'text/occi'
+                   headers['Category'] = categories unless categories.empty?
+                   headers['X-OCCI-Attributes'] = attributes unless attributes.empty?
+
+                   self.class.get(@endpoint + path, :headers => headers)
+                 else
+                   self.class.get(@endpoint + path)
+                 end
 
       response_msg = response_message response
       raise "HTTP GET failed! #{response_msg}" unless response.code.between? 200, 300
 
-      kind = @model.get_by_location path if @model
+      kind = @model.get_by_location(('/' + path).match(/\/.*\//).to_s) if @model
       kind ? entity_type = kind.entity_type : entity_type = nil
-      _, collection = OCCI::Parser.parse(response.content_type, response.body, path.include?('-/'), entity_type)
+      _, collection = Occi::Parser.parse(response.content_type, response.body, path.include?('-/'), entity_type)
 
       collection
     end
 
     # @param [String]
-    # @param [OCCI::Collection]
+    # @param [Occi::Collection]
     # @return [String]
     def post(path, collection)
       path     = path.reverse.chomp('/').reverse
       response = if @media_type == 'application/occi+json'
-        self.class.post(@endpoint + path,
-                        :body    => collection.to_json,
-                        :headers => { 'Accept' => 'text/uri-list', 'Content-Type' => 'application/occi+json' })
-      else
-        self.class.post(@endpoint + path,
-                        :body    => collection.to_text,
-                        :headers => { 'Accept' => 'text/uri-list', 'Content-Type' => 'text/plain' })
-      end
+                   self.class.post(@endpoint + path,
+                                   :body    => collection.to_json,
+                                   :headers => { 'Accept' => 'text/uri-list', 'Content-Type' => 'application/occi+json' })
+                 elsif @media_type == 'text/occi'
+                   self.class.post(@endpoint + path,
+                                   :headers => collection.to_header.merge({ 'Accept' => 'text/uri-list', 'Content-Type' => 'text/occi' }))
+                 else
+                   self.class.post(@endpoint + path,
+                                   :body    => collection.to_text,
+                                   :headers => { 'Accept' => 'text/uri-list', 'Content-Type' => 'text/plain' })
+                 end
 
       response_msg = response_message response
       raise "HTTP POST failed! #{response_msg}" unless response.code.between? 200, 300
@@ -471,26 +491,26 @@ module OCCI
     end
 
     # @param [String]
-    # @param [OCCI::Collection]
-    # @return [OCCI::Collection]
+    # @param [Occi::Collection]
+    # @return [Occi::Collection]
     def put(path, collection)
       path     = path.reverse.chomp('/').reverse
       response = if @media_type == 'application/occi+json'
-        self.class.post(@endpoint + path, :body => collection.to_json, :headers => { 'Content-Type' => 'application/occi+json' })
-      else
-        self.class.post(@endpoint + path, { :body => collection.to_text, :headers => { 'Content-Type' => 'text/plain' } })
-      end
+                   self.class.post(@endpoint + path, :body => collection.to_json, :headers => { 'Content-Type' => 'application/occi+json' })
+                 else
+                   self.class.post(@endpoint + path, { :body => collection.to_text, :headers => { 'Content-Type' => 'text/plain' } })
+                 end
 
       response_msg = response_message response
       raise "HTTP PUT failed! #{response_msg}" unless response.code.between? 200, 300
 
-      _, collection = OCCI::Parser.parse(response.content_type, response.body)
+      _, collection = Occi::Parser.parse(response.content_type, response.body)
 
       collection
     end
 
     # @param [String]
-    # @param [OCCI::Collection]
+    # @param [Occi::Collection]
     # @return [Boolean]
     def del(path, collection=nil)
       path     = path.reverse.chomp('/').reverse
@@ -503,14 +523,14 @@ module OCCI
     end
 
     # @param [String]
-    # @param [OCCI::Core::Resource]
+    # @param [Occi::Core::Resource]
     # @param [URI,String]
     # @param [String]
-    # @param [OCCI::Core::Attributes]
+    # @param [Occi::Core::Attributes]
     # @param [Array]
-    # @return [OCCI::Core::Link]
-    def link(kind, source, target_location, target_kind, attributes=OCCI::Core::Attributes.new, mixins=[])
-      link            = OCCI::Core::Link.new(kind)
+    # @return [Occi::Core::Link]
+    def link(kind, source, target_location, target_kind, attributes=Occi::Core::Attributes.new, mixins=[])
+      link            = Occi::Core::Link.new(kind)
       link.mixins     = mixins
       link.attributes = attributes
       link.target     = (target_location.kind_of? URI::Generic) ? target_location.path : target_location.to_s
@@ -541,11 +561,11 @@ module OCCI
 
       #
       model  = get('/-/')
-      @model = OCCI::Model.new(model)
+      @model = Occi::Model.new(model)
 
       @mixins = {
-        :os_tpl => [],
-        :resource_tpl => []
+          :os_tpl       => [],
+          :resource_tpl => []
       }
 
       #
@@ -559,12 +579,12 @@ module OCCI
       end
     end
 
-    # @return [OCCI::Collection] collection including all registered OS templates
+    # @return [Occi::Collection] collection including all registered OS templates
     def get_os_templates
       @model.get.mixins.select { |mixin| mixin.related.select { |rel| rel.end_with? 'os_tpl' }.any? }
     end
 
-    # @return [OCCI::Collection] collection including all registered resource templates
+    # @return [Occi::Collection] collection including all registered resource templates
     def get_resource_templates
       @model.get.mixins.select { |mixin| mixin.related.select { |rel| rel.end_with? 'resource_tpl' }.any? }
     end
@@ -572,13 +592,13 @@ module OCCI
     # @return [String]
     def set_media_type
       media_types = self.class.head(@endpoint).headers['accept']
-      OCCI::Log.debug("Available media types: #{media_types}")
+      Occi::Log.debug("Available media types: #{media_types}")
       @media_type = case media_types
-      when /application\/occi\+json/
-        'application/occi+json'
-      else
-        'text/plain'
-      end
+                      when /application\/occi\+json/
+                        'application/occi+json'
+                      else
+                        'text/plain'
+                    end
     end
 
     # @param [HTTParty::Response]
