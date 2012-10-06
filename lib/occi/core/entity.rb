@@ -47,7 +47,6 @@ module Occi
         @kind       = kind
         @mixins     = mixins.to_a.flatten
         @attributes = Occi::Core::Attributes.new(attributes)
-        #@attributes.occi!.core![:id] ||= UUIDTools::UUID.random_create.to_s
         @actions    = actions.to_a.flatten
       end
 
@@ -89,8 +88,7 @@ module Occi
 
       # @return [String] location of the entity
       def location
-        self.id = UUIDTools::UUID.random_create.to_uri unless self.id
-        '/' + @kind.split('#').last + '/' + self.id.gsub('urn:uuid:','')
+        '/' + @kind.split('#').last + '/' + self.id.gsub('urn:uuid:','') if self.id
       end
 
       # check attributes against their definitions and set defaults
@@ -168,7 +166,6 @@ module Occi
           value = value.inspect
           text << 'X-OCCI-Attribute: ' + name + '=' + value + "\n"
         end
-        text << 'X-OCCI-Attribute: occi.core.id=' + self.id.inspect
         @actions.each do |action|
           _, term = action.split('#')
           text << 'Link: <' + self.location + '?action=' + term + '>;rel=' + action.inspect + "\n"
