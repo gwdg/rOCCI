@@ -30,7 +30,6 @@ module Occi
       def initialize(kind, mixins=[], attributes={ }, actions=[], rel=nil, target=nil, source=nil)
         super(kind, mixins, attributes, actions)
         @rel = rel if rel
-        self.id = UUIDTools::UUID.random_create.to_uri unless self.id
         self.source = source if source
         self.target = target
       end
@@ -79,16 +78,14 @@ module Occi
       def to_string
         string = '<' + self.target.to_s + '>'
         string << ';rel=' + @rel.inspect
-        string << ';self=' + self.location.inspect
+        string << ';self=' + self.location.inspect if self.location
         categories = [@kind] + @mixins
         string << ';category=' + categories.join(' ').inspect
-        string << ';' if @attributes.any?
+        string << ';'
         @attributes.combine.each_pair do |name, value|
           value = value.inspect
           string << name + '=' + value + ';'
         end
-        puts self.target.to_s
-        string << 'occi.core.id=' + self.id.inspect
         string << 'occi.core.target=' + self.target.to_s.inspect
         string << 'occi.core.source=' + self.source.to_s.inspect if self.source.kind_of? String if self.source
 
