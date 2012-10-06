@@ -24,7 +24,7 @@ module OCCI
 
       case media_type
         when 'text/uri-list'
-          body.each_line { |line| locations << URI.parse(line) }
+          body.each_line { |line| locations << URI.parse(line.chomp) }
         when 'text/occi'
           nil
         when 'text/plain', nil
@@ -77,7 +77,13 @@ module OCCI
       return collection if category_strings.empty?
       attribute_strings = header['HTTP_X_OCCI_ATTRIBUTE'].to_s.split(',')
       categories        = Hashie::Mash.new({ :kinds => [], :mixins => [], :actions => [] })
-      category_strings.each { |cat| categories.merge!(OCCIANTLR::Parser.new('Category: ' + cat).category) }
+      category_strings.each do |category|
+        cat = OCCIANTLR::Parser.new('Category: ' + category).category
+        categories.kinds.concat cat.kinds
+        categories.mixins.concat cat.mixins
+        categories.actions.concat cat.actions
+      end
+
       return collection if categories.kinds.empty?
       entity.kind = categories.kinds.first.scheme + categories.kinds.first.term
       entity.mixins = categories.mixins.collect { |mixin| mixin.scheme + mixin.term } if categories.mixins.any?
@@ -85,16 +91,29 @@ module OCCI
       if entity_type == OCCI::Core::Link
         entity.target = link.attributes!.occi!.core!.target
         entity.source = link.attributes!.occi!.core!.source
-        collection.links << OCCI::Core::Link.new(entity.kind, entity.mixins, entity.attributes)
+        cats          = entity.categories.split(' ')
+        kind          = cats.reverse!.pop
+        mixins        = cats.categories
+        collection.links << OCCI::Core::Link.new(kind, mixins, entity.attributes)
       elsif entity_type == OCCI::Core::Resource
         entity.links = []
         link_strings = header['HTTP_LINK'].to_s.split(',')
         link_strings.each do |link_string|
-          link                                = OCCIANTLR::Parser.new('Link: ' + link_string).link
-          link.attributes!.occi!.core!.target = link.target
-          entity.links << OCCI::Core::Link.new(link.kind, link.mixins, link.attributes, link.actions, link.rel)
+          link = OCCIANTLR::Parser.new('Link: ' + link_string).link
+          if link.rel.include? 'action#'
+            entity.actions = link.rel + entity.actions.to_a
+          else
+            link.attributes!.occi!.core!.target = link.target
+
+            link.category ||= 'http://schemas.ogf.org/occi/core#link'
+            cats          = link.category.split(' ')
+            kind          = cats.reverse!.pop
+            mixins        = cats
+
+            entity.links << OCCI::Core::Link.new(kind, mixins, link.attributes, link.actions, link.rel, link.target, link.source)
+          end
         end
-        collection.resources << OCCI::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.links)
+        collection.resources << OCCI::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.actions, entity.links)
       end
       collection
     end
@@ -102,7 +121,7 @@ module OCCI
     # @param [String] text
     # @return [Array] list of URIs
     def self.text_locations(text)
-      text.lines.collect { |line| OCCIANTLR::Parser.new(line).x_occi_location if line.include? 'X-OCCI-Location' }.compact
+      text.lines.collect { |line| OCCIANTLR::Parser.new(line.chomp).x_occi_location if line.include? 'X-OCCI-Location' }.compact
     end
 
     # @param [String] text
@@ -110,7 +129,7 @@ module OCCI
     def self.text_categories(text)
       collection = OCCI::Collection.new
       text.each_line do |line|
-        category = OCCIANTLR::Parser.new(line).category
+        category = OCCIANTLR::Parser.new(line.chomp).category
         next if category.nil?
         collection.kinds.concat category.kinds.collect { |kind| OCCI::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) }
         collection.mixins.concat category.mixins.collect { |mixin| OCCI::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) }
@@ -128,19 +147,41 @@ module OCCI
       links      = []
       categories = Hashie::Mash.new({ :kinds => [], :mixins => [], :actions => [] })
       text.each_line do |line|
-        categories.merge!(OCCIANTLR::Parser.new(line).category) if line.include? 'Category'
-        entity.attributes!.merge!(OCCIANTLR::Parser.new(line).x_occi_attribute) if line.include? 'X-OCCI-Attribute'
-        links << OCCIANTLR::Parser.new(line).link if line.include? 'Link'
+        if line.include? 'Category'
+          cat = (OCCIANTLR::Parser.new(line.chomp).category)
+          categories.kinds.concat cat.kinds
+          categories.mixins.concat cat.mixins
+          categories.actions.concat cat.actions
+        end
+        entity.attributes!.merge!(OCCIANTLR::Parser.new(line.chomp).x_occi_attribute) if line.include? 'X-OCCI-Attribute'
+        links << OCCIANTLR::Parser.new(line.chomp).link if line.include? 'Link'
       end
       entity.kind = categories.kinds.first.scheme + categories.kinds.first.term if categories.kinds.first
-      entity.mixins = categories.mixins.collect { |mixin| mixin.scheme + mixin.term } if entity.mixins
+      entity.mixins = categories.mixins.collect { |mixin| mixin.scheme + mixin.term } if categories.mixins
       if entity_type == OCCI::Core::Link
         entity.target = links.first.attributes!.occi!.core!.target
         entity.source = links.first.attributes!.occi!.core!.source
+        cats          = entity.categories.split(' ')
+        kind          = cats.reverse!.pop
+        mixins        = cats.categories
         collection.links << OCCI::Core::Link.new(entity.kind, entity.mixins, entity.attributes)
       elsif entity_type == OCCI::Core::Resource
-        entity.links = links.collect { |link| link.attributes!.occi!.core!.target = link.target; OCCI::Core::Link.new(link.kind, link.mixins, link.attributes, link.actions, link.rel) }
-        collection.resources << OCCI::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.links)
+        links.each do |link|
+          if link.rel.include? 'action#'
+            entity.actions = [link.rel] + entity.actions.to_a
+          else
+            link.attributes!.occi!.core!.target = link.target
+            link.category                       ||= 'http://schemas.ogf.org/occi/core#link'
+            cats                                = link.category.split(' ')
+            kind                                = cats.reverse!.pop
+            mixins                              = cats
+
+            link = OCCI::Core::Link.new(kind, mixins, link.attributes, link.actions, link.rel, link.target, link.source)
+            collection.links << link
+            entity.links = [link.id] + entity.links.to_a
+          end
+        end
+        collection.resources << OCCI::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.actions, entity.links)
       end unless entity.kind.nil?
       collection
     end
@@ -152,7 +193,7 @@ module OCCI
       hash       = Hashie::Mash.new(JSON.parse(json))
       collection.kinds.concat hash.kinds.collect { |kind| OCCI::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) } if hash.kinds
       collection.mixins.concat hash.mixins.collect { |mixin| OCCI::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) } if hash.mixins
-      collection.resources.concat hash.resources.collect { |resource| OCCI::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.links) } if hash.resources
+      collection.resources.concat hash.resources.collect { |resource| OCCI::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.actions, resource.links) } if hash.resources
       collection.links.concat hash.links.collect { |link| OCCI::Core::Link.new(link.kind, link.mixins, link.attributes) } if hash.links
       collection
     end
@@ -164,7 +205,7 @@ module OCCI
       hash       = Hashie::Mash.new(Hash.from_xml(Nokogiri::XML(xml)))
       collection.kinds.concat hash.kinds.collect { |kind| OCCI::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) } if hash.kinds
       collection.mixins.concat hash.mixins.collect { |mixin| OCCI::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) } if hash.mixins
-      collection.resources.concat hash.resources.collect { |resource| OCCI::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.links) } if hash.resources
+      collection.resources.concat hash.resources.collect { |resource| OCCI::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.actions, resource.links) } if hash.resources
       collection.links.concat hash.links.collect { |link| OCCI::Core::Link.new(link.kind, link.mixins, link.attributes) } if hash.links
       collection
     end
