@@ -38,7 +38,7 @@ module Occi
                     end
 
         namespace = namespace.inject(Object) do |mod, name|
-          if mod.constants.include? name.classify.to_sym
+          if mod.constants.collect{|sym| sym.to_s}.include? name.classify
             mod.const_get name.classify
           else
             mod.const_set name.classify, Module.new
