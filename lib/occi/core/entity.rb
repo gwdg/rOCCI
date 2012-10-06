@@ -192,7 +192,6 @@ module Occi
           attributes << name + '=' + value.inspect
         end
         header['X-OCCI-Attribute'] = attributes.join(',') if attributes.any?
-        header['X-OCCI-Attribute'] = 'occi.core.id=' + self.id.inspect
         links = []
         @actions.each do |action|
           _, term = action.split('#')
