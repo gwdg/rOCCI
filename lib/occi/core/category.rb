@@ -33,7 +33,7 @@ module Occi
 
         uri = URI.parse(scheme)
 
-        puts uri.to_s
+        Occi::Log.debug "URI #{uri.to_s}"
 
         namespace = if uri.host == 'schemas.ogf.org'
                       uri.path.reverse.chomp('/').reverse.split('/')

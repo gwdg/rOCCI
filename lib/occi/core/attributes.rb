@@ -44,7 +44,7 @@ module Occi
       def self.split(attributes)
         attribute = Attributes.new
         attributes.each do |name, value|
-          puts name
+          Occi::Log.debug "Attribute named #{name}"
           key, _, rest = name.partition('.')
           if rest.empty?
             attribute[key] = value

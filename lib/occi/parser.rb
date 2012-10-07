@@ -269,7 +269,7 @@ module Occi
       File.read(mf).each_line do |line|
         name = line.scan(/SHA1\(([^\)]*)\)= (.*)/).flatten.first
         sha1 = line.scan(/SHA1\(([^\)]*)\)= (.*)/).flatten.last
-        puts Digest::SHA1.hexdigest(files[name])
+        Occi::Log.debug "SHA1 hash #{Digest::SHA1.hexdigest(files[name])}"
         raise "SHA1 mismatch for file #{name}" if Digest::SHA1.hexdigest(File.read(files[name])) != sha1
       end if mf
 
