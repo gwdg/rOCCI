@@ -24,7 +24,7 @@ class OcciOpts
     
     # TODO: change media type back to occi+json after the rOCCI-server update
     #options.media_type = "application/occi+json"
-    options.media_type = "text/plain"
+    options.media_type = "text/plain,text/occi"
 
     opts = OptionParser.new do |opts|
       opts.banner = "Usage: occi [OPTIONS]"
@@ -57,7 +57,7 @@ class OcciOpts
         options.auth[:user_cert] = user_cred
       end
 
-      opts.on("--media-type MEDIA_TYPE", ["application/occi+json", "application/occi+xml", "text/plain"], "Media type for client <-> server communication, defaults to '#{options.media_type}'") do |media_type|
+      opts.on("--media-type MEDIA_TYPE", ["application/occi+json", "application/occi+xml", "text/plain,text/occi", "text/plain"], "Media type for client <-> server communication, defaults to '#{options.media_type}'") do |media_type|
         options.media_type = media_type
       end
 
