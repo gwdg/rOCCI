@@ -43,18 +43,6 @@ module Occi
       @client.refresh
     end
 
-    def storagelink(*args)
-      check
-
-      @client.storagelink(*args)
-    end
-
-    def networkinterface(*args)
-      check
-
-      @client.networkinterface(*args)
-    end
-
     ###
 
     def resource_types
