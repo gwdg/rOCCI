@@ -123,7 +123,7 @@ else
   ## attach chosen resources to the compute resource
   cmpt.mixins << os << size
   ## we can change some of the values manually
-  cmpt.attributes.occi!.core!.title = "My rOCCI x509 VM"
+  cmpt.title = "My rOCCI x509 VM"
 end
 
 ## create the compute resource and print its location
