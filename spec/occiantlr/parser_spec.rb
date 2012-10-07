@@ -3,8 +3,7 @@ require 'hashie'
 
 require 'occiantlr/OCCIANTLRParser'
 
-module Occi
-  module ANTLR
+module OCCIANTLR
     describe Parser do
       describe "#Category" do
         it "is parsed successful" do
@@ -81,4 +80,3 @@ module Occi
       end
     end
   end
-end
