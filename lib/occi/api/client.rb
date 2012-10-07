@@ -374,33 +374,7 @@ module Occi
       set_model
     end
 
-    # @param [Occi::Core::Resource] Compute instance
-    # @param [URI,String] Storage location (URI)
-    # @param [Occi::Core::Attributes] Attributes
-    # @param [Array] Mixins
-    # @return [Occi::Core::Link] Link instance
-    def storagelink(compute, storage_location, attributes=Occi::Core::Attributes.new, mixins=[])
-      kind         = 'http://schemas.ogf.org/occi/infrastructure#storagelink'
-      storage_kind = 'http://schemas.ogf.org/occi/infrastructure#storage'
-      storagelink  = link(kind, compute, storage_location, storage_kind, attributes, mixins)
-
-      storagelink
-    end
-
-    # @param [Occi::Core::Resource] Compute instance
-    # @param [URI,String] Network location (URI)
-    # @param [Occi::Core::Attributes] Attributes
-    # @param [Array] Mixins
-    # @return [Occi::Core::Link] Link instance
-    def networkinterface(compute, network_location, attributes=Occi::Core::Attributes.new, mixins=[])
-      kind             = 'http://schemas.ogf.org/occi/infrastructure#networkinterface'
-      network_kind     = 'http://schemas.ogf.org/occi/infrastructure#network'
-      networkinterface = link(kind, compute, network_location, network_kind, attributes, mixins)
-
-      networkinterface
-    end
-
-    #private
+    private
 
     # @param [Hash]
     def set_logger(log_options)

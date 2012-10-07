@@ -38,6 +38,7 @@ Occi::Log.debug "Options: #{options}"
 
 # running with an empty password?
 if options.auth[:password].nil? or options.auth[:user_cert_password].nil?
+  Occi::Log.debug "Password not set, asking for it now ..."
   options.auth[:password] = options.auth[:user_cert_password] = ask("Enter password: ") { |q| q.echo = false } unless options.auth[:type] == "none"
 end
 
@@ -50,42 +51,51 @@ begin
   case options.action
   when :list
     if resource_types.include? options.resource or resource_type_identifiers.include? options.resource
+      Occi::Log.debug "#{options.resource} is a resource type or resource type identifier."
       pp list options.resource
     elsif mixin_types.include? options.resource
+      Occi::Log.debug "#{options.resource} is a mixin type."
       pp mixins options.resource
     elsif mixin_type_identifiers.include? options.resource
+      Occi::Log.debug "#{options.resource} is a mixin type identifier."
       pp mixins options.resource.split('#').last
     else 
+      Occi::Log.debug "I have no idea what #{options.resource} is ..."
       puts "Unknown resource #{options.resource}, there is nothing to list here!"
     end
 
   when :describe
-
     if resource_types.include? options.resource or resource_type_identifiers.include? options.resource or options.resource.start_with? options.endpoint
+      Occi::Log.debug "#{options.resource} is a resource type or resource type identifier."
       pp describe options.resource
     elsif mixin_types.include? options.resource
+      Occi::Log.debug "#{options.resourcre} is a mixin type."
       mixins(options.resource).each do |mxn|
         mxn = mxn.split("#").last
         pp mixin(mxn, options.resource, true)
       end
     elsif mixin_type_identifiers.include? options.resource
+      Occi::Log.debug "#{options.resource} is a mixin type identifier."
       mixins(options.resource.split('#').last).each do |mxn|
         mxn = mxn.split("#").last
         pp mixin(mxn, options.resource, true)
       end
     elsif mixins.include? options.resource
+      Occi::Log.debug "#{options.resource} is a specific mixin."
       mxn_type,mxn = options.resource.split("/").last.split('#')
       pp mixin(mxn, mxn_type, true)
     elsif mixin_types.include? options.resource.split('#').first
+      Occi::Log.debug "#{options.resource} is a specific mixin type."
       mxn_type,mxn = options.resource.split('#')
       pp mixin(mxn, mxn_type, true)
     else
+      Occi::Log.debug "I have no idea what #{options.resource} is ..."
       puts "Unknown resource #{options.resource}, there is nothing to describe here!"
     end
 
   when :create
-    
     if resource_types.include? options.resource or resource_type_identifiers.include? options.resource
+      Occi::Log.debug "#{options.resource} is a resource type or resource type identifier."
       raise "Not yet implemented!" unless options.resource.include? "compute"
       
       res = resource options.resource
@@ -107,8 +117,11 @@ begin
       #TODO: set other attributes
       res.title = options.resource_title
 
+      Occi::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
+
       puts create res
     else
+      Occi::Log.debug "I have no idea what #{options.resource} is ..."
       puts "Unknown resource #{options.resource}, there is nothing to create here!"
     end
 
@@ -131,11 +144,11 @@ rescue OpenSSL::SSL::SSLError => ssl_ex
   raise ssl_ex if options.debug
   exit!
 rescue OpenSSL::PKey::RSAError => key_ex
-  Occi::Log.error "An X509 Error occurred! Please, check your credentials! Message: #{key_ex.message}"
+  Occi::Log.error "An X509 Error occurred! Please, make sure you are using the right password and the file contains both your certificate and your private key! Message: #{key_ex.message}"
   raise key_ex if options.debug
   exit!
 rescue Exception => ex
-  Occi::Log.error "An error occurred! Message: #{ex.message}"
+  Occi::Log.error "An unkown error occurred! Message: #{ex.message}"
   raise ex if options.debug
   exit!
 end
