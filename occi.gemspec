@@ -5,13 +5,13 @@ $:.unshift lib unless $:.include?(lib)
 require 'occi/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "Occi"
+  gem.name          = "occi"
   gem.version       = Occi::VERSION
   gem.authors       = ["Florian Feldhaus","Piotr Kasprzak"]
   gem.email         = ["florian.feldhaus@gwdg.de", "piotr.kasprzak@gwdg.de"]
   gem.description   = %q{OCCI is a collection of classes to simplify the implementation of the Open Cloud Computing API in Ruby}
   gem.summary       = %q{OCCI toolkit}
-  gem.homepage      = 'https://github.com/gwdg/rOcci'
+  gem.homepage      = 'https://github.com/gwdg/rOCCI'
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.files         = `git ls-files`.split("\n")
