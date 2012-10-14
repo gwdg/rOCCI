@@ -20,8 +20,9 @@ require 'pp'
 require 'highline/import'
 require 'openssl'
 
-# OcciOpts is not part of the Occi required above
-require 'occi/client/occiopts'
+# OcciOpts and ResourceOutputFactory are not part of the occi core required above
+require 'occi/client/occi_opts'
+require 'occi/client/resource_output_factory'
 
 extend Occi::DSL
 
