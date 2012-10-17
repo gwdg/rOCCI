@@ -1,5 +1,6 @@
 require 'ostruct'
 require 'optparse'
+require 'occi/client/resource_output_factory'
 
 class OcciOpts
 
@@ -21,6 +22,8 @@ class OcciOpts
     options.auth[:user_cert] = ENV['HOME'] + "/.globus/usercred.pem"
     options.auth[:ca_path] = "/etc/grid-security/certificates"
     options.auth[:username] = "anonymous"
+
+    options.output_format = :plain
     
     # TODO: change media type back to occi+json after the rOCCI-server update
     #options.media_type = "application/occi+json"
@@ -89,6 +92,10 @@ class OcciOpts
 
       opts.on("--log-to OUTPUT", [:STDOUT, :stdout, :STDERR, :stderr], "Log to the specified device, defaults to 'STDERR'") do |log_to|
         options.log[:out] = STDOUT if log_to == :stdout or log_to == :STDOUT
+      end
+
+      opts.on("--output-format FORMAT", ResourceOutputFactory.allowed_formats, "Output format, defaults to human-readable 'plain'") do |output_format|
+        options.output_format = output_format
       end
 
       opts.on_tail("--debug", "Enable debugging messages") do |debug|

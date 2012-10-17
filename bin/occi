@@ -29,10 +29,13 @@ extend Occi::DSL
 # get arguments and validate/parse them to an ostruct
 options = OcciOpts.parse ARGV
 
-# initiate the Logger
+# initialize logger
 logger = Occi::Log.new(options.log[:out])
 logger.level = options.log[:level]
 options.log[:logger] = logger
+
+# initialize output factory
+output = ResourceOutputFactory.new options.output_format
 
 Occi::Log.info "Starting OCCI client ..."
 Occi::Log.debug "Options: #{options}"
@@ -51,52 +54,61 @@ begin
   Occi::Log.info "Executing action #{options.action.to_s} on #{options.resource} ..."
   case options.action
   when :list
-    if resource_types.include? options.resource or resource_type_identifiers.include? options.resource
-      Occi::Log.debug "#{options.resource} is a resource type or resource type identifier."
-      pp list options.resource
+
+    found = []
+
+    if resource_types.include? options.resource
+      Occi::Log.debug "#{options.resource} is a resource type."
+      found = list options.resource
     elsif mixin_types.include? options.resource
       Occi::Log.debug "#{options.resource} is a mixin type."
-      pp mixins options.resource
-    elsif mixin_type_identifiers.include? options.resource
-      Occi::Log.debug "#{options.resource} is a mixin type identifier."
-      pp mixins options.resource.split('#').last
+      found = mixins options.resource
     else 
       Occi::Log.debug "I have no idea what #{options.resource} is ..."
       puts "Unknown resource #{options.resource}, there is nothing to list here!"
     end
 
+    puts output.format(found, :locations, options.resource.to_sym)
+
   when :describe
-    if resource_types.include? options.resource or resource_type_identifiers.include? options.resource or options.resource.start_with? options.endpoint
-      Occi::Log.debug "#{options.resource} is a resource type or resource type identifier."
-      pp describe options.resource
+
+    found = [] 
+
+    if resource_types.include? options.resource or options.resource.start_with? options.endpoint
+      Occi::Log.debug "#{options.resource} is a resource type or an actual resource."
+      
+      found = describe(options.resource)
     elsif mixin_types.include? options.resource
       Occi::Log.debug "#{options.resourcre} is a mixin type."
+      
       mixins(options.resource).each do |mxn|
         mxn = mxn.split("#").last
-        pp mixin(mxn, options.resource, true)
+        found << mixin(mxn, options.resource, true)
       end
-    elsif mixin_type_identifiers.include? options.resource
-      Occi::Log.debug "#{options.resource} is a mixin type identifier."
-      mixins(options.resource.split('#').last).each do |mxn|
-        mxn = mxn.split("#").last
-        pp mixin(mxn, options.resource, true)
-      end
-    elsif mixins.include? options.resource
-      Occi::Log.debug "#{options.resource} is a specific mixin."
-      mxn_type,mxn = options.resource.split("/").last.split('#')
-      pp mixin(mxn, mxn_type, true)
     elsif mixin_types.include? options.resource.split('#').first
       Occi::Log.debug "#{options.resource} is a specific mixin type."
+      
       mxn_type,mxn = options.resource.split('#')
-      pp mixin(mxn, mxn_type, true)
+      found << mixin(mxn, mxn_type, true)
     else
       Occi::Log.debug "I have no idea what #{options.resource} is ..."
+      
       puts "Unknown resource #{options.resource}, there is nothing to describe here!"
     end
 
+    if options.resource.start_with? options.endpoint
+      resource_type = options.resource.split("/")[3].to_sym
+    elsif mixin_types.include? options.resource.split('#').first
+      resource_type = options.resource.split('#').first.to_sym
+    else
+      resource_type = options.resource.to_sym
+    end
+
+    puts output.format(found, :resources, resource_type)
+
   when :create
-    if resource_types.include? options.resource or resource_type_identifiers.include? options.resource
-      Occi::Log.debug "#{options.resource} is a resource type or resource type identifier."
+    if resource_types.include? options.resource
+      Occi::Log.debug "#{options.resource} is a resource type."
       raise "Not yet implemented!" unless options.resource.include? "compute"
       
       res = resource options.resource
@@ -155,5 +167,3 @@ rescue Exception => ex
 end
 
 Occi::Log.info "OCCI client is shutting down ..."
-
-exit!(true)
