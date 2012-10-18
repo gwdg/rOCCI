@@ -1,0 +1,11 @@
+<%# We always get an array of OCCI::Collections %>
+Available NETWORK resources:
+<% occi_resources.each do |occi_network| %>
+  <% network = occi_network.as_json %>
+  NETWORK resource "<%= network.resources.first.attributes.occi.core.title %>":
+    ID:           <%= network.resources.first.attributes.occi.core.id %>
+    TITLE:        <%= network.resources.first.attributes.occi.core.title %>
+    STATE:        <%= network.resources.first.attributes.occi.network.state %>
+    ALLOCATION:   <%= network.resources.first.attributes.occi.network.allocation %>
+    DESCRIPTION:  <%= network.resources.first.attributes.occi.core.summary %>
+<% end %>
