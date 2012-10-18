@@ -78,6 +78,11 @@ begin
       Occi::Log.debug "#{options.resource} is a resource type or an actual resource."
       
       found = describe(options.resource)
+
+      # TODO: Fix this in the API
+      if not found.is_a? Array
+        found = [] << found
+      end
     elsif mixin_types.include? options.resource
       Occi::Log.debug "#{options.resourcre} is a mixin type."
       
