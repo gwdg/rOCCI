@@ -1,8 +1,8 @@
 <% require 'hashie/mash' %>
-<%# We always get an array of JSON objects in json_encoded_resources %>
+<%# We always get an array of OCCI::Collections %>
 Available OS templates:
-<% json_encoded_resources.each do |json_os_tpl| %>
-  <% os_tpl = Hashie::Mash.new(json_os_tpl.as_json) %>
+<% occi_resources.each do |occi_os_tpl| %>
+  <% os_tpl = occi_os_tpl.as_json %>
   OS template "os_tpl#<%= os_tpl.title %>":
     TITLE:        <%= os_tpl.title %>
     TERM:         <%= os_tpl.term %>

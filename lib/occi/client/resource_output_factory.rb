@@ -5,7 +5,9 @@ class ResourceOutputFactory
 
   @@allowed_formats = [:json, :plain].freeze
   @@allowed_resource_types = [:compute, :storage, :network, :os_tpl, :resource_tpl].freeze
-  attr_accessor :output_format
+  @@allowed_data_types = [:locations, :resources].freeze
+
+  attr_reader :output_format
 
   def initialize(output_format = :plain)
     raise "Unsupported output format!" unless @@allowed_formats.include? output_format
@@ -13,26 +15,19 @@ class ResourceOutputFactory
   end
 
   def format(data, data_type, resource_type)
-    raise "I need an array to format the output properly!" unless data.is_a? Array
-    raise "Unsupported resource type!" unless @@allowed_resource_types.include? resource_type
+    raise "Data has to be in an array!" unless data.is_a? Array
+    raise "Unsupported resource type! Got: #{resource_type.to_s}" unless @@allowed_resource_types.include? resource_type
+    raise "Unsupported data type! Got: #{data_type.to_s}" unless @@allowed_data_types.include? data_type
 
-    case data_type
-    when :resources
-      # validate incoming data
-      begin
-        data = JSON.parse(data) if data.is_a? String
-        JSON.generate(data)
-      rescue
-        # report errors
-        raise "I need the resources to be in a JSON-formatted string or a JSON object!"
+    # validate incoming data
+    if data_type == :resources
+      data.each do |occi_collection|
+        raise "I need the resources to be in a Collection!" unless occi_collection.respond_to? :as_json
       end
-
-      method = ("resources_to_" + output_format.to_s).to_sym
-    when :locations
-      method = ("locations_to_" + output_format.to_s).to_sym
-    else
-      raise "Unknown data type!"
     end
+
+    # construct method name from data type and output format
+    method = (data_type.to_s + "_to_" + output_format.to_s).to_sym
 
     ResourceOutputFactory.send method, data, resource_type
   end
@@ -45,12 +40,16 @@ class ResourceOutputFactory
     @@allowed_resource_types
   end
 
-  def self.resources_to_json(json_encoded_resources, resource_type)
-    # generate JSON document from an array of JSON objects 
-    JSON.generate json_encoded_resources
+  def self.allowed_data_types
+    @@allowed_data_types
   end
 
-  def self.resources_to_plain(json_encoded_resources, resource_type)
+  def self.resources_to_json(occi_resources, resource_type)
+    # generate JSON document from an array of JSON objects 
+    JSON.generate occi_resources
+  end
+
+  def self.resources_to_plain(occi_resources, resource_type)
     # using ERB templates for known resource and mixin types
     file = File.expand_path("..", __FILE__) + '/templates/' + resource_type.to_s + ".erb"
     template = ERB.new File.new(file).read

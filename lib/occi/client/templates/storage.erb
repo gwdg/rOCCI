@@ -1,8 +1,7 @@
-<% require 'hashie/mash' %>
-<%# We always get an array of JSON objects in json_encoded_resources %>
+<%# We always get an array of OCCI::Collections %>
 Available STORAGE resources:
-<% json_encoded_resources.each do |json_storage| %>
-  <% storage = Hashie::Mash.new(json_storage.as_json) %>
+<% occi_resources.each do |occi_storage| %>
+  <% storage = occi_storage.as_json %>
   STORAGE resource "<%= storage.resources.first.attributes.occi.core.title %>":
     ID:           <%= storage.resources.first.attributes.occi.core.id %>
     TITLE:        <%= storage.resources.first.attributes.occi.core.title %>
