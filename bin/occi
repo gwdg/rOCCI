@@ -153,11 +153,11 @@ begin
   end
 
 rescue OpenSSL::SSL::SSLError => ssl_ex
-  Occi::Log.error "An SSL Auth Error occurred! Please, make sure your credentials are valid and the endpoind is trusted! Message: #{ssl_ex.message}"
+  Occi::Log.error "An SSL error occurred! Please, make sure your credentials are valid and recognized by the endpoint! Message: #{ssl_ex.message}"
   raise ssl_ex if options.debug
   exit!
 rescue OpenSSL::PKey::RSAError => key_ex
-  Occi::Log.error "An X509 Error occurred! Please, make sure you are using the right password and the file contains both your certificate and your private key! Message: #{key_ex.message}"
+  Occi::Log.error "An X509 error occurred! Please, make sure you are using the right password and the file contains both your certificate and your private key! Message: #{key_ex.message}"
   raise key_ex if options.debug
   exit!
 rescue Exception => ex

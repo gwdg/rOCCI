@@ -1,0 +1,10 @@
+<% require 'hashie/mash' %>
+<%# We always get an array of JSON objects in json_encoded_resources %>
+Available OS templates:
+<% json_encoded_resources.each do |json_os_tpl| %>
+  <% os_tpl = Hashie::Mash.new(json_os_tpl.as_json) %>
+  OS template "os_tpl#<%= os_tpl.title %>":
+    TITLE:        <%= os_tpl.title %>
+    TERM:         <%= os_tpl.term %>
+    LOCATION:     <%= os_tpl.location %>
+<% end %>
