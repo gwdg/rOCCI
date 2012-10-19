@@ -59,7 +59,14 @@ class ResourceOutputFactory
 
   def self.locations_to_json(url_locations, resource_type)
     # give all locatios a common key and convert to JSON
-    { resource_type => url_locations }.to_json
+    locations = { resource_type => [] }
+
+    url_locations.each do |location|
+      location = location.split("/").last if [:os_tpl, :resource_tpl].include? resource_type
+      locations[resource_type] << location
+    end
+
+    locations.to_json
   end
 
   def self.locations_to_plain(url_locations, resource_type)
@@ -67,6 +74,7 @@ class ResourceOutputFactory
     output = resource_type.to_s.capitalize + " locations:\n"
 
     url_locations.each do |location|
+      location = location.split("/").last if [:os_tpl, :resource_tpl].include? resource_type
       output << "\t" << location << "\n"
     end
 
