@@ -46,117 +46,10 @@ if options.auth[:password].nil? or options.auth[:user_cert_password].nil?
   options.auth[:password] = options.auth[:user_cert_password] = ask("Enter password: ") { |q| q.echo = false } unless options.auth[:type] == "none"
 end
 
+# establish a connection
 begin
-
   Occi::Log.info "Establishing a connection to #{options.endpoint} ..."
   connect options.endpoint, options.auth, options.log, true, options.media_type
-
-  Occi::Log.info "Executing action #{options.action.to_s} on #{options.resource} ..."
-  case options.action
-  when :list
-
-    found = []
-
-    if resource_types.include? options.resource
-      Occi::Log.debug "#{options.resource} is a resource type."
-      found = list options.resource
-    elsif mixin_types.include? options.resource
-      Occi::Log.debug "#{options.resource} is a mixin type."
-      found = mixins options.resource
-    else 
-      Occi::Log.debug "I have no idea what #{options.resource} is ..."
-      puts "Unknown resource #{options.resource}, there is nothing to list here!"
-    end
-
-    puts output.format(found, :locations, options.resource.to_sym)
-
-  when :describe
-
-    found = [] 
-
-    if resource_types.include? options.resource or options.resource.start_with? options.endpoint
-      Occi::Log.debug "#{options.resource} is a resource type or an actual resource."
-      
-      found = describe(options.resource)
-
-      # TODO: Fix this in the API
-      if not found.is_a? Array
-        found = [] << found
-      end
-    elsif mixin_types.include? options.resource
-      Occi::Log.debug "#{options.resourcre} is a mixin type."
-      
-      mixins(options.resource).each do |mxn|
-        mxn = mxn.split("#").last
-        found << mixin(mxn, options.resource, true)
-      end
-    elsif mixin_types.include? options.resource.split('#').first
-      Occi::Log.debug "#{options.resource} is a specific mixin type."
-      
-      mxn_type,mxn = options.resource.split('#')
-      found << mixin(mxn, mxn_type, true)
-    else
-      Occi::Log.debug "I have no idea what #{options.resource} is ..."
-      
-      puts "Unknown resource #{options.resource}, there is nothing to describe here!"
-    end
-
-    if options.resource.start_with? options.endpoint
-      resource_type = options.resource.split("/")[3].to_sym
-    elsif mixin_types.include? options.resource.split('#').first
-      resource_type = options.resource.split('#').first.to_sym
-    else
-      resource_type = options.resource.to_sym
-    end
-
-    puts output.format(found, :resources, resource_type)
-
-  when :create
-    if resource_types.include? options.resource
-      Occi::Log.debug "#{options.resource} is a resource type."
-      raise "Not yet implemented!" unless options.resource.include? "compute"
-      
-      res = resource options.resource
-
-      Occi::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
-      Occi::Log.debug "with mixins:#{options.mixin}"
-      
-      options.mixin.keys.each do |type|
-        Occi::Log.debug "Adding mixins of type #{type} to #{options.resource}"
-        options.mixin[type].each do |name|
-          mxn = mixin name, type
-
-          raise "Unknown mixin #{type}##{name}, stopping here!" if mxn.nil?
-          Occi::Log.debug "Adding mixin #{mxn} to #{options.resource}"
-          res.mixins << mxn
-        end
-      end
-
-      #TODO: set other attributes
-      res.title = options.resource_title
-
-      Occi::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
-
-      puts create res
-    else
-      Occi::Log.debug "I have no idea what #{options.resource} is ..."
-      puts "Unknown resource #{options.resource}, there is nothing to create here!"
-    end
-
-  when :delete
-    result = delete options.resource
-
-    if result
-      puts "Resource #{options.resource} successfully removed!"
-    else
-      puts "Failed to remove resource #{options.resource}!"
-    end
-  when :trigger
-    raise "Not yet implemented!"
-  else
-    raise "Unknown action [#{options.action}]!"
-  end
-
 rescue OpenSSL::SSL::SSLError => ssl_ex
   Occi::Log.error "An SSL error occurred! Please, make sure your credentials are valid and recognized by the endpoint! Message: #{ssl_ex.message}"
   raise ssl_ex if options.debug
@@ -165,10 +58,227 @@ rescue OpenSSL::PKey::RSAError => key_ex
   Occi::Log.error "An X509 error occurred! Please, make sure you are using the right password and the file contains both your certificate and your private key! Message: #{key_ex.message}"
   raise key_ex if options.debug
   exit!
-rescue Exception => ex
-  Occi::Log.error "An unkown error occurred! Message: #{ex.message}"
-  raise ex if options.debug
-  exit!
 end
+
+begin
+
+  if options.interactive
+
+    Occi::Log.debug "Running is an interactive mode ..."
+
+    # reset action and resource
+    options.action = nil
+    options.resource = nil
+
+    # TODO: some refactoring necessary
+    menu_resources = [:compute, :network, :storage, :os_tpl, :resource_tpl].freeze
+
+    # separate menus from each other
+    say("\n")
+
+    # first we need an action
+    choose do |menu|
+      menu.prompt = "Please, choose an action: "
+
+      # list action requires resource type
+      menu.choice(:list) {
+        options.action = :list
+
+        # separate menus from each other
+        say("\n")
+
+        choose do |list_menu|
+          list_menu.prompt = "Which one should I list? "
+
+          menu_resources.each do |menu_resource|
+            list_menu.choice(menu_resource) { options.resource = menu_resource.to_s }
+          end
+        end
+      }
+
+      # describe action requires resource type or TODO: resource location
+      menu.choice(:describe) { 
+        options.action = :describe
+
+        # separate menus from each other
+        say("\n")
+
+        choose do |describe_menu|
+          describe_menu.prompt = "Which one should I describe? "
+
+          menu_resources.each do |menu_resource|
+            describe_menu.choice(menu_resource) { options.resource = menu_resource.to_s }
+          end
+        end
+      }
+
+      # create action requires resource type, resource title and optionally mixins (usually two)
+      menu.choice(:create) {
+        options.action = :create
+
+        # separate menus from each other
+        say("\n")
+
+        choose do |create_menu|
+          create_menu.prompt = "Which one should I create? "
+
+          menu_resources.each do |menu_resource|
+            create_menu.choice(menu_resource) {
+              options.resource = menu_resource.to_s
+            } unless menu_resource.to_s.reverse.start_with? "lpt_"
+          end
+        end
+
+        options.resource_title = ask("What name should I give to the new resource? ")
+        number_of_mixins = ask("How many mixins do you wish me to mix into this resource? ", Integer) { |q| q.in = 0..2 }
+        
+        options.mixin = {}
+        (1..number_of_mixins).each do |mixin_number|
+          mixin = ask("What mixin should I mix in? ") { |q| q.validate = /\A\w+#\w+\Z/ }
+          parts = mixin.split("#")
+
+          options.mixin[parts[0]] = [] if options.mixin[parts[0]].nil?
+          options.mixin[parts[0]] << parts[1]
+        end
+      }
+
+      # delete action requires resource location (TODO: list available types and locations for the chosen type)
+      menu.choice(:delete) {
+        options.action = :delete
+
+        options.resource = ask("Which one should I delete? ")
+      }
+
+      # TODO: trigger is not yet implemented
+      menu.choice(:trigger) {
+        options.action = :trigger
+        say("Not yet implemented!")
+
+        exit!(0)
+      }
+
+      menu.choice(:quit) {
+        say("Good bye!")
+        exit!(0)
+      }
+    end
+
+  end
+
+  begin
+
+    Occi::Log.info "Executing action #{options.action.to_s} on #{options.resource} ..."
+    case options.action
+    when :list
+
+      found = []
+
+      if resource_types.include? options.resource
+        Occi::Log.debug "#{options.resource} is a resource type."
+        found = list options.resource
+      elsif mixin_types.include? options.resource
+        Occi::Log.debug "#{options.resource} is a mixin type."
+        found = mixins options.resource
+      else
+        Occi::Log.debug "I have no idea what #{options.resource} is ..."
+        puts "Unknown resource #{options.resource}, there is nothing to list here!"
+      end
+
+      puts output.format(found, :locations, options.resource.to_sym)
+
+    when :describe
+
+      found = []
+
+      if resource_types.include? options.resource or options.resource.start_with? options.endpoint
+        Occi::Log.debug "#{options.resource} is a resource type or an actual resource."
+
+        found = describe(options.resource)
+
+        # TODO: Fix this in the API
+        if not found.is_a? Array
+          found = [] << found
+        end
+      elsif mixin_types.include? options.resource
+        Occi::Log.debug "#{options.resourcre} is a mixin type."
+
+        mixins(options.resource).each do |mxn|
+          mxn = mxn.split("#").last
+          found << mixin(mxn, options.resource, true)
+        end
+      elsif mixin_types.include? options.resource.split('#').first
+        Occi::Log.debug "#{options.resource} is a specific mixin type."
+
+        mxn_type,mxn = options.resource.split('#')
+        found << mixin(mxn, mxn_type, true)
+      else
+        Occi::Log.debug "I have no idea what #{options.resource} is ..."
+
+        puts "Unknown resource #{options.resource}, there is nothing to describe here!"
+      end
+
+      if options.resource.start_with? options.endpoint
+        resource_type = options.resource.split("/")[3].to_sym
+      elsif mixin_types.include? options.resource.split('#').first
+        resource_type = options.resource.split('#').first.to_sym
+      else
+        resource_type = options.resource.to_sym
+      end
+
+      puts output.format(found, :resources, resource_type)
+
+    when :create
+      if resource_types.include? options.resource
+        Occi::Log.debug "#{options.resource} is a resource type."
+        raise "Not yet implemented!" unless options.resource.include? "compute"
+
+        res = resource options.resource
+
+        Occi::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
+        Occi::Log.debug "with mixins:#{options.mixin}"
+
+        options.mixin.keys.each do |type|
+          Occi::Log.debug "Adding mixins of type #{type} to #{options.resource}"
+          options.mixin[type].each do |name|
+            mxn = mixin name, type
+
+            raise "Unknown mixin #{type}##{name}, stopping here!" if mxn.nil?
+            Occi::Log.debug "Adding mixin #{mxn} to #{options.resource}"
+            res.mixins << mxn
+          end
+        end
+
+        #TODO: set other attributes
+        res.title = options.resource_title
+
+        Occi::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
+
+        puts create res
+      else
+        Occi::Log.debug "I have no idea what #{options.resource} is ..."
+        puts "Unknown resource #{options.resource}, there is nothing to create here!"
+      end
+
+    when :delete
+      result = delete options.resource
+
+      if result
+        puts "Resource #{options.resource} successfully removed!"
+      else
+        puts "Failed to remove resource #{options.resource}!"
+      end
+    when :trigger
+      raise "Not yet implemented!"
+    else
+      raise "Unknown action [#{options.action}]!"
+    end
+
+  rescue Exception => ex
+    Occi::Log.error "An error occurred! Message: #{ex.message}"
+    raise ex if options.debug
+    exit!
+  end
+
+end while options.interactive
 
 Occi::Log.info "OCCI client is shutting down ..."

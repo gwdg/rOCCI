@@ -15,6 +15,8 @@ class OcciOpts
     options.log[:out] = STDERR
     options.log[:level] = Occi::Log::WARN
     
+    options.interactive = false
+
     options.endpoint = "https://localhost:3300/"
     
     options.auth = {}
@@ -34,6 +36,10 @@ class OcciOpts
 
       opts.separator ""
       opts.separator "Options:"
+
+      opts.on("--interactive", "Run as an interactive client without additional arguments") do |interactive|
+        options.interactive = interactive
+      end
 
       opts.on("--endpoint URI", String, "OCCI server URI, defaults to '#{options.endpoint}'") do |endpoint|
         options.endpoint = endpoint
@@ -128,25 +134,27 @@ class OcciOpts
       exit!
     end
 
-    mandatory = []
+    if not options.interactive
+      mandatory = []
 
-    if options.action == :trigger
-      mandatory << :trigger_action
-    end
+      if options.action == :trigger
+        mandatory << :trigger_action
+      end
 
-    if options.action == :create
-      mandatory << :mixin << :resource_title
-    end
+      if options.action == :create
+        mandatory << :mixin << :resource_title
+      end
 
-    mandatory.concat [:resource, :action]
-    
-    options_hash = options.marshal_dump
+      mandatory.concat [:resource, :action]
+      
+      options_hash = options.marshal_dump
 
-    missing = mandatory.select{ |param| options_hash[param].nil? }
-    if not missing.empty?
-      puts "Missing required arguments: #{missing.join(', ')}"
-      puts opts
-      exit!
+      missing = mandatory.select{ |param| options_hash[param].nil? }
+      if not missing.empty?
+        puts "Missing required arguments: #{missing.join(', ')}"
+        puts opts
+        exit!
+      end
     end
 
     options
