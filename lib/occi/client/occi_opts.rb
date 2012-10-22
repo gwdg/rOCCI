@@ -4,6 +4,11 @@ require 'occi/client/resource_output_factory'
 
 class OcciOpts
 
+  AUTH_METHODS = [:x509, :basic, :digest, :none].freeze
+  MEDIA_TYPES = ["application/occi+json", "application/occi+xml", "text/plain,text/occi", "text/plain"].freeze
+  ACTIONS = [:list, :describe, :create, :delete, :trigger].freeze
+  LOG_OUTPUTS = [:stdout, :stderr].freeze
+
   def self.parse(args)
 
     options = OpenStruct.new
@@ -37,52 +42,85 @@ class OcciOpts
       opts.separator ""
       opts.separator "Options:"
 
-      opts.on("--interactive", "Run as an interactive client without additional arguments") do |interactive|
+      opts.on("-i",
+              "--interactive",
+              "Run as an interactive client without additional arguments") do |interactive|
         options.interactive = interactive
       end
 
-      opts.on("--endpoint URI", String, "OCCI server URI, defaults to '#{options.endpoint}'") do |endpoint|
+      opts.on("-e",
+              "--endpoint URI",
+              String,
+              "OCCI server URI, defaults to '#{options.endpoint}'") do |endpoint|
         options.endpoint = endpoint
       end
 
-      opts.on("--auth METHOD", [:x509, :basic, :digest, :none], "Authentication method, defaults to '#{options.auth[:type]}'") do |auth|
+      opts.on("-n",
+              "--auth METHOD",
+              AUTH_METHODS,
+              "Authentication method, defaults to '#{options.auth[:type]}'") do |auth|
         options.auth[:type] = auth.to_s
       end
 
-      opts.on("--username USER", String, "Username for basic or digest authentication, defaults to '#{options.auth[:username]}'") do |username|
+      opts.on("-u",
+              "--username USER",
+              String,
+              "Username for basic or digest authentication, defaults to '#{options.auth[:username]}'") do |username|
         options.auth[:username] = username
       end
 
-      opts.on("--password PASSWORD", String, "Password for basic, digest or x509 authentication") do |password|
+      opts.on("-p",
+              "--password PASSWORD",
+              String,
+              "Password for basic, digest or x509 authentication") do |password|
         options.auth[:password] = password
         options.auth[:user_cert_password] = password
       end
 
-      opts.on("--ca-path PATH", String, "Path to CA certificates, defaults to '#{options.auth[:ca_path]}'") do |ca_path|
+      opts.on("-c",
+              "--ca-path PATH", String, "Path to CA certificates, defaults to '#{options.auth[:ca_path]}'") do |ca_path|
         options.auth[:ca_path] = ca_path
       end
 
-      opts.on("--user-cred X509_CREDENTIALS", String, "Path to user's x509 credentials, defaults to '#{options.auth[:user_cert]}'") do |user_cred|
+      opts.on("-x",
+              "--user-cred X509_CREDENTIALS",
+              String,
+              "Path to user's x509 credentials, defaults to '#{options.auth[:user_cert]}'") do |user_cred|
         options.auth[:user_cert] = user_cred
       end
 
-      opts.on("--media-type MEDIA_TYPE", ["application/occi+json", "application/occi+xml", "text/plain,text/occi", "text/plain"], "Media type for client <-> server communication, defaults to '#{options.media_type}'") do |media_type|
+      opts.on("-y",
+              "--media-type MEDIA_TYPE",
+              MEDIA_TYPES,
+              "Media type for client <-> server communication, defaults to '#{options.media_type}'") do |media_type|
         options.media_type = media_type
       end
 
-      opts.on("--resource RESOURCE", String, "Resource to be queried (e.g. network, compute, storage etc.), required") do |resource|
+      opts.on("-r",
+              "--resource RESOURCE",
+              String,
+              "Resource to be queried (e.g. network, compute, storage etc.), required") do |resource|
         options.resource = resource
       end
 
-      opts.on("--resource-title TITLE", String, "Resource title for new resources") do |resource_title|
+      opts.on("-t",
+              "--resource-title TITLE",
+              String,
+              "Resource title for new resources") do |resource_title|
         options.resource_title = resource_title
       end
 
-      opts.on("--action ACTION", [:list, :describe, :create, :delete, :trigger], "Action to be performed on the resource, required") do |action|
+      opts.on("-a",
+              "--action ACTION",
+              ACTIONS,
+              "Action to be performed on the resource, required") do |action|
         options.action = action
       end
 
-      opts.on("--mixin NAME", String, "Type and name of the mixin as TYPE#NAME (e.g. os_tpl#monitoring, resource_tpl#medium)") do |mixin|
+      opts.on("-M",
+              "--mixin NAME",
+              String,
+              "Type and name of the mixin as TYPE#NAME (e.g. os_tpl#monitoring, resource_tpl#medium)") do |mixin|
         parts = mixin.split("#")
 
         raise "Unknown mixin format! Use TYPE#NAME!" unless parts.length == 2
@@ -92,34 +130,51 @@ class OcciOpts
         options.mixin[parts[0]] << parts[1]
       end
 
-      opts.on("--trigger-action TRIGGER_ACTION", String, "Action to be triggered on the resource") do |trigger_action|
+      opts.on("-g",
+              "--trigger-action TRIGGER",
+              String,
+              "Action to be triggered on the resource") do |trigger_action|
         options.trigger_action = trigger_action
       end
 
-      opts.on("--log-to OUTPUT", [:STDOUT, :stdout, :STDERR, :stderr], "Log to the specified device, defaults to 'STDERR'") do |log_to|
+      opts.on("-l",
+              "--log-to OUTPUT",
+              LOG_OUTPUTS,
+              "Log to the specified device, defaults to 'STDERR'") do |log_to|
         options.log[:out] = STDOUT if log_to == :stdout or log_to == :STDOUT
       end
 
-      opts.on("--output-format FORMAT", ResourceOutputFactory.allowed_formats, "Output format, defaults to human-readable 'plain'") do |output_format|
+      opts.on("-o",
+              "--output-format FORMAT",
+              ResourceOutputFactory.allowed_formats,
+              "Output format, defaults to human-readable 'plain'") do |output_format|
         options.output_format = output_format
       end
 
-      opts.on_tail("--debug", "Enable debugging messages") do |debug|
+      opts.on_tail("-d",
+                   "--debug",
+                   "Enable debugging messages") do |debug|
         options.debug = debug
         options.log[:level] = Occi::Log::DEBUG
       end
 
-      opts.on_tail("--verbose", "Be more verbose, less intrusive than debug mode") do |verbose|
+      opts.on_tail("-b",
+                   "--verbose",
+                   "Be more verbose, less intrusive than debug mode") do |verbose|
         options.verbose = verbose
         options.log[:level] = Occi::Log::INFO unless options.log[:level] == Occi::Log::DEBUG
       end
 
-      opts.on_tail("-h", "--help", "Show this message") do
+      opts.on_tail("-h",
+                   "--help",
+                   "Show this message") do
         puts opts
         exit!
       end
 
-      opts.on_tail("--version", "Show version") do
+      opts.on_tail("-v",
+                   "--version",
+                   "Show version") do
         puts Occi::VERSION
         exit!(true)
       end
