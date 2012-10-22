@@ -151,10 +151,8 @@ begin
 
       # TODO: trigger is not yet implemented
       menu.choice(:trigger) {
-        options.action = :trigger
-        say("Not yet implemented!")
-
-        exit!(0)
+        options.action = :skip
+        say("Not implemented yet!")
       }
 
       menu.choice(:quit) {
@@ -269,6 +267,8 @@ begin
       end
     when :trigger
       raise "Not yet implemented!"
+    when :skip
+      Occi::Log.info "Skipping this action, probably not implemented yet!"
     else
       raise "Unknown action [#{options.action}]!"
     end

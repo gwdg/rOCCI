@@ -71,7 +71,7 @@ class ResourceOutputFactory
 
   def self.locations_to_plain(url_locations, resource_type)
     # just an attempt to make the array more readable 
-    output = resource_type.to_s.capitalize + " locations:\n"
+    output = "\n" + resource_type.to_s.capitalize + " locations:\n"
 
     url_locations.each do |location|
       location = location.split("/").last if [:os_tpl, :resource_tpl].include? resource_type
