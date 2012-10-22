@@ -192,8 +192,8 @@ module Occi
         mixins = []
 
         # flatten the hash and remove its keys
-        get_mixin_types.each do |type|
-          mixins.concat @mixins[type.to_sym]
+        get_mixin_types.each do |ltype|
+          mixins.concat @mixins[ltype.to_sym]
         end
 
         mixins
@@ -379,7 +379,7 @@ module Occi
     # @param [Hash]
     def set_logger(log_options)
 
-      if log_options[:logger].nil? or not (log_options[:logger].kind_of? Occi::Log)
+      if log_options[:logger].nil? or (not log_options[:logger].kind_of? Occi::Log)
         logger       = Occi::Log.new(log_options[:out])
         logger.level = log_options[:level]
       end
@@ -419,7 +419,9 @@ module Occi
     # @param [Occi::Collection]
     # @return [Occi::Collection]
     def get(path='', filter=nil)
-      path     = path.reverse.chomp('/').reverse
+      # remove the leading slash
+      path.gsub!(/\A\//, '')
+
       response = if filter
                    categories = filter.categories.collect { |category| category.to_text }.join(',')
                    attributes = filter.entities.collect { |entity| entity.attributes.combine.collect { |k, v| k + '=' + v } }.join(',')
@@ -448,7 +450,9 @@ module Occi
     # @param [Occi::Collection]
     # @return [String]
     def post(path, collection)
-      path     = path.reverse.chomp('/').reverse
+      # remove the leading slash
+      path.gsub!(/\A\//, '')
+
       response = if @media_type == 'application/occi+json'
                    self.class.post(@endpoint + path,
                                    :body    => collection.to_json,
@@ -472,7 +476,9 @@ module Occi
     # @param [Occi::Collection]
     # @return [Occi::Collection]
     def put(path, collection)
-      path     = path.reverse.chomp('/').reverse
+      # remove the leading slash
+      path.gsub!(/\A\//, '')
+
       response = if @media_type == 'application/occi+json'
                    self.class.post(@endpoint + path, :body => collection.to_json, :headers => { 'Content-Type' => 'application/occi+json' })
                  else
@@ -491,7 +497,9 @@ module Occi
     # @param [Occi::Collection]
     # @return [Boolean]
     def del(path, collection=nil)
-      path     = path.reverse.chomp('/').reverse
+      # remove the leading slash
+      path.gsub!(/\A\//, '')
+
       response = self.class.delete(@endpoint + path)
 
       response_msg = response_message response
