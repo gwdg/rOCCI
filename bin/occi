@@ -40,6 +40,23 @@ output = ResourceOutputFactory.new options.output_format
 Occi::Log.info "Starting OCCI client ..."
 Occi::Log.debug "Options: #{options}"
 
+if options.interactive
+  Occi::Log.debug "Checking for endpoint and auth changes ..."
+
+  options.endpoint = ask("What endpoint should I use? ") { |q| q.default = options.endpoint }
+
+  # separate menus
+  say "\n"
+
+  choose do |menu|
+    menu.prompt = "Which auth method should I use? "
+
+    OcciOpts::AUTH_METHODS.each do |auth_m|
+      menu.choice(auth_m) { options.auth[:type] = auth_m.to_s }
+    end
+  end
+end
+
 # running with an empty password?
 if options.auth[:password].nil? or options.auth[:user_cert_password].nil?
   Occi::Log.debug "Password not set, asking for it now ..."
