@@ -75,6 +75,9 @@ rescue OpenSSL::PKey::RSAError => key_ex
   Occi::Log.error "An X509 error occurred! Please, make sure you are using the right password and the file contains both your certificate and your private key! Message: #{key_ex.message}"
   raise key_ex if options.debug
   exit!
+rescue Errno::ECONNREFUSED
+  Occi::Log.error "Connection refused!"
+  exit!
 end
 
 begin
@@ -290,6 +293,9 @@ begin
       raise "Unknown action [#{options.action}]!"
     end
 
+  rescue Errno::ECONNREFUSED
+    Occi::Log.error "Connection refused!"
+    exit!
   rescue Exception => ex
     Occi::Log.error "An error occurred! Message: #{ex.message}"
     raise ex if options.debug
