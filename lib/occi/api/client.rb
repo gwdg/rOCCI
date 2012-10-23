@@ -230,16 +230,13 @@ module Occi
         # split the type identifier and get the most important part
         uri_part = resource_type_identifier.split('#').last
 
-        list = []
-
         # request uri-list from the server
         path = uri_part + '/'
       else
         path = '/'
       end
-      list = self.class.get(@endpoint + path, :headers => { "Accept" => 'text/uri-list' }).body.split("\n").compact
 
-      list
+      self.class.get(@endpoint + path, :headers => { "Accept" => 'text/uri-list' }).body.split("\n").compact
     end
 
     # @param [String] OCCI resource type identifier or just type
@@ -252,24 +249,23 @@ module Occi
       # check some basic pre-conditions
       raise "Endpoint is not connected!" unless @connected
 
-      descriptions = nil
+      descriptions = []
 
       if resource_type_identifier.nil?
-        descriptions = get('/')
+        descriptions << get('/')
       elsif @model.get_by_id resource_type_identifier
         # we got type identifier
         # get all available resources of this type
         locations     = list resource_type_identifier
-        # make the requests
-        descriptions = []
 
+        # make the requests
         locations.each do |location|
           descriptions << get(sanitize_resource_link(location))
         end
       elsif resource_type_identifier.start_with? @endpoint
         # we got resource link
         # make the request
-        descriptions = get(sanitize_resource_link(resource_type_identifier))
+        descriptions << get(sanitize_resource_link(resource_type_identifier))
       else
         raise "Unkown resource type identifier! [#{resource_type_identifier}]"
       end
