@@ -20,9 +20,10 @@ require 'pp'
 require 'highline/import'
 require 'openssl'
 
-# OcciOpts and ResourceOutputFactory are not part of the occi core required above
+# OcciOpts, ResourceOutputFactory and Helper are not part of the occi core required above
 require 'occi/client/occi_opts'
 require 'occi/client/resource_output_factory'
+require 'occi/client/helper'
 
 extend Occi::DSL
 
@@ -40,6 +41,7 @@ output = ResourceOutputFactory.new options.output_format
 Occi::Log.info "Starting OCCI client ..."
 Occi::Log.debug "Options: #{options}"
 
+#
 if options.interactive
   Occi::Log.debug "Checking for endpoint and auth changes ..."
 
@@ -92,6 +94,7 @@ rescue Errno::ECONNREFUSED
   exit!
 end
 
+#
 begin
 
   if options.interactive
@@ -190,128 +193,63 @@ begin
         say("Not implemented yet!")
       }
 
+      menu.choice(:refresh) {
+        options.action = :refresh
+      }
+
       menu.choice(:quit) {
         say("Good bye!")
         exit!(true)
       }
     end
-
   end
 
-  begin
+  Occi::Log.info "Executing action #{options.action.to_s} on #{options.resource} ..."
+  case options.action
+  when :list
+    found = helper_list options
+    puts output.format(found, :locations, options.resource.to_sym)
+  when :describe
+    found = helper_describe options
 
-    Occi::Log.info "Executing action #{options.action.to_s} on #{options.resource} ..."
-    case options.action
-    when :list
-
-      found = []
-
-      if resource_types.include? options.resource
-        Occi::Log.debug "#{options.resource} is a resource type."
-        found = list options.resource
-      elsif mixin_types.include? options.resource
-        Occi::Log.debug "#{options.resource} is a mixin type."
-        found = mixins options.resource
-      else
-        Occi::Log.debug "I have no idea what #{options.resource} is ..."
-        puts "Unknown resource #{options.resource}, there is nothing to list here!"
-      end
-
-      puts output.format(found, :locations, options.resource.to_sym)
-
-    when :describe
-
-      found = []
-
-      if resource_types.include? options.resource or options.resource.start_with? options.endpoint
-        Occi::Log.debug "#{options.resource} is a resource type or an actual resource."
-
-        found = describe(options.resource)
-      elsif mixin_types.include? options.resource
-        Occi::Log.debug "#{options.resourcre} is a mixin type."
-
-        mixins(options.resource).each do |mxn|
-          mxn = mxn.split("#").last
-          found << mixin(mxn, options.resource, true)
-        end
-      elsif mixin_types.include? options.resource.split('#').first
-        Occi::Log.debug "#{options.resource} is a specific mixin type."
-
-        mxn_type,mxn = options.resource.split('#')
-        found << mixin(mxn, mxn_type, true)
-      else
-        Occi::Log.debug "I have no idea what #{options.resource} is ..."
-
-        puts "Unknown resource #{options.resource}, there is nothing to describe here!"
-      end
-
-      if options.resource.start_with? options.endpoint
-        resource_type = options.resource.split("/")[3].to_sym
-      elsif mixin_types.include? options.resource.split('#').first
-        resource_type = options.resource.split('#').first.to_sym
-      else
-        resource_type = options.resource.to_sym
-      end
-
-      puts output.format(found, :resources, resource_type)
-
-    when :create
-      if resource_types.include? options.resource
-        Occi::Log.debug "#{options.resource} is a resource type."
-        raise "Not yet implemented!" unless options.resource.include? "compute"
-
-        res = resource options.resource
-
-        Occi::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
-        Occi::Log.debug "with mixins:#{options.mixin}"
-
-        options.mixin.keys.each do |type|
-          Occi::Log.debug "Adding mixins of type #{type} to #{options.resource}"
-          options.mixin[type].each do |name|
-            mxn = mixin name, type
-
-            raise "Unknown mixin #{type}##{name}, stopping here!" if mxn.nil?
-            Occi::Log.debug "Adding mixin #{mxn} to #{options.resource}"
-            res.mixins << mxn
-          end
-        end
-
-        #TODO: set other attributes
-        res.title = options.resource_title
-
-        Occi::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
-
-        puts create res
-      else
-        Occi::Log.debug "I have no idea what #{options.resource} is ..."
-        puts "Unknown resource #{options.resource}, there is nothing to create here!"
-      end
-
-    when :delete
-      result = delete options.resource
-
-      if result
-        puts "Resource #{options.resource} successfully removed!"
-      else
-        puts "Failed to remove resource #{options.resource}!"
-      end
-    when :trigger
-      raise "Not yet implemented!"
-    when :skip
-      Occi::Log.info "Skipping this action, probably not implemented yet!"
+    if options.resource.start_with? options.endpoint
+      resource_type = options.resource.split("/")[3].to_sym
+    elsif mixin_types.include? options.resource.split('#').first
+      resource_type = options.resource.split('#').first.to_sym
     else
-      raise "Unknown action [#{options.action}]!"
+      resource_type = options.resource.to_sym
     end
 
-  rescue Errno::ECONNREFUSED
-    Occi::Log.error "Connection refused!"
-    exit!
-  rescue Exception => ex
-    Occi::Log.error "An error occurred! Message: #{ex.message}"
-    raise ex if options.debug
-    exit!
+    puts output.format(found, :resources, resource_type)
+  when :create
+    location = helper_create options
+    puts location
+  when :delete
+    result = helper_delete options
+    
+    if result
+      puts "Resource #{options.resource} successfully removed!"
+    else
+      puts "Failed to remove resource #{options.resource}!"
+    end
+  when :trigger
+    helper_trigger options
+  when :refresh
+    refresh
+  when :skip
+    Occi::Log.info "Skipping this action, probably not implemented yet!"
+  else
+    raise "Unknown action [#{options.action}]!"
   end
 
+rescue Errno::ECONNREFUSED
+  Occi::Log.error "Connection refused!"
+  exit!
+rescue Exception => ex
+  Occi::Log.error "An error occurred! Message: #{ex.message}"
+  
+  raise ex if options.debug
+  exit!
 end while options.interactive
 
 Occi::Log.info "OCCI client is shutting down ..."
