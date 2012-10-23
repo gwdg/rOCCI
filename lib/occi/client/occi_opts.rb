@@ -169,7 +169,7 @@ class OcciOpts
                    "--help",
                    "Show this message") do
         puts opts
-        exit!
+        exit!(true)
       end
 
       opts.on_tail("-v",
