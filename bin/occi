@@ -130,6 +130,8 @@ begin
           menu_resources.each do |menu_resource|
             list_menu.choice(menu_resource) { options.resource = menu_resource.to_s }
           end
+
+          list_menu.choice(:back) { options.action = :skip }
         end
       }
 
@@ -161,9 +163,13 @@ begin
                 found.each do |found_resource|
                   describe_menu_spec.choice(found_resource.to_sym) { options.resource = found_resource }
                 end
+
+                describe_menu_spec.choice(:back) { options.action = :skip }
               end unless menu_resource.to_s.reverse.start_with? "lpt_"
             }
           end
+
+          describe_menu.choice(:back) { options.action = :skip }
         end
       }
 
@@ -183,19 +189,23 @@ begin
               options.resource = menu_resource.to_s
             } unless menu_resource.to_s.reverse.start_with? "lpt_"
           end
+
+          create_menu.choice(:back) { options.action = :skip }
         end
 
-        options.resource_title = ask("What name should I give to the new resource? ")
-        number_of_mixins = ask("How many mixins do you wish me to mix into this resource? ",
-                                Integer) { |q| q.in = 0..2 }
-        
-        options.mixin = {}
-        (1..number_of_mixins).each do |mixin_number|
-          mixin = ask("What mixin should I mix in? ") { |q| q.validate = /\A\w+#\w+\Z/ }
-          parts = mixin.split("#")
+        if options.action == :create
+          options.resource_title = ask("What name should I give to the new resource? ")
+          number_of_mixins = ask("How many mixins do you wish me to mix into this resource? ",
+                                  Integer) { |q| q.in = 0..2 }
 
-          options.mixin[parts[0]] = [] if options.mixin[parts[0]].nil?
-          options.mixin[parts[0]] << parts[1]
+          options.mixin = {}
+          (1..number_of_mixins).each do |mixin_number|
+            mixin = ask("What mixin should I mix in? ") { |q| q.validate = /\A\w+#\w+\Z/ }
+            parts = mixin.split("#")
+
+            options.mixin[parts[0]] = [] if options.mixin[parts[0]].nil?
+            options.mixin[parts[0]] << parts[1]
+          end
         end
       }
 
@@ -204,7 +214,36 @@ begin
       menu.choice(:delete) {
         options.action = :delete
 
-        options.resource = ask("Which one should I delete? ")
+        # separate menus from each other
+        say("\n")
+
+        choose do |delete_menu|
+          delete_menu.prompt = "Please, choose a resource type: "
+
+          menu_resources.each do |menu_resource|
+            delete_menu.choice(menu_resource) {
+
+              # separate menus from each other
+              say("\n")
+
+              choose do |delete_menu_spec|
+                delete_menu_spec.prompt = "Which resource should I delete? "
+
+                opts = OpenStruct.new
+                opts.resource = menu_resource.to_s
+
+                found = helper_list opts
+                found.each do |found_resource|
+                  delete_menu_spec.choice(found_resource.to_sym) { options.resource = found_resource }
+                end
+
+                delete_menu_spec.choice(:back) { options.action = :skip }
+              end unless menu_resource.to_s.reverse.start_with? "lpt_"
+            } unless menu_resource.to_s.reverse.start_with? "lpt_"
+          end
+
+          delete_menu.choice(:back) { options.action = :skip }
+        end
       }
 
       # TODO: trigger is not yet implemented
