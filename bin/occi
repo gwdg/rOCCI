@@ -65,6 +65,8 @@ end
 if options.auth[:password].nil? or options.auth[:user_cert_password].nil?
   Occi::Log.debug "Password not set, asking for it now ..."
 
+  say("\n")
+
   options.auth[:user_cert_password] = ask("Enter password: ") {
     |q| q.echo = false
   } unless options.auth[:type] == "none"
@@ -142,7 +144,25 @@ begin
           describe_menu.prompt = "Which one should I describe? "
 
           menu_resources.each do |menu_resource|
-            describe_menu.choice(menu_resource) { options.resource = menu_resource.to_s }
+            describe_menu.choice(menu_resource) {
+              options.resource = menu_resource.to_s
+
+              # separate menus from each other
+              say("\n")
+
+              choose do |describe_menu_spec|
+                describe_menu_spec.prompt = "Should I describe a specific resource? "
+
+                describe_menu_spec.choice(:all) {
+                  # leave options.resource set to compute/network/storage
+                }
+
+                found = helper_list options
+                found.each do |found_resource|
+                  describe_menu_spec.choice(found_resource.to_sym) { options.resource = found_resource }
+                end
+              end unless menu_resource.to_s.reverse.start_with? "lpt_"
+            }
           end
         end
       }
