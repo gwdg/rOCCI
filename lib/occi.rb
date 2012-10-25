@@ -33,9 +33,6 @@ require 'occiantlr/OCCIANTLRLexer'
 require 'occiantlr/OCCIANTLRParser'
 
 module Occi
-  def kind
-    nil
-  end
 
   def kinds
     []
