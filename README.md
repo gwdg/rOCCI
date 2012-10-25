@@ -20,11 +20,16 @@ Installation
 Usage
 -----
 ### Client
-The OCCI gem includes a client you can use directly from shell with the following auth methods: x509 (with --password, --user-cred and --ca-path), basic (with --username and --password), digest (with --username and --password), none. If you won't set a password using --password, the client will run in an interactive mode and ask for it later on.
+The OCCI gem includes a client you can use directly from shell with the following auth methods: x509 (with --password, --user-cred and --ca-path), basic (with --username and --password), digest (with --username and --password), none. If you won't set a password using --password, the client will ask for it later on. There is also an interactive mode, which will allow you to interact with the client through menus and answers to simple questions (this feature is still experimental).
 
 To find out more about available options and defaults use
 
     occi --help
+
+To run the client in an interactive mode use
+
+    occi --interactive
+    occi --interactive --endpoint https://<ENDPOINT>:<PORT>/
 
 To list available resources use
 
@@ -142,7 +147,7 @@ To create a new compute resource use
     size = mixin 'large', 'resource_tpl'
     cmpt = resource "compute"
     cmpt.mixins << os << size
-    cmpt.attributes.occi!.core!.title = "My VM"
+    cmpt.title = "My VM"
     create cmpt
 
 To get a description of a specific resource use
@@ -212,7 +217,7 @@ To create a new compute resource use
     size = client.find_mixin 'large', 'resource_tpl'
     cmpt = client.get_resource "compute"
     cmpt.mixins << os << size
-    cmpt.attributes.occi!.core!.title = "My VM"
+    cmpt.title = "My VM"
     client.create cmpt
 
 To get a description of a specific resource use
