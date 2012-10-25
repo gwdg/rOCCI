@@ -61,12 +61,18 @@ module Occi
         "505" => "HTTP Version not supported"
     }
 
-    # @param [String] Endpoint URI
-    # @param [Hash] Auth options
-    # @param [Hash] Logging options
-    # @param [Boolean] Enable autoconnect?
-    # @return [Occi:Client] Client instance
-    def initialize(endpoint = "http://localhost:3000/", auth_options = { :type => "none" }, log_options = { :out => STDERR, :level => Occi::Log::WARN, :logger => nil }, auto_connect = true, media_type = nil)
+    # Initializes client data structures and retrieves OCCI model
+    # from the server.
+    #
+    # @param [String] endpoint URI
+    # @param [Hash] auth options in a hash
+    # @param [Hash] logging options in a hash
+    # @param [Boolean] enable autoconnect
+    # @param [String] media type identifier
+    # @return [Occi::Client] client instance
+    def initialize(endpoint = "http://localhost:3000/", auth_options = { :type => "none" },
+                   log_options = { :out => STDERR, :level => Occi::Log::WARN, :logger => nil },
+                   auto_connect = true, media_type = nil)
       # set Occi::Log
       set_logger log_options
 
@@ -96,8 +102,16 @@ module Occi
       @connected = auto_connect
     end
 
-    # @param [String] Resource name or resource identifier
-    # @return [Occi::Core::Entity] Resource instance
+    # Creates a new resource instance, resource should be specified
+    # by its name or identifier.
+    #
+    # @example
+    #   client.get_resource "compute" # => Occi::Core::Resource
+    #   client.get_resource "storage" # => Occi::Core::Resource
+    #   client.get_resource "http://schemas.ogf.org/occi/infrastructure#network" # => Occi::Core::Resource
+    #
+    # @param [String] resource name or resource identifier
+    # @return [Occi::Core::Resource] new resource instance
     def get_resource(resource_type)
 
       Occi::Log.debug("Instantiating #{resource_type} ...")
@@ -107,64 +121,67 @@ module Occi
         Occi::Core::Resource.new resource_type
       elsif @model.kinds.select { |kind| kind.term == resource_type }.any?
         # we got a resource type name
-        Occi::Core::Resource.new @model.kinds.select { |kind| kind.term == resource_type }.first.type_identifier
+        Occi::Core::Resource.new @model.kinds.select {
+          |kind| kind.term == resource_type
+        }.first.type_identifier
       else
         raise "Unknown resource type! [#{resource_type}]"
       end
 
     end
 
-    # @return [Array] List of available resource types in a human-readable format
+    # Retrieves all available resource types.
+    #
+    # @example
+    #    client.get_resource_types # => [ "compute", "storage", "network" ]
+    #
+    # @return [Array<String>] list of available resource types in a human-readable format
     def get_resource_types
       Occi::Log.debug("Getting resource types ...")
       @model.kinds.collect { |kind| kind.term }
     end
 
-    # @return [Array] List of available resource types in a Occi ID format
+    # Retrieves all available resource type identifiers.
+    #
+    # @example
+    #    client.get_resource_type_identifiers 
+    #    # => [ "http://schemas.ogf.org/occi/infrastructure#compute",
+    #           "http://schemas.ogf.org/occi/infrastructure#storage",
+    #           "http://schemas.ogf.org/occi/infrastructure#network" ]
+    #
+    # @return [Array<String>] list of available resource types in a Occi ID format
     def get_resource_type_identifiers
       Occi::Log.debug("Getting resource identifiers ...")
       @model.kinds.collect { |kind| kind.type_identifier }
     end
 
-    # @param [String] Name of the mixin
-    # @param [String] Type of the mixin
-    # @param [Boolean] Should we describe the mixin or return its link?
-    # @return [String, Occi:Collection] Link or mixin description
+    # Looks up a mixin using its name and, optionally, a type as well.
+    # Will return mixin's full location (a link) or a description. 
+    #
+    # @example
+    #    client.find_mixin "debian6" # => "http://my.occi.service/occi/infrastructure/os_tpl#debian6"
+    #    client.find_mixin "debian6", "os_tpl" # => "http://my.occi.service/occi/infrastructure/os_tpl#debian6"
+    #    client.find_mixin "large", "resource_tpl" # => "http://my.occi.service/occi/infrastructure/resource_tpl#large"
+    #    client.find_mixin "debian6", "resource_tpl" # => nil
+    #
+    # @param [String] name of the mixin
+    # @param [String] type of the mixin
+    # @param [Boolean] should we describe the mixin or return its link?
+    # @return [String, Occi::Collection, nil] link, mixin description or nothing found
     def find_mixin(name, type = nil, describe = false)
 
       Occi::Log.debug("Looking for mixin #{name} + #{type} + #{describe}")
 
       # is type valid?
-      unless type.nil?
+      if type
         raise "Unknown mixin type! [#{type}]" unless @mixins.has_key? type.to_sym
       end
 
       # TODO: extend this code to support multiple matches and regex filters
       # should we look for links or descriptions?
-      unless describe
-        # we are looking for links
-        # prefix mixin name with '#' to simplify the search
-        name = "#" + name
-        unless type
-          # there is no type preference, return first global match
-          @mixins.flatten(2).select { |mixin| mixin.to_s.reverse.start_with? name.reverse }.first
-        else
-          # return the first match with the selected type
-          @mixins[type.to_sym].select { |mixin| mixin.to_s.reverse.start_with? name.reverse }.first
-        end
-      else
+      if describe
         # we are looking for descriptions
-        unless type
-          # try in os_tpls first
-          found = get_os_templates.select { |mixin| mixin.term == name }.first
-
-          # then try in resource_tpls
-          unless found
-            found = get_resource_templates.select { |template| template.term == name }.first
-          end
-
-          found
-        else
+        if type
           # get the first match from either os_tpls or resource_tpls
           case
             when type == "os_tpl"
@@ -174,6 +191,25 @@ module Occi
             else
               nil
           end
+        else
+          # try in os_tpls first
+          found = get_os_templates.select { |os| os.term == name }.first
+
+          # then try in resource_tpls
+          found = get_resource_templates.select { |template| template.term == name }.first unless found
+
+          found
+        end
+      else
+        # we are looking for links
+        # prefix mixin name with '#' to simplify the search
+        name = "#" + name
+        if type
+          # return the first match with the selected type
+          @mixins[type.to_sym].select { |mixin| mixin.to_s.reverse.start_with? name.reverse }.first
+        else
+          # there is no type preference, return first global match
+          @mixins.flatten(2).select { |mixin| mixin.to_s.reverse.start_with? name.reverse }.first
         end
       end
     end
