@@ -1,0 +1,15 @@
+<%# We always get an array of OCCI::Collections %>
+Available COMPUTE resources:
+<% occi_resources.each do |occi_compute| %>
+  <% compute = occi_compute.as_json %>
+  COMPUTE resource "<%= compute.resources.first.attributes.occi.core.title %>":
+    ID:           <%= compute.resources.first.attributes.occi.core.id %>
+    TITLE:        <%= compute.resources.first.attributes.occi.core.title %>
+    STATE:        <%= compute.resources.first.attributes.occi.compute.state %>
+    LINKS:
+    <% compute.links.each do |link| %>
+      LINK "<%= link.attributes.occi.core.target.split("/")[1] %>":
+        ID:     <%= link.attributes.occi.core.id %>
+        TARGET: <%= link.attributes.occi.core.target %>
+    <% end %>
+<% end %>

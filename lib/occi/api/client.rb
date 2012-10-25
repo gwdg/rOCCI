@@ -192,8 +192,8 @@ module Occi
         mixins = []
 
         # flatten the hash and remove its keys
-        get_mixin_types.each do |type|
-          mixins.concat @mixins[type.to_sym]
+        get_mixin_types.each do |ltype|
+          mixins.concat @mixins[ltype.to_sym]
         end
 
         mixins
@@ -230,16 +230,13 @@ module Occi
         # split the type identifier and get the most important part
         uri_part = resource_type_identifier.split('#').last
 
-        list = []
-
         # request uri-list from the server
         path = uri_part + '/'
       else
         path = '/'
       end
-      list = self.class.get(@endpoint + path, :headers => { "Accept" => 'text/uri-list' }).body.split("\n").compact
 
-      list
+      self.class.get(@endpoint + path, :headers => { "Accept" => 'text/uri-list' }).body.split("\n").compact
     end
 
     # @param [String] OCCI resource type identifier or just type
@@ -252,24 +249,23 @@ module Occi
       # check some basic pre-conditions
       raise "Endpoint is not connected!" unless @connected
 
-      descriptions = nil
+      descriptions = []
 
       if resource_type_identifier.nil?
-        descriptions = get('/')
+        descriptions << get('/')
       elsif @model.get_by_id resource_type_identifier
         # we got type identifier
         # get all available resources of this type
         locations     = list resource_type_identifier
-        # make the requests
-        descriptions = []
 
+        # make the requests
         locations.each do |location|
           descriptions << get(sanitize_resource_link(location))
         end
       elsif resource_type_identifier.start_with? @endpoint
         # we got resource link
         # make the request
-        descriptions = get(sanitize_resource_link(resource_type_identifier))
+        descriptions << get(sanitize_resource_link(resource_type_identifier))
       else
         raise "Unkown resource type identifier! [#{resource_type_identifier}]"
       end
@@ -374,38 +370,12 @@ module Occi
       set_model
     end
 
-    # @param [Occi::Core::Resource] Compute instance
-    # @param [URI,String] Storage location (URI)
-    # @param [Occi::Core::Attributes] Attributes
-    # @param [Array] Mixins
-    # @return [Occi::Core::Link] Link instance
-    def storagelink(compute, storage_location, attributes=Occi::Core::Attributes.new, mixins=[])
-      kind         = 'http://schemas.ogf.org/occi/infrastructure#storagelink'
-      storage_kind = 'http://schemas.ogf.org/occi/infrastructure#storage'
-      storagelink  = link(kind, compute, storage_location, storage_kind, attributes, mixins)
-
-      storagelink
-    end
-
-    # @param [Occi::Core::Resource] Compute instance
-    # @param [URI,String] Network location (URI)
-    # @param [Occi::Core::Attributes] Attributes
-    # @param [Array] Mixins
-    # @return [Occi::Core::Link] Link instance
-    def networkinterface(compute, network_location, attributes=Occi::Core::Attributes.new, mixins=[])
-      kind             = 'http://schemas.ogf.org/occi/infrastructure#networkinterface'
-      network_kind     = 'http://schemas.ogf.org/occi/infrastructure#network'
-      networkinterface = link(kind, compute, network_location, network_kind, attributes, mixins)
-
-      networkinterface
-    end
-
-    #private
+    private
 
     # @param [Hash]
     def set_logger(log_options)
 
-      if log_options[:logger].nil? or not (log_options[:logger].kind_of? Occi::Log)
+      if log_options[:logger].nil? or (not log_options[:logger].kind_of? Occi::Log)
         logger       = Occi::Log.new(log_options[:out])
         logger.level = log_options[:level]
       end
@@ -445,7 +415,9 @@ module Occi
     # @param [Occi::Collection]
     # @return [Occi::Collection]
     def get(path='', filter=nil)
-      path     = path.reverse.chomp('/').reverse
+      # remove the leading slash
+      path.gsub!(/\A\//, '')
+
       response = if filter
                    categories = filter.categories.collect { |category| category.to_text }.join(',')
                    attributes = filter.entities.collect { |entity| entity.attributes.combine.collect { |k, v| k + '=' + v } }.join(',')
@@ -474,7 +446,9 @@ module Occi
     # @param [Occi::Collection]
     # @return [String]
     def post(path, collection)
-      path     = path.reverse.chomp('/').reverse
+      # remove the leading slash
+      path.gsub!(/\A\//, '')
+
       response = if @media_type == 'application/occi+json'
                    self.class.post(@endpoint + path,
                                    :body    => collection.to_json,
@@ -498,7 +472,9 @@ module Occi
     # @param [Occi::Collection]
     # @return [Occi::Collection]
     def put(path, collection)
-      path     = path.reverse.chomp('/').reverse
+      # remove the leading slash
+      path.gsub!(/\A\//, '')
+
       response = if @media_type == 'application/occi+json'
                    self.class.post(@endpoint + path, :body => collection.to_json, :headers => { 'Content-Type' => 'application/occi+json' })
                  else
@@ -517,7 +493,9 @@ module Occi
     # @param [Occi::Collection]
     # @return [Boolean]
     def del(path, collection=nil)
-      path     = path.reverse.chomp('/').reverse
+      # remove the leading slash
+      path.gsub!(/\A\//, '')
+
       response = self.class.delete(@endpoint + path)
 
       response_msg = response_message response

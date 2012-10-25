@@ -1,0 +1,9 @@
+<%# We always get an array of OCCI::Collections %>
+Available RESOURCE templates:
+<% occi_resources.each do |occi_res_tpl| %>
+  <% res_tpl = occi_res_tpl.as_json %>
+  RESOURCE template "resource_tpl#<%= res_tpl.term %>":
+    TITLE:        <%= res_tpl.title %>
+    TERM:         <%= res_tpl.term %>
+    LOCATION:     <%= res_tpl.location %>
+<% end %>
