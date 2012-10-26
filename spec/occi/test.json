@@ -1,66 +1,30 @@
 {
-    "resources": [
+    "resources":[
         {
-            "links": [
-                {
-                    "kind": "http://schemas.ogf.org/occi/infrastructure#storagelink",
-                    "attributes": {
-                        "occi": {
-                            "core": {
-                                "id": "34cb5bce-d31a-11e1-a11a-a4b197fffef3",
-                                "title": "lamp",
-                                "target": "http://example.com/lamp.vmdk"
-                            }
-                        }
-                    }
-                }
-            ],
-            "kind": "http://schemas.ogf.org/occi/infrastructure#storage",
-            "attributes": {
-                "occi": {
-                    "core": {
-                        "id": "34c88188-d31a-11e1-a11a-a4b197fffef3",
-                        "title": "lamp"
-                    }
-                }
-            }
-        },
-        {
-            "kind": "http://schemas.ogf.org/occi/infrastructure#network",
-            "attributes": {
-                "occi": {
-                    "core": {
-                        "id": "34cb6830-d31a-11e1-a11a-a4b197fffef3",
-                        "title": "VM Network"
-                    }
-                }
-            }
-        },
-        {
-            "links": [
-                {
-                    "kind": "http://schemas.ogf.org/occi/infrastructure#storagelink",
-                    "attributes": {
-                        "occi": {
-                            "core": {
-                                "id": "34cbb948-d31a-11e1-a11a-a4b197fffef3",
-                                "title": "Harddisk 1",
-                                "target": "/storage/34c88188-d31a-11e1-a11a-a4b197fffef3"
-                            }
-                        }
-                    }
-                }
-            ],
-            "kind": "http://schemas.ogf.org/occi/infrastructure#compute",
-            "attributes": {
-                "occi": {
-                    "core": {
-                        "id": "34cb6f60-d31a-11e1-a11a-a4b197fffef3",
-                        "summary": ""
+            "kind":"http://schemas.ogf.org/occi/infrastructure#compute",
+            "attributes":{
+                "occi":{
+                    "core":{
+                        "summary":""
                     },
-                    "compute": {
-                        "cores": 1,
-                        "memory": 256
+                    "compute":{
+                        "cores":1,
+                        "memory":256
+                    }
+                }
+            },
+            "links":["/storagelink/34cbb948-d31a-11e1-a11a-a4b197fffef3"]
+        }
+    ],
+    "links":[
+        {
+            "kind":"http://schemas.ogf.org/occi/infrastructure#storagelink",
+            "attributes":{
+                "occi":{
+                    "core":{
+                        "id":"urn:uuid:34cbb948-d31a-11e1-a11a-a4b197fffef3",
+                        "title":"Harddisk 1",
+                        "target":"/storage/34c88188-d31a-11e1-a11a-a4b197fffef3"
                     }
                 }
             }

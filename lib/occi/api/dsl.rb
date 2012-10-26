@@ -1,8 +1,8 @@
-module OCCI
+module Occi
   module DSL
 
     def connect(*args)
-      @client = OCCI::Client.new(*args)
+      @client = Occi::Client.new(*args)
 
       true
     end
@@ -41,18 +41,6 @@ module OCCI
       check
 
       @client.refresh
-    end
-
-    def storagelink(*args)
-      check
-
-      @client.storagelink(*args)
-    end
-
-    def networkinterface(*args)
-      check
-
-      @client.networkinterface(*args)
     end
 
     ###

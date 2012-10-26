@@ -3,12 +3,11 @@ require 'hashie'
 
 require 'occiantlr/OCCIANTLRParser'
 
-module OCCI
-  module ANTLR
+module OCCIANTLR
     describe Parser do
       describe "#Category" do
         it "is parsed successful" do
-          ATTRIBUTE                       = { :Mutable => true, :Required => false, :Type => "string" }
+          ATTRIBUTE                       = { :mutable => true, :required => false, :type => "string" }
           term                            = 'entity'
           scheme                          = 'http://schemas.ogf.org/occi/core#'
           class_type                      = 'kind'
@@ -16,7 +15,7 @@ module OCCI
           rel                             = ['http://schemas.ogf.org/occi/core#resource#']
           location                        = '/storage/'
           attributes                      = Hashie::Mash.new
-          attributes.occi!.storage!.size  = { :Mutable => false, :Required => false, :Type => "string" }
+          attributes.occi!.storage!.size  = { :mutable => false, :required => false, :type => "string" }
           attributes.occi!.storage!.state = ATTRIBUTE
           attributes_string               = 'occi.storage.size{immutable} occi.storage.state'
           actions                         = Array.new
@@ -42,7 +41,7 @@ module OCCI
           target                                       = '/network/123'
           rel                                          = 'http://schemas.ogf.org/occi/infrastructure#network'
           self_location                                = '/link/networkinterface/456'
-          kind                                     = 'http://schemas.ogf.org/occi/infrastructure#networkinterface'
+          kind                                         = 'http://schemas.ogf.org/occi/infrastructure#networkinterface'
           attributes                                   = Hashie::Mash.new
           attributes.occi!.networkinterface!.interface = 'eth0'
           attributes.occi!.networkinterface!.mac       = '00:11:22:33:44:55'
@@ -54,7 +53,7 @@ module OCCI
           link[:target].should == target
           link[:rel].should == rel
           link[:self].should == self_location
-          link[:kind].should == kind
+          link[:categories].first.should == kind
           link[:attributes].should == attributes
         end
       end
@@ -81,4 +80,3 @@ module OCCI
       end
     end
   end
-end

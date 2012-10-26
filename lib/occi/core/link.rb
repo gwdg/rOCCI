@@ -1,64 +1,64 @@
-require 'hashie/mash'
-require 'occi/core/entity'
-require 'occi/core/kind'
-
-module OCCI
+module Occi
   module Core
     class Link < Entity
 
-      attr_accessor :rel
+      attr_accessor :rel, :source, :target
 
-      # @return [OCCI::Core::Kind] kind definition of Link type
-      def self.kind_definition
-        kind = OCCI::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'link')
+      # @return [Occi::Core::Kind] kind definition of Link type
+      def self.kind
+        kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'link')
 
         kind.related = %w{http://schemas.ogf.org/occi/core#entity}
-        kind.title   = "Link"
+        kind.title   = "link"
 
-        kind.attributes.occi!.core!.target!.Type     = "string"
-        kind.attributes.occi!.core!.target!.Pattern  = ".*"
-        kind.attributes.occi!.core!.target!.Required = false
-        kind.attributes.occi!.core!.target!.Mutable  = true
+        kind.attributes.occi!.core!.target = Occi::Core::AttributeProperties.new(
+            { :mutable => true })
 
-        kind.attributes.occi!.core!.source!.Type     = "string"
-        kind.attributes.occi!.core!.source!.Pattern  = ".*"
-        kind.attributes.occi!.core!.source!.Required = false
-        kind.attributes.occi!.core!.source!.Mutable  = true
+        kind.attributes.occi!.core!.source = Occi::Core::AttributeProperties.new(
+            { :mutable => true })
 
         kind
       end
 
       # @param [String] kind
       # @param [String] mixins
-      # @param [OCCI::Core::Attributes] attributes
-      def initialize(kind, mixins=nil, attributes=nil, actions=nil, rel=nil)
-        super(kind,mixins,attributes,actions)
-        @rel        = rel
+      # @param [Occi::Core::Attributes] attributes
+      # @param [Array] actions
+      # @param [String] rel
+      # @param [String,Occi::Core::Entity] target
+      # @param [String,Occi::Core::Entity] source
+      def initialize(kind, mixins=[], attributes={ }, actions=[], rel=nil, target=nil, source=nil)
+        super(kind, mixins, attributes, actions)
+        @rel = rel if rel
+        self.source = source if source
+        self.target = target
       end
 
       # @return [String] target attribute of the link
       def target
-        self.attributes.occi!.core!.target
+        @target ||= self.attributes.occi.core.target if @attributes.occi.core if @attributes.occi
+        @target
       end
 
       # set target attribute of link
       # @param [String] target
-      def target=(target)
-        self.attributes.occi!.core!.target = target
+      def target=(resource)
+        @target = resource
       end
 
       # @return [String] source attribute of the link
       def source
-        self.attributes.occi!.core!.source
+        @source ||= self.attributes.occi.core.source if @attributes.occi.core if @attributes.occi
+        @source
       end
 
       # set source attribute of link
       # @param [String] source
-      def source=(source)
-        self.attributes.occi!.core!.source = source
+      def source=(resource)
+        @source = resource
       end
 
-      # @param [OCCI::Model] model
+      # @param [Occi::Model] model
       def check(model)
         raise "rel must be provided" unless @rel
         super(model)
@@ -67,23 +67,34 @@ module OCCI
       # @param [Hash] options
       # @return [Hashie::Mash] json representation
       def as_json(options={ })
-        link = Hashie::Mash.new
-        link.kind = @kind if @kind
+        link = super
         link.rel = @rel if @rel
-        link.mixins = @mixins if @mixins.any?
-        link.attributes = @attributes if @attributes.any?
+        link.source = self.source.to_s if self.source.kind_of? String if self.source
+        link.target = self.target.to_s if self.target
         link
       end
 
       # @return [String] text representation of link reference
-      def to_reference_text
-        OCCI::Log.debug "Test"
-        text = '<' + target + '>'
-        text << ';rel=' + @rel.inspect
-        text << ';self=' + self.location
-        text << ';category=' + @kind
-        @attributes.combine.each_pair { |name, value| text << name + '=' + value + ';' }
-        text
+      def to_string
+        string = '<' + self.target.to_s + '>'
+        string << ';rel=' + @rel.inspect
+        string << ';self=' + self.location.inspect if self.location
+        categories = [@kind] + @mixins
+        string << ';category=' + categories.join(' ').inspect
+        string << ';'
+        @attributes.combine.each_pair do |name, value|
+          value = value.inspect
+          string << name + '=' + value + ';'
+        end
+        string << 'occi.core.target=' + self.target.to_s.inspect
+        string << 'occi.core.source=' + self.source.to_s.inspect if self.source.kind_of? String if self.source
+
+        string
+      end
+
+      # @return [String] text representation of link
+      def to_text_link
+        'Link: ' + self.to_string
       end
 
     end

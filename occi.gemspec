@@ -6,7 +6,7 @@ require 'occi/version'
 
 Gem::Specification.new do |gem|
   gem.name          = "occi"
-  gem.version       = OCCI::VERSION
+  gem.version       = Occi::VERSION
   gem.authors       = ["Florian Feldhaus","Piotr Kasprzak"]
   gem.email         = ["florian.feldhaus@gwdg.de", "piotr.kasprzak@gwdg.de"]
   gem.description   = %q{OCCI is a collection of classes to simplify the implementation of the Open Cloud Computing API in Ruby}

@@ -1,7 +1,7 @@
 require 'rspec'
 require 'occi'
 
-module OCCI
+module Occi
   describe Client do
 
     it "should do something" do

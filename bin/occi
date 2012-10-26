@@ -20,127 +20,333 @@ require 'pp'
 require 'highline/import'
 require 'openssl'
 
-# OcciOpts is not part of the occi required above
-require 'occi/client/occiopts'
+# OcciOpts, ResourceOutputFactory and Helper are not part of the occi core required above
+require 'occi/client/occi_opts'
+require 'occi/client/resource_output_factory'
+require 'occi/client/helper'
 
-extend OCCI::DSL
+extend Occi::DSL
 
 # get arguments and validate/parse them to an ostruct
 options = OcciOpts.parse ARGV
 
-# initiate the Logger
-logger = OCCI::Log.new(options.log[:out])
+# initialize logger
+logger = Occi::Log.new(options.log[:out])
 logger.level = options.log[:level]
 options.log[:logger] = logger
 
-OCCI::Log.info "Starting OCCI client ..."
-OCCI::Log.debug "Options: #{options}"
+# initialize output factory
+output = ResourceOutputFactory.new options.output_format
 
-# running with an empty password?
-if options.auth[:password].nil? or options.auth[:user_cert_password].nil?
-  options.auth[:password] = options.auth[:user_cert_password] = ask("Enter password: ") { |q| q.echo = false } unless options.auth[:type] == "none"
+Occi::Log.info "Starting OCCI client ..."
+Occi::Log.debug "Options: #{options}"
+
+# to make the interactive mode completely self-sufficient
+# ask for endpoint and auth method (provide defaults)
+if options.interactive
+  Occi::Log.debug "Checking for endpoint and auth changes ..."
+
+  options.endpoint = ask("What endpoint should I use? ") {
+    |q| q.default = options.endpoint
+  }
+
+  # separate menus
+  say "\n"
+
+  choose do |menu|
+    menu.prompt = "Which auth method should I use? "
+
+    OcciOpts::AUTH_METHODS.each do |auth_m|
+      menu.choice(auth_m) { options.auth[:type] = auth_m.to_s }
+    end
+  end
 end
 
+# running with an empty password, we should ask the user for one
+# if auth method is not "none"
+if options.auth[:password].nil? or options.auth[:user_cert_password].nil?
+  Occi::Log.debug "Password is not set, asking for it now ..."
+
+  say("\n")
+
+  options.auth[:user_cert_password] = ask("Enter password: ") {
+    |q| q.echo = false
+  } unless options.auth[:type] == "none"
+
+  options.auth[:password] = options.auth[:user_cert_password]
+end
+
+# establish a connection before entering the loop
+# this will considerably speed-up the interactive mode and has
+# no effect on the non-interactive one
+begin
+  Occi::Log.info "Establishing a connection to #{options.endpoint} ..."
+  connect options.endpoint, options.auth, options.log, true, options.media_type
+rescue OpenSSL::SSL::SSLError => ssl_ex
+  # generic SSL error raised whilst establishing a connection
+  # possibly an untrusted server cert or invalid user credentials 
+  Occi::Log.error "An SSL error occurred! Please, make sure your credentials " \
+                  "are valid and recognized by the endpoint! Message: #{ssl_ex.message}"
+
+  raise ssl_ex if options.debug
+  exit!
+rescue OpenSSL::PKey::RSAError => key_ex
+  # generic X509 error raised whilst reading user's credentials from a file
+  # possibly a wrong password or mangled/unsupported credential format
+  Occi::Log.error "An X509 error occurred! Please, make sure you are using the " \
+                  "right password and the file contains both your certificate " \
+                  "and your private key! Message: #{key_ex.message}"
+
+  raise key_ex if options.debug
+  exit!
+rescue Errno::ECONNREFUSED
+  # the remote server has refused our connection attempt(s)
+  # there is nothing we can do ...
+  Occi::Log.error "Connection refused!"
+  exit!
+end
+
+# start of the main loop, this part of the code is responsible for
+# interactive menus and actions execution
+# this block will run while options.interactive is True, i.e.
+# only once in the non-interactive mode
 begin
 
-  OCCI::Log.info "Establishing a connection to #{options.endpoint} ..."
-  connect options.endpoint, options.auth, options.log, true, options.media_type
+  # display menus in the interactive mode, there are two main variables
+  # that need to be set here: options.action and options.resource
+  if options.interactive
 
-  OCCI::Log.info "Executing action #{options.action.to_s} on #{options.resource} ..."
+    Occi::Log.debug "Running is an interactive mode ..."
+
+    # reset action and resource, just to be sure
+    options.action = nil
+    options.resource = nil
+
+    # offer just the resource types we will be able to process
+    menu_resources = ResourceOutputFactory.allowed_resource_types
+
+    # separate menus from each other
+    say("\n")
+
+    # first we need an action
+    choose do |menu|
+      menu.prompt = "Please, choose an action: "
+
+      # list action requires a resource type
+      menu.choice(:list) {
+        options.action = :list
+
+        # separate menus from each other
+        say("\n")
+
+        choose do |list_menu|
+          list_menu.prompt = "Which one should I list? "
+
+          menu_resources.each do |menu_resource|
+            list_menu.choice(menu_resource) { options.resource = menu_resource.to_s }
+          end
+
+          list_menu.choice(:back) { options.action = :skip }
+        end
+      }
+
+      # describe action requires a resource type or a resource location
+      menu.choice(:describe) { 
+        options.action = :describe
+
+        # separate menus from each other
+        say("\n")
+
+        # display the resource types first
+        choose do |describe_menu|
+          describe_menu.prompt = "Which one should I describe? "
+
+          menu_resources.each do |menu_resource|
+            describe_menu.choice(menu_resource) {
+              options.resource = menu_resource.to_s
+
+              # separate menus from each other
+              say("\n")
+
+              # display available resources for this resource type
+              choose do |describe_menu_spec|
+                describe_menu_spec.prompt = "Should I describe a specific resource? "
+
+                describe_menu_spec.choice(:all) {
+                  # leave options.resource set to compute/network/storage
+                }
+
+                found = helper_list options
+                found.each do |found_resource|
+                  describe_menu_spec.choice(found_resource.to_sym) { options.resource = found_resource }
+                end
+
+                describe_menu_spec.choice(:back) { options.action = :skip }
+              end unless menu_resource.to_s.reverse.start_with? "lpt_"
+            }
+          end
+
+          describe_menu.choice(:back) { options.action = :skip }
+        end
+      }
+
+      # create action requires resource type, resource title
+      # and optionally mixins (usually two, os_tpl and resource_tpl)
+      menu.choice(:create) {
+        options.action = :create
+
+        # separate menus from each other
+        say("\n")
+
+        # display the resource types
+        choose do |create_menu|
+          create_menu.prompt = "Which one should I create? "
+
+          menu_resources.each do |menu_resource|
+            create_menu.choice(menu_resource) {
+              options.resource = menu_resource.to_s
+            } unless menu_resource.to_s.reverse.start_with? "lpt_"
+          end
+
+          create_menu.choice(:back) { options.action = :skip }
+        end
+
+        # if the user didn't choose "Back", ask for details
+        # TODO: currently only COMPUTE is supported
+        if options.action == :create
+          options.resource_title = ask("What name should I give to the new resource? ")
+          number_of_mixins = ask("How many mixins do you wish me to mix into this resource? ",
+                                  Integer) { |q| q.in = 0..2 }
+
+          options.mixin = {}
+          (1..number_of_mixins).each do |mixin_number|
+            mixin = ask("What mixin should I mix in? ") { |q| q.validate = /\A\w+#\w+\Z/ }
+            parts = mixin.split("#")
+
+            options.mixin[parts[0]] = [] if options.mixin[parts[0]].nil?
+            options.mixin[parts[0]] << parts[1]
+          end
+        end
+      }
+
+      # delete action requires a resource location
+      menu.choice(:delete) {
+        options.action = :delete
+
+        # separate menus from each other
+        say("\n")
+
+        # display the resource types first
+        choose do |delete_menu|
+          delete_menu.prompt = "Please, choose a resource type: "
+
+          menu_resources.each do |menu_resource|
+            delete_menu.choice(menu_resource) {
+
+              # separate menus from each other
+              say("\n")
+
+              # display available resources for this type
+              choose do |delete_menu_spec|
+                delete_menu_spec.prompt = "Which resource should I delete? "
+
+                opts = OpenStruct.new
+                opts.resource = menu_resource.to_s
+
+                found = helper_list opts
+                found.each do |found_resource|
+                  delete_menu_spec.choice(found_resource.to_sym) { options.resource = found_resource }
+                end
+
+                delete_menu_spec.choice(:back) { options.action = :skip }
+              end unless menu_resource.to_s.reverse.start_with? "lpt_"
+            } unless menu_resource.to_s.reverse.start_with? "lpt_"
+          end
+
+          delete_menu.choice(:back) { options.action = :skip }
+        end
+      }
+
+      # TODO: trigger is not yet implemented
+      menu.choice(:trigger) {
+        options.action = :skip
+        say("Not implemented yet!")
+      }
+
+      # refresh the OCCI model structures without exiting/re-launching
+      # the client, useful when adding new os_tpls/resource_tpls on
+      # the server
+      menu.choice(:refresh) {
+        options.action = :refresh
+      }
+
+      # enough is enough, bye!
+      menu.choice(:quit) {
+        say("Good bye!")
+        exit!(true)
+      }
+    end
+  end
+
+  Occi::Log.info "Executing action #{options.action.to_s} on #{options.resource} ..."
+
+  # call the appropriate helper and then format its output
   case options.action
   when :list
+    found = helper_list options
 
-    if resource_types.include? options.resource or resource_type_identifiers.include? options.resource
-      pp list options.resource
-    elsif mixin_types.include? options.resource
-      pp mixins options.resource
-    elsif mixin_type_identifiers.include? options.resource
-      pp mixins options.resource.split('#').last
-    else 
-      puts "Unknown resource #{options.resource}, there is nothing to list here!"
-    end
+    valid = ResourceOutputFactory.allowed_resource_types.include? options.resource.to_sym
+    Occi::Log.error "Not printing, the resource type is not supported!" unless valid
 
+    puts output.format(found, :locations, options.resource.to_sym) if valid
   when :describe
+    found = helper_describe options
 
-    if resource_types.include? options.resource or resource_type_identifiers.include? options.resource or options.resource.start_with? options.endpoint
-      pp describe options.resource
-    elsif mixin_types.include? options.resource
-      mixins(options.resource).each do |mxn|
-        mxn = mxn.split("#").last
-        pp mixin(mxn, options.resource, true)
-      end
-    elsif mixin_type_identifiers.include? options.resource
-      mixins(options.resource.split('#').last).each do |mxn|
-        mxn = mxn.split("#").last
-        pp mixin(mxn, options.resource, true)
-      end
-    elsif mixins.include? options.resource
-      mxn_type,mxn = options.resource.split("/").last.split('#')
-      pp mixin(mxn, mxn_type, true)
+    if options.resource.start_with? options.endpoint
+      resource_type = options.resource.split("/")[3].to_sym
     elsif mixin_types.include? options.resource.split('#').first
-      mxn_type,mxn = options.resource.split('#')
-      pp mixin(mxn, mxn_type, true)
+      resource_type = options.resource.split('#').first.to_sym
     else
-      puts "Unknown resource #{options.resource}, there is nothing to describe here!"
+      resource_type = options.resource.to_sym
     end
 
+    valid = ResourceOutputFactory.allowed_resource_types.include? resource_type
+    Occi::Log.error "Not printing, the resource type is not supported!" unless valid
+
+    puts output.format(found, :resources, resource_type) if valid
   when :create
-    
-    if resource_types.include? options.resource or resource_type_identifiers.include? options.resource
-      raise "Not yet implemented!" unless options.resource.include? "compute"
-      
-      res = resource options.resource
-
-      OCCI::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
-      OCCI::Log.debug "with mixins:#{options.mixin}"
-      
-      options.mixin.keys.each do |type|
-        OCCI::Log.debug "Adding mixins of type #{type} to #{options.resource}"
-        options.mixin[type].each do |name|
-          mxn = mixin name, type
-
-          raise "Unknown mixin #{type}##{name}, stopping here!" if mxn.nil?
-          OCCI::Log.debug "Adding mixin #{mxn} to #{options.resource}"
-          res.mixins << mxn
-        end
-      end
-
-      #TODO: set other attributes
-      res.attributes.occi!.core!.title = options.resource_title
-
-      puts create res
-    else
-      puts "Unknown resource #{options.resource}, there is nothing to create here!"
-    end
-
+    location = helper_create options
+    puts location
   when :delete
-    result = delete options.resource
-
+    result = helper_delete options
+    
     if result
       puts "Resource #{options.resource} successfully removed!"
     else
       puts "Failed to remove resource #{options.resource}!"
     end
   when :trigger
-    raise "Not yet implemented!"
+    helper_trigger options
+  when :refresh
+    refresh
+  when :skip
+    Occi::Log.info "Skipping this action, probably not implemented yet!"
   else
     raise "Unknown action [#{options.action}]!"
   end
 
-rescue OpenSSL::SSL::SSLError => ssl_ex
-  OCCI::Log.error "An SSL Auth Error occurred! Please, make sure your credentials are valid and the endpoind is trusted! Message: #{ssl_ex.message}"
-  raise ssl_ex if options.debug
-  exit!
-rescue OpenSSL::PKey::RSAError => key_ex
-  OCCI::Log.error "An X509 Error occurred! Please, check your credentials! Message: #{key_ex.message}"
-  raise key_ex if options.debug
+rescue Errno::ECONNREFUSED
+  # remote server refused our connection attempt(s)
+  # even though initial connect was successful
+  Occi::Log.error "Connection refused!"
   exit!
 rescue Exception => ex
-  OCCI::Log.error "An error occurred! Message: #{ex.message}"
+  # something went wrong during the execution
+  # hide the stack trace in non-debug modes
+  Occi::Log.error "An error occurred! Message: #{ex.message}"
+  
   raise ex if options.debug
   exit!
-end
+end while options.interactive
 
-OCCI::Log.info "OCCI client is shutting down ..."
-
-exit!(true)
+Occi::Log.info "OCCI client is shutting down ..."

@@ -14,13 +14,13 @@ CA_PATH            = '/etc/grid-security/certificates'
 ENDPOINT           = 'https://localhost:3300'
 
 ## get an OCCI::Client instance
-client = OCCI::Client.new(ENDPOINT,
+client = Occi::Client.new(ENDPOINT,
         { :type               => "x509",
           :user_cert          => USER_CERT,
           :user_cert_password => USER_CERT_PASSWORD,
           :ca_path            => CA_PATH },
         { :out   => STDERR,
-          :level => OCCI::Log::DEBUG })
+          :level => Occi::Log::DEBUG })
 
 puts "\n\nListing all available resource types:"
 client.get_resource_types.each do |type|
@@ -111,8 +111,8 @@ unless use_os_temlate
 
   ## create links and attach them to the compure resource
   puts "\n Connecting to our compute:"
-  client.storagelink cmpt, storage_loc
-  client.networkinterface cmpt, network_loc
+  cmpt.storagelink storage_loc
+  cmpt.networkinterface network_loc
 else
   ## with OS template, we have to find the template by name
   ## optionally we can change its "size" by choosing an instance type
@@ -123,7 +123,7 @@ else
   ## attach chosen resources to the compute resource
   cmpt.mixins << os << size
   ## we can change some of the values manually
-  cmpt.attributes.occi!.core!.title = "My rOCCI x509 VM"
+  cmpt.title = "My rOCCI x509 VM"
 end
 
 ## create the compute resource and print its location

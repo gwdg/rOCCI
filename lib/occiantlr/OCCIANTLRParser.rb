@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: OCCIANTLR.g
-# Generated at: 2012-09-10 16:19:48
+# Generated at: 2012-10-05 18:10:39
 # 
 
 # ~~~> start load path setup
@@ -62,7 +62,7 @@ end
  
 	require 'uri' 
 	require 'hashie'
-	ATTRIBUTE = { :Mutable => true, :Required => false, :Type => "string" }
+	ATTRIBUTE = { :mutable => true, :required => false, :type => "string" }
 
 # - - - - - - end action @parser::header - - - - - - -
 
@@ -935,7 +935,7 @@ module OCCIANTLR
 
         end
         # --> action
-         hash[:kind] = link_category20 
+         hash[:categories] = link_category20 
         # <-- action
         @state.following.push( TOKENS_FOLLOWING_link_attributes_IN_link_value_558 )
         link_attributes21 = link_attributes
@@ -1131,18 +1131,21 @@ module OCCIANTLR
     # parser rule link_category
     # 
     # (in OCCIANTLR.g)
-    # 83:2: link_category returns [value] : SEMICOLON ( WS )? CATEGORY EQUALS QUOTE uri QUOTE ;
+    # 83:2: link_category returns [array] : SEMICOLON ( WS )? CATEGORY EQUALS QUOTE kind= uri ( WS mixin= uri )* QUOTE ;
     # 
     def link_category
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 16 )
-      value = nil
-      uri25 = nil
+      array = nil
+      kind = nil
+      mixin = nil
+      # - - - - @init action - - - -
+      array = Array.new
 
       begin
-        # at line 83:35: SEMICOLON ( WS )? CATEGORY EQUALS QUOTE uri QUOTE
-        match( SEMICOLON, TOKENS_FOLLOWING_SEMICOLON_IN_link_category_664 )
-        # at line 83:45: ( WS )?
+        # at line 84:36: SEMICOLON ( WS )? CATEGORY EQUALS QUOTE kind= uri ( WS mixin= uri )* QUOTE
+        match( SEMICOLON, TOKENS_FOLLOWING_SEMICOLON_IN_link_category_702 )
+        # at line 84:46: ( WS )?
         alt_23 = 2
         look_23_0 = @input.peek( 1 )
 
@@ -1151,20 +1154,44 @@ module OCCIANTLR
         end
         case alt_23
         when 1
-          # at line 83:45: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_link_category_666 )
+          # at line 84:46: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_link_category_704 )
 
         end
-        match( CATEGORY, TOKENS_FOLLOWING_CATEGORY_IN_link_category_669 )
-        match( EQUALS, TOKENS_FOLLOWING_EQUALS_IN_link_category_671 )
-        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_link_category_673 )
-        @state.following.push( TOKENS_FOLLOWING_uri_IN_link_category_675 )
-        uri25 = uri
+        match( CATEGORY, TOKENS_FOLLOWING_CATEGORY_IN_link_category_707 )
+        match( EQUALS, TOKENS_FOLLOWING_EQUALS_IN_link_category_709 )
+        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_link_category_711 )
+        @state.following.push( TOKENS_FOLLOWING_uri_IN_link_category_715 )
+        kind = uri
         @state.following.pop
-        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_link_category_677 )
         # --> action
-         value = ( uri25 && @input.to_s( uri25.start, uri25.stop ) ) 
+         array << ( kind && @input.to_s( kind.start, kind.stop ) ) 
         # <-- action
+        # at line 84:105: ( WS mixin= uri )*
+        while true # decision 24
+          alt_24 = 2
+          look_24_0 = @input.peek( 1 )
+
+          if ( look_24_0 == WS )
+            alt_24 = 1
+
+          end
+          case alt_24
+          when 1
+            # at line 84:106: WS mixin= uri
+            match( WS, TOKENS_FOLLOWING_WS_IN_link_category_720 )
+            @state.following.push( TOKENS_FOLLOWING_uri_IN_link_category_724 )
+            mixin = uri
+            @state.following.pop
+            # --> action
+             array << ( mixin && @input.to_s( mixin.start, mixin.stop ) ) 
+            # <-- action
+
+          else
+            break # out of loop for decision 24
+          end
+        end # loop for decision 24
+        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_link_category_730 )
 
       rescue ANTLR3::Error::RecognitionError => re
         report_error(re)
@@ -1176,7 +1203,7 @@ module OCCIANTLR
 
       end
       
-      return value
+      return array
     end
 
 
@@ -1184,60 +1211,60 @@ module OCCIANTLR
     # parser rule link_attributes
     # 
     # (in OCCIANTLR.g)
-    # 84:2: link_attributes returns [hash] : ( SEMICOLON ( WS )? attribute )* ;
+    # 85:2: link_attributes returns [hash] : ( SEMICOLON ( WS )? attribute )* ;
     # 
     def link_attributes
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 17 )
       hash = nil
-      attribute26 = nil
+      attribute25 = nil
       # - - - - @init action - - - -
-       hash = Hashie::Mash.new 
+      hash = Hashie::Mash.new
 
       begin
-        # at line 85:8: ( SEMICOLON ( WS )? attribute )*
-        # at line 85:8: ( SEMICOLON ( WS )? attribute )*
-        while true # decision 25
-          alt_25 = 2
-          look_25_0 = @input.peek( 1 )
+        # at line 86:8: ( SEMICOLON ( WS )? attribute )*
+        # at line 86:8: ( SEMICOLON ( WS )? attribute )*
+        while true # decision 26
+          alt_26 = 2
+          look_26_0 = @input.peek( 1 )
 
-          if ( look_25_0 == SEMICOLON )
-            look_25_1 = @input.peek( 2 )
+          if ( look_26_0 == SEMICOLON )
+            look_26_1 = @input.peek( 2 )
 
-            if ( look_25_1.between?( WS, SCHEME ) || look_25_1.between?( CLASS, ACTIONS ) || look_25_1.between?( SELF, CATEGORY ) || look_25_1 == LOALPHA || look_25_1.between?( KIND, ACTION ) || look_25_1.between?( LINK, TERM ) )
-              alt_25 = 1
+            if ( look_26_1.between?( WS, SCHEME ) || look_26_1.between?( CLASS, ACTIONS ) || look_26_1.between?( SELF, CATEGORY ) || look_26_1 == LOALPHA || look_26_1.between?( KIND, ACTION ) || look_26_1.between?( LINK, TERM ) )
+              alt_26 = 1
 
             end
 
           end
-          case alt_25
+          case alt_26
           when 1
-            # at line 85:9: SEMICOLON ( WS )? attribute
-            match( SEMICOLON, TOKENS_FOLLOWING_SEMICOLON_IN_link_attributes_703 )
-            # at line 85:19: ( WS )?
-            alt_24 = 2
-            look_24_0 = @input.peek( 1 )
+            # at line 86:9: SEMICOLON ( WS )? attribute
+            match( SEMICOLON, TOKENS_FOLLOWING_SEMICOLON_IN_link_attributes_754 )
+            # at line 86:19: ( WS )?
+            alt_25 = 2
+            look_25_0 = @input.peek( 1 )
 
-            if ( look_24_0 == WS )
-              alt_24 = 1
+            if ( look_25_0 == WS )
+              alt_25 = 1
             end
-            case alt_24
+            case alt_25
             when 1
-              # at line 85:19: WS
-              match( WS, TOKENS_FOLLOWING_WS_IN_link_attributes_705 )
+              # at line 86:19: WS
+              match( WS, TOKENS_FOLLOWING_WS_IN_link_attributes_756 )
 
             end
-            @state.following.push( TOKENS_FOLLOWING_attribute_IN_link_attributes_708 )
-            attribute26 = attribute
+            @state.following.push( TOKENS_FOLLOWING_attribute_IN_link_attributes_759 )
+            attribute25 = attribute
             @state.following.pop
             # --> action
-             hash.merge!(attribute26) 
+             hash.merge!(attribute25) 
             # <-- action
 
           else
-            break # out of loop for decision 25
+            break # out of loop for decision 26
           end
-        end # loop for decision 25
+        end # loop for decision 26
 
       rescue ANTLR3::Error::RecognitionError => re
         report_error(re)
@@ -1257,49 +1284,49 @@ module OCCIANTLR
     # parser rule x_occi_attribute
     # 
     # (in OCCIANTLR.g)
-    # 97:1: x_occi_attribute returns [hash] : X_OCCI_ATTRIBUTE_KEY COLON ( WS )? attribute ( SEMICOLON )? ;
+    # 98:1: x_occi_attribute returns [hash] : X_OCCI_ATTRIBUTE_KEY COLON ( WS )? attribute ( SEMICOLON )? ;
     # 
     def x_occi_attribute
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 18 )
       hash = nil
-      attribute27 = nil
+      attribute26 = nil
 
       begin
-        # at line 98:4: X_OCCI_ATTRIBUTE_KEY COLON ( WS )? attribute ( SEMICOLON )?
-        match( X_OCCI_ATTRIBUTE_KEY, TOKENS_FOLLOWING_X_OCCI_ATTRIBUTE_KEY_IN_x_occi_attribute_729 )
-        match( COLON, TOKENS_FOLLOWING_COLON_IN_x_occi_attribute_731 )
-        # at line 98:31: ( WS )?
-        alt_26 = 2
-        look_26_0 = @input.peek( 1 )
-
-        if ( look_26_0 == WS )
-          alt_26 = 1
-        end
-        case alt_26
-        when 1
-          # at line 98:31: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_x_occi_attribute_733 )
-
-        end
-        @state.following.push( TOKENS_FOLLOWING_attribute_IN_x_occi_attribute_736 )
-        attribute27 = attribute
-        @state.following.pop
-        # at line 98:45: ( SEMICOLON )?
+        # at line 99:4: X_OCCI_ATTRIBUTE_KEY COLON ( WS )? attribute ( SEMICOLON )?
+        match( X_OCCI_ATTRIBUTE_KEY, TOKENS_FOLLOWING_X_OCCI_ATTRIBUTE_KEY_IN_x_occi_attribute_780 )
+        match( COLON, TOKENS_FOLLOWING_COLON_IN_x_occi_attribute_782 )
+        # at line 99:31: ( WS )?
         alt_27 = 2
         look_27_0 = @input.peek( 1 )
 
-        if ( look_27_0 == SEMICOLON )
+        if ( look_27_0 == WS )
           alt_27 = 1
         end
         case alt_27
         when 1
-          # at line 98:45: SEMICOLON
-          match( SEMICOLON, TOKENS_FOLLOWING_SEMICOLON_IN_x_occi_attribute_738 )
+          # at line 99:31: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_x_occi_attribute_784 )
+
+        end
+        @state.following.push( TOKENS_FOLLOWING_attribute_IN_x_occi_attribute_787 )
+        attribute26 = attribute
+        @state.following.pop
+        # at line 99:45: ( SEMICOLON )?
+        alt_28 = 2
+        look_28_0 = @input.peek( 1 )
+
+        if ( look_28_0 == SEMICOLON )
+          alt_28 = 1
+        end
+        case alt_28
+        when 1
+          # at line 99:45: SEMICOLON
+          match( SEMICOLON, TOKENS_FOLLOWING_SEMICOLON_IN_x_occi_attribute_789 )
 
         end
         # --> action
-         hash = attribute27 
+         hash = attribute26 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -1320,49 +1347,49 @@ module OCCIANTLR
     # parser rule x_occi_location
     # 
     # (in OCCIANTLR.g)
-    # 106:1: x_occi_location returns [location] : X_OCCI_LOCATION_KEY COLON ( WS )? uri ( SEMICOLON )? ;
+    # 107:1: x_occi_location returns [location] : X_OCCI_LOCATION_KEY COLON ( WS )? uri ( SEMICOLON )? ;
     # 
     def x_occi_location
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 19 )
       location = nil
-      uri28 = nil
+      uri27 = nil
 
       begin
-        # at line 107:4: X_OCCI_LOCATION_KEY COLON ( WS )? uri ( SEMICOLON )?
-        match( X_OCCI_LOCATION_KEY, TOKENS_FOLLOWING_X_OCCI_LOCATION_KEY_IN_x_occi_location_758 )
-        match( COLON, TOKENS_FOLLOWING_COLON_IN_x_occi_location_760 )
-        # at line 107:30: ( WS )?
-        alt_28 = 2
-        look_28_0 = @input.peek( 1 )
-
-        if ( look_28_0 == WS )
-          alt_28 = 1
-        end
-        case alt_28
-        when 1
-          # at line 107:30: WS
-          match( WS, TOKENS_FOLLOWING_WS_IN_x_occi_location_762 )
-
-        end
-        @state.following.push( TOKENS_FOLLOWING_uri_IN_x_occi_location_765 )
-        uri28 = uri
-        @state.following.pop
-        # at line 107:38: ( SEMICOLON )?
+        # at line 108:4: X_OCCI_LOCATION_KEY COLON ( WS )? uri ( SEMICOLON )?
+        match( X_OCCI_LOCATION_KEY, TOKENS_FOLLOWING_X_OCCI_LOCATION_KEY_IN_x_occi_location_809 )
+        match( COLON, TOKENS_FOLLOWING_COLON_IN_x_occi_location_811 )
+        # at line 108:30: ( WS )?
         alt_29 = 2
         look_29_0 = @input.peek( 1 )
 
-        if ( look_29_0 == SEMICOLON )
+        if ( look_29_0 == WS )
           alt_29 = 1
         end
         case alt_29
         when 1
-          # at line 107:38: SEMICOLON
-          match( SEMICOLON, TOKENS_FOLLOWING_SEMICOLON_IN_x_occi_location_767 )
+          # at line 108:30: WS
+          match( WS, TOKENS_FOLLOWING_WS_IN_x_occi_location_813 )
+
+        end
+        @state.following.push( TOKENS_FOLLOWING_uri_IN_x_occi_location_816 )
+        uri27 = uri
+        @state.following.pop
+        # at line 108:38: ( SEMICOLON )?
+        alt_30 = 2
+        look_30_0 = @input.peek( 1 )
+
+        if ( look_30_0 == SEMICOLON )
+          alt_30 = 1
+        end
+        case alt_30
+        when 1
+          # at line 108:38: SEMICOLON
+          match( SEMICOLON, TOKENS_FOLLOWING_SEMICOLON_IN_x_occi_location_818 )
 
         end
         # --> action
-         location = URI.parse(( uri28 && @input.to_s( uri28.start, uri28.stop ) )) 
+         location = URI.parse(( uri27 && @input.to_s( uri27.start, uri27.stop ) )) 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -1384,7 +1411,7 @@ module OCCIANTLR
     # parser rule uri
     # 
     # (in OCCIANTLR.g)
-    # 109:1: uri : ( LOALPHA | UPALPHA | DIGIT | AT | COLON | PERCENT | UNDERSCORE | BACKSLASH | PLUS | DOT | TILDE | HASH | QUESTION | AMPERSAND | SLASH | EQUALS | DASH | X_OCCI_ATTRIBUTE_KEY | X_OCCI_LOCATION_KEY | reserved_words )+ ;
+    # 110:1: uri : ( LOALPHA | UPALPHA | DIGIT | AT | COLON | PERCENT | UNDERSCORE | BACKSLASH | PLUS | DOT | TILDE | HASH | QUESTION | AMPERSAND | SLASH | EQUALS | DASH | X_OCCI_ATTRIBUTE_KEY | X_OCCI_LOCATION_KEY | reserved_words )+ ;
     # 
     def uri
       # -> uncomment the next line to manually enable rule tracing
@@ -1395,124 +1422,124 @@ module OCCIANTLR
       return_value.start = @input.look
 
       begin
-        # at line 109:9: ( LOALPHA | UPALPHA | DIGIT | AT | COLON | PERCENT | UNDERSCORE | BACKSLASH | PLUS | DOT | TILDE | HASH | QUESTION | AMPERSAND | SLASH | EQUALS | DASH | X_OCCI_ATTRIBUTE_KEY | X_OCCI_LOCATION_KEY | reserved_words )+
-        # at file 109:9: ( LOALPHA | UPALPHA | DIGIT | AT | COLON | PERCENT | UNDERSCORE | BACKSLASH | PLUS | DOT | TILDE | HASH | QUESTION | AMPERSAND | SLASH | EQUALS | DASH | X_OCCI_ATTRIBUTE_KEY | X_OCCI_LOCATION_KEY | reserved_words )+
-        match_count_30 = 0
+        # at line 110:9: ( LOALPHA | UPALPHA | DIGIT | AT | COLON | PERCENT | UNDERSCORE | BACKSLASH | PLUS | DOT | TILDE | HASH | QUESTION | AMPERSAND | SLASH | EQUALS | DASH | X_OCCI_ATTRIBUTE_KEY | X_OCCI_LOCATION_KEY | reserved_words )+
+        # at file 110:9: ( LOALPHA | UPALPHA | DIGIT | AT | COLON | PERCENT | UNDERSCORE | BACKSLASH | PLUS | DOT | TILDE | HASH | QUESTION | AMPERSAND | SLASH | EQUALS | DASH | X_OCCI_ATTRIBUTE_KEY | X_OCCI_LOCATION_KEY | reserved_words )+
+        match_count_31 = 0
         while true
-          alt_30 = 21
-          case look_30 = @input.peek( 1 )
-          when LOALPHA then alt_30 = 1
-          when UPALPHA then alt_30 = 2
-          when DIGIT then alt_30 = 3
-          when AT then alt_30 = 4
-          when COLON then alt_30 = 5
-          when PERCENT then alt_30 = 6
-          when UNDERSCORE then alt_30 = 7
-          when BACKSLASH then alt_30 = 8
-          when PLUS then alt_30 = 9
-          when DOT then alt_30 = 10
-          when TILDE then alt_30 = 11
-          when HASH then alt_30 = 12
-          when QUESTION then alt_30 = 13
-          when AMPERSAND then alt_30 = 14
-          when SLASH then alt_30 = 15
-          when EQUALS then alt_30 = 16
-          when DASH then alt_30 = 17
-          when X_OCCI_ATTRIBUTE_KEY then alt_30 = 18
-          when X_OCCI_LOCATION_KEY then alt_30 = 19
-          when SCHEME, CLASS, TITLE, REL, LOCATION, ATTRIBUTES, ACTIONS, SELF, CATEGORY, KIND, MIXIN, ACTION, LINK, TERM then alt_30 = 20
+          alt_31 = 21
+          case look_31 = @input.peek( 1 )
+          when LOALPHA then alt_31 = 1
+          when UPALPHA then alt_31 = 2
+          when DIGIT then alt_31 = 3
+          when AT then alt_31 = 4
+          when COLON then alt_31 = 5
+          when PERCENT then alt_31 = 6
+          when UNDERSCORE then alt_31 = 7
+          when BACKSLASH then alt_31 = 8
+          when PLUS then alt_31 = 9
+          when DOT then alt_31 = 10
+          when TILDE then alt_31 = 11
+          when HASH then alt_31 = 12
+          when QUESTION then alt_31 = 13
+          when AMPERSAND then alt_31 = 14
+          when SLASH then alt_31 = 15
+          when EQUALS then alt_31 = 16
+          when DASH then alt_31 = 17
+          when X_OCCI_ATTRIBUTE_KEY then alt_31 = 18
+          when X_OCCI_LOCATION_KEY then alt_31 = 19
+          when SCHEME, CLASS, TITLE, REL, LOCATION, ATTRIBUTES, ACTIONS, SELF, CATEGORY, KIND, MIXIN, ACTION, LINK, TERM then alt_31 = 20
           end
-          case alt_30
+          case alt_31
           when 1
-            # at line 109:11: LOALPHA
-            match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_uri_783 )
+            # at line 110:11: LOALPHA
+            match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_uri_834 )
 
           when 2
-            # at line 109:21: UPALPHA
-            match( UPALPHA, TOKENS_FOLLOWING_UPALPHA_IN_uri_787 )
+            # at line 110:21: UPALPHA
+            match( UPALPHA, TOKENS_FOLLOWING_UPALPHA_IN_uri_838 )
 
           when 3
-            # at line 109:31: DIGIT
-            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_uri_791 )
+            # at line 110:31: DIGIT
+            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_uri_842 )
 
           when 4
-            # at line 109:39: AT
-            match( AT, TOKENS_FOLLOWING_AT_IN_uri_795 )
+            # at line 110:39: AT
+            match( AT, TOKENS_FOLLOWING_AT_IN_uri_846 )
 
           when 5
-            # at line 109:44: COLON
-            match( COLON, TOKENS_FOLLOWING_COLON_IN_uri_799 )
+            # at line 110:44: COLON
+            match( COLON, TOKENS_FOLLOWING_COLON_IN_uri_850 )
 
           when 6
-            # at line 109:52: PERCENT
-            match( PERCENT, TOKENS_FOLLOWING_PERCENT_IN_uri_803 )
+            # at line 110:52: PERCENT
+            match( PERCENT, TOKENS_FOLLOWING_PERCENT_IN_uri_854 )
 
           when 7
-            # at line 109:62: UNDERSCORE
-            match( UNDERSCORE, TOKENS_FOLLOWING_UNDERSCORE_IN_uri_807 )
+            # at line 110:62: UNDERSCORE
+            match( UNDERSCORE, TOKENS_FOLLOWING_UNDERSCORE_IN_uri_858 )
 
           when 8
-            # at line 109:75: BACKSLASH
-            match( BACKSLASH, TOKENS_FOLLOWING_BACKSLASH_IN_uri_811 )
+            # at line 110:75: BACKSLASH
+            match( BACKSLASH, TOKENS_FOLLOWING_BACKSLASH_IN_uri_862 )
 
           when 9
-            # at line 109:87: PLUS
-            match( PLUS, TOKENS_FOLLOWING_PLUS_IN_uri_815 )
+            # at line 110:87: PLUS
+            match( PLUS, TOKENS_FOLLOWING_PLUS_IN_uri_866 )
 
           when 10
-            # at line 109:94: DOT
-            match( DOT, TOKENS_FOLLOWING_DOT_IN_uri_819 )
+            # at line 110:94: DOT
+            match( DOT, TOKENS_FOLLOWING_DOT_IN_uri_870 )
 
           when 11
-            # at line 109:100: TILDE
-            match( TILDE, TOKENS_FOLLOWING_TILDE_IN_uri_823 )
+            # at line 110:100: TILDE
+            match( TILDE, TOKENS_FOLLOWING_TILDE_IN_uri_874 )
 
           when 12
-            # at line 109:108: HASH
-            match( HASH, TOKENS_FOLLOWING_HASH_IN_uri_827 )
+            # at line 110:108: HASH
+            match( HASH, TOKENS_FOLLOWING_HASH_IN_uri_878 )
 
           when 13
-            # at line 109:115: QUESTION
-            match( QUESTION, TOKENS_FOLLOWING_QUESTION_IN_uri_831 )
+            # at line 110:115: QUESTION
+            match( QUESTION, TOKENS_FOLLOWING_QUESTION_IN_uri_882 )
 
           when 14
-            # at line 109:126: AMPERSAND
-            match( AMPERSAND, TOKENS_FOLLOWING_AMPERSAND_IN_uri_835 )
+            # at line 110:126: AMPERSAND
+            match( AMPERSAND, TOKENS_FOLLOWING_AMPERSAND_IN_uri_886 )
 
           when 15
-            # at line 109:138: SLASH
-            match( SLASH, TOKENS_FOLLOWING_SLASH_IN_uri_839 )
+            # at line 110:138: SLASH
+            match( SLASH, TOKENS_FOLLOWING_SLASH_IN_uri_890 )
 
           when 16
-            # at line 109:146: EQUALS
-            match( EQUALS, TOKENS_FOLLOWING_EQUALS_IN_uri_843 )
+            # at line 110:146: EQUALS
+            match( EQUALS, TOKENS_FOLLOWING_EQUALS_IN_uri_894 )
 
           when 17
-            # at line 109:155: DASH
-            match( DASH, TOKENS_FOLLOWING_DASH_IN_uri_847 )
+            # at line 110:155: DASH
+            match( DASH, TOKENS_FOLLOWING_DASH_IN_uri_898 )
 
           when 18
-            # at line 109:162: X_OCCI_ATTRIBUTE_KEY
-            match( X_OCCI_ATTRIBUTE_KEY, TOKENS_FOLLOWING_X_OCCI_ATTRIBUTE_KEY_IN_uri_851 )
+            # at line 110:162: X_OCCI_ATTRIBUTE_KEY
+            match( X_OCCI_ATTRIBUTE_KEY, TOKENS_FOLLOWING_X_OCCI_ATTRIBUTE_KEY_IN_uri_902 )
 
           when 19
-            # at line 109:185: X_OCCI_LOCATION_KEY
-            match( X_OCCI_LOCATION_KEY, TOKENS_FOLLOWING_X_OCCI_LOCATION_KEY_IN_uri_855 )
+            # at line 110:185: X_OCCI_LOCATION_KEY
+            match( X_OCCI_LOCATION_KEY, TOKENS_FOLLOWING_X_OCCI_LOCATION_KEY_IN_uri_906 )
 
           when 20
-            # at line 109:207: reserved_words
-            @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_uri_859 )
+            # at line 110:207: reserved_words
+            @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_uri_910 )
             reserved_words
             @state.following.pop
 
           else
-            match_count_30 > 0 and break
-            eee = EarlyExit(30)
+            match_count_31 > 0 and break
+            eee = EarlyExit(31)
 
 
             raise eee
           end
-          match_count_30 += 1
+          match_count_31 += 1
         end
 
         # - - - - - - - rule clean up - - - - - - - -
@@ -1537,7 +1564,7 @@ module OCCIANTLR
     # parser rule term
     # 
     # (in OCCIANTLR.g)
-    # 110:1: term : ( LOALPHA | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )* ;
+    # 111:1: term : ( LOALPHA | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )* ;
     # 
     def term
       # -> uncomment the next line to manually enable rule tracing
@@ -1548,72 +1575,72 @@ module OCCIANTLR
       return_value.start = @input.look
 
       begin
-        # at line 110:10: ( LOALPHA | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )*
-        # at line 110:10: ( LOALPHA | reserved_words )
-        alt_31 = 2
-        look_31_0 = @input.peek( 1 )
+        # at line 111:10: ( LOALPHA | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )*
+        # at line 111:10: ( LOALPHA | reserved_words )
+        alt_32 = 2
+        look_32_0 = @input.peek( 1 )
 
-        if ( look_31_0 == LOALPHA )
-          alt_31 = 1
-        elsif ( look_31_0 == SCHEME || look_31_0.between?( CLASS, ACTIONS ) || look_31_0.between?( SELF, CATEGORY ) || look_31_0.between?( KIND, ACTION ) || look_31_0.between?( LINK, TERM ) )
-          alt_31 = 2
+        if ( look_32_0 == LOALPHA )
+          alt_32 = 1
+        elsif ( look_32_0 == SCHEME || look_32_0.between?( CLASS, ACTIONS ) || look_32_0.between?( SELF, CATEGORY ) || look_32_0.between?( KIND, ACTION ) || look_32_0.between?( LINK, TERM ) )
+          alt_32 = 2
         else
-          raise NoViableAlternative( "", 31, 0 )
+          raise NoViableAlternative( "", 32, 0 )
         end
-        case alt_31
+        case alt_32
         when 1
-          # at line 110:12: LOALPHA
-          match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_term_872 )
+          # at line 111:12: LOALPHA
+          match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_term_923 )
 
         when 2
-          # at line 110:22: reserved_words
-          @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_term_876 )
+          # at line 111:22: reserved_words
+          @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_term_927 )
           reserved_words
           @state.following.pop
 
         end
-        # at line 110:39: ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )*
-        while true # decision 32
-          alt_32 = 7
-          case look_32 = @input.peek( 1 )
-          when LOALPHA then alt_32 = 1
-          when DIGIT then alt_32 = 2
-          when DASH then alt_32 = 3
-          when UNDERSCORE then alt_32 = 4
-          when DOT then alt_32 = 5
-          when SCHEME, CLASS, TITLE, REL, LOCATION, ATTRIBUTES, ACTIONS, SELF, CATEGORY, KIND, MIXIN, ACTION, LINK, TERM then alt_32 = 6
+        # at line 111:39: ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )*
+        while true # decision 33
+          alt_33 = 7
+          case look_33 = @input.peek( 1 )
+          when LOALPHA then alt_33 = 1
+          when DIGIT then alt_33 = 2
+          when DASH then alt_33 = 3
+          when UNDERSCORE then alt_33 = 4
+          when DOT then alt_33 = 5
+          when SCHEME, CLASS, TITLE, REL, LOCATION, ATTRIBUTES, ACTIONS, SELF, CATEGORY, KIND, MIXIN, ACTION, LINK, TERM then alt_33 = 6
           end
-          case alt_32
+          case alt_33
           when 1
-            # at line 110:41: LOALPHA
-            match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_term_882 )
+            # at line 111:41: LOALPHA
+            match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_term_933 )
 
           when 2
-            # at line 110:51: DIGIT
-            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_term_886 )
+            # at line 111:51: DIGIT
+            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_term_937 )
 
           when 3
-            # at line 110:59: DASH
-            match( DASH, TOKENS_FOLLOWING_DASH_IN_term_890 )
+            # at line 111:59: DASH
+            match( DASH, TOKENS_FOLLOWING_DASH_IN_term_941 )
 
           when 4
-            # at line 110:66: UNDERSCORE
-            match( UNDERSCORE, TOKENS_FOLLOWING_UNDERSCORE_IN_term_894 )
+            # at line 111:66: UNDERSCORE
+            match( UNDERSCORE, TOKENS_FOLLOWING_UNDERSCORE_IN_term_945 )
 
           when 5
-            # at line 110:79: DOT
-            match( DOT, TOKENS_FOLLOWING_DOT_IN_term_898 )
+            # at line 111:79: DOT
+            match( DOT, TOKENS_FOLLOWING_DOT_IN_term_949 )
 
           when 6
-            # at line 110:85: reserved_words
-            @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_term_902 )
+            # at line 111:85: reserved_words
+            @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_term_953 )
             reserved_words
             @state.following.pop
 
           else
-            break # out of loop for decision 32
+            break # out of loop for decision 33
           end
-        end # loop for decision 32
+        end # loop for decision 33
         # - - - - - - - rule clean up - - - - - - - -
         return_value.stop = @input.look( -1 )
 
@@ -1636,7 +1663,7 @@ module OCCIANTLR
     # parser rule scheme
     # 
     # (in OCCIANTLR.g)
-    # 111:1: scheme : uri ;
+    # 112:1: scheme : uri ;
     # 
     def scheme
       # -> uncomment the next line to manually enable rule tracing
@@ -1647,8 +1674,8 @@ module OCCIANTLR
       return_value.start = @input.look
 
       begin
-        # at line 111:20: uri
-        @state.following.push( TOKENS_FOLLOWING_uri_IN_scheme_922 )
+        # at line 112:20: uri
+        @state.following.push( TOKENS_FOLLOWING_uri_IN_scheme_973 )
         uri
         @state.following.pop
         # - - - - - - - rule clean up - - - - - - - -
@@ -1673,7 +1700,7 @@ module OCCIANTLR
     # parser rule class_type
     # 
     # (in OCCIANTLR.g)
-    # 112:1: class_type : ( KIND | MIXIN | ACTION ) ;
+    # 113:1: class_type : ( KIND | MIXIN | ACTION ) ;
     # 
     def class_type
       # -> uncomment the next line to manually enable rule tracing
@@ -1684,7 +1711,7 @@ module OCCIANTLR
       return_value.start = @input.look
 
       begin
-        # at line 112:15: ( KIND | MIXIN | ACTION )
+        # at line 113:15: ( KIND | MIXIN | ACTION )
         if @input.peek( 1 ).between?( KIND, ACTION )
           @input.consume
           @state.error_recovery = false
@@ -1716,7 +1743,7 @@ module OCCIANTLR
     # parser rule title
     # 
     # (in OCCIANTLR.g)
-    # 113:1: title : ( ESC | ~ ( BACKSLASH | QUOTE | SQUOTE ) | SQUOTE )* ;
+    # 114:1: title : ( ESC | ~ ( BACKSLASH | QUOTE | SQUOTE ) | SQUOTE )* ;
     # 
     def title
       # -> uncomment the next line to manually enable rule tracing
@@ -1727,17 +1754,17 @@ module OCCIANTLR
       return_value.start = @input.look
 
       begin
-        # at line 113:11: ( ESC | ~ ( BACKSLASH | QUOTE | SQUOTE ) | SQUOTE )*
-        # at line 113:11: ( ESC | ~ ( BACKSLASH | QUOTE | SQUOTE ) | SQUOTE )*
-        while true # decision 33
-          alt_33 = 2
-          look_33_0 = @input.peek( 1 )
+        # at line 114:11: ( ESC | ~ ( BACKSLASH | QUOTE | SQUOTE ) | SQUOTE )*
+        # at line 114:11: ( ESC | ~ ( BACKSLASH | QUOTE | SQUOTE ) | SQUOTE )*
+        while true # decision 34
+          alt_34 = 2
+          look_34_0 = @input.peek( 1 )
 
-          if ( look_33_0.between?( CATEGORY_KEY, EQUALS ) || look_33_0.between?( CLASS, UNDERSCORE ) || look_33_0.between?( PLUS, T__52 ) )
-            alt_33 = 1
+          if ( look_34_0.between?( CATEGORY_KEY, EQUALS ) || look_34_0.between?( CLASS, UNDERSCORE ) || look_34_0.between?( PLUS, T__52 ) )
+            alt_34 = 1
 
           end
-          case alt_33
+          case alt_34
           when 1
             # at line 
             if @input.peek( 1 ).between?( CATEGORY_KEY, EQUALS ) || @input.peek( 1 ).between?( CLASS, UNDERSCORE ) || @input.peek( 1 ).between?( PLUS, T__52 )
@@ -1751,9 +1778,9 @@ module OCCIANTLR
 
 
           else
-            break # out of loop for decision 33
+            break # out of loop for decision 34
           end
-        end # loop for decision 33
+        end # loop for decision 34
         # - - - - - - - rule clean up - - - - - - - -
         return_value.stop = @input.look( -1 )
 
@@ -1775,7 +1802,7 @@ module OCCIANTLR
     # parser rule attribute
     # 
     # (in OCCIANTLR.g)
-    # 114:1: attribute returns [hash] : comp_first= attribute_component ( '.' comp_next= attribute_component )* EQUALS attribute_value ;
+    # 115:1: attribute returns [hash] : comp_first= attribute_component ( '.' comp_next= attribute_component )* EQUALS attribute_value ;
     # 
     def attribute
       # -> uncomment the next line to manually enable rule tracing
@@ -1783,32 +1810,32 @@ module OCCIANTLR
       hash = nil
       comp_first = nil
       comp_next = nil
-      attribute_value29 = nil
+      attribute_value28 = nil
       # - - - - @init action - - - -
        hash = Hashie::Mash.new 
 
       begin
-        # at line 115:6: comp_first= attribute_component ( '.' comp_next= attribute_component )* EQUALS attribute_value
-        @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_999 )
+        # at line 116:6: comp_first= attribute_component ( '.' comp_next= attribute_component )* EQUALS attribute_value
+        @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_1050 )
         comp_first = attribute_component
         @state.following.pop
         # --> action
          cur_hash = hash; comp = ( comp_first && @input.to_s( comp_first.start, comp_first.stop ) ) 
         # <-- action
-        # at line 116:6: ( '.' comp_next= attribute_component )*
-        while true # decision 34
-          alt_34 = 2
-          look_34_0 = @input.peek( 1 )
+        # at line 117:6: ( '.' comp_next= attribute_component )*
+        while true # decision 35
+          alt_35 = 2
+          look_35_0 = @input.peek( 1 )
 
-          if ( look_34_0 == DOT )
-            alt_34 = 1
+          if ( look_35_0 == DOT )
+            alt_35 = 1
 
           end
-          case alt_34
+          case alt_35
           when 1
-            # at line 116:8: '.' comp_next= attribute_component
-            match( DOT, TOKENS_FOLLOWING_DOT_IN_attribute_1010 )
-            @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_1014 )
+            # at line 117:8: '.' comp_next= attribute_component
+            match( DOT, TOKENS_FOLLOWING_DOT_IN_attribute_1061 )
+            @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_1065 )
             comp_next = attribute_component
             @state.following.pop
             # --> action
@@ -1816,15 +1843,15 @@ module OCCIANTLR
             # <-- action
 
           else
-            break # out of loop for decision 34
+            break # out of loop for decision 35
           end
-        end # loop for decision 34
-        match( EQUALS, TOKENS_FOLLOWING_EQUALS_IN_attribute_1025 )
-        @state.following.push( TOKENS_FOLLOWING_attribute_value_IN_attribute_1027 )
-        attribute_value29 = attribute_value
+        end # loop for decision 35
+        match( EQUALS, TOKENS_FOLLOWING_EQUALS_IN_attribute_1076 )
+        @state.following.push( TOKENS_FOLLOWING_attribute_value_IN_attribute_1078 )
+        attribute_value28 = attribute_value
         @state.following.pop
         # --> action
-         cur_hash[comp.to_sym] = attribute_value29 
+         cur_hash[comp.to_sym] = attribute_value28 
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -1845,7 +1872,7 @@ module OCCIANTLR
     # parser rule attribute_name
     # 
     # (in OCCIANTLR.g)
-    # 118:1: attribute_name returns [hash] : comp_first= attribute_component ( '.' comp_next= attribute_component )* ( '{' ( 'mutable' )? ( 'immutable' )? ( 'required' )? '}' )? ;
+    # 119:1: attribute_name returns [hash] : comp_first= attribute_component ( '.' comp_next= attribute_component )* ( '{' ( 'mutable' )? ( 'immutable' )? ( 'required' )? '}' )? ;
     # 
     def attribute_name
       # -> uncomment the next line to manually enable rule tracing
@@ -1857,27 +1884,27 @@ module OCCIANTLR
        hash = Hashie::Mash.new 
 
       begin
-        # at line 119:27: comp_first= attribute_component ( '.' comp_next= attribute_component )* ( '{' ( 'mutable' )? ( 'immutable' )? ( 'required' )? '}' )?
-        @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1071 )
+        # at line 120:27: comp_first= attribute_component ( '.' comp_next= attribute_component )* ( '{' ( 'mutable' )? ( 'immutable' )? ( 'required' )? '}' )?
+        @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1122 )
         comp_first = attribute_component
         @state.following.pop
         # --> action
          cur_hash = hash; comp = ( comp_first && @input.to_s( comp_first.start, comp_first.stop ) ) 
         # <-- action
-        # at line 120:6: ( '.' comp_next= attribute_component )*
-        while true # decision 35
-          alt_35 = 2
-          look_35_0 = @input.peek( 1 )
+        # at line 121:6: ( '.' comp_next= attribute_component )*
+        while true # decision 36
+          alt_36 = 2
+          look_36_0 = @input.peek( 1 )
 
-          if ( look_35_0 == DOT )
-            alt_35 = 1
+          if ( look_36_0 == DOT )
+            alt_36 = 1
 
           end
-          case alt_35
+          case alt_36
           when 1
-            # at line 120:8: '.' comp_next= attribute_component
-            match( DOT, TOKENS_FOLLOWING_DOT_IN_attribute_name_1082 )
-            @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1086 )
+            # at line 121:8: '.' comp_next= attribute_component
+            match( DOT, TOKENS_FOLLOWING_DOT_IN_attribute_name_1133 )
+            @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1137 )
             comp_next = attribute_component
             @state.following.pop
             # --> action
@@ -1885,72 +1912,72 @@ module OCCIANTLR
             # <-- action
 
           else
-            break # out of loop for decision 35
+            break # out of loop for decision 36
           end
-        end # loop for decision 35
+        end # loop for decision 36
         # --> action
          cur_hash[comp.to_sym] = ATTRIBUTE 
         # <-- action
-        # at line 122:6: ( '{' ( 'mutable' )? ( 'immutable' )? ( 'required' )? '}' )?
-        alt_39 = 2
-        look_39_0 = @input.peek( 1 )
+        # at line 123:6: ( '{' ( 'mutable' )? ( 'immutable' )? ( 'required' )? '}' )?
+        alt_40 = 2
+        look_40_0 = @input.peek( 1 )
 
-        if ( look_39_0 == T__48 )
-          alt_39 = 1
+        if ( look_40_0 == T__48 )
+          alt_40 = 1
         end
-        case alt_39
+        case alt_40
         when 1
-          # at line 122:7: '{' ( 'mutable' )? ( 'immutable' )? ( 'required' )? '}'
-          match( T__48, TOKENS_FOLLOWING_T__48_IN_attribute_name_1106 )
-          # at line 122:11: ( 'mutable' )?
-          alt_36 = 2
-          look_36_0 = @input.peek( 1 )
-
-          if ( look_36_0 == T__49 )
-            alt_36 = 1
-          end
-          case alt_36
-          when 1
-            # at line 122:12: 'mutable'
-            match( T__49, TOKENS_FOLLOWING_T__49_IN_attribute_name_1109 )
-            # --> action
-             cur_hash[comp.to_sym][:Mutable] = true 
-            # <-- action
-
-          end
-          # at line 122:67: ( 'immutable' )?
+          # at line 123:7: '{' ( 'mutable' )? ( 'immutable' )? ( 'required' )? '}'
+          match( T__48, TOKENS_FOLLOWING_T__48_IN_attribute_name_1157 )
+          # at line 123:11: ( 'mutable' )?
           alt_37 = 2
           look_37_0 = @input.peek( 1 )
 
-          if ( look_37_0 == T__50 )
+          if ( look_37_0 == T__49 )
             alt_37 = 1
           end
           case alt_37
           when 1
-            # at line 122:68: 'immutable'
-            match( T__50, TOKENS_FOLLOWING_T__50_IN_attribute_name_1116 )
+            # at line 123:12: 'mutable'
+            match( T__49, TOKENS_FOLLOWING_T__49_IN_attribute_name_1160 )
             # --> action
-             cur_hash[comp.to_sym][:Mutable] = false 
+             cur_hash[comp.to_sym][:mutable] = true 
             # <-- action
 
           end
-          # at line 122:126: ( 'required' )?
+          # at line 123:67: ( 'immutable' )?
           alt_38 = 2
           look_38_0 = @input.peek( 1 )
 
-          if ( look_38_0 == T__51 )
+          if ( look_38_0 == T__50 )
             alt_38 = 1
           end
           case alt_38
           when 1
-            # at line 122:127: 'required'
-            match( T__51, TOKENS_FOLLOWING_T__51_IN_attribute_name_1123 )
+            # at line 123:68: 'immutable'
+            match( T__50, TOKENS_FOLLOWING_T__50_IN_attribute_name_1167 )
             # --> action
-             cur_hash[comp.to_sym][:Required] = true 
+             cur_hash[comp.to_sym][:mutable] = false 
             # <-- action
 
           end
-          match( T__52, TOKENS_FOLLOWING_T__52_IN_attribute_name_1129 )
+          # at line 123:126: ( 'required' )?
+          alt_39 = 2
+          look_39_0 = @input.peek( 1 )
+
+          if ( look_39_0 == T__51 )
+            alt_39 = 1
+          end
+          case alt_39
+          when 1
+            # at line 123:127: 'required'
+            match( T__51, TOKENS_FOLLOWING_T__51_IN_attribute_name_1174 )
+            # --> action
+             cur_hash[comp.to_sym][:required] = true 
+            # <-- action
+
+          end
+          match( T__52, TOKENS_FOLLOWING_T__52_IN_attribute_name_1180 )
 
         end
 
@@ -1973,7 +2000,7 @@ module OCCIANTLR
     # parser rule attribute_component
     # 
     # (in OCCIANTLR.g)
-    # 123:1: attribute_component : ( LOALPHA | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | reserved_words )* ;
+    # 124:1: attribute_component : ( LOALPHA | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | reserved_words )* ;
     # 
     def attribute_component
       # -> uncomment the next line to manually enable rule tracing
@@ -1984,67 +2011,67 @@ module OCCIANTLR
       return_value.start = @input.look
 
       begin
-        # at line 123:23: ( LOALPHA | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | reserved_words )*
-        # at line 123:23: ( LOALPHA | reserved_words )
-        alt_40 = 2
-        look_40_0 = @input.peek( 1 )
+        # at line 124:23: ( LOALPHA | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | reserved_words )*
+        # at line 124:23: ( LOALPHA | reserved_words )
+        alt_41 = 2
+        look_41_0 = @input.peek( 1 )
 
-        if ( look_40_0 == LOALPHA )
-          alt_40 = 1
-        elsif ( look_40_0 == SCHEME || look_40_0.between?( CLASS, ACTIONS ) || look_40_0.between?( SELF, CATEGORY ) || look_40_0.between?( KIND, ACTION ) || look_40_0.between?( LINK, TERM ) )
-          alt_40 = 2
+        if ( look_41_0 == LOALPHA )
+          alt_41 = 1
+        elsif ( look_41_0 == SCHEME || look_41_0.between?( CLASS, ACTIONS ) || look_41_0.between?( SELF, CATEGORY ) || look_41_0.between?( KIND, ACTION ) || look_41_0.between?( LINK, TERM ) )
+          alt_41 = 2
         else
-          raise NoViableAlternative( "", 40, 0 )
+          raise NoViableAlternative( "", 41, 0 )
         end
-        case alt_40
+        case alt_41
         when 1
-          # at line 123:25: LOALPHA
-          match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1141 )
+          # at line 124:25: LOALPHA
+          match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1192 )
 
         when 2
-          # at line 123:35: reserved_words
-          @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1145 )
+          # at line 124:35: reserved_words
+          @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1196 )
           reserved_words
           @state.following.pop
 
         end
-        # at line 123:51: ( LOALPHA | DIGIT | DASH | UNDERSCORE | reserved_words )*
-        while true # decision 41
-          alt_41 = 6
-          case look_41 = @input.peek( 1 )
-          when LOALPHA then alt_41 = 1
-          when DIGIT then alt_41 = 2
-          when DASH then alt_41 = 3
-          when UNDERSCORE then alt_41 = 4
-          when SCHEME, CLASS, TITLE, REL, LOCATION, ATTRIBUTES, ACTIONS, SELF, CATEGORY, KIND, MIXIN, ACTION, LINK, TERM then alt_41 = 5
+        # at line 124:51: ( LOALPHA | DIGIT | DASH | UNDERSCORE | reserved_words )*
+        while true # decision 42
+          alt_42 = 6
+          case look_42 = @input.peek( 1 )
+          when LOALPHA then alt_42 = 1
+          when DIGIT then alt_42 = 2
+          when DASH then alt_42 = 3
+          when UNDERSCORE then alt_42 = 4
+          when SCHEME, CLASS, TITLE, REL, LOCATION, ATTRIBUTES, ACTIONS, SELF, CATEGORY, KIND, MIXIN, ACTION, LINK, TERM then alt_42 = 5
           end
-          case alt_41
+          case alt_42
           when 1
-            # at line 123:53: LOALPHA
-            match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1150 )
+            # at line 124:53: LOALPHA
+            match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1201 )
 
           when 2
-            # at line 123:63: DIGIT
-            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_attribute_component_1154 )
+            # at line 124:63: DIGIT
+            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_attribute_component_1205 )
 
           when 3
-            # at line 123:71: DASH
-            match( DASH, TOKENS_FOLLOWING_DASH_IN_attribute_component_1158 )
+            # at line 124:71: DASH
+            match( DASH, TOKENS_FOLLOWING_DASH_IN_attribute_component_1209 )
 
           when 4
-            # at line 123:78: UNDERSCORE
-            match( UNDERSCORE, TOKENS_FOLLOWING_UNDERSCORE_IN_attribute_component_1162 )
+            # at line 124:78: UNDERSCORE
+            match( UNDERSCORE, TOKENS_FOLLOWING_UNDERSCORE_IN_attribute_component_1213 )
 
           when 5
-            # at line 123:91: reserved_words
-            @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1166 )
+            # at line 124:91: reserved_words
+            @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1217 )
             reserved_words
             @state.following.pop
 
           else
-            break # out of loop for decision 41
+            break # out of loop for decision 42
           end
-        end # loop for decision 41
+        end # loop for decision 42
         # - - - - - - - rule clean up - - - - - - - -
         return_value.stop = @input.look( -1 )
 
@@ -2066,45 +2093,45 @@ module OCCIANTLR
     # parser rule attribute_value
     # 
     # (in OCCIANTLR.g)
-    # 124:1: attribute_value returns [value] : ( quoted_string | number ) ;
+    # 125:1: attribute_value returns [value] : ( quoted_string | number ) ;
     # 
     def attribute_value
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 28 )
       value = nil
-      quoted_string30 = nil
-      number31 = nil
+      quoted_string29 = nil
+      number30 = nil
 
       begin
-        # at line 124:35: ( quoted_string | number )
-        # at line 124:35: ( quoted_string | number )
-        alt_42 = 2
-        look_42_0 = @input.peek( 1 )
+        # at line 125:35: ( quoted_string | number )
+        # at line 125:35: ( quoted_string | number )
+        alt_43 = 2
+        look_43_0 = @input.peek( 1 )
 
-        if ( look_42_0 == QUOTE )
-          alt_42 = 1
-        elsif ( look_42_0 == DIGIT )
-          alt_42 = 2
+        if ( look_43_0 == QUOTE )
+          alt_43 = 1
+        elsif ( look_43_0 == DIGIT )
+          alt_43 = 2
         else
-          raise NoViableAlternative( "", 42, 0 )
+          raise NoViableAlternative( "", 43, 0 )
         end
-        case alt_42
+        case alt_43
         when 1
-          # at line 124:37: quoted_string
-          @state.following.push( TOKENS_FOLLOWING_quoted_string_IN_attribute_value_1183 )
-          quoted_string30 = quoted_string
+          # at line 125:37: quoted_string
+          @state.following.push( TOKENS_FOLLOWING_quoted_string_IN_attribute_value_1234 )
+          quoted_string29 = quoted_string
           @state.following.pop
           # --> action
-           value = quoted_string30 
+           value = quoted_string29 
           # <-- action
 
         when 2
-          # at line 124:85: number
-          @state.following.push( TOKENS_FOLLOWING_number_IN_attribute_value_1189 )
-          number31 = number
+          # at line 125:85: number
+          @state.following.push( TOKENS_FOLLOWING_number_IN_attribute_value_1240 )
+          number30 = number
           @state.following.pop
           # --> action
-           value = ( number31 && @input.to_s( number31.start, number31.stop ) ).to_i 
+           value = ( number30 && @input.to_s( number30.start, number30.stop ) ).to_i 
           # <-- action
 
         end
@@ -2128,7 +2155,7 @@ module OCCIANTLR
     # parser rule number
     # 
     # (in OCCIANTLR.g)
-    # 125:1: number : ( digits ( DOT digits )? ) ;
+    # 126:1: number : ( digits ( DOT digits )? ) ;
     # 
     def number
       # -> uncomment the next line to manually enable rule tracing
@@ -2139,24 +2166,24 @@ module OCCIANTLR
       return_value.start = @input.look
 
       begin
-        # at line 125:12: ( digits ( DOT digits )? )
-        # at line 125:12: ( digits ( DOT digits )? )
-        # at line 125:14: digits ( DOT digits )?
-        @state.following.push( TOKENS_FOLLOWING_digits_IN_number_1204 )
+        # at line 126:12: ( digits ( DOT digits )? )
+        # at line 126:12: ( digits ( DOT digits )? )
+        # at line 126:14: digits ( DOT digits )?
+        @state.following.push( TOKENS_FOLLOWING_digits_IN_number_1255 )
         digits
         @state.following.pop
-        # at line 125:21: ( DOT digits )?
-        alt_43 = 2
-        look_43_0 = @input.peek( 1 )
+        # at line 126:21: ( DOT digits )?
+        alt_44 = 2
+        look_44_0 = @input.peek( 1 )
 
-        if ( look_43_0 == DOT )
-          alt_43 = 1
+        if ( look_44_0 == DOT )
+          alt_44 = 1
         end
-        case alt_43
+        case alt_44
         when 1
-          # at line 125:23: DOT digits
-          match( DOT, TOKENS_FOLLOWING_DOT_IN_number_1208 )
-          @state.following.push( TOKENS_FOLLOWING_digits_IN_number_1210 )
+          # at line 126:23: DOT digits
+          match( DOT, TOKENS_FOLLOWING_DOT_IN_number_1259 )
+          @state.following.push( TOKENS_FOLLOWING_digits_IN_number_1261 )
           digits
           @state.following.pop
 
@@ -2183,14 +2210,14 @@ module OCCIANTLR
     # parser rule reserved_words
     # 
     # (in OCCIANTLR.g)
-    # 126:1: reserved_words : ( ACTION | ACTIONS | ATTRIBUTES | CATEGORY | CLASS | KIND | LINK | LOCATION | MIXIN | REL | SCHEME | SELF | TERM | TITLE ) ;
+    # 127:1: reserved_words : ( ACTION | ACTIONS | ATTRIBUTES | CATEGORY | CLASS | KIND | LINK | LOCATION | MIXIN | REL | SCHEME | SELF | TERM | TITLE ) ;
     # 
     def reserved_words
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 30 )
 
       begin
-        # at line 127:4: ( ACTION | ACTIONS | ATTRIBUTES | CATEGORY | CLASS | KIND | LINK | LOCATION | MIXIN | REL | SCHEME | SELF | TERM | TITLE )
+        # at line 128:4: ( ACTION | ACTIONS | ATTRIBUTES | CATEGORY | CLASS | KIND | LINK | LOCATION | MIXIN | REL | SCHEME | SELF | TERM | TITLE )
         if @input.peek(1) == SCHEME || @input.peek( 1 ).between?( CLASS, ACTIONS ) || @input.peek( 1 ).between?( SELF, CATEGORY ) || @input.peek( 1 ).between?( KIND, ACTION ) || @input.peek( 1 ).between?( LINK, TERM )
           @input.consume
           @state.error_recovery = false
@@ -2219,23 +2246,23 @@ module OCCIANTLR
     # parser rule quoted_string
     # 
     # (in OCCIANTLR.g)
-    # 187:1: quoted_string returns [text] : QUOTE string QUOTE ;
+    # 188:1: quoted_string returns [text] : QUOTE string QUOTE ;
     # 
     def quoted_string
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 31 )
       text = nil
-      string32 = nil
+      string31 = nil
 
       begin
-        # at line 188:4: QUOTE string QUOTE
-        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1676 )
-        @state.following.push( TOKENS_FOLLOWING_string_IN_quoted_string_1678 )
-        string32 = string
+        # at line 189:4: QUOTE string QUOTE
+        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1727 )
+        @state.following.push( TOKENS_FOLLOWING_string_IN_quoted_string_1729 )
+        string31 = string
         @state.following.pop
-        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1680 )
+        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1731 )
         # --> action
-        text = ( string32 && @input.to_s( string32.start, string32.stop ) )
+        text = ( string31 && @input.to_s( string31.start, string31.stop ) )
         # <-- action
 
       rescue ANTLR3::Error::RecognitionError => re
@@ -2257,7 +2284,7 @@ module OCCIANTLR
     # parser rule string
     # 
     # (in OCCIANTLR.g)
-    # 189:1: string : ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )* ;
+    # 190:1: string : ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )* ;
     # 
     def string
       # -> uncomment the next line to manually enable rule tracing
@@ -2268,17 +2295,17 @@ module OCCIANTLR
       return_value.start = @input.look
 
       begin
-        # at line 189:11: ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )*
-        # at line 189:11: ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )*
-        while true # decision 44
-          alt_44 = 2
-          look_44_0 = @input.peek( 1 )
+        # at line 190:11: ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )*
+        # at line 190:11: ( ESC | ~ ( '\\\\' | QUOTE | '\\'' ) | '\\'' )*
+        while true # decision 45
+          alt_45 = 2
+          look_45_0 = @input.peek( 1 )
 
-          if ( look_44_0.between?( CATEGORY_KEY, EQUALS ) || look_44_0.between?( CLASS, UNDERSCORE ) || look_44_0.between?( PLUS, T__52 ) )
-            alt_44 = 1
+          if ( look_45_0.between?( CATEGORY_KEY, EQUALS ) || look_45_0.between?( CLASS, UNDERSCORE ) || look_45_0.between?( PLUS, T__52 ) )
+            alt_45 = 1
 
           end
-          case alt_44
+          case alt_45
           when 1
             # at line 
             if @input.peek( 1 ).between?( CATEGORY_KEY, EQUALS ) || @input.peek( 1 ).between?( CLASS, UNDERSCORE ) || @input.peek( 1 ).between?( PLUS, T__52 )
@@ -2292,9 +2319,9 @@ module OCCIANTLR
 
 
           else
-            break # out of loop for decision 44
+            break # out of loop for decision 45
           end
-        end # loop for decision 44
+        end # loop for decision 45
         # - - - - - - - rule clean up - - - - - - - -
         return_value.stop = @input.look( -1 )
 
@@ -2316,37 +2343,37 @@ module OCCIANTLR
     # parser rule digits
     # 
     # (in OCCIANTLR.g)
-    # 190:1: digits : ( DIGIT )+ ;
+    # 191:1: digits : ( DIGIT )+ ;
     # 
     def digits
       # -> uncomment the next line to manually enable rule tracing
       # trace_in( __method__, 33 )
 
       begin
-        # at line 190:10: ( DIGIT )+
-        # at file 190:10: ( DIGIT )+
-        match_count_45 = 0
+        # at line 191:10: ( DIGIT )+
+        # at file 191:10: ( DIGIT )+
+        match_count_46 = 0
         while true
-          alt_45 = 2
-          look_45_0 = @input.peek( 1 )
+          alt_46 = 2
+          look_46_0 = @input.peek( 1 )
 
-          if ( look_45_0 == DIGIT )
-            alt_45 = 1
+          if ( look_46_0 == DIGIT )
+            alt_46 = 1
 
           end
-          case alt_45
+          case alt_46
           when 1
-            # at line 190:10: DIGIT
-            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_digits_1725 )
+            # at line 191:10: DIGIT
+            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_digits_1776 )
 
           else
-            match_count_45 > 0 and break
-            eee = EarlyExit(45)
+            match_count_46 > 0 and break
+            eee = EarlyExit(46)
 
 
             raise eee
           end
-          match_count_45 += 1
+          match_count_46 += 1
         end
 
 
@@ -2486,14 +2513,14 @@ module OCCIANTLR
       end
     end
     class DFA18 < ANTLR3::DFA
-      EOT = unpack( 28, -1 )
-      EOF = unpack( 2, 2, 26, -1 )
-      MIN = unpack( 1, 6, 1, 7, 1, -1, 2, 8, 1, 10, 8, 4, 1, -1, 12, 4, 
-                    1, -1 )
-      MAX = unpack( 1, 6, 1, 45, 1, -1, 2, 45, 1, 26, 8, 52, 1, -1, 12, 
-                    52, 1, -1 )
-      ACCEPT = unpack( 2, -1, 1, 2, 11, -1, 1, 1, 12, -1, 1, 1 )
-      SPECIAL = unpack( 28, -1 )
+      EOT = unpack( 48, -1 )
+      EOF = unpack( 2, 2, 46, -1 )
+      MIN = unpack( 1, 6, 1, 7, 1, -1, 2, 8, 1, 10, 8, 4, 1, -1, 13, 4, 
+                    1, -1, 19, 4 )
+      MAX = unpack( 1, 6, 1, 45, 1, -1, 2, 45, 1, 26, 8, 52, 1, -1, 13, 
+                    52, 1, -1, 19, 52 )
+      ACCEPT = unpack( 2, -1, 1, 2, 11, -1, 1, 1, 13, -1, 1, 1, 19, -1 )
+      SPECIAL = unpack( 48, -1 )
       TRANSITION = [
         unpack( 1, 1 ),
         unpack( 1, 3, 1, 2, 2, -1, 6, 2, 3, -1, 1, 2, 1, 4, 2, -1, 1, 2, 
@@ -2509,84 +2536,164 @@ module OCCIANTLR
                  26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
                  1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
                  1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
         unpack(  ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack( 1, 2, 1, 11, 2, 2, 1, 26, 1, 22, 1, 27, 6, 26, 3, 2, 2, 
-                 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 1, 13, 
-                 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 
-                 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
-        unpack(  )
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 11, 1, 2, 1, 27, 1, 26, 1, 22, 1, 28, 6, 26, 3, 
+                 2, 2, 26, 1, 24, 1, 25, 1, 7, 1, 8, 1, 9, 1, 10, 1, 12, 
+                 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 
+                 1, 21, 1, 23, 3, 26, 2, 2, 2, 26, 7, 2 ),
+        unpack( 1, 2, 1, 33, 2, 2, 1, 47, 1, 43, 1, 2, 6, 47, 3, 2, 2, 
+                 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 34, 1, 
+                 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 41, 1, 
+                 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack(  ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 ),
+        unpack( 1, 2, 1, 33, 1, 2, 1, 27, 1, 47, 1, 43, 1, 28, 6, 47, 3, 
+                 2, 2, 47, 1, 45, 1, 46, 1, 29, 1, 30, 1, 31, 1, 32, 1, 
+                 34, 1, 35, 1, 28, 1, 36, 1, 37, 1, 38, 1, 39, 1, 40, 1, 
+                 41, 1, 42, 1, 44, 3, 47, 2, 2, 2, 47, 7, 2 )
       ].freeze
       
       ( 0 ... MIN.length ).zip( MIN, MAX ) do | i, a, z |
@@ -2708,88 +2815,90 @@ module OCCIANTLR
     TOKENS_FOLLOWING_QUOTE_IN_link_self_645 = Set[ 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
     TOKENS_FOLLOWING_uri_IN_link_self_647 = Set[ 10 ]
     TOKENS_FOLLOWING_QUOTE_IN_link_self_649 = Set[ 1 ]
-    TOKENS_FOLLOWING_SEMICOLON_IN_link_category_664 = Set[ 7, 21 ]
-    TOKENS_FOLLOWING_WS_IN_link_category_666 = Set[ 21 ]
-    TOKENS_FOLLOWING_CATEGORY_IN_link_category_669 = Set[ 9 ]
-    TOKENS_FOLLOWING_EQUALS_IN_link_category_671 = Set[ 10 ]
-    TOKENS_FOLLOWING_QUOTE_IN_link_category_673 = Set[ 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_uri_IN_link_category_675 = Set[ 10 ]
-    TOKENS_FOLLOWING_QUOTE_IN_link_category_677 = Set[ 1 ]
-    TOKENS_FOLLOWING_SEMICOLON_IN_link_attributes_703 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_WS_IN_link_attributes_705 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_attribute_IN_link_attributes_708 = Set[ 1, 6 ]
-    TOKENS_FOLLOWING_X_OCCI_ATTRIBUTE_KEY_IN_x_occi_attribute_729 = Set[ 5 ]
-    TOKENS_FOLLOWING_COLON_IN_x_occi_attribute_731 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_WS_IN_x_occi_attribute_733 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_attribute_IN_x_occi_attribute_736 = Set[ 1, 6 ]
-    TOKENS_FOLLOWING_SEMICOLON_IN_x_occi_attribute_738 = Set[ 1 ]
-    TOKENS_FOLLOWING_X_OCCI_LOCATION_KEY_IN_x_occi_location_758 = Set[ 5 ]
-    TOKENS_FOLLOWING_COLON_IN_x_occi_location_760 = Set[ 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_WS_IN_x_occi_location_762 = Set[ 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_uri_IN_x_occi_location_765 = Set[ 1, 6 ]
-    TOKENS_FOLLOWING_SEMICOLON_IN_x_occi_location_767 = Set[ 1 ]
-    TOKENS_FOLLOWING_LOALPHA_IN_uri_783 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_UPALPHA_IN_uri_787 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_DIGIT_IN_uri_791 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_AT_IN_uri_795 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_COLON_IN_uri_799 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_PERCENT_IN_uri_803 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_UNDERSCORE_IN_uri_807 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_BACKSLASH_IN_uri_811 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_PLUS_IN_uri_815 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_DOT_IN_uri_819 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_TILDE_IN_uri_823 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_HASH_IN_uri_827 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_QUESTION_IN_uri_831 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_AMPERSAND_IN_uri_835 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_SLASH_IN_uri_839 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_EQUALS_IN_uri_843 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_DASH_IN_uri_847 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_X_OCCI_ATTRIBUTE_KEY_IN_uri_851 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_X_OCCI_LOCATION_KEY_IN_uri_855 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_reserved_words_IN_uri_859 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_LOALPHA_IN_term_872 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_reserved_words_IN_term_876 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_LOALPHA_IN_term_882 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_DIGIT_IN_term_886 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_DASH_IN_term_890 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_UNDERSCORE_IN_term_894 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_DOT_IN_term_898 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_reserved_words_IN_term_902 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_uri_IN_scheme_922 = Set[ 1 ]
-    TOKENS_FOLLOWING_set_IN_class_type_931 = Set[ 1 ]
-    TOKENS_FOLLOWING_set_IN_title_952 = Set[ 1, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
-    TOKENS_FOLLOWING_attribute_component_IN_attribute_999 = Set[ 9, 32 ]
-    TOKENS_FOLLOWING_DOT_IN_attribute_1010 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_attribute_component_IN_attribute_1014 = Set[ 9, 32 ]
-    TOKENS_FOLLOWING_EQUALS_IN_attribute_1025 = Set[ 10, 26 ]
-    TOKENS_FOLLOWING_attribute_value_IN_attribute_1027 = Set[ 1 ]
-    TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1071 = Set[ 1, 32, 48 ]
-    TOKENS_FOLLOWING_DOT_IN_attribute_name_1082 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1086 = Set[ 1, 32, 48 ]
-    TOKENS_FOLLOWING_T__48_IN_attribute_name_1106 = Set[ 49, 50, 51, 52 ]
-    TOKENS_FOLLOWING_T__49_IN_attribute_name_1109 = Set[ 50, 51, 52 ]
-    TOKENS_FOLLOWING_T__50_IN_attribute_name_1116 = Set[ 51, 52 ]
-    TOKENS_FOLLOWING_T__51_IN_attribute_name_1123 = Set[ 52 ]
-    TOKENS_FOLLOWING_T__52_IN_attribute_name_1129 = Set[ 1 ]
-    TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1141 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1145 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1150 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_DIGIT_IN_attribute_component_1154 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_DASH_IN_attribute_component_1158 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_UNDERSCORE_IN_attribute_component_1162 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1166 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_quoted_string_IN_attribute_value_1183 = Set[ 1 ]
-    TOKENS_FOLLOWING_number_IN_attribute_value_1189 = Set[ 1 ]
-    TOKENS_FOLLOWING_digits_IN_number_1204 = Set[ 1, 32 ]
-    TOKENS_FOLLOWING_DOT_IN_number_1208 = Set[ 10, 26 ]
-    TOKENS_FOLLOWING_digits_IN_number_1210 = Set[ 1 ]
-    TOKENS_FOLLOWING_set_IN_reserved_words_1223 = Set[ 1 ]
-    TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1676 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
-    TOKENS_FOLLOWING_string_IN_quoted_string_1678 = Set[ 10 ]
-    TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1680 = Set[ 1 ]
-    TOKENS_FOLLOWING_set_IN_string_1691 = Set[ 1, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
-    TOKENS_FOLLOWING_DIGIT_IN_digits_1725 = Set[ 1, 26 ]
+    TOKENS_FOLLOWING_SEMICOLON_IN_link_category_702 = Set[ 7, 21 ]
+    TOKENS_FOLLOWING_WS_IN_link_category_704 = Set[ 21 ]
+    TOKENS_FOLLOWING_CATEGORY_IN_link_category_707 = Set[ 9 ]
+    TOKENS_FOLLOWING_EQUALS_IN_link_category_709 = Set[ 10 ]
+    TOKENS_FOLLOWING_QUOTE_IN_link_category_711 = Set[ 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_uri_IN_link_category_715 = Set[ 7, 10 ]
+    TOKENS_FOLLOWING_WS_IN_link_category_720 = Set[ 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_uri_IN_link_category_724 = Set[ 7, 10 ]
+    TOKENS_FOLLOWING_QUOTE_IN_link_category_730 = Set[ 1 ]
+    TOKENS_FOLLOWING_SEMICOLON_IN_link_attributes_754 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_WS_IN_link_attributes_756 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_attribute_IN_link_attributes_759 = Set[ 1, 6 ]
+    TOKENS_FOLLOWING_X_OCCI_ATTRIBUTE_KEY_IN_x_occi_attribute_780 = Set[ 5 ]
+    TOKENS_FOLLOWING_COLON_IN_x_occi_attribute_782 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_WS_IN_x_occi_attribute_784 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_attribute_IN_x_occi_attribute_787 = Set[ 1, 6 ]
+    TOKENS_FOLLOWING_SEMICOLON_IN_x_occi_attribute_789 = Set[ 1 ]
+    TOKENS_FOLLOWING_X_OCCI_LOCATION_KEY_IN_x_occi_location_809 = Set[ 5 ]
+    TOKENS_FOLLOWING_COLON_IN_x_occi_location_811 = Set[ 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_WS_IN_x_occi_location_813 = Set[ 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_uri_IN_x_occi_location_816 = Set[ 1, 6 ]
+    TOKENS_FOLLOWING_SEMICOLON_IN_x_occi_location_818 = Set[ 1 ]
+    TOKENS_FOLLOWING_LOALPHA_IN_uri_834 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_UPALPHA_IN_uri_838 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_DIGIT_IN_uri_842 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_AT_IN_uri_846 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_COLON_IN_uri_850 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_PERCENT_IN_uri_854 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_UNDERSCORE_IN_uri_858 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_BACKSLASH_IN_uri_862 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_PLUS_IN_uri_866 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_DOT_IN_uri_870 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_TILDE_IN_uri_874 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_HASH_IN_uri_878 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_QUESTION_IN_uri_882 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_AMPERSAND_IN_uri_886 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_SLASH_IN_uri_890 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_EQUALS_IN_uri_894 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_DASH_IN_uri_898 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_X_OCCI_ATTRIBUTE_KEY_IN_uri_902 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_X_OCCI_LOCATION_KEY_IN_uri_906 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_reserved_words_IN_uri_910 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_LOALPHA_IN_term_923 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_reserved_words_IN_term_927 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_LOALPHA_IN_term_933 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_DIGIT_IN_term_937 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_DASH_IN_term_941 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_UNDERSCORE_IN_term_945 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_DOT_IN_term_949 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_reserved_words_IN_term_953 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_uri_IN_scheme_973 = Set[ 1 ]
+    TOKENS_FOLLOWING_set_IN_class_type_982 = Set[ 1 ]
+    TOKENS_FOLLOWING_set_IN_title_1003 = Set[ 1, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
+    TOKENS_FOLLOWING_attribute_component_IN_attribute_1050 = Set[ 9, 32 ]
+    TOKENS_FOLLOWING_DOT_IN_attribute_1061 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_attribute_component_IN_attribute_1065 = Set[ 9, 32 ]
+    TOKENS_FOLLOWING_EQUALS_IN_attribute_1076 = Set[ 10, 26 ]
+    TOKENS_FOLLOWING_attribute_value_IN_attribute_1078 = Set[ 1 ]
+    TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1122 = Set[ 1, 32, 48 ]
+    TOKENS_FOLLOWING_DOT_IN_attribute_name_1133 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1137 = Set[ 1, 32, 48 ]
+    TOKENS_FOLLOWING_T__48_IN_attribute_name_1157 = Set[ 49, 50, 51, 52 ]
+    TOKENS_FOLLOWING_T__49_IN_attribute_name_1160 = Set[ 50, 51, 52 ]
+    TOKENS_FOLLOWING_T__50_IN_attribute_name_1167 = Set[ 51, 52 ]
+    TOKENS_FOLLOWING_T__51_IN_attribute_name_1174 = Set[ 52 ]
+    TOKENS_FOLLOWING_T__52_IN_attribute_name_1180 = Set[ 1 ]
+    TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1192 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1196 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1201 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_DIGIT_IN_attribute_component_1205 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_DASH_IN_attribute_component_1209 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_UNDERSCORE_IN_attribute_component_1213 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1217 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_quoted_string_IN_attribute_value_1234 = Set[ 1 ]
+    TOKENS_FOLLOWING_number_IN_attribute_value_1240 = Set[ 1 ]
+    TOKENS_FOLLOWING_digits_IN_number_1255 = Set[ 1, 32 ]
+    TOKENS_FOLLOWING_DOT_IN_number_1259 = Set[ 10, 26 ]
+    TOKENS_FOLLOWING_digits_IN_number_1261 = Set[ 1 ]
+    TOKENS_FOLLOWING_set_IN_reserved_words_1274 = Set[ 1 ]
+    TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1727 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
+    TOKENS_FOLLOWING_string_IN_quoted_string_1729 = Set[ 10 ]
+    TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1731 = Set[ 1 ]
+    TOKENS_FOLLOWING_set_IN_string_1742 = Set[ 1, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
+    TOKENS_FOLLOWING_DIGIT_IN_digits_1776 = Set[ 1, 26 ]
 
   end # class Parser < ANTLR3::Parser
 

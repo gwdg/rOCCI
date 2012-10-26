@@ -1,2 +1,2 @@
-occi-antlr-ruby
+Occi-antlr-ruby
 ===============

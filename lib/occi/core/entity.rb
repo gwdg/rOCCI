@@ -1,72 +1,78 @@
-require 'rubygems'
-require 'uuidtools'
-require 'hashie/mash'
-require 'active_support/json'
-require 'occi/model'
-require 'occi/core/attributes'
-require 'occi/core/kind'
-require 'occi/core/attribute_properties'
-
-module OCCI
+module Occi
   module Core
     class Entity
 
-      attr_accessor :mixins, :attributes, :actions
+      attr_accessor :mixins, :attributes, :actions, :id
       attr_reader :kind
 
-      # @return [OCCI::Core::Kind] kind definition of Entity type
-      def self.kind_definition
-        kind = OCCI::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'entity')
+      # @return [String]
+      def self.type_identifier
+        self.kind.type_identifier
+      end
 
-        kind.title = "Entity"
+      # @return [Occi::Core::Kind] kind definition of Entity type
+      def self.kind
+        kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'entity')
 
-        kind.attributes.occi!.core!.id!.Type     = "string"
-        kind.attributes.occi!.core!.id!.Pattern  = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
-        kind.attributes.occi!.core!.id!.Required = false
-        kind.attributes.occi!.core!.id!.Mutable  = false
+        kind.title = "entity"
 
-        kind.attributes.occi!.core!.title!.Type     = "string"
-        kind.attributes.occi!.core!.title!.Pattern  = ".*"
-        kind.attributes.occi!.core!.title!.Required = false
-        kind.attributes.occi!.core!.title!.Mutable  = true
+        kind.attributes.occi!.core!.id = Occi::Core::AttributeProperties.new(
+            { :pattern => "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}" })
+
+        kind.attributes.occi!.core!.title = Occi::Core::AttributeProperties.new(
+            { :mutable => true })
 
         kind
       end
 
+      # @param [Array] args list of arguments
+      # @return [Object] new instance of this class
+      def self.new(*args)
+        args[0]      ||= self.kind.type_identifier
+        scheme, term = args[0].split '#'
+
+        klass = Occi::Core::Kind.get_class scheme, term
+
+        object = klass.allocate
+        object.send :initialize, *args
+        object
+      end
+
       # @param [String] kind
       # @param [String] mixins
-      # @param [OCCI::Core::Attributes] attributes
-      def initialize(kind, mixins=nil, attributes=nil, actions=nil)
+      # @param [Occi::Core::Attributes] attributes
+      def initialize(kind, mixins=[], attributes={ }, actions=[])
         @checked = false
         raise "Kind #{kind} not of type String" unless kind.kind_of? String
-        @kind                        = kind
-        @mixins                      = mixins.to_a.flatten
-        @attributes                  = OCCI::Core::Attributes.new(attributes)
-        @attributes.occi!.core![:id] ||= UUIDTools::UUID.random_create.to_s
-        @actions                     = actions.to_a.flatten
+        @kind       = kind
+        @mixins     = mixins.to_a.flatten
+        @attributes = Occi::Core::Attributes.new(attributes)
+        @actions    = actions.to_a.flatten
       end
 
       # @param [Array] mixins
       def mixins=(mixins)
-        @checked=false
-        @mixins =mixins
+        @checked = false
+        @mixins  = mixins
       end
 
-      # @param [OCCI::Core::Attributes] attributes
+      # @param [Occi::Core::Attributes] attributes
       def attributes=(attributes)
-        @checked   =false
-        @attributes=attributes
+        @checked    = false
+        @attributes = attributes
       end
 
       # set id for entity
       # @param [UUIDTools::UUID] id
       def id=(id)
         @attributes.occi!.core!.id = id
+        @id = id
       end
 
       # @return [UUIDTools::UUID] id of the entity
       def id
-        @attributes.occi!.core!.id
+        @id ||= @attributes.occi.core.id if @attributes.occi.core if @attributes.occi
+        @id
       end
 
       # set title attribute for entity
@@ -77,16 +83,16 @@ module OCCI
 
       # @return [String] title attribute of entity
       def title
-        @attributes.occi!.core!.title
+        @attributes.occi.core.title if @attributes.occi.core if @attributes.occi
       end
 
       # @return [String] location of the entity
       def location
-        '/' + @kind.split('#').last + '/' + @attributes.occi!.core!.id
+        '/' + @kind.split('#').last + '/' + self.id.gsub('urn:uuid:','') if self.id
       end
 
       # check attributes against their definitions and set defaults
-      # @param [OCCI::Model] model representation of the OCCI model to check the attributes against
+      # @param [Occi::Model] model representation of the Occi model to check the attributes against
       def check(model)
         raise "No kind defined" unless @kind
         definitions = model.get_by_id(@kind).attributes
@@ -99,28 +105,26 @@ module OCCI
         @attributes = Entity.check(@attributes, definitions) if definitions
       end
 
-      # @param [OCCI::Core::Attributes] attributes
-      # @param [OCCI::Core::AttributeProperties] definitions
-      # @return [OCCI::Core::Attributes] attributes with their defaults set
+      # @param [Occi::Core::Attributes] attributes
+      # @param [Occi::Core::Attributes] definitions
+      # @return [Occi::Core::Attributes] attributes with their defaults set
       def self.check(attributes, definitions)
-        attributes = OCCI::Core::Attributes.new(attributes)
+        attributes = Occi::Core::Attributes.new(attributes)
         definitions.each_key do |key|
           properties = definitions[key]
-          value      = attributes[key] ||= properties.Default
-          if properties.key? :Type
-            raise "required attribute #{key} not found" if value.nil? && properties.Required
-            next if value.nil? && !properties.Required
-            case properties.Type
+          value      = attributes[key] ||= properties.default
+          if properties.key? :type
+            raise "required attribute #{key} not found" if value.nil? && properties.required
+            next if value.nil? && !properties.required
+            case properties.type
               when 'number'
-                raise "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.Type}" unless value.kind_of?(Numeric)
-                raise "attribute #{key} with value #{value} not in range #{properties.Minimum}-#{properties.Maximum}" unless (properties.Minimum..properties.Maximum) === value if properties.Minimum && properties.Maximum
+                Occi::Log.warn "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless value.kind_of?(Numeric)
               when 'boolean'
-                raise "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.Type}" unless !!value == value
+                Occi::Log.warn "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless !!value == value
               else
-                raise "attribute #{key} with value #{value} from class #{value.class.name} does not match attribute property type #{properties.Type}" unless value.kind_of?(String)
-                raise "attribute #{key} with length #{value.length} not in range #{properties.Minimum}-#{properties.Maximum}" unless (properties.Minimum..properties.Maximum) === value.length if properties.Minimum && properties.Maximum
+                Occi::Log.warn "attribute #{key} with value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless value.kind_of?(String)
             end
-            raise "attribute #{key} with value #{value} does not match pattern #{properties.Pattern}" if value.to_s.scan(Regexp.new(properties.Pattern)).empty? if properties.Pattern
+            Occi::Log.warn "attribute #{key} with value #{value} does not match pattern #{properties.pattern}" if value.to_s.scan(Regexp.new(properties.pattern)).empty? if properties.pattern
             attributes[key] = value
           else
             attributes[key] = check(value, definitions[key])
@@ -144,19 +148,21 @@ module OCCI
         entity.mixins = @mixins if @mixins.any?
         entity.actions = @actions if @actions.any?
         entity.attributes = @attributes if @attributes.any?
+        entity.id = self.id if self.id
         entity
       end
 
       # @return [String] text representation
       def to_text
         scheme, term = self.kind.split('#')
-        text         = 'Category: ' + term + ';scheme=' + scheme.inspect + ';class="kind"' + "\n"
+        scheme << '#'
+        text = 'Category: ' + term + ';scheme=' + scheme.inspect + ';class="kind"' + "\n"
         @mixins.each do |mixin|
           scheme, term = mixin.split('#')
+          scheme << '#'
           text << 'Category: ' + term + ';scheme=' + scheme.inspect + ';class="mixin"' + "\n"
         end
         @attributes.combine.each_pair do |name, value|
-          name = name.inspect
           value = value.inspect
           text << 'X-OCCI-Attribute: ' + name + '=' + value + "\n"
         end
@@ -167,17 +173,19 @@ module OCCI
         text
       end
 
+      # @return [Hash] hash containing the HTTP headers of the text/occi rendering
       def to_header
-        scheme, term      = self.kind.split('#')
-        header            = Hashie::Mash.new
+        scheme, term = self.kind.split('#')
+        scheme << '#'
+        header             = Hashie::Mash.new
         header['Category'] = term + ';scheme=' + scheme.inspect + ';class="kind"'
         @mixins.each do |mixin|
-          scheme, term      = mixin.split('#')
+          scheme, term = mixin.split('#')
+          scheme << '#'
           header['Category'] += ',' + term + ';scheme=' + scheme.inspect + ';class="mixin"'
         end
         attributes = []
         @attributes.combine.each_pair do |name, value|
-          name = name.inspect
           attributes << name + '=' + value.inspect
         end
         header['X-OCCI-Attribute'] = attributes.join(',') if attributes.any?
@@ -186,12 +194,17 @@ module OCCI
           _, term = action.split('#')
           links << self.location + '?action=' + term + '>;rel=' + action.inspect
         end
-        header['Link'] = links.join(',') if links.any?
         header
       end
 
+      # @return [String] json representation
       def inspect
         JSON.pretty_generate(JSON.parse(to_json))
+      end
+
+      # @return [String] string representation of entity is its location
+      def to_s
+        self.location
       end
 
     end
