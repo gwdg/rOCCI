@@ -346,16 +346,16 @@ module Occi
             case resType.to_s
               # 4 is the ResourceType for memory in the CIM_ResourceAllocationSettingData
               when "4" then
-               OCCI::Log.debug('calculating memory in gb ')
-              alloc_units = resource_alloc.xpath("item:AllocationUnits/text()", 'item' => "#{Parser::RASD}").to_s
-              OCCI::Log.debug('allocated units in ovf file: ' + alloc_units)
-              alloc_unit_bytes = self.alloc_units_bytes(alloc_units)
-              capacity = self.calculate_capacity_bytes(resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}").to_s, alloc_unit_bytes)
-              capacity_gb = self.calculate_capacity_gb(capacity)
-               OCCI::Log.debug('virtual quantity of memory configured in gb: ' + capacity_gb.to_s)
-              compute.attributes.occi!.compute!.memory = capacity_gb.to_s
-              #  compute.attributes.occi!.compute!.memory = resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}").to_s.to_i
-              # 3 is the ResourceType for processor in the CIM_ResourceAllocationSettingData
+                OCCI::Log.debug('calculating memory in gb ')
+                alloc_units = resource_alloc.xpath("item:AllocationUnits/text()", 'item' => "#{Parser::RASD}").to_s
+                OCCI::Log.debug('allocated units in ovf file: ' + alloc_units)
+                alloc_unit_bytes = self.alloc_units_bytes(alloc_units)
+                capacity = self.calculate_capacity_bytes(resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}").to_s, alloc_unit_bytes)
+                capacity_gb = self.calculate_capacity_gb(capacity)
+                OCCI::Log.debug('virtual quantity of memory configured in gb: ' + capacity_gb.to_s)
+                compute.attributes.occi!.compute!.memory = capacity_gb.to_s
+                #  compute.attributes.occi!.compute!.memory = resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}").to_s.to_i
+                # 3 is the ResourceType for processor in the CIM_ResourceAllocationSettingData
               when "3" then
                 compute.attributes.occi!.compute!.cores = resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}").to_s.to_i
               when "10" then
