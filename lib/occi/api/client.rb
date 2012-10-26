@@ -108,7 +108,8 @@ module Occi
     # @example
     #   client.get_resource "compute" # => Occi::Core::Resource
     #   client.get_resource "storage" # => Occi::Core::Resource
-    #   client.get_resource "http://schemas.ogf.org/occi/infrastructure#network" # => Occi::Core::Resource
+    #   client.get_resource "http://schemas.ogf.org/occi/infrastructure#network"
+    #    # => Occi::Core::Resource
     #
     # @param [String] resource name or resource identifier
     # @return [Occi::Core::Resource] new resource instance
@@ -159,9 +160,12 @@ module Occi
     # Will return mixin's full location (a link) or a description. 
     #
     # @example
-    #    client.find_mixin "debian6" # => "http://my.occi.service/occi/infrastructure/os_tpl#debian6"
-    #    client.find_mixin "debian6", "os_tpl" # => "http://my.occi.service/occi/infrastructure/os_tpl#debian6"
-    #    client.find_mixin "large", "resource_tpl" # => "http://my.occi.service/occi/infrastructure/resource_tpl#large"
+    #    client.find_mixin "debian6"
+    #     # => "http://my.occi.service/occi/infrastructure/os_tpl#debian6"
+    #    client.find_mixin "debian6", "os_tpl"
+    #     # => "http://my.occi.service/occi/infrastructure/os_tpl#debian6"
+    #    client.find_mixin "large", "resource_tpl"
+    #     # => "http://my.occi.service/occi/infrastructure/resource_tpl#large"
     #    client.find_mixin "debian6", "resource_tpl" # => nil
     #
     # @param [String] name of the mixin
@@ -196,7 +200,9 @@ module Occi
           found = get_os_templates.select { |os| os.term == name }.first
 
           # then try in resource_tpls
-          found = get_resource_templates.select { |template| template.term == name }.first unless found
+          found = get_resource_templates.select {
+            |template| template.term == name
+          }.first unless found
 
           found
         end
@@ -206,18 +212,35 @@ module Occi
         name = "#" + name
         if type
           # return the first match with the selected type
-          @mixins[type.to_sym].select { |mixin| mixin.to_s.reverse.start_with? name.reverse }.first
+          @mixins[type.to_sym].select {
+            |mixin| mixin.to_s.reverse.start_with? name.reverse
+          }.first
         else
           # there is no type preference, return first global match
-          @mixins.flatten(2).select { |mixin| mixin.to_s.reverse.start_with? name.reverse }.first
+          @mixins.flatten(2).select {
+            |mixin| mixin.to_s.reverse.start_with? name.reverse
+          }.first
         end
       end
     end
 
-    # @param [String] Type of mixins to return
-    # @return [Array] List of available mixins
+    # Retrieves available mixins of a specified type or all available
+    # mixins if the type wasn't specified. Mixins are returned in the
+    # form of mixin identifiers.
+    #
+    # @example
+    #    client.get_mixins
+    #     # => ["http://my.occi.service/occi/infrastructure/os_tpl#debian6",
+    #           "http://my.occi.service/occi/infrastructure/resource_tpl#small"]
+    #    client.get_mixins "os_tpl"
+    #     # => ["http://my.occi.service/occi/infrastructure/os_tpl#debian6"]
+    #    client.get_mixins "resource_tpl"
+    #     # => ["http://my.occi.service/occi/infrastructure/resource_tpl#small"]
+    #
+    # @param [String] type of mixins
+    # @return [Array<String>] list of available mixins
     def get_mixins(type = nil)
-      unless type.nil?
+      if type
         # is type valid?
         raise "Unknown mixin type! #{type}" unless @mixins.has_key? type.to_sym
 
@@ -236,12 +259,25 @@ module Occi
       end
     end
 
-    # @return [Array] List of available mixin types
+    # Retrieves available mixin types. Mixin types are presented
+    # in a shortened format (i.e. not as type identifiers).
+    #
+    # @example
+    #    client.get_mixin_types # => [ "os_tpl", "resource_tpl" ]
+    #
+    # @return [Array<String>] list of available mixin types
     def get_mixin_types
       @mixins.keys.map! { |k| k.to_s }
     end
 
-    # @return [Array] List of available mixin type identifiers
+    # Retrieves available mixin type identifiers.
+    #
+    # @example
+    #    client.get_mixin_type_identifiers
+    #     # => ['http://schemas.ogf.org/occi/infrastructure#os_tpl',
+    #           'http://schemas.ogf.org/occi/infrastructure#resource_tpl'] 
+    #
+    # @return [Array<String>] list of available mixin type identifiers
     def get_mixin_type_identifiers
       identifiers = []
 
@@ -252,12 +288,31 @@ module Occi
       identifiers
     end
 
-    # @param [String] Occi resource type identifier or just type
-    # @return [Array] List of links
+    # Retrieves available resources represented by resource locations (URIs).
+    # If no type identifier is specified, all available resource are listed.
+    # Type identifier can be specified in its shortened format (e.g. "compute",
+    # "storage", "network").
+    #
+    # @example
+    #    client.list
+    #     # => [ "http://localhost:3300/compute/jh425jhj3h413-7dj29d7djd9e3-djh2jh4j4j",
+    #            "http://localhost:3300/network/kh425jhj3h413-7dj29d7djd9e3-djh2jh4j4j",
+    #            "http://localhost:3300/storage/lh425jhj3h413-7dj29d7djd9e3-djh2jh4j4j" ]
+    #    client.list "compute"
+    #     # => [ "http://localhost:3300/compute/jh425jhj3h413-7dj29d7djd9e3-djh2jh4j4j" ]
+    #    client.list "http://schemas.ogf.org/occi/infrastructure#compute"
+    #     # => [ "http://localhost:3300/compute/jh425jhj3h413-7dj29d7djd9e3-djh2jh4j4j" ]
+    #
+    # @param [String] resource type identifier or just type name
+    # @return [Array<String>] list of links
     def list(resource_type_identifier=nil)
       if resource_type_identifier
         # convert type to type identifier
-        resource_type_identifier = @model.kinds.select { |kind| kind.term == resource_type_identifier }.first.type_identifier if @model.kinds.select { |kind| kind.term == resource_type_identifier }.any?
+        resource_type_identifier = @model.kinds.select {
+          |kind| kind.term == resource_type_identifier
+        }.first.type_identifier if @model.kinds.select {
+          |kind| kind.term == resource_type_identifier
+        }.any?
 
         # check some basic pre-conditions
         raise "Endpoint is not connected!" unless @connected
@@ -272,15 +327,35 @@ module Occi
         path = '/'
       end
 
-      self.class.get(@endpoint + path, :headers => { "Accept" => 'text/uri-list' }).body.split("\n").compact
+      self.class.get(@endpoint + path,
+                     :headers => { "Accept" => 'text/uri-list' }).body.split("\n").compact
     end
 
-    # @param [String] OCCI resource type identifier or just type
-    # @return [Occi::Collection] List of descriptions
+    # Retrieves descriptions for available resources specified by a type
+    # identifier or resource location. If no type identifier or location
+    # is specified, all available resources in all available resource types
+    # will be described. 
+    #
+    # @example
+    #    client.describe
+    #     # => [#<Occi::Collection>, #<Occi::Collection>, #<Occi::Collection>]
+    #    client.describe "compute"
+    #     # => [#<Occi::Collection>, #<Occi::Collection>, #<Occi::Collection>]
+    #    client.describe "http://schemas.ogf.org/occi/infrastructure#compute"
+    #     # => [#<Occi::Collection>, #<Occi::Collection>, #<Occi::Collection>]
+    #    client.describe "http://localhost:3300/compute/j5hk1234jk2524-2j3j2k34jjh234-adfaf1234"
+    #     # => [#<Occi::Collection>]
+    #
+    # @param [String] resource type identifier, type name or resource location
+    # @return [Array<Occi::Collection>] list of resource descriptions
     def describe(resource_type_identifier=nil)
 
       # convert type to type identifier
-      resource_type_identifier = @model.kinds.select { |kind| kind.term == resource_type_identifier }.first.type_identifier if @model.kinds.select { |kind| kind.term == resource_type_identifier }.any?
+      resource_type_identifier = @model.kinds.select {
+        |kind| kind.term == resource_type_identifier
+      }.first.type_identifier if @model.kinds.select {
+        |kind| kind.term == resource_type_identifier
+      }.any?
 
       # check some basic pre-conditions
       raise "Endpoint is not connected!" unless @connected
@@ -309,7 +384,20 @@ module Occi
       descriptions
     end
 
-    # @param [Occi::Core::Entity] Entity to be created on the server
+    # Creates a new resource on the server. Resource must be provided
+    # as an instance of Occi::Core::Entity, e.g. instantiated using
+    # the get_resource method. 
+    #
+    # @example
+    #    res = client.get_resource "compute"
+    #
+    #    res.title = "MyComputeResource1"
+    #    res.mixins << client.find_mixin('small', "resource_tpl")
+    #    res.mixins << client.find_mixin('debian6', "os_tpl")
+    #
+    #    client.create res # => "http://localhost:3300/compute/df7698...f987fa"
+    #
+    # @param [Occi::Core::Entity] resource to be created on the server
     # @return [String] URI of the new resource
     def create(entity)
 
@@ -334,12 +422,20 @@ module Occi
       post location, collection
     end
 
-    # @param [String] Location of a OVF/OVA file
+    # Deploys a compute resource based on an OVF/OVA descriptor available
+    # on a local file system.
+    #
+    # @example
+    #    client.deploy "~/MyVMs/rOcciVM.ovf" # => "http://localhost:3300/compute/343423...42njhdafa"
+    #
+    # @param [String] location of an OVF/OVA file
     # @return [String] URI of the new resource
     def deploy(location)
       media_types = self.class.head(@endpoint).headers['accept'].to_s
       raise "File #{location} does not exist" unless File.exist? location
+
       file        = File.read(location)
+
       if location.include? '.ovf'
         if media_types.include? 'application/ovf'
           headers                 = self.class.headers.clone
@@ -359,12 +455,23 @@ module Occi
       end
     end
 
-    # @param [String] Resource link (URI)
-    # @return [Boolean] Success?
+    # Deletes a resource or all resource of a certain resource type
+    # from the server.
+    #
+    # @example
+    #    client.delete "compute" # => true
+    #    client.delete "http://schemas.ogf.org/occi/infrastructure#compute" # => true
+    #    client.delete "http://localhost:3300/compute/245j42594...98s9df8s9f" # => true 
+    #
+    # @param [String] resource type identifier, type name or location
+    # @return [Boolean] status
     def delete(resource_type_identifier)
       # convert type to type identifier
       if @model.kinds.select { |kind| kind.term == resource_type_identifier }.any?
-        type_identifier          = @model.kinds.select { |kind| kind.term == resource_type_identifier }.first.type_identifier
+        type_identifier          = @model.kinds.select {
+          |kind| kind.term == resource_type_identifier
+        }.first.type_identifier
+
         location                 = @model.get_by_id(type_identifier).location
         resource_type_identifier = @endpoint + location
       end
@@ -377,13 +484,21 @@ module Occi
       del(sanitize_resource_link(resource_type_identifier))
     end
 
-    # @param [String] Resource link (URI)
-    # @param [String] Type of action
-    # @return [String] Resource link (URI)
+    # Triggers given action on a specific resource.
+    #
+    # @example
+    #    TODO: add examples
+    #
+    # @param [String] resource location
+    # @param [String] type of action
+    # @return [String] resource location
     def trigger(resource_type_identifier, action)
       # TODO: not tested
       if @model.kinds.select { |kind| kind.term == resource_type }.any?
-        type_identifier          = @model.kinds.select { |kind| kind.term == resource_type_identifier }.first.type_identifier
+        type_identifier          = @model.kinds.select {
+          |kind| kind.term == resource_type_identifier
+        }.first.type_identifier
+
         location                 = @model.get_by_id(type_identifier).location
         resource_type_identifier = @endpoint + location
       end
@@ -401,6 +516,12 @@ module Occi
       post path, collection
     end
 
+    # Refreshes the Occi::Model used inside the client. Useful for
+    # updating the model without creating a new instance or
+    # reconnecting. Saves a lot of time in an interactive mode.
+    #
+    # @example
+    #    client.refresh
     def refresh
       # re-download the model from the server
       set_model
