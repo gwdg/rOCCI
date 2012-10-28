@@ -64,6 +64,9 @@ module Occi
     # Initializes client data structures and retrieves OCCI model
     # from the server.
     #
+    # @example
+    #    Occi::Client.new # => #<Occi::Client>
+    #
     # @param [String] endpoint URI
     # @param [Hash] auth options in a hash
     # @param [Hash] logging options in a hash
@@ -147,8 +150,8 @@ module Occi
     # @example
     #    client.get_resource_type_identifiers 
     #    # => [ "http://schemas.ogf.org/occi/infrastructure#compute",
-    #           "http://schemas.ogf.org/occi/infrastructure#storage",
-    #           "http://schemas.ogf.org/occi/infrastructure#network" ]
+    #    #      "http://schemas.ogf.org/occi/infrastructure#storage",
+    #    #      "http://schemas.ogf.org/occi/infrastructure#network" ]
     #
     # @return [Array<String>] list of available resource types in a Occi ID format
     def get_resource_type_identifiers
@@ -231,7 +234,7 @@ module Occi
     # @example
     #    client.get_mixins
     #     # => ["http://my.occi.service/occi/infrastructure/os_tpl#debian6",
-    #           "http://my.occi.service/occi/infrastructure/resource_tpl#small"]
+    #     #     "http://my.occi.service/occi/infrastructure/resource_tpl#small"]
     #    client.get_mixins "os_tpl"
     #     # => ["http://my.occi.service/occi/infrastructure/os_tpl#debian6"]
     #    client.get_mixins "resource_tpl"
@@ -275,7 +278,7 @@ module Occi
     # @example
     #    client.get_mixin_type_identifiers
     #     # => ['http://schemas.ogf.org/occi/infrastructure#os_tpl',
-    #           'http://schemas.ogf.org/occi/infrastructure#resource_tpl'] 
+    #     #     'http://schemas.ogf.org/occi/infrastructure#resource_tpl'] 
     #
     # @return [Array<String>] list of available mixin type identifiers
     def get_mixin_type_identifiers
@@ -296,8 +299,8 @@ module Occi
     # @example
     #    client.list
     #     # => [ "http://localhost:3300/compute/jh425jhj3h413-7dj29d7djd9e3-djh2jh4j4j",
-    #            "http://localhost:3300/network/kh425jhj3h413-7dj29d7djd9e3-djh2jh4j4j",
-    #            "http://localhost:3300/storage/lh425jhj3h413-7dj29d7djd9e3-djh2jh4j4j" ]
+    #     #      "http://localhost:3300/network/kh425jhj3h413-7dj29d7djd9e3-djh2jh4j4j",
+    #     #      "http://localhost:3300/storage/lh425jhj3h413-7dj29d7djd9e3-djh2jh4j4j" ]
     #    client.list "compute"
     #     # => [ "http://localhost:3300/compute/jh425jhj3h413-7dj29d7djd9e3-djh2jh4j4j" ]
     #    client.list "http://schemas.ogf.org/occi/infrastructure#compute"
@@ -529,19 +532,33 @@ module Occi
 
     private
 
-    # @param [Hash]
+    # Sets the logger and log levels. This allows users to pass existing logger
+    # instances to the rOCCI client.
+    #
+    # @example
+    #    set_logger { :out => STDERR, :level => Occi::Log::WARN, :logger => nil }
+    #
+    # @param [Hash] logger options
     def set_logger(log_options)
-
       if log_options[:logger].nil? or (not log_options[:logger].kind_of? Occi::Log)
         logger       = Occi::Log.new(log_options[:out])
         logger.level = log_options[:level]
       end
 
       self.class.debug_output $stderr if log_options[:level] == Occi::Log::DEBUG
-
     end
 
-    # @param [Hash]
+    # Sets auth method and appropriate httparty attributes. Supported auth methods
+    # are: ["basic", "digest", "x509", "none"] 
+    #
+    # @example
+    #    change_auth { :type => "none" }
+    #    change_auth { :type => "basic", :username => "123", :password => "321" }
+    #    change_auth { :type => "digest", :username => "123", :password => "321" }
+    #    change_auth { :type => "x509", :user_cert => "~/cert.pem",
+    #                  :user_cert_password => "321", :ca_path => nil }
+    #
+    # @param [Hash] authentication options
     def change_auth(auth_options)
       @auth_options = auth_options
 
@@ -568,9 +585,16 @@ module Occi
       end
     end
 
-    # @param [String]
-    # @param [Occi::Collection]
-    # @return [Occi::Collection]
+    # Performs GET request and parses the responses to collections.
+    #
+    # @example
+    #    get "/-/" # => #<Occi::Collection>
+    #    get "/compute/" # => #<Occi::Collection>
+    #    get "/compute/fs65g4fs6g-sf54g54gsf-aa12faddf52" # => #<Occi::Collection>
+    #
+    # @param [String] path for the GET request
+    # @param [Occi::Collection] collection of filters
+    # @return [Occi::Collection] parsed result of the request
     def get(path='', filter=nil)
       # remove the leading slash
       path.gsub!(/\A\//, '')
@@ -599,9 +623,21 @@ module Occi
       collection
     end
 
-    # @param [String]
-    # @param [Occi::Collection]
-    # @return [String]
+    # Performs POST requests and returns URI locations. Resource data must be provided
+    # in an Occi::Collection instance.
+    #
+    # @example
+    #    collection = Occi::Collection.new
+    #    collection.resources << entity if entity.kind_of? Occi::Core::Resource
+    #    collection.links << entity if entity.kind_of? Occi::Core::Link
+    #
+    #    post "/compute/", collection # => "http://localhost:3300/compute/23sf4g65as-asdgsg2-sdfgsf2g"
+    #    post "/network/", collection # => "http://localhost:3300/network/23sf4g65as-asdgsg2-sdfgsf2g"
+    #    post "/storage/", collection # => "http://localhost:3300/storage/23sf4g65as-asdgsg2-sdfgsf2g"
+    #
+    # @param [String] path for the POST request
+    # @param [Occi::Collection] resource data to be POSTed
+    # @return [String] URI location
     def post(path, collection)
       # remove the leading slash
       path.gsub!(/\A\//, '')
@@ -625,9 +661,14 @@ module Occi
       URI.parse(response.body).to_s
     end
 
-    # @param [String]
-    # @param [Occi::Collection]
-    # @return [Occi::Collection]
+    # Performs PUT requests and parses responses to collections.
+    #
+    # @example
+    #    TODO: add examples
+    #
+    # @param [String] path for the PUT request
+    # @param [Occi::Collection] resource data to send
+    # @return [Occi::Collection] parsed result of the request
     def put(path, collection)
       # remove the leading slash
       path.gsub!(/\A\//, '')
@@ -646,10 +687,15 @@ module Occi
       collection
     end
 
-    # @param [String]
-    # @param [Occi::Collection]
-    # @return [Boolean]
-    def del(path, collection=nil)
+    # Performs DELETE requests and returns True on success.
+    #
+    # @example
+    #    del "/compute/65sf4g65sf4g-sf6g54sf5g-sfgsf32g3" # => true
+    #
+    # @param [String] path for the DELETE request
+    # @param [Occi::Collection] collection of filters (currently NOT used)
+    # @return [Boolean] status
+    def del(path, filter=nil)
       # remove the leading slash
       path.gsub!(/\A\//, '')
 
@@ -661,13 +707,23 @@ module Occi
       true
     end
 
-    # @param [String]
-    # @param [Occi::Core::Resource]
-    # @param [URI,String]
-    # @param [String]
-    # @param [Occi::Core::Attributes]
-    # @param [Array]
-    # @return [Occi::Core::Link]
+    # Creates a link of a specified kind and binds it to the given resource.
+    #
+    # @example
+    #    link_kind = 'http://schemas.ogf.org/occi/infrastructure#storagelink'
+    #    compute = client.get_resource "compute"
+    #    storage_location = "http://localhost:3300/storage/321df21adfad-f3adfa5f4adf-a3d54ffadffe"
+    #    linked_resource_kind = 'http://schemas.ogf.org/occi/infrastructure#storage'
+    #
+    #    link link_kind, compute, storage_location, linked_resource_kind
+    #
+    # @param [String] link type identifier (link kind)
+    # @param [Occi::Core::Resource] resource to link to
+    # @param [URI, String] resource to be linked
+    # @param [String] type identifier of the linked resource
+    # @param [Occi::Core::Attributes] link attributes
+    # @param [Array<String>] link mixins
+    # @return [Occi::Core::Link] link instance 
     def link(kind, source, target_location, target_kind, attributes=Occi::Core::Attributes.new, mixins=[])
       link            = Occi::Core::Link.new(kind)
       link.mixins     = mixins
@@ -678,24 +734,42 @@ module Occi
       jj link
       link.check @model
       source.links << link
+
       link
     end
 
-    # @param [String]
-    # @return [String]
+    # Checks whether the given endpoint URI is valid and adds a trailing
+    # slash if necessary.
+    #
+    # @example 
+    #    prepare_endpoint "http://localhost:3300" # => "http://localhost:3300/"
+    #
+    # @param [String] endpoint URI in a non-canonical string 
+    # @return [String] canonical endpoint URI in a string, with a trailing slash
     def prepare_endpoint(endpoint)
       raise 'Endpoint not a valid URI' if (endpoint =~ URI::ABS_URI).nil?
       @endpoint = endpoint.chomp('/') + '/'
     end
 
-    # @param [String]
-    # @return [String]
+    # Extracts the resource path from a resource link. It will remove the leading @endpoint
+    # and replace it with a slash.
+    #
+    # @example
+    #    sanitize_resource_link "http://localhost:3300/compute/35ad4f45gsf-gsfg524s6gsfg-sfgsf4gsfg"
+    #     # => "/compute/35ad4f45gsf-gsfg524s6gsfg-sfgsf4gsfg"
+    #
+    # @param [String] string containing the full resource link
+    # @return [String] extracted path, with a leading slash
     def sanitize_resource_link(resource_link)
       raise "Resource link #{resource_link} is not valid!" unless resource_link.start_with? @endpoint
 
       resource_link.gsub @endpoint, '/'
     end
 
+    # Creates an Occi::Model from data retrieved from the server.
+    #
+    # @example
+    #    set_model
     def set_model
 
       #
@@ -718,17 +792,33 @@ module Occi
       end
     end
 
-    # @return [Occi::Collection] collection including all registered OS templates
+    # Retrieves available os_tpls from the model.
+    #
+    # @example
+    #    get_os_templates # => #<Occi::Collection>
+    #
+    # @return [Occi::Collection] collection containing all registered OS templates
     def get_os_templates
       @model.get.mixins.select { |mixin| mixin.related.select { |rel| rel.end_with? 'os_tpl' }.any? }
     end
 
-    # @return [Occi::Collection] collection including all registered resource templates
+    # Retrieves available resource_tpls from the model.
+    #
+    # @example
+    #    get_resource_templates # => #<Occi::Collection>
+    #
+    # @return [Occi::Collection] collection containing all registered resource templates
     def get_resource_templates
       @model.get.mixins.select { |mixin| mixin.related.select { |rel| rel.end_with? 'resource_tpl' }.any? }
     end
 
-    # @return [String]
+    # Sets media type. Will choose either application/occi+json or text/plain
+    # based on the formats supported by the server.
+    #
+    # @example
+    #    set_media_type # => 'application/occi+json'
+    #
+    # @return [String] chosen media type
     def set_media_type
       media_types = self.class.head(@endpoint).headers['accept']
       Occi::Log.debug("Available media types: #{media_types}")
@@ -740,13 +830,25 @@ module Occi
                     end
     end
 
-    # @param [HTTParty::Response]
+    # Generates a human-readable response message based on the HTTP response code. 
+    #
+    # @example
+    #    response_message self.class.delete(@endpoint + path)
+    #     # =>  'HTTP Response status: [200] OK'
+    #
+    # @param [HTTParty::Response] HTTParty response object
+    # @return [String] message
     def response_message(response)
       'HTTP Response status: [' + response.code.to_s + '] ' + reason_phrase(response.code)
     end
 
-    # @param [Integer]
-    # @return [String]
+    # Converts HTTP response codes to human-readable phrases.
+    #
+    # @example
+    #    reason_phrase(500) # => "Internal Server Error"
+    #
+    # @param [Integer] HTTP response code
+    # @return [String] human-readable phrase
     def reason_phrase(code)
       HTTP_CODES[code.to_s]
     end
