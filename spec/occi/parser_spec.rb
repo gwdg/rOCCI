@@ -37,7 +37,7 @@ describe "Parser" do
     compute_resources = collection.resources.select { |resource| resource.kind.to_s == 'http://schemas.ogf.org/occi/infrastructure#compute' }
     compute_resources.should have(1).compute_resource
     compute_resources.first.attributes.occi!.compute!.cores.should == 1
-    compute_resources.first.attributes.occi!.compute!.memory.should == 256
+    compute_resources.first.attributes.occi!.compute!.memory.should == 0.25
   end
 
   it "should parse an OVA container" do
@@ -53,6 +53,6 @@ describe "Parser" do
     compute_resources = collection.resources.select { |resource| resource.kind.to_s == 'http://schemas.ogf.org/occi/infrastructure#compute' }
     compute_resources.should have(1).compute_resource
     compute_resources.first.attributes.occi!.compute!.cores.should == 1
-    compute_resources.first.attributes.occi!.compute!.memory.should == 256
+    compute_resources.first.attributes.occi!.compute!.memory.should == 0.25
   end
 end
