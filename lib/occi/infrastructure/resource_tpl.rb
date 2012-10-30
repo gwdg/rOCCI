@@ -4,7 +4,7 @@ module Occi
 
       extend Occi
 
-      def self.mixins
+      def self.mixin
         mixin = Occi::Core::Mixin.new('http://schemas.ogf.org/occi/infrastructure#', 'resource_tpl')
 
         mixin.title = "resource template"

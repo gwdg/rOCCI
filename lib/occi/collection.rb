@@ -1,6 +1,6 @@
 module Occi
   class Collection
-    attr_accessor :kinds, :mixins, :actions, :resources, :links, :action
+    attr_accessor :kinds, :mixins, :actions, :resources, :links, :action, :model
 
     # Initialize a new OCCI Collection by initializing all supplied OCCI objects
     #
@@ -30,10 +30,22 @@ module Occi
       @resources + @links
     end
 
+    # @param [Occi::Core::Model] model
+    # @return [Occi::Core::Model]
+    def model=(model)
+      categories.each {|category| category.model=model}
+      entities.each {|entity| entity.model = model}
+    end
+
+    # @param [Occi::Collection] other_collection
+    # @return [Occi::Collection]
     def merge!(other_collection)
       merge other_collection, self
     end
 
+    # @param [Occi::Collection] other_collection
+    # @param [Occi::Collection] collection
+    # @return [Occi::Collection]
     def merge(other_collection, collection=self.clone)
       collection.kinds.concat other_collection.kinds.select { |kind| get_by_id(kind.type_identifier).nil? }
       collection.mixins.concat other_collection.mixins.select { |mixin| get_by_id(mixin.type_identifier).nil? }
@@ -44,10 +56,15 @@ module Occi
       collection
     end
 
+    # @param [Occi::Collection] other_collection
+    # @return [Occi::Collection]
     def intersect!(other_collection)
       intersect other_collection, self
     end
 
+    # @param [Occi::Collection] other_collection
+    # @param [Occi::Collection] collection
+    # @return [Occi::Collection]
     def intersect(other_collection, collection=self.clone)
       collection.kinds     = other_collection.kinds.select { |kind| get_by_id(kind.type_identifier) }
       collection.mixins    = other_collection.mixins.select { |mixin| get_by_id(mixin.type_identifier) }

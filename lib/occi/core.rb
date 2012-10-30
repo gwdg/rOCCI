@@ -1,12 +1,15 @@
 require 'occi/core/category'
+require 'occi/core/categories'
 require 'occi/core/kind'
 require 'occi/core/mixin'
+require 'occi/core/mixins'
 require 'occi/core/action'
+require 'occi/core/actions'
+require 'occi/core/attributes'
+require 'occi/core/attribute_properties'
 require 'occi/core/entity'
 require 'occi/core/link'
 require 'occi/core/resource'
-require 'occi/core/attributes'
-require 'occi/core/attribute_properties'
 
 module Occi
   module Core

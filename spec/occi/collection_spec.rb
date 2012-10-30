@@ -3,7 +3,6 @@ require 'occi'
 
 module Occi
   describe Collection do
-    describe "initialize" do
 
       it "should create a new Occi collection including the Occi base objects" do
         collection = Hashie::Mash.new(:kinds => [], :mixins => [], :actions => [], :resources => [], :links => [])
@@ -14,6 +13,5 @@ module Occi
         collection.links << { :kind => "http://schemas.ogf.org/occi/infrastructure#storagelink" }
       end
 
-    end
   end
 end

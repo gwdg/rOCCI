@@ -22,7 +22,7 @@ module Occi
       # @return [Hashie::Mash] json representation
       def as_json(options={ })
         mixin = Hashie::Mash.new
-        mixin.related = @related if @related.any?
+        mixin.related = @related.join(' ').split(' ') if @related.any?
         mixin.actions = @actions if @actions.any?
         mixin.location = @location if @location
         mixin.merge! super

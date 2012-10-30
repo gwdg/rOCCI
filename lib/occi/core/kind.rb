@@ -2,7 +2,7 @@ module Occi
   module Core
     class Kind < Occi::Core::Category
 
-      attr_accessor :entities, :related, :actions, :location, :entity_type
+      attr_accessor :entities, :related, :actions, :location
 
       # @param [String ] scheme
       # @param [String] term
@@ -10,20 +10,23 @@ module Occi
       # @param [Hash] attributes
       # @param [Array] related
       # @param [Array] actions
-      def initialize(scheme, term, title=nil, attributes={}, related=[], actions=[],location=nil)
+      def initialize(scheme, term, title=nil, attributes={ }, related=[], actions=[], location=nil)
         super(scheme, term, title, attributes)
         @related  = related.to_a.flatten
         @actions  = actions.to_a.flatten
         @location = location ||= '/' + term + '/'
         @entities = []
-        @entity_type = self.class.get_class scheme, term, related
+      end
+
+      def entity_type
+        self.class.get_class @scheme, @term, @related
       end
 
       # @param [Hash] options
       # @return [Hashie::Mash] json representation
       def as_json(options={ })
         kind = Hashie::Mash.new
-        kind.related = @related if @related.any?
+        kind.related = @related.join(' ').split(' ') if @related.any?
         kind.actions = @actions if @actions.any?
         kind.location = @location if @location
         kind.merge! super

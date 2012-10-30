@@ -2,10 +2,11 @@ module Occi
   module Infrastructure
     class Network < Occi::Core::Resource
 
+      require 'occi/infrastructure/network/ipnetwork'
+
       extend Occi
 
       def self.mixins
-        require 'occi/infrastructure/network/ipnetwork'
         Occi::Infrastructure::Network::Ipnetwork.mixins
       end
 

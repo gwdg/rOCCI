@@ -4,21 +4,16 @@ module Occi
 
       attr_accessor :rel, :source, :target
 
-      # @return [Occi::Core::Kind] kind definition of Link type
-      def self.kind
-        kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'link')
+      @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'link')
 
-        kind.related = %w{http://schemas.ogf.org/occi/core#entity}
-        kind.title   = "link"
+      @kind.related = %w{http://schemas.ogf.org/occi/core#entity}
+      @kind.title   = "link"
 
-        kind.attributes.occi!.core!.target = Occi::Core::AttributeProperties.new(
-            { :mutable => true })
+      @kind.attributes.occi!.core!.target = Occi::Core::AttributeProperties.new(
+          { :mutable => true })
 
-        kind.attributes.occi!.core!.source = Occi::Core::AttributeProperties.new(
-            { :mutable => true })
-
-        kind
-      end
+      @kind.attributes.occi!.core!.source = Occi::Core::AttributeProperties.new(
+          { :mutable => true })
 
       # @param [String] kind
       # @param [String] mixins
@@ -27,7 +22,7 @@ module Occi
       # @param [String] rel
       # @param [String,Occi::Core::Entity] target
       # @param [String,Occi::Core::Entity] source
-      def initialize(kind, mixins=[], attributes={ }, actions=[], rel=nil, target=nil, source=nil)
+      def initialize(kind=self.kind, mixins=[], attributes={ }, actions=[], rel=nil, target=nil, source=nil)
         super(kind, mixins, attributes, actions)
         @rel = rel if rel
         self.source = source if source

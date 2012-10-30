@@ -1,12 +1,8 @@
-require 'active_support/json'
-require 'active_support/inflector'
-require 'hashie/mash'
-
 module Occi
   module Core
     class Category
 
-      attr_accessor :model, :scheme, :term, :title, :attributes
+      attr_accessor :scheme, :term, :title, :attributes, :model
 
       # @param [String ] scheme
       # @param [String] term
@@ -24,16 +20,17 @@ module Occi
       # @param [Array] related
       # @return [Class] ruby class with scheme as namespace, term as name and related kind as super class
       def self.get_class(scheme, term, related=['http://schemas.ogf.org/occi/core#entity'])
-        if related.to_a.first == 'http://schemas.ogf.org/occi/core#entity' or related.to_a.first.nil?
+        related = related.to_a.flatten
+        scheme += '#' unless scheme.end_with? '#'
+
+        if related.first.to_s == 'http://schemas.ogf.org/occi/core#entity' or related.first.nil?
           parent = Occi::Core::Entity
         else
-          scheme, term = related.first.split '#'
-          parent       = self.get_class scheme, term
+          related_scheme, related_term = related.first.to_s.split '#'
+          parent                       = self.get_class related_scheme, related_term
         end
 
         uri = URI.parse(scheme)
-
-        Occi::Log.debug "URI #{uri.to_s}"
 
         namespace = if uri.host == 'schemas.ogf.org'
                       uri.path.reverse.chomp('/').reverse.split('/')
@@ -42,20 +39,22 @@ module Occi
                     end
 
         namespace = namespace.inject(Object) do |mod, name|
-          if mod.constants.collect{|sym| sym.to_s}.include? name.classify
+          if mod.constants.collect { |sym| sym.to_s }.include? name.classify
             mod.const_get name.classify
           else
             mod.const_set name.classify, Module.new
           end
         end
 
-        klass = if namespace.const_defined? term.classify
-                  namespace.const_get term.classify
-                else
-                  namespace.const_set term.classify, Class.new(parent)
-                end
-
-        klass.allocate.kind_of? Occi::Core::Entity or raise "OCCI Kind with type identifier #{scheme + term} could not be created as the corresponding class #{klass.to_s} already exists and is not derived from Occi::Core::Entity"
+        if namespace.const_defined? term.classify
+          klass = namespace.const_get term.classify
+          unless klass.ancestors.include? Occi::Core::Entity or klass.instance_of? Module
+            raise "OCCI Kind with type identifier #{scheme + term} could not be created as the corresponding class #{klass.to_s} already exists and is not derived from Occi::Core::Entity"
+          end
+        else
+          klass      = namespace.const_set term.classify, Class.new(parent)
+          klass.kind = Occi::Core::Kind.new scheme, term, nil, { }, related
+        end
 
         klass
       end
@@ -66,11 +65,11 @@ module Occi
       end
 
       # check if category is related to another category
-      # @param [String] category_id Type identifier of a related category
+      # @param [String, Category] category Related Category or its type identifier
       # @return [true,false] true if category is related to category_id else false
-      def related_to?(category_id)
-        self.related.each do |rel_id|
-          return true if rel_id == category_id || @model.get_by_id(rel_id).related_to?(category_id)
+      def related_to?(category)
+        self.related.each do |related|
+          return true if related.to_s == category.to_s
         end if self.class.method_defined? 'related'
         false
       end
@@ -113,10 +112,13 @@ module Occi
         JSON.pretty_generate(JSON.parse(to_json))
       end
 
-
       # @return [NilClass] category itself does not have a location
       def location
         nil # not implemented
+      end
+
+      def to_s
+        self.type_identifier
       end
 
     end

@@ -2,36 +2,41 @@ module Occi
   module Core
     class Entity
 
-      attr_accessor :mixins, :attributes, :actions, :id
+      attr_accessor :mixins, :attributes, :actions, :id, :model
       attr_reader :kind
+
+      class << self
+        attr_accessor :kind
+      end
+
+      @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'entity')
+
+      @kind.title = "entity"
+
+      @kind.attributes.occi!.core!.id = Occi::Core::AttributeProperties.new(
+          { :pattern => "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}" })
+
+      @kind.attributes.occi!.core!.title = Occi::Core::AttributeProperties.new(
+          { :mutable => true })
+
 
       # @return [String]
       def self.type_identifier
         self.kind.type_identifier
       end
 
-      # @return [Occi::Core::Kind] kind definition of Entity type
-      def self.kind
-        kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'entity')
-
-        kind.title = "entity"
-
-        kind.attributes.occi!.core!.id = Occi::Core::AttributeProperties.new(
-            { :pattern => "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}" })
-
-        kind.attributes.occi!.core!.title = Occi::Core::AttributeProperties.new(
-            { :mutable => true })
-
-        kind
-      end
-
       # @param [Array] args list of arguments
       # @return [Object] new instance of this class
       def self.new(*args)
-        args[0]      ||= self.kind.type_identifier
-        scheme, term = args[0].split '#'
+        if args.size > 0
+          type_identifier = args[0]
+          related         = [self.kind]
+        else
+          type_identifier = self.kind.type_identifier
+        end
+        scheme, term = type_identifier.split '#'
 
-        klass = Occi::Core::Kind.get_class scheme, term
+        klass = Occi::Core::Kind.get_class scheme, term, related
 
         object = klass.allocate
         object.send :initialize, *args
@@ -41,13 +46,26 @@ module Occi
       # @param [String] kind
       # @param [String] mixins
       # @param [Occi::Core::Attributes] attributes
-      def initialize(kind, mixins=[], attributes={ }, actions=[])
-        @checked = false
-        raise "Kind #{kind} not of type String" unless kind.kind_of? String
-        @kind       = kind
-        @mixins     = mixins.to_a.flatten
-        @attributes = Occi::Core::Attributes.new(attributes)
-        @actions    = actions.to_a.flatten
+      def initialize(kind = self.kind, mixins=[], attributes={ }, actions=[])
+        @kind       = self.class.kind.clone
+        @mixins     = Occi::Core::Mixins.new mixins
+        @attributes = Occi::Core::Attributes.new attributes
+        @actions    = Occi::Core::Actions.new actions
+      end
+
+      # @return [Occi::Core::Kind]
+      def kind
+        @kind
+      end
+
+      # @param [Occi::Core::Kind,String] kind
+      # @return [Occi::Core::Kind]
+      def kind=(kind)
+        if kind.kind_of? String
+          scheme, term = kind.split '#'
+          kind         = Occi::Core::Category.get_class scheme, term
+        end
+        @kind = kind
       end
 
       # @param [Array] mixins
@@ -66,7 +84,7 @@ module Occi
       # @param [UUIDTools::UUID] id
       def id=(id)
         @attributes.occi!.core!.id = id
-        @id = id
+        @id                        = id
       end
 
       # @return [UUIDTools::UUID] id of the entity
@@ -86,9 +104,24 @@ module Occi
         @attributes.occi.core.title if @attributes.occi.core if @attributes.occi
       end
 
+      # @param [Occi::Model] model
+      # @return [Occi::Model]
+      def model=(model)
+        @model = model
+        @kind &&= model.get_by_id kind.type_identifier
+        @kind.entities << self
+        @mixins.each do |mixin|
+          model_mixin = model.get_by_id mixin.type_identifier
+          if model_mixin
+            mixin = model_mixin
+            mixin.entities << self
+          end
+        end
+      end
+
       # @return [String] location of the entity
       def location
-        '/' + @kind.split('#').last + '/' + self.id.gsub('urn:uuid:','') if self.id
+        kind.location + id.gsub('urn:uuid:', '') if id
       end
 
       # check attributes against their definitions and set defaults
@@ -135,30 +168,23 @@ module Occi
         attributes
       end
 
-      # @return [true,false]
-      def checked?
-        @checked && @attributes.checked?
-      end
-
       # @param [Hash] options
       # @return [Hashie::Mash] json representation
       def as_json(options={ })
         entity = Hashie::Mash.new
-        entity.kind = @kind if @kind
-        entity.mixins = @mixins if @mixins.any?
+        entity.kind = @kind.to_s if @kind
+        entity.mixins = @mixins.join(' ').split(' ') if @mixins.any?
         entity.actions = @actions if @actions.any?
         entity.attributes = @attributes if @attributes.any?
-        entity.id = self.id if self.id
+        entity.id = id if id
         entity
       end
 
       # @return [String] text representation
       def to_text
-        scheme, term = self.kind.split('#')
-        scheme << '#'
-        text = 'Category: ' + term + ';scheme=' + scheme.inspect + ';class="kind"' + "\n"
+        text = 'Category: ' + self.kind.term + ';scheme=' + self.kind.scheme.inspect + ';class="kind"' + "\n"
         @mixins.each do |mixin|
-          scheme, term = mixin.split('#')
+          scheme, term = mixin.to_s.split('#')
           scheme << '#'
           text << 'Category: ' + term + ';scheme=' + scheme.inspect + ';class="mixin"' + "\n"
         end
@@ -175,12 +201,10 @@ module Occi
 
       # @return [Hash] hash containing the HTTP headers of the text/occi rendering
       def to_header
-        scheme, term = self.kind.split('#')
-        scheme << '#'
         header             = Hashie::Mash.new
-        header['Category'] = term + ';scheme=' + scheme.inspect + ';class="kind"'
+        header['Category'] = self.kind.term + ';scheme=' + self.kind.scheme.inspect + ';class="kind"'
         @mixins.each do |mixin|
-          scheme, term = mixin.split('#')
+          scheme, term = mixin.to_s.split('#')
           scheme << '#'
           header['Category'] += ',' + term + ';scheme=' + scheme.inspect + ';class="mixin"'
         end

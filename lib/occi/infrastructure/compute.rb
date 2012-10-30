@@ -4,48 +4,44 @@ module Occi
 
       extend Occi
 
-      def self.kind
-        kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/infrastructure#', 'compute')
+      @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/infrastructure#', 'compute')
 
-        kind.title = "compute resource"
+      @kind.title = "compute resource"
 
-        kind.related << Occi::Core::Resource.type_identifier
+      @kind.related << Occi::Core::Resource.type_identifier
 
-        kind.attributes.occi!.compute!.architecture = Occi::Core::AttributeProperties.new(
-            { :mutable => true,
-              :pattern => 'x86|x64' })
+      @kind.attributes.occi!.compute!.architecture = Occi::Core::AttributeProperties.new(
+          { :mutable => true,
+            :pattern => 'x86|x64' })
 
-        kind.attributes.occi!.compute!.cores = Occi::Core::AttributeProperties.new(
-            { :type    => 'number',
-              :mutable => true })
+      @kind.attributes.occi!.compute!.cores = Occi::Core::AttributeProperties.new(
+          { :type    => 'number',
+            :mutable => true })
 
-        kind.attributes.occi!.compute!.hostname = Occi::Core::AttributeProperties.new(
-            { :mutable => true,
-              :pattern => '(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*' })
+      @kind.attributes.occi!.compute!.hostname = Occi::Core::AttributeProperties.new(
+          { :mutable => true,
+            :pattern => '(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*' })
 
-        kind.attributes.occi!.compute!.speed = Occi::Core::AttributeProperties.new(
-            { :type    => 'number',
-              :mutable => true })
+      @kind.attributes.occi!.compute!.speed = Occi::Core::AttributeProperties.new(
+          { :type    => 'number',
+            :mutable => true })
 
-        kind.attributes.occi!.compute!.memory = Occi::Core::AttributeProperties.new(
-            { :type    => 'number',
-              :mutable => true })
+      @kind.attributes.occi!.compute!.memory = Occi::Core::AttributeProperties.new(
+          { :type    => 'number',
+            :mutable => true })
 
-        kind.attributes.occi!.compute!.state = Occi::Core::AttributeProperties.new(
-            { :pattern => 'inactive|active|suspended|error',
-              :default => 'inactive' })
+      @kind.attributes.occi!.compute!.state = Occi::Core::AttributeProperties.new(
+          { :pattern => 'inactive|active|suspended|error',
+            :default => 'inactive' })
 
-        kind.location = '/compute/'
+      @kind.location = '/compute/'
 
-        kind.actions = [
-            "http://schemas.ogf.org/occi/infrastructure/compute/action#start",
-            "http://schemas.ogf.org/occi/infrastructure/compute/action#stop",
-            "http://schemas.ogf.org/occi/infrastructure/compute/action#restart",
-            "http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"
-        ]
-
-        kind
-      end
+      @kind.actions = [
+          "http://schemas.ogf.org/occi/infrastructure/compute/action#start",
+          "http://schemas.ogf.org/occi/infrastructure/compute/action#stop",
+          "http://schemas.ogf.org/occi/infrastructure/compute/action#restart",
+          "http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"
+      ]
 
       def self.actions
         start = Occi::Core::Action.new('http://schemas.ogf.org/occi/infrastructure/compute/action#',
@@ -131,7 +127,7 @@ module Occi
       end
 
       def storagelink(target, mixins=[], attributes=Occi::Core::Attributes.new)
-        link(target, Occi::Infrastructure::Storagelink.kind, mixins, attributes,rel=Occi::Infrastructure::Storage.type_identifier)
+        link(target, Occi::Infrastructure::Storagelink.kind, mixins, attributes, rel=Occi::Infrastructure::Storage.type_identifier)
       end
 
       def networkinterface(target, mixins=[], attributes=Occi::Core::Attributes.new)
