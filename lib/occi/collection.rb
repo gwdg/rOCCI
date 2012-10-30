@@ -6,10 +6,11 @@ module Occi
     #
     # @param [Hash] collection including one or more of the keys kinds, mixins, actions, resources, links
     def initialize(collection={ })
+      #TODO: add classes for entity lists
       collection = Hashie::Mash.new(collection) unless collection.kind_of? Occi::Collection
-      @kinds     = []
-      @mixins    = []
-      @actions   = []
+      @kinds     = Set.new
+      @mixins    = Occi::Core::Mixins.new
+      @actions   = Occi::Core::Actions.new
       @resources = []
       @links     = []
       @kinds = collection.kinds.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) } if collection.kinds.instance_of? Array

@@ -5,6 +5,10 @@ module Occi
       extend Occi
 
       def self.mixins
+        [self.mixin]
+      end
+
+      def self.mixin
         mixin = Occi::Core::Mixin.new('http://schemas.ogf.org/occi/infrastructure#', 'os_tpl')
 
         mixin.title = "operating system template"
@@ -13,7 +17,7 @@ module Occi
 
         mixin.location = '/mixins/os_tpl/'
 
-        [mixin]
+        mixin
       end
     end
   end

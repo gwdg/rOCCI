@@ -4,6 +4,10 @@ module Occi
 
       extend Occi
 
+      def self.mixins
+        [self.mixin]
+      end
+
       def self.mixin
         mixin = Occi::Core::Mixin.new('http://schemas.ogf.org/occi/infrastructure#', 'resource_tpl')
 
@@ -13,7 +17,7 @@ module Occi
 
         mixin.location = '/mixins/resource_tpl/'
 
-        [mixin]
+        mixin
       end
     end
   end
