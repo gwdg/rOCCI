@@ -99,7 +99,7 @@ module Occi
 
       # get model information from the endpoint
       # and create Occi::Model instance
-      eel
+      set_model
 
       # auto-connect?
       @connected = auto_connect
