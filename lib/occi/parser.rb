@@ -60,9 +60,9 @@ module Occi
       category_strings = header['HTTP_CATEGORY'].to_s.split(',')
       category_strings.each do |cat|
         category = OCCIANTLR::Parser.new('Category: ' + cat).category
-        collection.kinds.concat category.kinds.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) }
-        collection.mixins.concat category.mixins.collect { |mixin| Occi::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) }
-        collection.actions.concat category.actions.collect { |action| Occi::Core::Action.new(action.scheme, action.term, action.title, action.attributes) }
+        collection.kinds.merge category.kinds.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) }
+        collection.mixins.merge category.mixins.collect { |mixin| Occi::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) }
+        collection.actions.merge category.actions.collect { |action| Occi::Core::Action.new(action.scheme, action.term, action.title, action.attributes) }
       end
       collection
     end
@@ -131,9 +131,9 @@ module Occi
       text.each_line do |line|
         category = OCCIANTLR::Parser.new(line.chomp).category
         next if category.nil?
-        collection.kinds.concat category.kinds.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) }
-        collection.mixins.concat category.mixins.collect { |mixin| Occi::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) }
-        collection.actions.concat category.actions.collect { |action| Occi::Core::Action.new(action.scheme, action.term, action.title, action.attributes) }
+        collection.kinds.merge category.kinds.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) }
+        collection.mixins.merge category.mixins.collect { |mixin| Occi::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) }
+        collection.actions.merge category.actions.collect { |action| Occi::Core::Action.new(action.scheme, action.term, action.title, action.attributes) }
       end
       collection
     end
@@ -191,10 +191,10 @@ module Occi
     def self.json(json)
       collection = Occi::Collection.new
       hash       = Hashie::Mash.new(JSON.parse(json))
-      collection.kinds.concat hash.kinds.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) } if hash.kinds
-      collection.mixins.concat hash.mixins.collect { |mixin| Occi::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) } if hash.mixins
-      collection.resources.concat hash.resources.collect { |resource| Occi::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.actions, resource.links) } if hash.resources
-      collection.links.concat hash.links.collect { |link| Occi::Core::Link.new(link.kind, link.mixins, link.attributes) }
+      collection.kinds.merge hash.kinds.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) } if hash.kinds
+      collection.mixins.merge hash.mixins.collect { |mixin| Occi::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) } if hash.mixins
+      collection.resources.merge hash.resources.collect { |resource| Occi::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.actions, resource.links) } if hash.resources
+      collection.links.merge hash.links.collect { |link| Occi::Core::Link.new(link.kind, link.mixins, link.attributes) }
 
       if collection.resources.size == 1 & collection.links.size > 0
         if collection.resources.first.links.empty?
@@ -217,10 +217,10 @@ module Occi
     def self.xml(xml)
       collection = Occi::Collection.new
       hash       = Hashie::Mash.new(Hash.from_xml(Nokogiri::XML(xml)))
-      collection.kinds.concat hash.kinds.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) } if hash.kinds
-      collection.mixins.concat hash.mixins.collect { |mixin| Occi::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) } if hash.mixins
-      collection.resources.concat hash.resources.collect { |resource| Occi::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.actions, resource.links) } if hash.resources
-      collection.links.concat hash.links.collect { |link| Occi::Core::Link.new(link.kind, link.mixins, link.attributes) } if hash.links
+      collection.kinds.merge hash.kinds.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) } if hash.kinds
+      collection.mixins.merge hash.mixins.collect { |mixin| Occi::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) } if hash.mixins
+      collection.resources.merge hash.resources.collect { |resource| Occi::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.actions, resource.links) } if hash.resources
+      collection.links.merge hash.links.collect { |link| Occi::Core::Link.new(link.kind, link.mixins, link.attributes) } if hash.links
       collection
     end
 

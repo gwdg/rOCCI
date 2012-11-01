@@ -7,7 +7,7 @@ module Occi
 
       @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'resource')
 
-      @kind.related = [Occi::Core::Entity.kind]
+      @kind.related << Occi::Core::Entity.kind
       @kind.title   = 'resource'
 
       @kind.attributes.occi!.core!.summary = Occi::Core::AttributeProperties.new(

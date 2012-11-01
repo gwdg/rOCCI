@@ -30,7 +30,7 @@ module Occi
 
       it "checks if the category is related to another category" do
         category = Occi::Core::Resource.kind
-        category.related_to? Occi::Core::Entity.kind
+        category.related_to?(Occi::Core::Entity.kind).should be true
       end
 
       # rendering

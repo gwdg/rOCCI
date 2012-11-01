@@ -1,6 +1,6 @@
 module Occi
   module Core
-    class Actions < Occi::Core::Categories
+    class Kinds < Occi::Core::Categories
 
       private
 
@@ -11,8 +11,8 @@ module Occi
           scheme, term = category.split '#'
           scheme       += '#'
 
-          klass    = Occi::Core::Category.get_class scheme, term, [Occi::Core::Action.new]
-          category = klass.new(scheme, term)
+          klass    = Occi::Core::Category.get_class scheme, term, [Occi::Core::Kind.new]
+          category = klass.kind
         end
         category
       end

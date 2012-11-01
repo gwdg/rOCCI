@@ -37,15 +37,15 @@ require 'occiantlr/OCCIANTLRParser'
 module Occi
 
   def kinds
-    []
+    Occi::Core::Kinds.new
   end
 
   def mixins
-    []
+    Occi::Core::Mixins.new
   end
 
   def actions
-    []
+    Occi::Core::Actions.new
   end
 
   # @return [Array] list of Occi::Core::Categories

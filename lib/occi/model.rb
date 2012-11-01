@@ -54,17 +54,12 @@ module Occi
 
     # @param [Occi::Core::Category] category
     def register(category)
-      Occi::Log.debug "### Registering category #{category.type_identifier}"
+      Occi::Log.debug "### Registering category #{category}"
       # add model to category as back reference
       category.model = self
-      case category.class.name
-        when Occi::Core::Kind.to_s
-          @kinds << category unless get_by_id(category.type_identifier)
-        when Occi::Core::Mixin.to_s
-          @mixins << category unless get_by_id(category.type_identifier)
-        when Occi::Core::Action.to_s
-          @actions << category unless get_by_id(category.type_identifier)
-      end
+      @kinds << category unless get_by_id(category.to_s) if category.class.ancestors.include? Occi::Core::Kind
+      @mixins << category unless get_by_id(category.to_s) if category.class.ancestors.include? Occi::Core::Mixin
+      @actions << category unless get_by_id(category.to_s) if category.class.ancestors.include? Occi::Core::Action
     end
 
     # @param [Occi::Core::Category] category

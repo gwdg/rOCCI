@@ -7,15 +7,22 @@ module Occi
       # @param [String ] scheme
       # @param [String] term
       # @param [String] title
-      # @param [Hash] attributes
-      # @param [Array] related
-      # @param [Array] actions
-      def initialize(scheme, term, title=nil, attributes={}, related=[], actions=[],location=nil)
+      # @param [Occi::Core::Attributes,Hash,NilClass] attributes
+      # @param [Occi::Core::Categories,Hash,NilClass] related
+      # @param [Occi::Core::Actions,Hash,NilClass] actions
+      def initialize(scheme='http://schemas.ogf.org/occi/core#',
+          term='mixin',
+          title='',
+          attributes=Occi::Core::Attributes.new,
+          related=Occi::Core::Related.new,
+          actions=Occi::Core::Actions.new,
+          location='')
+
         super(scheme, term, title, attributes)
-        @related  = related.to_a.flatten
-        @actions  = actions.to_a.flatten
-        @location = location ||= '/' + term + '/'
-        @entities = []
+        @related  = Occi::Core::Related.new(related)
+        @actions  = Occi::Core::Actions.new(actions)
+        @entities = Occi::Core::Entities.new
+        location.to_s.empty? ? @location = '/mixins/' + term + '/' : @location = location
       end
 
       # @param [Hash] options

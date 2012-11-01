@@ -8,11 +8,11 @@ module Occi
     def initialize(collection={ })
       #TODO: add classes for entity lists
       collection = Hashie::Mash.new(collection) unless collection.kind_of? Occi::Collection
-      @kinds     = Set.new
+      @kinds     = Occi::Core::Kinds.new
       @mixins    = Occi::Core::Mixins.new
       @actions   = Occi::Core::Actions.new
-      @resources = []
-      @links     = []
+      @resources = Occi::Core::Resources.new
+      @links     = Occi::Core::Links.new
       @kinds = collection.kinds.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) } if collection.kinds.instance_of? Array
       @mixins = collection.mixins.collect { |mixin| Occi::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) } if collection.mixins.instance_of? Array
       @actions = collection.actions.collect { |action| Occi::Core::Action.new(action.scheme, action.term, action.title, action.attributes) } if collection.actions.instance_of? Array
@@ -34,8 +34,11 @@ module Occi
     # @param [Occi::Core::Model] model
     # @return [Occi::Core::Model]
     def model=(model)
-      categories.each {|category| category.model=model}
-      entities.each {|entity| entity.model = model}
+      @kinds.model   = model
+      @mixins.model  = model
+      @actions.model = model
+      @resource.model= model
+      @links.model   = model
     end
 
     # @param [Occi::Collection] other_collection
@@ -48,11 +51,11 @@ module Occi
     # @param [Occi::Collection] collection
     # @return [Occi::Collection]
     def merge(other_collection, collection=self.clone)
-      collection.kinds.concat other_collection.kinds.select { |kind| get_by_id(kind.type_identifier).nil? }
-      collection.mixins.concat other_collection.mixins.select { |mixin| get_by_id(mixin.type_identifier).nil? }
-      collection.actions.concat other_collection.actions.select { |action| get_by_id(action.type_identifier).nil? }
-      collection.resources.concat other_collection.resources.select { |resource| get_by_id(resource.id).nil? }
-      collection.links.concat other_collection.links.select { |link| get_by_id(link.type_identifier).nil? }
+      collection.kinds.merge other_collection.kinds.select { |kind| get_by_id(kind.type_identifier).nil? }
+      collection.mixins.merge other_collection.mixins.select { |mixin| get_by_id(mixin.type_identifier).nil? }
+      collection.actions.merge other_collection.actions.select { |action| get_by_id(action.type_identifier).nil? }
+      collection.resources.merge other_collection.resources.select { |resource| get_by_id(resource.id).nil? }
+      collection.links.merge other_collection.links.select { |link| get_by_id(link.type_identifier).nil? }
       collection.action = other_collection.action if other_collection.action
       collection
     end
@@ -110,8 +113,7 @@ module Occi
       collection.mixins = @mixins.collect { |mixin| mixin.as_json } if @mixins.any?
       collection.actions = @actions.collect { |action_category| action_category.as_json } if actions.any?
       collection.resources = @resources.collect { |resource| resource.as_json } if @resources.any?
-      @links.concat(@resources.collect { |resource| resource.links.select { |link| link.kind_of? Occi::Core::Link } }.flatten)
-      @links.uniq!
+      @links.merge(@resources.collect { |resource| resource.links.select { |link| link.kind_of? Occi::Core::Link } }.flatten)
       collection.links = @links.collect { |link| link.as_json } if @links.any?
       collection.action = @action.as_json if @action
       collection

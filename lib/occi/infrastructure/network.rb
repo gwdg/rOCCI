@@ -4,51 +4,54 @@ module Occi
 
       require 'occi/infrastructure/network/ipnetwork'
 
-      extend Occi
-
       def self.mixins
-        Occi::Infrastructure::Network::Ipnetwork.mixins
+        Occi::Core::Mixins.new << Occi::Infrastructure::Network::Ipnetwork.new
       end
 
-      def self.kind
-        kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/infrastructure#', 'network')
+      class Up < Occi::Core::Action
+        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/network/action#',
+            term='up',
+            title='activate network')
+          super
+        end
+      end
 
-        kind.title = "network resource"
+      class Down < Occi::Core::Action
+        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/network/action#',
+            term='down',
+            title='deactivate network')
+          super
+        end
+      end
 
-        kind.related << Occi::Core::Resource.type_identifier
+      def self.actions
+        Occi::Core::Actions.new << Up.new << Down.new
+      end
 
-        kind.attributes.occi!.network!.vlan = Occi::Core::AttributeProperties.new(
+      begin
+        @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/infrastructure#', 'network')
+
+        @kind.title = "network resource"
+
+        @kind.related << Occi::Core::Resource.kind
+
+        @kind.attributes.occi!.network!.vlan = Occi::Core::AttributeProperties.new(
             { :type    => 'number',
               :mutable => true,
               :pattern => 'x86|x64' })
 
-        kind.attributes.occi!.network!.label = Occi::Core::AttributeProperties.new(
+        @kind.attributes.occi!.network!.label = Occi::Core::AttributeProperties.new(
             { :mutable => true })
 
-        kind.attributes.occi!.network!.state = Occi::Core::AttributeProperties.new(
+        @kind.attributes.occi!.network!.state = Occi::Core::AttributeProperties.new(
             { :pattern => 'active|inactive|error',
               :default => 'inactive' })
 
-        kind.location = '/network/'
+        @kind.location = '/network/'
 
-        kind.actions = [
-            "http://schemas.ogf.org/occi/infrastructure/network/action#up",
-            "http://schemas.ogf.org/occi/infrastructure/network/action#down"
-        ]
+        @kind.actions = self.actions
 
-        kind
-      end
-
-      def self.actions
-        up = Occi::Core::Action.new('http://schemas.ogf.org/occi/infrastructure/network/action#',
-                                    'up',
-                                    'activate network')
-
-        down = Occi::Core::Action.new('http://schemas.ogf.org/occi/infrastructure/network/action#',
-                                      'down',
-                                      'deactivate network')
-
-        [up, down]
+        @kind
       end
 
       def ipnetwork(boolean=true)
@@ -83,6 +86,44 @@ module Occi
 
       def state=(state)
         @attributes.occi!.network!.state = state
+      end
+
+      # IPNetwork Mixin attributes
+
+      def address
+        @attributes.occi.network.address if @attributes.occi.network if @attributes.occi
+      end
+
+      def address=(address)
+        if @mixins.select { |mixin| mixin.kind_of? Occi::Infrastructure::Network::Ipnetwork }.empty?
+          Occi::Log.info 'Adding mixin IPNetwork mixin'
+          @mixins << Occi::Infrastructure::Network::Ipnetwork.new
+        end
+        @attributes.occi!.network!.address = address
+      end
+
+      def gateway
+        @attributes.occi.network.gateway if @attributes.occi.network if @attributes.occi
+      end
+
+      def gateway=(gateway)
+        if @mixins.select { |mixin| mixin.kind_of? Occi::Infrastructure::Network::Ipnetwork }.empty?
+          Occi::Log.info 'Adding mixin IP network'
+          @mixins << Occi::Infrastructure::Network::Ipnetwork.new
+        end
+        @attributes.occi!.network!.gateway = gateway
+      end
+
+      def allocation
+        @attributes.occi.network.allocation if @attributes.occi.network if @attributes.occi
+      end
+
+      def allocation=(allocation)
+        if @mixins.select { |mixin| mixin.kind_of? Occi::Infrastructure::Network::Ipnetwork }.empty?
+          Occi::Log.info 'Adding mixin IPNetwork mixin'
+          @mixins << Occi::Infrastructure::Network::Ipnetwork.new
+        end
+        @attributes.occi!.network!.allocation = allocation
       end
 
     end

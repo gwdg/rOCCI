@@ -2,13 +2,32 @@ module Occi
   module Infrastructure
     class Storagelink < Occi::Core::Link
 
-      extend Occi
+      class Online < Occi::Core::Action
+        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/storagelink/action#',
+            term='online',
+            title='activate storagelink')
+          super
+        end
+      end
 
+      class Offline < Occi::Core::Action
+        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/storagelink/action#',
+            term='offline',
+            title='deactivate storagelink')
+          super
+        end
+      end
+
+      def self.actions
+        Occi::Core::Actions.new << Online.new << Offline.new
+      end
+
+      begin
       @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/infrastructure#', 'storagelink')
 
       @kind.title = "storage link"
 
-      @kind.related << Occi::Core::Link.type_identifier
+      @kind.related << Occi::Core::Link.kind
 
       @kind.attributes.occi!.storagelink!.deviceid = Occi::Core::AttributeProperties.new(
           { :mutable => true })
@@ -22,21 +41,7 @@ module Occi
 
       @kind.location = '/storagelink/'
 
-      @kind.actions = [
-          "http://schemas.ogf.org/occi/infrastructure/storagelink/action#online",
-          "http://schemas.ogf.org/occi/infrastructure/storagelink/action#offline"
-      ]
-
-      def self.actions
-        online = Occi::Core::Action.new('http://schemas.ogf.org/occi/infrastructure/storagelink/action#',
-                                        'online',
-                                        'activate storagelink')
-
-        offline = Occi::Core::Action.new('http://schemas.ogf.org/occi/infrastructure/storagelink/action#',
-                                         'offline',
-                                         'deactivate storagelink')
-
-        [online, offline]
+      @kind.actions = self.actions
       end
 
       def deviceid

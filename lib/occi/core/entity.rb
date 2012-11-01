@@ -2,11 +2,15 @@ module Occi
   module Core
     class Entity
 
-      attr_accessor :mixins, :attributes, :actions, :id, :model
-      attr_reader :kind
+      attr_accessor :mixins, :attributes, :actions, :id, :model, :kind
 
       class << self
         attr_accessor :kind
+        attr_reader :mixins, :actions
+      end
+
+      def self.mixins
+        Occi::Core::Mixins.new
       end
 
       @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'entity')
@@ -108,15 +112,11 @@ module Occi
       # @return [Occi::Model]
       def model=(model)
         @model = model
-        @kind &&= model.get_by_id kind.type_identifier
+        @kind  &&= model.get_by_id kind.type_identifier
         @kind.entities << self
-        @mixins.each do |mixin|
-          model_mixin = model.get_by_id mixin.type_identifier
-          if model_mixin
-            mixin = model_mixin
-            mixin.entities << self
-          end
-        end
+        @mixins.model = model
+        @mixins.each { |mixin| mixin.entities << self }
+        @actions.model = model
       end
 
       # @return [String] location of the entity

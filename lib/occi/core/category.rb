@@ -4,11 +4,18 @@ module Occi
 
       attr_accessor :scheme, :term, :title, :attributes, :model
 
+      def self.categories
+        self.mixins + self.actions << self.kind
+      end
+
       # @param [String ] scheme
       # @param [String] term
       # @param [String] title
       # @param [Hash] attributes
-      def initialize(scheme, term, title=nil, attributes=nil)
+      def initialize(scheme='http://schemas.ogf.org/occi/core#',
+          term='category',
+          title='',
+          attributes=Occi::Core::Attributes.new)
         @scheme     = scheme
         @term       = term
         @title      = title
@@ -25,6 +32,8 @@ module Occi
 
         if related.first.to_s == 'http://schemas.ogf.org/occi/core#entity' or related.first.nil?
           parent = Occi::Core::Entity
+        elsif related.first.kind_of? Occi::Core::Category
+          parent = related.first.class
         else
           related_scheme, related_term = related.first.to_s.split '#'
           parent                       = self.get_class related_scheme, related_term
@@ -48,15 +57,20 @@ module Occi
 
         if namespace.const_defined? term.classify
           klass = namespace.const_get term.classify
-          unless klass.ancestors.include? Occi::Core::Entity or klass.instance_of? Module
+          unless klass.ancestors.include? Occi::Core::Entity or klass.ancestors.include? Occi::Core::Category
             raise "OCCI Kind with type identifier #{scheme + term} could not be created as the corresponding class #{klass.to_s} already exists and is not derived from Occi::Core::Entity"
           end
         else
-          klass      = namespace.const_set term.classify, Class.new(parent)
-          klass.kind = Occi::Core::Kind.new scheme, term, nil, { }, related
+          klass = namespace.const_set term.classify, Class.new(parent)
+          klass.kind = Occi::Core::Kind.new scheme, term, nil, { }, related unless parent.ancestors.include? Occi::Core::Category
         end
 
         klass
+      end
+
+      # @param [Occi::Model] model
+      def model=(model)
+        @related.model=model if @related
       end
 
       # @return [String] Type identifier of the category
@@ -68,9 +82,9 @@ module Occi
       # @param [String, Category] category Related Category or its type identifier
       # @return [true,false] true if category is related to category_id else false
       def related_to?(category)
-        self.related.each do |related|
-          return true if related.to_s == category.to_s
-        end if self.class.method_defined? 'related'
+        self.related.each do |cat|
+          return true if cat.to_s == category.to_s
+        end if @related
         false
       end
 

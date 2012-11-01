@@ -6,7 +6,7 @@ module Occi
 
       @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'link')
 
-      @kind.related = %w{http://schemas.ogf.org/occi/core#entity}
+      @kind.related << Occi::Core::Entity.kind
       @kind.title   = "link"
 
       @kind.attributes.occi!.core!.target = Occi::Core::AttributeProperties.new(
