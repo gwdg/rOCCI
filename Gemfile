@@ -20,4 +20,5 @@ group :development do
   gem "yard"
   gem "yard-sinatra"
   gem "rspec-http"
+  gem "redcarpet"
 end
