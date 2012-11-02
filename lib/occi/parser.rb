@@ -194,7 +194,7 @@ module Occi
       collection.kinds.merge hash.kinds.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) } if hash.kinds
       collection.mixins.merge hash.mixins.collect { |mixin| Occi::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) } if hash.mixins
       collection.resources.merge hash.resources.collect { |resource| Occi::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.actions, resource.links) } if hash.resources
-      collection.links.merge hash.links.collect { |link| Occi::Core::Link.new(link.kind, link.mixins, link.attributes) }
+      collection.links.merge hash.links.collect { |link| Occi::Core::Link.new(link.kind, link.mixins, link.attributes) } if hash.links
 
       if collection.resources.size == 1 & collection.links.size > 0
         if collection.resources.first.links.empty?
@@ -202,6 +202,7 @@ module Occi
         end
       end
 
+      # TODO: replace the following mechanism with one in the Links class
       # replace link locations with link objects in all resources
       collection.resources.each do |resource|
         resource.links.collect! do |resource_link|
