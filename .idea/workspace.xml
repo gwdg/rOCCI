@@ -1,0 +1,2025 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="a9452f31-a894-40df-92ff-b9a06046a4e7" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/features/core/discover_capabilities.feature" />
+    </list>
+    <ignored path="rOCCI.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <file path="/discover_capabilities.feature" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351798982806" ignored="false" />
+    <file path="/Dummy.txt" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351795897187" ignored="false" />
+    <file path="/entity_spec.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351794152007" ignored="false" />
+    <file path="/collection.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351794100908" ignored="false" />
+    <file path="/entities.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351794040645" ignored="false" />
+    <file path="/categories.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351793850517" ignored="false" />
+    <file path="/categories_spec.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351789213010" ignored="false" />
+    <file path="/parser.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351788881668" ignored="false" />
+    <file path="/link.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351788750973" ignored="false" />
+    <file path="/category.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351788616416" ignored="false" />
+    <file path="/*.regexp" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351788537930" ignored="false" />
+    <file path="/kind.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351787258370" ignored="false" />
+    <file path="/client.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351786225081" ignored="false" />
+    <file path="/entity.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351782043125" ignored="false" />
+    <file path="/model.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351777603198" ignored="false" />
+    <file path="/mixins.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351775920247" ignored="false" />
+    <file path="/actions.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351775913373" ignored="false" />
+    <file path="/kinds.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351775876128" ignored="false" />
+    <file path="/network.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351771363143" ignored="false" />
+    <file path="/networkinterface.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351771349719" ignored="false" />
+    <file path="/related.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351771136031" ignored="false" />
+    <file path="/core.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351770419735" ignored="false" />
+    <file path="/mixin.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351770403380" ignored="false" />
+    <file path="/storagelink.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351712482783" ignored="false" />
+    <file path="/storage.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351712472872" ignored="false" />
+    <file path="/compute.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351712441548" ignored="false" />
+    <file path="/ipnetwork.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351709521384" ignored="false" />
+    <file path="/ipnetworkinterface.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351709493905" ignored="false" />
+    <file path="/infrastructure.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351706952329" ignored="false" />
+    <file path="/occi.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351638796031" ignored="false" />
+    <file path="/resources.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351638655421" ignored="false" />
+    <file path="/links.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351638645011" ignored="false" />
+    <file path="/resource_tpl.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351637790273" ignored="false" />
+    <file path="/os_tpl.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351637388989" ignored="false" />
+    <file path="/category_spec.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351613114014" ignored="false" />
+    <file path="/.gitignore" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351611333951" ignored="false" />
+    <file path="/resource.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351553727592" ignored="false" />
+    <file path="/parser_spec.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351112712287" ignored="false" />
+    <file path="/model_spec.rb" changelist="a9452f31-a894-40df-92ff-b9a06046a4e7" time="1351517819158" ignored="false" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/rOCCI@All_specs_in__rOCCI.coverage" NAME="All specs in: rOCCI Coverage Results" MODIFIED="1351613423384" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="rcov" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/rOCCI@All_specs_in__rOCCI.rcov" NAME="All specs in: rOCCI Coverage Results" MODIFIED="1340553048304" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="rcov" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/rOCCI@IRB_console.coverage" NAME="IRB console Coverage Results" MODIFIED="1340554282287" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="rcov" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="DatabaseView">
+    <flatten value="false" />
+    <groupTables value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="rOCCI">
+      <favorite_root url="file://$PROJECT_DIR$/lib/occi/parser.rb" type="psiFile" klass="com.intellij.ide.projectView.impl.nodes.PsiFileNode" />
+    </favorites_list>
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="resource.rb" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/occi/core/resource.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="9" column="46" selection-start="215" selection-end="215" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="storagelink.rb" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/occi/infrastructure/storagelink.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="3.2">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="parser.rb" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/occi/parser.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="83" column="33" selection-start="4339" selection-end="4339" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="categories_spec.rb" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/spec/occi/core/categories_spec.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="17" column="28" selection-start="745" selection-end="745" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="categories.rb" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/occi/core/categories.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="25" column="71" selection-start="559" selection-end="559" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="entity.rb" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/lib/occi/core/entity.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="36" column="10" selection-start="968" selection-end="968" vertical-scroll-proportion="-2.2585437">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="entities.rb" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/occi/core/entities.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="9" column="42" selection-start="189" selection-end="189" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="collection.rb" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/occi/collection.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="40" column="23" selection-start="2282" selection-end="2282" vertical-scroll-proportion="-19.346153">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="entity_spec.rb" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/spec/occi/core/entity_spec.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="31" column="38" selection-start="1014" selection-end="1014" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="discover_capabilities.feature" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/features/core/discover_capabilities.feature">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="8" column="28" selection-start="307" selection-end="307" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/lib/occi/core/mixins.rb" />
+        <option value="$PROJECT_DIR$/lib/occi/model.rb" />
+        <option value="$PROJECT_DIR$/lib/occi/core/entity.rb" />
+        <option value="$PROJECT_DIR$/lib/occi/api/client.rb" />
+        <option value="$PROJECT_DIR$/lib/occi/core/kind.rb" />
+        <option value="$PROJECT_DIR$/spec/occi/core/categories.rb" />
+        <option value="$PROJECT_DIR$/lib/occi/core/category.rb" />
+        <option value="$PROJECT_DIR$/lib/occi/core/link.rb" />
+        <option value="$PROJECT_DIR$/lib/occi/core/resource.rb" />
+        <option value="$PROJECT_DIR$/lib/occi/parser.rb" />
+        <option value="$PROJECT_DIR$/spec/occi/core/categories_spec.rb" />
+        <option value="$PROJECT_DIR$/lib/occi/core/categories.rb" />
+        <option value="$PROJECT_DIR$/lib/occi/core/entities.rb" />
+        <option value="$PROJECT_DIR$/lib/occi/collection.rb" />
+        <option value="$PROJECT_DIR$/spec/occi/core/entity_spec.rb" />
+        <option value="$PROJECT_DIR$/features/core/discover_capabilities.feature" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="y" value="22" />
+    <option name="width" value="1680" />
+    <option name="height" value="1024" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>Ruby</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>RubyLiteralArrayInspection</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="Scope">
+        <subPane subId="Project Files">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="spec" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="spec" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="occi" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="spec" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="occi" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="occi" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="occi" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="features" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="examples" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rOCCI" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bin" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="192" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="200" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="201" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="recentsLimit" value="5" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
+    <property name="last_opened_file_path" value="$USER_HOME$/.rvm/rubies/ruby-1.9.3-p194/bin/ruby" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="205" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="1007" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="993" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="208" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="202" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
+    <property name="FullScreen" value="false" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
+    <property name="options.lastSelected" value="preferences.keymap" />
+    <property name="restartRequiresConfirmation" value="true" />
+    <property name="options.searchVisible" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/etc/backend/opennebula/model/infrastructure" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/spec/occi/core" />
+      <recent name="$PROJECT_DIR$/lib/occi/infrastructure/networkinterface" />
+      <recent name="$PROJECT_DIR$/lib/occi/infrastructure/network" />
+      <recent name="$PROJECT_DIR$/lib/occi" />
+      <recent name="$PROJECT_DIR$/spec/occi" />
+    </key>
+  </component>
+  <component name="RunManager" selected="RSpec.All specs in: rOCCI">
+    <configuration default="false" name="collection_spec" type="RSpecRunConfigurationType" factoryName="RSpec" temporary="true">
+      <predefined_log_file id="RUBY_RSPEC" enabled="true" />
+      <module name="rOCCI" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="WORK DIR" VALUE="$PROJECT_DIR$/spec/occi" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="SHOULD_USE_SDK" VALUE="false" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="ALTERN_SDK_NAME" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="myPassParentEnvs" VALUE="true" />
+      <envs>
+        <env name="JRUBY_OPTS" value="-X+O" />
+      </envs>
+      <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="true" />
+      <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" track_test_folders="true" runner="rcov">
+        <COVERAGE_PATTERN ENABLED="true">
+          <PATTERN REGEXPS="/.rvm/" INCLUDED="false" />
+        </COVERAGE_PATTERN>
+      </EXTENSION>
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="TESTS_FOLDER_PATH" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="TEST_SCRIPT_PATH" VALUE="$PROJECT_DIR$/spec/occi/collection_spec.rb" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="SPEC_RUNNER_PATH" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="TEST_FILE_MASK" VALUE="**/*_spec.rb" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="SPEC_EXAMPLE_NAME" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="TEST_TEST_TYPE" VALUE="TEST_SCRIPT" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="SPEC_ARGS" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="RUNNER_VERSION" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="USE_CUSTOM_SPEC_RUNNER" VALUE="false" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="DRB" VALUE="false" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="FULL_BACKTRACE" VALUE="false" />
+      <RunnerSettings RunnerId="RubyRunner" />
+      <ConfigurationWrapper RunnerId="RubyRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="All specs in: rOCCI" type="RSpecRunConfigurationType" factoryName="RSpec" temporary="true">
+      <predefined_log_file id="RUBY_RSPEC" enabled="true" />
+      <module name="rOCCI" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="WORK DIR" VALUE="$PROJECT_DIR$" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="SHOULD_USE_SDK" VALUE="false" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="ALTERN_SDK_NAME" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="myPassParentEnvs" VALUE="true" />
+      <envs>
+        <env name="JRUBY_OPTS" value="-X+O" />
+      </envs>
+      <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="true" />
+      <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" track_test_folders="true" runner="rcov">
+        <COVERAGE_PATTERN ENABLED="true">
+          <PATTERN REGEXPS="/.rvm/" INCLUDED="false" />
+        </COVERAGE_PATTERN>
+      </EXTENSION>
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="TESTS_FOLDER_PATH" VALUE="$PROJECT_DIR$" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="TEST_SCRIPT_PATH" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="SPEC_RUNNER_PATH" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="TEST_FILE_MASK" VALUE="**/*_spec.rb" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="SPEC_EXAMPLE_NAME" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="TEST_TEST_TYPE" VALUE="ALL_IN_FOLDER" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="SPEC_ARGS" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="RUNNER_VERSION" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="USE_CUSTOM_SPEC_RUNNER" VALUE="false" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="DRB" VALUE="false" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="FULL_BACKTRACE" VALUE="false" />
+      <RunnerSettings RunnerId="RubyCover" />
+      <RunnerSettings RunnerId="RubyRunner" />
+      <ConfigurationWrapper RunnerId="RubyCover" />
+      <ConfigurationWrapper RunnerId="RubyRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="IRB console" type="IrbRunConfigurationType" factoryName="IRB console" temporary="true">
+      <module name="rOCCI" />
+      <IRB_RUN_CONFIG NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
+      <IRB_RUN_CONFIG NAME="WORK DIR" VALUE="$PROJECT_DIR$" />
+      <IRB_RUN_CONFIG NAME="SHOULD_USE_SDK" VALUE="false" />
+      <IRB_RUN_CONFIG NAME="ALTERN_SDK_NAME" VALUE="" />
+      <IRB_RUN_CONFIG NAME="myPassParentEnvs" VALUE="true" />
+      <envs />
+      <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="false" />
+      <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" track_test_folders="true" runner="rcov">
+        <COVERAGE_PATTERN ENABLED="true">
+          <PATTERN REGEXPS="/.rvm/" INCLUDED="false" />
+        </COVERAGE_PATTERN>
+      </EXTENSION>
+      <IRB_RUN_CONFIG NAME="SCRIPT_PATH" VALUE="$USER_HOME$/.rvm/rubies/ruby-1.9.3-p194/bin/irb" />
+      <IRB_RUN_CONFIG NAME="SCRIPT_ARGS" VALUE="--prompt simple" />
+      <IRB_RUN_CONFIG NAME="IS_RAILS_CONSOLE" VALUE="false" />
+      <RunnerSettings RunnerId="RubyRunner" />
+      <ConfigurationWrapper RunnerId="RubyRunner" />
+      <method />
+    </configuration>
+    <configuration default="true" type="RSpecRunConfigurationType" factoryName="RSpec">
+      <predefined_log_file id="RUBY_RSPEC" enabled="true" />
+      <module name="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="WORK DIR" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="SHOULD_USE_SDK" VALUE="false" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="ALTERN_SDK_NAME" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="myPassParentEnvs" VALUE="true" />
+      <envs />
+      <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="false" />
+      <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" track_test_folders="true" runner="rcov">
+        <COVERAGE_PATTERN ENABLED="true">
+          <PATTERN REGEXPS="/.rvm/" INCLUDED="false" />
+        </COVERAGE_PATTERN>
+      </EXTENSION>
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="TESTS_FOLDER_PATH" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="TEST_SCRIPT_PATH" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="SPEC_RUNNER_PATH" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="TEST_FILE_MASK" VALUE="**/*_spec.rb" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="SPEC_EXAMPLE_NAME" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="TEST_TEST_TYPE" VALUE="TEST_SCRIPT" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="SPEC_ARGS" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="RUNNER_VERSION" VALUE="" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="USE_CUSTOM_SPEC_RUNNER" VALUE="false" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="DRB" VALUE="false" />
+      <RSPEC_RUN_CONFIG_SETTINGS_ID NAME="FULL_BACKTRACE" VALUE="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="RubyRunConfigurationType" factoryName="Ruby">
+      <module name="" />
+      <RUBY_RUN_CONFIG NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
+      <RUBY_RUN_CONFIG NAME="WORK DIR" VALUE="" />
+      <RUBY_RUN_CONFIG NAME="SHOULD_USE_SDK" VALUE="false" />
+      <RUBY_RUN_CONFIG NAME="ALTERN_SDK_NAME" VALUE="" />
+      <RUBY_RUN_CONFIG NAME="myPassParentEnvs" VALUE="true" />
+      <envs />
+      <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="false" />
+      <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" track_test_folders="true" runner="rcov">
+        <COVERAGE_PATTERN ENABLED="true">
+          <PATTERN REGEXPS="/.rvm/" INCLUDED="false" />
+        </COVERAGE_PATTERN>
+      </EXTENSION>
+      <RUBY_RUN_CONFIG NAME="SCRIPT_PATH" VALUE="" />
+      <RUBY_RUN_CONFIG NAME="SCRIPT_ARGS" VALUE="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="TestUnitRunConfigurationType" factoryName="Test::Unit/Shoulda/Minitest">
+      <predefined_log_file id="RUBY_TESTUNIT" enabled="true" />
+      <module name="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="WORK DIR" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="SHOULD_USE_SDK" VALUE="false" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="ALTERN_SDK_NAME" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="myPassParentEnvs" VALUE="true" />
+      <envs />
+      <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="false" />
+      <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" track_test_folders="true" runner="rcov">
+        <COVERAGE_PATTERN ENABLED="true">
+          <PATTERN REGEXPS="/.rvm/" INCLUDED="false" />
+        </COVERAGE_PATTERN>
+      </EXTENSION>
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TESTS_FOLDER_PATH" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_SCRIPT_PATH" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_FILE_MASK" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_METHOD_NAME" VALUE="" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TEST_TEST_TYPE" VALUE="TEST_SCRIPT" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="DRB" VALUE="false" />
+      <RTEST_RUN_CONFIG_SETTINGS_ID NAME="RUNNER_OPTIONS" VALUE="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="IrbRunConfigurationType" factoryName="IRB console">
+      <module name="" />
+      <IRB_RUN_CONFIG NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
+      <IRB_RUN_CONFIG NAME="WORK DIR" VALUE="" />
+      <IRB_RUN_CONFIG NAME="SHOULD_USE_SDK" VALUE="false" />
+      <IRB_RUN_CONFIG NAME="ALTERN_SDK_NAME" VALUE="" />
+      <IRB_RUN_CONFIG NAME="myPassParentEnvs" VALUE="true" />
+      <envs />
+      <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="false" />
+      <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" track_test_folders="true" runner="rcov">
+        <COVERAGE_PATTERN ENABLED="true">
+          <PATTERN REGEXPS="/.rvm/" INCLUDED="false" />
+        </COVERAGE_PATTERN>
+      </EXTENSION>
+      <IRB_RUN_CONFIG NAME="SCRIPT_PATH" VALUE="" />
+      <IRB_RUN_CONFIG NAME="SCRIPT_ARGS" VALUE="" />
+      <IRB_RUN_CONFIG NAME="IS_RAILS_CONSOLE" VALUE="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="CucumberRunConfigurationType" factoryName="Cucumber">
+      <predefined_log_file id="RUBY_CUCUMBER" enabled="true" />
+      <module name="" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="RUBY_ARGS" VALUE="-e $stdout.sync=true;$stderr.sync=true;load($0=ARGV.shift)" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="WORK DIR" VALUE="" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="SHOULD_USE_SDK" VALUE="false" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="ALTERN_SDK_NAME" VALUE="" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="myPassParentEnvs" VALUE="true" />
+      <envs>
+        <env name="ANSICON" value="" />
+      </envs>
+      <EXTENSION ID="BundlerRunConfigurationExtension" bundleExecEnabled="false" />
+      <EXTENSION ID="RubyCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" track_test_folders="true" runner="rcov">
+        <COVERAGE_PATTERN ENABLED="true">
+          <PATTERN REGEXPS="/.rvm/" INCLUDED="false" />
+        </COVERAGE_PATTERN>
+      </EXTENSION>
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="TEST_FILE_MASK" VALUE="**/*.feature" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="TEST_TEST_TYPE" VALUE="TEST_SCRIPT" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="TESTS_FOLDER_PATH" VALUE="" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="TEST_SCRIPT_PATH" VALUE="" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="TEST_TAGS_FILTER" VALUE="" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="TEST_NAME_FILTER" VALUE="" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="CUCUMBER_ARGS" VALUE="--color -r features" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="RUNNER_VERSION" VALUE="" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="FULL_BACKTRACE" VALUE="false" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="VERBOSE_OPTION" VALUE="false" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="DRB" VALUE="false" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="CUCUMBER_RUNNER_PATH" VALUE="" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="USE_CUSTOM_RUNNER" VALUE="false" />
+      <CUCUMBER_RUN_CONFIG_SETTINGS_ID NAME="SETTINGS_VERSION" VALUE="2" />
+      <method />
+    </configuration>
+    <list size="3">
+      <item index="0" class="java.lang.String" itemvalue="RSpec.collection_spec" />
+      <item index="1" class="java.lang.String" itemvalue="RSpec.All specs in: rOCCI" />
+      <item index="2" class="java.lang.String" itemvalue="IRB console.IRB console" />
+    </list>
+    <recent_temporary>
+      <list size="5">
+        <item index="0" class="java.lang.String" itemvalue="RSpec.All specs in: rOCCI" />
+        <item index="1" class="java.lang.String" itemvalue="IRB console.IRB console" />
+        <item index="2" class="java.lang.String" itemvalue="IRB console.IRB console" />
+        <item index="3" class="java.lang.String" itemvalue="IRB console.IRB console" />
+        <item index="4" class="java.lang.String" itemvalue="IRB console.IRB console" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="mySSHConnectionTimeout" value="30000" />
+    <option name="mySSHReadTimeout" value="30000" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="DETECT_NESTED_COPIES" value="true" />
+    <option name="CHECK_NESTED_FOR_QUICK_MERGE" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="FORCE_UPDATE" value="false" />
+    <option name="IGNORE_EXTERNALS" value="false" />
+    <configuration useDefault="false">$USER_HOME$/.subversion_IDEA</configuration>
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a9452f31-a894-40df-92ff-b9a06046a4e7" name="Default" comment="set attribute property defaults for mutable, required, type and pattern" />
+      <created>1337554997093</created>
+      <updated>1337554997093</updated>
+    </task>
+    <task id="LOCAL-00001" summary="set attribute property defaults for mutable, required, type and pattern">
+      <created>1337559906693</created>
+      <updated>1337559906693</updated>
+    </task>
+    <task id="LOCAL-00002" summary="fix to resetting of OCCI model">
+      <created>1337563818443</created>
+      <updated>1337563818443</updated>
+    </task>
+    <task id="LOCAL-00003" summary="moved entity initialization from kind and mixin to category">
+      <created>1337805516269</created>
+      <updated>1337805516269</updated>
+    </task>
+    <task id="LOCAL-00004" summary="changed default initializer for category">
+      <created>1337805729813</created>
+      <updated>1337805729813</updated>
+    </task>
+    <task id="LOCAL-00005" summary="changed initialization of entitiy to allow instantiation without content">
+      <created>1337805820953</created>
+      <updated>1337805820953</updated>
+    </task>
+    <task id="LOCAL-00006" summary="removed storage definition from OpenNebula templates">
+      <created>1337816109572</created>
+      <updated>1337816109572</updated>
+    </task>
+    <task id="LOCAL-00007" summary="added related_to? method to category">
+      <created>1337894845383</created>
+      <updated>1337894845383</updated>
+    </task>
+    <task id="LOCAL-00008" summary="added applicable actions to entity and improved attribute verification">
+      <created>1337894892396</created>
+      <updated>1337894892396</updated>
+    </task>
+    <task id="LOCAL-00009" summary="reverted kind to previous version">
+      <created>1337895135582</created>
+      <updated>1337895135582</updated>
+    </task>
+    <task id="LOCAL-00010" summary="reverted mixin to previous version">
+      <created>1337895173589</created>
+      <updated>1337895173589</updated>
+    </task>
+    <task id="LOCAL-00011" summary="moved applicable actions from resource to entity as it can be used for link as well">
+      <created>1337895224867</created>
+      <updated>1337895224867</updated>
+    </task>
+    <task id="LOCAL-00012" summary="removed custom initializer for link">
+      <created>1337895243412</created>
+      <updated>1337895243412</updated>
+    </task>
+    <task id="LOCAL-00013" summary="small fix for parsing model directories if trailing slash is omitted. Also preparations for HTML renderer using HAML">
+      <created>1337895414519</created>
+      <updated>1337895414519</updated>
+    </task>
+    <task id="LOCAL-00014" summary="rewrote OpenNebula backend to be compatible with refactoring of OCCI server">
+      <created>1337895456950</created>
+      <updated>1337895456950</updated>
+    </task>
+    <task id="LOCAL-00015" summary="added rSpec tests for initialization of OpenNebula model">
+      <created>1337895528730</created>
+      <updated>1337895528730</updated>
+    </task>
+    <task id="LOCAL-00016" summary="removed leading whitespaces in collection.erb as they mess up the rendering">
+      <created>1337895575706</created>
+      <updated>1337895575707</updated>
+    </task>
+    <task id="LOCAL-00017" summary="added erubis and haml gems to gemfile">
+      <created>1337895600543</created>
+      <updated>1337895600543</updated>
+    </task>
+    <task id="LOCAL-00018" summary="improved OpenNebula configuration section with model definitions and better directory structure">
+      <created>1337895660988</created>
+      <updated>1337895660988</updated>
+    </task>
+    <task id="LOCAL-00019" summary="removed state machine, as applicable actions are now directly added to entities by the backend">
+      <created>1337895716855</created>
+      <updated>1337895716855</updated>
+    </task>
+    <task id="LOCAL-00020" summary="moved opennebula and ec2 back into their own folder">
+      <created>1337905210586</created>
+      <updated>1337905210586</updated>
+    </task>
+    <task id="LOCAL-00021" summary="fixed several bugs in OpenNebula classes">
+      <created>1337905236269</created>
+      <updated>1337905236269</updated>
+    </task>
+    <task id="LOCAL-00022" summary="changed location of opennebula and ec2 in backend manager">
+      <created>1337905264373</created>
+      <updated>1337905264374</updated>
+    </task>
+    <task id="LOCAL-00023" summary="updated opennebula and general OCCI model">
+      <created>1337905307721</created>
+      <updated>1337905307721</updated>
+    </task>
+    <task id="LOCAL-00024" summary="moved location method from category to kind and mixin. mixin has now an own top level location to allow for kinds and mixins with the same term">
+      <created>1337905805450</created>
+      <updated>1337905805450</updated>
+    </task>
+    <task id="LOCAL-00025" summary="added convert_value fix to link and resource">
+      <created>1337905846748</created>
+      <updated>1337905846748</updated>
+    </task>
+    <task id="LOCAL-00026" summary="removed applicable_actions variable from entities. it is now done dircetly through the hash key action">
+      <created>1337905893416</created>
+      <updated>1337905893416</updated>
+    </task>
+    <task id="LOCAL-00027" summary="location is now correctly taken from category within OCCI Registry">
+      <created>1337905937839</created>
+      <updated>1337905937839</updated>
+    </task>
+    <task id="LOCAL-00028" summary="added debug information to request parsing">
+      <created>1337905976611</created>
+      <updated>1337905976611</updated>
+    </task>
+    <task id="LOCAL-00029" summary="fix for OCCI Server URI retrieval in Resource creation">
+      <created>1337906036620</created>
+      <updated>1337906036620</updated>
+    </task>
+    <task id="LOCAL-00030" summary="deleted outdated opennebula extensions">
+      <created>1337906068594</created>
+      <updated>1337906068594</updated>
+    </task>
+    <task id="LOCAL-00031" summary="text/plain rendering now only presents locations for collections. text/uri-list only returns locations for collections and nothing for specific entities">
+      <created>1338279437351</created>
+      <updated>1338279437351</updated>
+    </task>
+    <task id="LOCAL-00032" summary="removed refresh method from backends">
+      <created>1338294105393</created>
+      <updated>1338294105393</updated>
+    </task>
+    <task id="LOCAL-00033" summary="fixed and improved action handling in dummy and opennebula backend">
+      <created>1338306990195</created>
+      <updated>1338306990195</updated>
+    </task>
+    <task id="LOCAL-00034" summary="small fixes to entity regarding attribute checking and location definition">
+      <created>1338307041829</created>
+      <updated>1338307041829</updated>
+    </task>
+    <task id="LOCAL-00035" summary="small fixes to OCCI Server regarding action handling">
+      <created>1338307103456</created>
+      <updated>1338307103456</updated>
+    </task>
+    <task id="LOCAL-00036" summary="fixed handling of additional parameters for actions (e.g. size) in OCCI Server and dummy backend">
+      <created>1338308073440</created>
+      <updated>1338308073440</updated>
+    </task>
+    <task id="LOCAL-00037" summary="fixed link rendering for text/plain">
+      <created>1338310948364</created>
+      <updated>1338310948372</updated>
+    </task>
+    <task id="LOCAL-00038" summary="added scenarios for creating storage and invoking actions">
+      <created>1338311004690</created>
+      <updated>1338311004690</updated>
+    </task>
+    <task id="LOCAL-00039" summary="removed ruby 1.8.7 from travis CI tests for now. Therefore only ruby &gt;= 1.9.2 is supported">
+      <created>1338325422259</created>
+      <updated>1338325422259</updated>
+    </task>
+    <task id="LOCAL-00040" summary="fixed wrong attribute type for network">
+      <created>1338379590306</created>
+      <updated>1338379590306</updated>
+    </task>
+    <task id="LOCAL-00041" summary="fix for Ruby 1.8.7">
+      <created>1338383641243</created>
+      <updated>1338383641243</updated>
+    </task>
+    <task id="LOCAL-00042" summary="removed outdated css and js from public directory">
+      <created>1338394517502</created>
+      <updated>1338394517502</updated>
+    </task>
+    <task id="LOCAL-00043" summary="removed old version of noVNC">
+      <created>1338394869642</created>
+      <updated>1338394869642</updated>
+    </task>
+    <task id="LOCAL-00044" summary="restructuring of parser to prepare the code for a separation of generic OCCI stuff into a library, server code into rocci-server and client code into rocci-client">
+      <created>1338557640898</created>
+      <updated>1338557640898</updated>
+    </task>
+    <task id="LOCAL-00045" summary="removed all files which are unnecessary for a generic OCCI ruby gem. Added a Ruby gemspec file and a file holding the version of the gem.">
+      <created>1338795056072</created>
+      <updated>1338795056072</updated>
+    </task>
+    <task id="LOCAL-00046" summary="removed ANTLR submodule to replace it with subtree">
+      <created>1338797628015</created>
+      <updated>1338797628015</updated>
+    </task>
+    <task id="LOCAL-00047" summary="removed occi server spec as it is not needed for OCCI gem">
+      <created>1338798109762</created>
+      <updated>1338798109762</updated>
+    </task>
+    <task id="LOCAL-00048" summary="updated rakefile to include Bundler tasks">
+      <created>1338798966507</created>
+      <updated>1338798966507</updated>
+    </task>
+    <task id="LOCAL-00049" summary="bumped version to 2.0.0 to align with existing OCCI gem which has version 1.x.x">
+      <created>1338840907714</created>
+      <updated>1338840907714</updated>
+    </task>
+    <task id="LOCAL-00050" summary="Readme cleanup. Removed server related parts.">
+      <created>1338841320897</created>
+      <updated>1338841320898</updated>
+    </task>
+    <task id="LOCAL-00051" summary="added Ruby 1.8.7 testing with Travis again">
+      <created>1338841358941</created>
+      <updated>1338841358941</updated>
+    </task>
+    <task id="LOCAL-00052" summary="further cleanup of unneccessary code for OCCI gem">
+      <created>1338845295241</created>
+      <updated>1338845295241</updated>
+    </task>
+    <task id="LOCAL-00053" summary="version bump to 2.0.1">
+      <created>1338845351556</created>
+      <updated>1338845351556</updated>
+    </task>
+    <task id="LOCAL-00054" summary="further cleanup and version bump to 2.0.2">
+      <created>1338845519091</created>
+      <updated>1338845519091</updated>
+    </task>
+    <task id="LOCAL-00055" summary="version bump to 2.0.2">
+      <created>1338845568737</created>
+      <updated>1338845568737</updated>
+    </task>
+    <task id="LOCAL-00056" summary="removed ec2 file which is not needed in OCCI gem">
+      <created>1338911580860</created>
+      <updated>1338911580860</updated>
+    </task>
+    <task id="LOCAL-00057" summary="removed vnc extension as it is not needed for the OCCI gem">
+      <created>1338911616803</created>
+      <updated>1338911616804</updated>
+    </task>
+    <task id="LOCAL-00058" summary="improved handling of id, title and summary in entity and resource">
+      <created>1338911654528</created>
+      <updated>1338911654528</updated>
+    </task>
+    <task id="LOCAL-00059" summary="version bump to 2.0.3">
+      <created>1338911669537</created>
+      <updated>1338911669537</updated>
+    </task>
+    <task id="LOCAL-00060" summary="added generic OCCI file to require all classes of the gem">
+      <created>1338914352601</created>
+      <updated>1338914352601</updated>
+    </task>
+    <task id="LOCAL-00061" summary="version bump">
+      <created>1338914365643</created>
+      <updated>1338914365643</updated>
+    </task>
+    <task id="LOCAL-00062" summary="updated gem dependencies">
+      <created>1338916098532</created>
+      <updated>1338916098532</updated>
+    </task>
+    <task id="LOCAL-00063" summary="version bump">
+      <created>1338916107652</created>
+      <updated>1338916107652</updated>
+    </task>
+    <task id="LOCAL-00064" summary="added hashie as dependency">
+      <created>1338972821481</created>
+      <updated>1338972821481</updated>
+    </task>
+    <task id="LOCAL-00065" summary="version bump">
+      <created>1338972835475</created>
+      <updated>1338972835475</updated>
+    </task>
+    <task id="LOCAL-00066" summary="removed copyright message in OCCI.g as it is not reflecting the true copyright of the code. This grammar was entirely written by Florian Feldhaus. Only the examples are related to a grammar version copyrighted by Intel.">
+      <created>1338973284887</created>
+      <updated>1338973284887</updated>
+    </task>
+    <task id="LOCAL-00067" summary="improved requiring of dependencies">
+      <created>1338974141896</created>
+      <updated>1338974141897</updated>
+    </task>
+    <task id="LOCAL-00068" summary="moved some code from OCCI server over to logger to make it a standalone logger">
+      <created>1338974176832</created>
+      <updated>1338974176832</updated>
+    </task>
+    <task id="LOCAL-00069" summary="improved description on how to use the OCCI gem">
+      <created>1339160683358</created>
+      <updated>1339160683358</updated>
+    </task>
+    <task id="LOCAL-00070" summary="moved collection from OCCI::Core to OCCI and improved documentation and handling of collections">
+      <created>1339163438334</created>
+      <updated>1339163438334</updated>
+    </task>
+    <task id="LOCAL-00071" summary="added OCCI Infrastructure model again to make it easy to use the infrastructure model in other projects">
+      <created>1339163495257</created>
+      <updated>1339163495257</updated>
+    </task>
+    <task id="LOCAL-00072" summary="added .project file to .gitignore">
+      <created>1339163530207</created>
+      <updated>1339163530207</updated>
+    </task>
+    <task id="LOCAL-00073" summary="improved yardopts file">
+      <created>1339163900506</created>
+      <updated>1339163900506</updated>
+    </task>
+    <task id="LOCAL-00074" summary="cleanup of Gemfile">
+      <created>1339163912919</created>
+      <updated>1339163912919</updated>
+    </task>
+    <task id="LOCAL-00075" summary="latest Gemfile.lock">
+      <created>1339163953894</created>
+      <updated>1339163953894</updated>
+    </task>
+    <task id="LOCAL-00076" summary="added activesupport as dependency to gemspec">
+      <created>1339163979429</created>
+      <updated>1339163979429</updated>
+    </task>
+    <task id="LOCAL-00077" summary="minor wording change in Readme">
+      <created>1339164005862</created>
+      <updated>1339164005863</updated>
+    </task>
+    <task id="LOCAL-00078" summary="removed license comment at the beginning of OCCI Core classes and adapted them to the name change of the OCCI::Registry (now OCCI::Model) and the movement of OCCI::Core::Collection to OCCI::Core">
+      <created>1339164148005</created>
+      <updated>1339164148005</updated>
+    </task>
+    <task id="LOCAL-00079" summary="updated comments of OCCI Logger and added rSpec test for it">
+      <created>1339174145387</created>
+      <updated>1339174145387</updated>
+    </task>
+    <task id="LOCAL-00080" summary="updated OCCI Log scenario">
+      <created>1339176077901</created>
+      <updated>1339176077901</updated>
+    </task>
+    <task id="LOCAL-00081" summary="moved ANTLR files to new directory occiantlr">
+      <created>1339228295035</created>
+      <updated>1339228295035</updated>
+    </task>
+    <task id="LOCAL-00082" summary="fixed warnings for alternatives in ANTLR grammar and improved location parsing">
+      <created>1339230728366</created>
+      <updated>1339230728366</updated>
+    </task>
+    <task id="LOCAL-00083" summary="adapted occi.rb to moval of OCCI ANTLR Parser">
+      <created>1339230754857</created>
+      <updated>1339230754857</updated>
+    </task>
+    <task id="LOCAL-00084" summary="adapted parser spec to new location of OCCI ANTLR Parser">
+      <created>1339230781450</created>
+      <updated>1339230781450</updated>
+    </task>
+    <task id="LOCAL-00085" summary="improved OCCI model and added rSpec test for it">
+      <created>1339231582404</created>
+      <updated>1339231582404</updated>
+    </task>
+    <task id="LOCAL-00086" summary="improved collection initialization">
+      <created>1339231597227</created>
+      <updated>1339231597228</updated>
+    </task>
+    <task id="LOCAL-00087" summary="updated OCCI Parser and added rSpec test for it">
+      <created>1339232456603</created>
+      <updated>1339232456603</updated>
+    </task>
+    <task id="LOCAL-00088" summary="fixed initialization of OCCI collection">
+      <created>1339232474929</created>
+      <updated>1339232474930</updated>
+    </task>
+    <task id="LOCAL-00089" summary="removed unnecessary files">
+      <created>1339232496237</created>
+      <updated>1339232496238</updated>
+    </task>
+    <task id="LOCAL-00090" summary="added changelog to Readme">
+      <created>1339232915274</created>
+      <updated>1339232915274</updated>
+    </task>
+    <task id="LOCAL-00091" summary="version bump">
+      <created>1339232941974</created>
+      <updated>1339232941974</updated>
+    </task>
+    <task id="LOCAL-00092" summary="added rake to gemfile">
+      <created>1339233508807</created>
+      <updated>1339233508807</updated>
+    </task>
+    <task id="LOCAL-00093" summary="fixes to formatting of Readme">
+      <created>1339233716398</created>
+      <updated>1339233716399</updated>
+    </task>
+    <task id="LOCAL-00094" summary="added parameter scheme_base_url for registering objects to the OCCI model from files">
+      <created>1339401357272</created>
+      <updated>1339401357272</updated>
+    </task>
+    <task id="LOCAL-00095" summary="version bump">
+      <created>1339401370380</created>
+      <updated>1339401370381</updated>
+    </task>
+    <task id="LOCAL-00096" summary="removed debugging output from attribute properties">
+      <created>1339428631924</created>
+      <updated>1339428631924</updated>
+    </task>
+    <task id="LOCAL-00097" summary="improved check for related categories">
+      <created>1339428658537</created>
+      <updated>1339428658537</updated>
+    </task>
+    <task id="LOCAL-00098" summary="fixed setting of attributes when attributes are not yet initialized in entity and resource">
+      <created>1339428711859</created>
+      <updated>1339428711859</updated>
+    </task>
+    <task id="LOCAL-00099" summary="fixed initialization of OCCI objects in collection">
+      <created>1339428732412</created>
+      <updated>1339428732412</updated>
+    </task>
+    <task id="LOCAL-00100" summary="fixed registering of model files with relative schemes and improved category retrieval from model">
+      <created>1339428842191</created>
+      <updated>1339428842192</updated>
+    </task>
+    <task id="LOCAL-00101" summary="added default base scheme for registering OCCI model definitions from file">
+      <created>1339428950946</created>
+      <updated>1339428950946</updated>
+    </task>
+    <task id="LOCAL-00102" summary="improved text/occi parsing and some smaller fixes to parser">
+      <created>1339428996013</created>
+      <updated>1339428996021</updated>
+    </task>
+    <task id="LOCAL-00103" summary="fixed problem in OCCIANTLR regarding attribute components">
+      <created>1339500472073</created>
+      <updated>1339500472073</updated>
+    </task>
+    <task id="LOCAL-00104" summary="version bump">
+      <created>1339500499447</created>
+      <updated>1339500499447</updated>
+    </task>
+    <task id="LOCAL-00105" summary="further improvements to OCCIANTLR grammar regarding reserved words (e.g. link, category, ...)">
+      <created>1339594013501</created>
+      <updated>1339594013502</updated>
+    </task>
+    <task id="LOCAL-00106" summary="added empty? and to_json methods to OCCI::Collection">
+      <created>1339669636627</created>
+      <updated>1339669636627</updated>
+    </task>
+    <task id="LOCAL-00107" summary="changed behaviour of text/occi parsing in OCCI::Parser">
+      <created>1339669685714</created>
+      <updated>1339669685715</updated>
+    </task>
+    <task id="LOCAL-00108" summary="added split method to OCCI::Attributes to create an OCCI::Attribues object out of a attribute in key value format">
+      <created>1339669748787</created>
+      <updated>1339669748787</updated>
+    </task>
+    <task id="LOCAL-00109" summary="added combine_with_defaults method to OCCI::AttributeProperties to get the attributes as hashes with their default values">
+      <created>1339669822780</created>
+      <updated>1339669822780</updated>
+    </task>
+    <task id="LOCAL-00110" summary="added httparty to gemfile">
+      <created>1339669857568</created>
+      <updated>1339669857569</updated>
+    </task>
+    <task id="LOCAL-00111" summary="first version of OCCI client added">
+      <created>1339669874959</created>
+      <updated>1339669874959</updated>
+    </task>
+    <task id="LOCAL-00112" summary="added OCCI::Client to occi.rb file">
+      <created>1339670202603</created>
+      <updated>1339670202603</updated>
+    </task>
+    <task id="LOCAL-00113" summary="added client description to Readme">
+      <created>1339680473523</created>
+      <updated>1339680473523</updated>
+    </task>
+    <task id="LOCAL-00114" summary="improved compute resource creation">
+      <created>1339680494603</created>
+      <updated>1339680494604</updated>
+    </task>
+    <task id="LOCAL-00115" summary="version bump">
+      <created>1339680513524</created>
+      <updated>1339680513524</updated>
+    </task>
+    <task id="LOCAL-00116" summary="fixed issue with text/plain parsing">
+      <created>1339687010017</created>
+      <updated>1339687010017</updated>
+    </task>
+    <task id="LOCAL-00117" summary="version bump">
+      <created>1339687017492</created>
+      <updated>1339687017492</updated>
+    </task>
+    <task id="LOCAL-00118" summary="added httparty to gemspec">
+      <created>1339844085998</created>
+      <updated>1339844085998</updated>
+    </task>
+    <task id="LOCAL-00119" summary="version bump">
+      <created>1339844118400</created>
+      <updated>1339844118400</updated>
+    </task>
+    <task id="LOCAL-00120" summary="small changes to readme">
+      <created>1339872222269</created>
+      <updated>1339872222269</updated>
+    </task>
+    <task id="LOCAL-00121" summary="added private methods to yard documentation">
+      <created>1340812036210</created>
+      <updated>1340812036210</updated>
+    </task>
+    <task id="LOCAL-00122" summary="added to_text method for action">
+      <created>1340812059475</created>
+      <updated>1340812059475</updated>
+    </task>
+    <task id="LOCAL-00123" summary="small change to return statements in attribute properties">
+      <created>1340812934359</created>
+      <updated>1340812934359</updated>
+    </task>
+    <task id="LOCAL-00124" summary="code cleanup in attributes">
+      <created>1340815412964</created>
+      <updated>1340815412964</updated>
+    </task>
+    <task id="LOCAL-00125" summary="category not inheriting Hashie::Mash anymore, initialization changed and to_text and as_json methods added">
+      <created>1340816812543</created>
+      <updated>1340816812543</updated>
+    </task>
+    <task id="LOCAL-00126" summary="entity not inheriting from Hashie::Mash anymore, changed initialization and other methods to reflect that change, added as_json method">
+      <created>1340816945428</created>
+      <updated>1340816945428</updated>
+    </task>
+    <task id="LOCAL-00127" summary="changed initialization of kind, added as_json method">
+      <created>1340817279700</created>
+      <updated>1340817279700</updated>
+    </task>
+    <task id="LOCAL-00128" summary="adapted link to changes in entity and removed unnecessary code">
+      <created>1340874239362</created>
+      <updated>1340874239362</updated>
+    </task>
+    <task id="LOCAL-00129" summary="adapted mixin to changes in category and added as_json method">
+      <created>1340874270779</created>
+      <updated>1340874270779</updated>
+    </task>
+    <task id="LOCAL-00130" summary="adapted resource to changes in entity and added as_json method">
+      <created>1340874328757</created>
+      <updated>1340874328757</updated>
+    </task>
+    <task id="LOCAL-00131" summary="started to adopt changes in other classes to client">
+      <created>1340874368213</created>
+      <updated>1340874368213</updated>
+    </task>
+    <task id="LOCAL-00132" summary="added as_json to collection and some minor changes">
+      <created>1340874395540</created>
+      <updated>1340874395540</updated>
+    </task>
+    <task id="LOCAL-00133" summary="removed loglevel from log initialization">
+      <created>1340874428452</created>
+      <updated>1340874428452</updated>
+    </task>
+    <task id="LOCAL-00134" summary="changed model to be initialized. This allows other classes to contain more than one model.">
+      <created>1340874488520</created>
+      <updated>1340874488520</updated>
+    </task>
+    <task id="LOCAL-00135" summary="adapted parser to changes in other classes and added outline for OVF message parsing">
+      <created>1340874549238</created>
+      <updated>1340874549238</updated>
+    </task>
+    <task id="LOCAL-00136" summary="aligned log spec with changes in log">
+      <created>1340874592318</created>
+      <updated>1340874592318</updated>
+    </task>
+    <task id="LOCAL-00137" summary="added specs for category filtering in model spec">
+      <created>1340874627709</created>
+      <updated>1340874627709</updated>
+    </task>
+    <task id="LOCAL-00138" summary="added method for setting id in entity and improved documentation">
+      <created>1342467142388</created>
+      <updated>1342467142388</updated>
+    </task>
+    <task id="LOCAL-00139" summary="added method for getting and setting id and added a variable href to associate data (e.g. file content for storage) to the resource">
+      <created>1342467250256</created>
+      <updated>1342467250256</updated>
+    </task>
+    <task id="LOCAL-00140" summary="reset last commit of parser class">
+      <created>1342469990383</created>
+      <updated>1342469990383</updated>
+    </task>
+    <task id="LOCAL-00141" summary="improved OVF parsing">
+      <created>1342470541338</created>
+      <updated>1342470541338</updated>
+    </task>
+    <task id="LOCAL-00142" summary="required updated uuidtools gem in gemfile">
+      <created>1342470878637</created>
+      <updated>1342470878637</updated>
+    </task>
+    <task id="LOCAL-00143" summary="small fixes in parser">
+      <created>1342471505067</created>
+      <updated>1342471505067</updated>
+    </task>
+    <task id="LOCAL-00144" summary="added spec test for ovf parsing including a test ova appliance from DMTF DSP2021">
+      <created>1342480366765</created>
+      <updated>1342480366765</updated>
+    </task>
+    <task id="LOCAL-00145" summary="fixed location method in entity">
+      <created>1342480454703</created>
+      <updated>1342480454703</updated>
+    </task>
+    <task id="LOCAL-00146" summary="improved ovf parsing, separated ovf and ova parsing, added manifest checks to ova parsing">
+      <created>1342480507458</created>
+      <updated>1342480507458</updated>
+    </task>
+    <task id="LOCAL-00147" summary="added error handling for networkinterface and storagelink in OVF parsing">
+      <created>1342519854436</created>
+      <updated>1342519854436</updated>
+    </task>
+    <task id="LOCAL-00148" summary="fixed string handling in ovf parser">
+      <created>1342520263676</created>
+      <updated>1342520263676</updated>
+    </task>
+    <task id="LOCAL-00149" summary="removed href from resource">
+      <created>1342610618893</created>
+      <updated>1342610618893</updated>
+    </task>
+    <task id="LOCAL-00150" summary="added storagelink to storage when parsing disks in OVF files">
+      <created>1342610648816</created>
+      <updated>1342610648816</updated>
+    </task>
+    <task id="LOCAL-00151" summary="merged parser with remote changes and removed .project file">
+      <created>1342611929560</created>
+      <updated>1342611929560</updated>
+    </task>
+    <task id="LOCAL-00152" summary="fixed merge artefact in parser">
+      <created>1342612110920</created>
+      <updated>1342612110920</updated>
+    </task>
+    <task id="LOCAL-00153" summary="updated README to reflect the changes regarding OCCI resource initialization and OVF parsing">
+      <created>1342698515226</created>
+      <updated>1342698515226</updated>
+    </task>
+    <task id="LOCAL-00154" summary="version bump">
+      <created>1342698526187</created>
+      <updated>1342698526188</updated>
+    </task>
+    <task id="LOCAL-00155" summary="added model back reference to collection">
+      <created>1342865483716</created>
+      <updated>1342865483716</updated>
+    </task>
+    <task id="LOCAL-00156" summary="fixed bug in kind regarding model referencing">
+      <created>1342865595821</created>
+      <updated>1342865595821</updated>
+    </task>
+    <task id="LOCAL-00157" summary="removed unnecessary href in resource">
+      <created>1342865640204</created>
+      <updated>1342865640204</updated>
+    </task>
+    <task id="LOCAL-00158" summary="added model back reference to category if it is registered in model">
+      <created>1342865716183</created>
+      <updated>1342865716184</updated>
+    </task>
+    <task id="LOCAL-00159" summary="fixed resource and link initialization in text plain and text occi parser and fixed an issue with handling hrefs in OVF files">
+      <created>1342865784023</created>
+      <updated>1342865784025</updated>
+    </task>
+    <task id="LOCAL-00160" summary="improved parser spec to include json and ovf specs as well as extended existing spec tests">
+      <created>1342865834985</created>
+      <updated>1342865834985</updated>
+    </task>
+    <task id="LOCAL-00161" summary="minor version bump">
+      <created>1342865881819</created>
+      <updated>1342865881819</updated>
+    </task>
+    <task id="LOCAL-00162" summary="small fix in attributes to pick the right class in combine method">
+      <created>1343287665931</created>
+      <updated>1343287665931</updated>
+    </task>
+    <task id="LOCAL-00163" summary="removed explicit conversion of attributes in category as it is now handled in attribute_properties">
+      <created>1343287753427</created>
+      <updated>1343287753427</updated>
+    </task>
+    <task id="LOCAL-00164" summary="added missing text/occi to parser">
+      <created>1343287826211</created>
+      <updated>1343287826211</updated>
+    </task>
+    <task id="LOCAL-00165" summary="changed handling of attribute properties. They now start with an uppercase letter (e.g. Type instead of type) to allow a clear distinction between attribute names and attribute properties.">
+      <created>1343287899034</created>
+      <updated>1343287899035</updated>
+    </task>
+    <task id="LOCAL-00166" summary="version bump">
+      <created>1343288471882</created>
+      <updated>1343288471882</updated>
+    </task>
+    <task id="LOCAL-00167" summary="two small fixes in client">
+      <created>1343289379753</created>
+      <updated>1343289379753</updated>
+    </task>
+    <task id="LOCAL-00168" summary="removed defaults from infrastructure definition, except for state definitions">
+      <created>1344456909744</created>
+      <updated>1344456909745</updated>
+    </task>
+    <task id="LOCAL-00169" summary="added text representation to entity">
+      <created>1344468595666</created>
+      <updated>1344468595666</updated>
+    </task>
+    <task id="LOCAL-00170" summary="added text reference represenatation to link and improved documentation">
+      <created>1344468644826</created>
+      <updated>1344468644826</updated>
+    </task>
+    <task id="LOCAL-00171" summary="improved link handling and added text representation to resource">
+      <created>1344468688803</created>
+      <updated>1344468688803</updated>
+    </task>
+    <task id="LOCAL-00172" summary="improved documentation">
+      <created>1344468699612</created>
+      <updated>1344468699612</updated>
+    </task>
+    <task id="LOCAL-00173" summary="small restructuring and documentation changes in collection">
+      <created>1344524460429</created>
+      <updated>1344524460429</updated>
+    </task>
+    <task id="LOCAL-00174" summary="small restructuring and documentation changes in log">
+      <created>1344524847354</created>
+      <updated>1344524847355</updated>
+    </task>
+    <task id="LOCAL-00175" summary="documentation updates to model">
+      <created>1344524961295</created>
+      <updated>1344524961295</updated>
+    </task>
+    <task id="LOCAL-00176" summary="fixed link handling in parser by creating propper OCCI link classes instead of hashes; documentation improvements">
+      <created>1344526756265</created>
+      <updated>1344526756265</updated>
+    </task>
+    <task id="LOCAL-00177" summary="small changes to README">
+      <created>1344527395724</created>
+      <updated>1344527395724</updated>
+    </task>
+    <task id="LOCAL-00178" summary="many improvements to occi client including authentication and simplifications">
+      <created>1344527442919</created>
+      <updated>1344527442919</updated>
+    </task>
+    <task id="LOCAL-00179" summary="Merge branch 'master' of github.com:gwdg/rOCCI&#10;&#10;Conflicts:&#10;&#9;lib/occi/client.rb&#10;">
+      <created>1344527705302</created>
+      <updated>1344527705302</updated>
+    </task>
+    <task id="LOCAL-00180" summary="fix for ruby-1.8.7">
+      <created>1344528432966</created>
+      <updated>1344528432966</updated>
+    </task>
+    <task id="LOCAL-00181" summary="added pretty inspecting to OCCI classes for much better readablity">
+      <created>1344529994146</created>
+      <updated>1344529994146</updated>
+    </task>
+    <task id="LOCAL-00182" summary="bug fix for setting uuid in entity">
+      <created>1344531074951</created>
+      <updated>1344531074951</updated>
+    </task>
+    <task id="LOCAL-00183" summary="version bump and minor wording change in client">
+      <created>1344531496030</created>
+      <updated>1344531496030</updated>
+    </task>
+    <task id="LOCAL-00184" summary="reintroduced method id= for entity">
+      <created>1344533055351</created>
+      <updated>1344533055351</updated>
+    </task>
+    <task id="LOCAL-00185" summary="minor version bump">
+      <created>1344533077353</created>
+      <updated>1344533077353</updated>
+    </task>
+    <task id="LOCAL-00186" summary="improved OCCI client documentation and added version 2.5 to changelog">
+      <created>1344543322162</created>
+      <updated>1344543322163</updated>
+    </task>
+    <task id="LOCAL-00187" summary="Ensured that for every entity the mixins and actions are flat arrays">
+      <created>1345036649774</created>
+      <updated>1345036649774</updated>
+    </task>
+    <task id="LOCAL-00188" summary="minor version bump">
+      <created>1345036666547</created>
+      <updated>1345036666548</updated>
+    </task>
+    <task id="LOCAL-00189" summary="fixed rendering of links within resources">
+      <created>1345551691052</created>
+      <updated>1345551691052</updated>
+    </task>
+    <task id="LOCAL-00190" summary="minor version bump">
+      <created>1345551708016</created>
+      <updated>1345551708016</updated>
+    </task>
+    <task id="LOCAL-00191" summary="small changes to README regaring usage of the client&#10;&#10;[ci skip]">
+      <created>1346167333854</created>
+      <updated>1346167333854</updated>
+    </task>
+    <task id="LOCAL-00192" summary="restructured occi requires">
+      <created>1346704961835</created>
+      <updated>1346704961835</updated>
+    </task>
+    <task id="LOCAL-00193" summary="removed requires in parser">
+      <created>1346705043060</created>
+      <updated>1346705043060</updated>
+    </task>
+    <task id="LOCAL-00194" summary="removed requires from log">
+      <created>1346705183780</created>
+      <updated>1346705183780</updated>
+    </task>
+    <task id="LOCAL-00195" summary="fixes in  OCCI ANTLR grammar&#10;&#10;* fixed handling of rel in categories&#10;* added immutable, mutable, required to text/plain rendering">
+      <created>1346873454895</created>
+      <updated>1346873454895</updated>
+    </task>
+    <task id="LOCAL-00196" summary="updated parser spec to reflect changes in OCCI ANTLR grammar">
+      <created>1346873922274</created>
+      <updated>1346873922274</updated>
+    </task>
+    <task id="LOCAL-00197" summary="removed requires from collection">
+      <created>1346874185526</created>
+      <updated>1346874185526</updated>
+    </task>
+    <task id="LOCAL-00198" summary="added core file to start streamlining the handling of specified OCCI components">
+      <created>1346874480655</created>
+      <updated>1346874480655</updated>
+    </task>
+    <task id="LOCAL-00199" summary="removed not yet committed classes from core and occi">
+      <created>1346874556997</created>
+      <updated>1346874556997</updated>
+    </task>
+    <task id="LOCAL-00200" summary="Client&#10;&#10;* implemented a somewhat cleaner way to update headers in get">
+      <created>1346875139892</created>
+      <updated>1346875139893</updated>
+    </task>
+    <task id="LOCAL-00201" summary="minor change to logger">
+      <created>1346875915089</created>
+      <updated>1346875915089</updated>
+    </task>
+    <task id="LOCAL-00202" summary="another change to logger">
+      <created>1346876396606</created>
+      <updated>1346876396606</updated>
+    </task>
+    <task id="LOCAL-00203" summary="OCCI Client: in get() fixed category parsing for text/plain">
+      <created>1346877051083</created>
+      <updated>1346877051083</updated>
+    </task>
+    <task id="LOCAL-00204" summary="DSL example: made endpoint a constant and some formatting">
+      <created>1346877373534</created>
+      <updated>1346877373534</updated>
+    </task>
+    <task id="LOCAL-00205" summary="OCCI Client: changed retrieval of os and resource templates&#10;&#10;retrieval of os and resource templates is now done by looking them up in the model instead of retrieving them from the service provider. This solves problems with the way the OpenStack implementation interprets the request.">
+      <created>1346879052820</created>
+      <updated>1346879052820</updated>
+    </task>
+    <task id="LOCAL-00206" summary="entity: fixed text rendering">
+      <created>1346880948145</created>
+      <updated>1346880948145</updated>
+    </task>
+    <task id="LOCAL-00207" summary="OCCIANTLR: fixed parsing of category attribute properties">
+      <created>1346880993479</created>
+      <updated>1346880993479</updated>
+    </task>
+    <task id="LOCAL-00208" summary="OCCIANTLR: adapted parser spec to changes in grammar">
+      <created>1346881310906</created>
+      <updated>1346881310906</updated>
+    </task>
+    <task id="LOCAL-00209" summary="Client: fixed problem with os and resource template retrieval">
+      <created>1346921041271</created>
+      <updated>1346921041271</updated>
+    </task>
+    <task id="LOCAL-00210" summary="Entity: small fix to text rendering">
+      <created>1346921077309</created>
+      <updated>1346921077309</updated>
+    </task>
+    <task id="LOCAL-00211" summary="OCCI ANTLR grammar: fixed wrong type name categories to kind for links">
+      <created>1347272510872</created>
+      <updated>1347272510872</updated>
+    </task>
+    <task id="LOCAL-00212" summary="spec: fixed parser spec which was wrong and let to problems with link parsing">
+      <created>1347272869965</created>
+      <updated>1347272869965</updated>
+    </task>
+    <task id="LOCAL-00213" summary="Gem: added i18n gem to gemfile and gemspec">
+      <created>1347282166802</created>
+      <updated>1347282166803</updated>
+    </task>
+    <task id="LOCAL-00214" summary="Version: minor bump">
+      <created>1347282267246</created>
+      <updated>1347282267247</updated>
+    </task>
+    <task id="LOCAL-00215" summary="Parser: small fix to link parsing in text/occi format">
+      <created>1347284960247</created>
+      <updated>1347284960247</updated>
+    </task>
+    <task id="LOCAL-00216" summary="Version: minor bump">
+      <created>1347284980761</created>
+      <updated>1347284980761</updated>
+    </task>
+    <task id="LOCAL-00217" summary="OCCI ANTLR Parser: fixed parsing of quoted strings">
+      <created>1347286832223</created>
+      <updated>1347286832223</updated>
+    </task>
+    <task id="LOCAL-00218" summary="Version: minor bump">
+      <created>1347286847599</created>
+      <updated>1347286847599</updated>
+    </task>
+    <task id="LOCAL-00219" summary="Parser: fixed access to target for links rendered inline of resources">
+      <created>1347289782009</created>
+      <updated>1347289782009</updated>
+    </task>
+    <task id="LOCAL-00220" summary="Version: minor version bump">
+      <created>1347289801561</created>
+      <updated>1347289801561</updated>
+    </task>
+    <task id="LOCAL-00221" summary="Parser spec: changed handling of quoted strings in parser spec for text rendering">
+      <created>1347290177908</created>
+      <updated>1347290177908</updated>
+    </task>
+    <task id="LOCAL-00222" summary="Rendering: added rendering to HTTP header to support text/occi until this finally gets removed">
+      <created>1347380213007</created>
+      <updated>1347380213007</updated>
+    </task>
+    <task id="LOCAL-00223" summary="Rendering: small fixes to header rendering for links within entity">
+      <created>1347380535010</created>
+      <updated>1347380535010</updated>
+    </task>
+    <task id="LOCAL-00224" summary="Rendering: more fixes to header rendering for links within entity">
+      <created>1347380638264</created>
+      <updated>1347380638264</updated>
+    </task>
+    <task id="LOCAL-00225" summary="Version: minor bump">
+      <created>1347380653443</created>
+      <updated>1347380653443</updated>
+    </task>
+    <task id="LOCAL-00226" summary="Entity: fix to rendering of actions in text/plain and text/occi rendering">
+      <created>1347382445946</created>
+      <updated>1347382445946</updated>
+    </task>
+    <task id="LOCAL-00227" summary="Version: minor bump">
+      <created>1347382469452</created>
+      <updated>1347382469452</updated>
+    </task>
+    <task id="LOCAL-00228" summary="Entity: small fix to header rendering">
+      <created>1347441674209</created>
+      <updated>1347441674209</updated>
+    </task>
+    <task id="LOCAL-00229" summary="Version: minor bump">
+      <created>1347441696038</created>
+      <updated>1347441696039</updated>
+    </task>
+    <task id="LOCAL-00230" summary="Parser: fix to OVF parsing when supplied file does not exist&#10;&#10;Parser does not return invalid links when a file specified in the OVF file does not exist in an OVA package.">
+      <created>1347575474950</created>
+      <updated>1347575474951</updated>
+    </task>
+    <task id="LOCAL-00231" summary="Version: minor bump">
+      <created>1347575505267</created>
+      <updated>1347575505267</updated>
+    </task>
+    <task id="LOCAL-00232" summary="Entity: small fix for text and occi rendering">
+      <created>1347666956569</created>
+      <updated>1347666956569</updated>
+    </task>
+    <task id="LOCAL-00233" summary="Author: added Boris to the list of authors">
+      <created>1349379537755</created>
+      <updated>1349379537755</updated>
+    </task>
+    <task id="LOCAL-00234" summary="README: updated readme with changes to Occi naming">
+      <created>1349379825438</created>
+      <updated>1349379825438</updated>
+    </task>
+    <task id="LOCAL-00235" summary="gemspec: updated gemspec with new dependecies">
+      <created>1349379917262</created>
+      <updated>1349379917262</updated>
+    </task>
+    <task id="LOCAL-00236" summary="General&#10;- changed OCCI to Occi&#10;- improved rendering of OCCI objects into plain text, http headers and JSON objects&#10;- improved handling of OCCI Attribute Properties&#10;&#10;Client&#10;- get Resource from Model instead of from fixed hash&#10;- added method to deploy OVF/OVA files&#10;&#10;Category&#10;- added factory method to get ruby class from OCCI category type identifier&#10;&#10;ID&#10;- changed entity IDs from UUID Strings to the UUID URN format&#10;&#10;Occi / Core / Infrastructure&#10;- added methods to get kinds, mixins, actions and categories from namespaces&#10;- all OCCI Kinds and Mixins are now Ruby classes&#10;- added OCCI Infrastructure categories as classes with methods to simplify handling them&#10;&#10;Model / Collection&#10;- changed model to inherit from collection&#10;- removed categories and locations from model&#10;- new methods for getting categories by ID or location implemented in collection&#10;&#10;Version&#10;- bumped Version to 3.0.0-alpha.1&#10;&#10;OCCI ANTLR&#10;- added parsing of OCCI Attribute Properties mutable and required">
+      <created>1349453899052</created>
+      <updated>1349453899052</updated>
+    </task>
+    <task id="LOCAL-00237" summary="Version&#10;&#10;- changed to 3.0.0 to be gemspec compliant">
+      <created>1349456956835</created>
+      <updated>1349456956835</updated>
+    </task>
+    <task id="LOCAL-00238" summary="gemspec&#10;&#10;- removed dependencies which are already in the ruby standard library">
+      <created>1349456996109</created>
+      <updated>1349456996109</updated>
+    </task>
+    <task id="LOCAL-00239" summary="Merge remote-tracking branch 'origin/master' into plugfest-results&#10;&#10;Conflicts:&#10;&#9;lib/occi/core/entity.rb&#10;">
+      <created>1349457189890</created>
+      <updated>1349457189890</updated>
+    </task>
+    <task id="LOCAL-00240" summary="Model&#10;&#10;- removed unnecessary require statements">
+      <created>1349457402367</created>
+      <updated>1349457402367</updated>
+    </task>
+    <task id="LOCAL-00241" summary="rspec&#10;&#10;- fixed requires in spec files">
+      <created>1349470259721</created>
+      <updated>1349470259721</updated>
+    </task>
+    <task id="LOCAL-00242" summary="rspec&#10;&#10;- fixed requires in spec files">
+      <created>1349470397963</created>
+      <updated>1349470397963</updated>
+    </task>
+    <task id="LOCAL-00243" summary="Gems&#10;&#10;- added rubygems to required gems">
+      <created>1349524654055</created>
+      <updated>1349524654056</updated>
+    </task>
+    <task id="LOCAL-00244" summary="Category&#10;&#10;- fix for ruby 1.8.7 when checking for existing constants">
+      <created>1349525303263</created>
+      <updated>1349525303263</updated>
+    </task>
+    <task id="LOCAL-00245" summary="Example&#10;&#10;- updated examples regarding storagelink and networkinterface">
+      <created>1349542372231</created>
+      <updated>1349542372238</updated>
+    </task>
+    <task id="LOCAL-00246" summary="Documentation&#10;&#10;- improved documentation of core classes">
+      <created>1349543931205</created>
+      <updated>1349543931205</updated>
+    </task>
+    <task id="LOCAL-00247" summary="Entity&#10;&#10;- fixed rendering of occi.core.id">
+      <created>1349555689627</created>
+      <updated>1349555689627</updated>
+    </task>
+    <task id="LOCAL-00248" summary="Entity&#10;&#10;- fixed rendering of occi.core.id&#10;- fixed rendering of links">
+      <created>1349557092187</created>
+      <updated>1349557092187</updated>
+    </task>
+    <task id="LOCAL-00249" summary="Resource&#10;&#10;- fixed link rendering">
+      <created>1349557141621</created>
+      <updated>1349557141621</updated>
+    </task>
+    <task id="LOCAL-00250" summary="Link&#10;&#10;- removed creation of ID">
+      <created>1349557173499</created>
+      <updated>1349557173499</updated>
+    </task>
+    <task id="LOCAL-00251" summary="Collection&#10;&#10;- fixed handling of links in collection">
+      <created>1349557210030</created>
+      <updated>1349557210030</updated>
+    </task>
+    <task id="LOCAL-00252" summary="Parser&#10;&#10;- fixed parsing of links when only one resource is provided in request">
+      <created>1349557251523</created>
+      <updated>1349557251523</updated>
+    </task>
+    <task id="LOCAL-00253" summary="Parser&#10;&#10;- fixed parsing of mixins">
+      <created>1349561742340</created>
+      <updated>1349561742340</updated>
+    </task>
+    <task id="LOCAL-00254" summary="Link and Resource&#10;&#10;- fixed some issues with the initialization of Link and Resource">
+      <created>1349561769748</created>
+      <updated>1349561769748</updated>
+    </task>
+    <task id="LOCAL-00255" summary="Version&#10;&#10;- minor bump">
+      <created>1349561783041</created>
+      <updated>1349561783041</updated>
+    </task>
+    <task id="LOCAL-00256" summary="Gemfile&#10;&#10;- updated with latest version of gems">
+      <created>1351177217259</created>
+      <updated>1351177217259</updated>
+    </task>
+    <task id="LOCAL-00257" summary="OCCI&#10;&#10;- removed empty kind method from occi.rb as it doesn't make sense">
+      <created>1351177266438</created>
+      <updated>1351177266438</updated>
+    </task>
+    <task id="LOCAL-00258" summary="OCCI Core functionality&#10;&#10;- all kinds and mixins are now ruby objects. If a type identifier is added as kind or mixin to an entity, the corresponding object will be used&#10;- improvements to rspec tests&#10;- improvements and bug fixes in the OCCI core classes">
+      <created>1351611283803</created>
+      <updated>1351611283803</updated>
+    </task>
+    <task id="LOCAL-00259" summary="Merge branch 'master' of github.com:gwdg/rOCCI into core_updates&#10;&#10;Conflicts:&#10;&#9;spec/occi/parser_spec.rb&#10;">
+      <created>1351611629519</created>
+      <updated>1351611629519</updated>
+    </task>
+    <task id="LOCAL-00260" summary="Mixins&#10;&#10;- fixed mixin problem in os_tpl and resource_tpl&#10;- added sets to Collection">
+      <created>1351634865692</created>
+      <updated>1351634865692</updated>
+    </task>
+    <task id="LOCAL-00261" summary="Categories and Model&#10;&#10;- all lists of kinds, actions, mixins, categories and related categories are now specific classes and take care of converting type identifier strings to category instances if they are either implemented as a class in rOCCI or available in the associated model&#10;- a model can be added to a collection. Adding it updates all categories in the collection (also within the entities) with the corresponding category from the model. categories not present in the model are currently not removed&#10;- added rspec tests for the categories class and updated the tests for category and entity class&#10;- several bug fixes">
+      <created>1351794578662</created>
+      <updated>1351794578662</updated>
+    </task>
+    <task id="LOCAL-00262" summary="Client&#10;&#10;- reverted to previous commit as there was an unintended change">
+      <created>1351795907894</created>
+      <updated>1351795907894</updated>
+    </task>
+    <option name="localTasksCounter" value="263" />
+    <servers />
+  </component>
+  <component name="TodoView" selected-index="0">
+    <todo-panel id="selected-file">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="default-changelist">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="22" width="1680" height="1024" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34951457" sideWeight="0.49265605" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22977346" sideWeight="0.95688546" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34951457" sideWeight="0.50306" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3257821" sideWeight="0.497552" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32901832" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32925338" sideWeight="0.67098165" order="5" side_tool="true" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32901832" sideWeight="0.497552" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20073439" sideWeight="0.16828479" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20073439" sideWeight="0.77022654" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32901832" sideWeight="0.49510404" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32965687" sideWeight="0.67098165" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Kahlua" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32965687" sideWeight="0.67098165" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Regex Tester" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.13700108" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="CHECK_NEW_TODO" value="true" />
+    <option name="myTodoPanelSettings">
+      <value>
+        <are-packages-shown value="false" />
+        <are-modules-shown value="false" />
+        <flatten-packages value="false" />
+        <is-autoscroll-to-source value="false" />
+      </value>
+    </option>
+    <option name="PERFORM_UPDATE_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_COMMIT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_EDIT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_CHECKOUT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_ADD_REMOVE_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_ROLLBACK_IN_BACKGROUND" value="false" />
+    <option name="CHECK_LOCALLY_CHANGED_CONFLICTS_IN_BACKGROUND" value="false" />
+    <option name="CHANGED_ON_SERVER_INTERVAL" value="60" />
+    <option name="SHOW_ONLY_CHANGED_IN_SELECTION_DIFF" value="true" />
+    <option name="CHECK_COMMIT_MESSAGE_SPELLING" value="true" />
+    <option name="DEFAULT_PATCH_EXTENSION" value="patch" />
+    <option name="SHORT_DIFF_HORISONTALLY" value="true" />
+    <option name="SHORT_DIFF_EXTRA_LINES" value="2" />
+    <option name="SOFT_WRAPS_IN_SHORT_DIFF" value="true" />
+    <option name="INCLUDE_TEXT_INTO_PATCH" value="false" />
+    <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
+    <option name="SHOW_FILE_HISTORY_DETAILS" value="true" />
+    <option name="SHOW_VCS_ERROR_NOTIFICATIONS" value="true" />
+    <option name="SHOW_DIRTY_RECURSIVELY" value="false" />
+    <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
+    <option name="LAST_COMMIT_MESSAGE" value="Client&#10;&#10;- reverted to previous commit as there was an unintended change" />
+    <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
+    <option name="FILE_HISTORY_DIALOG_COMMENTS_SPLITTER_PROPORTION" value="0.8" />
+    <option name="FILE_HISTORY_DIALOG_SPLITTER_PROPORTION" value="0.5" />
+    <option name="ACTIVE_VCS_NAME" />
+    <option name="UPDATE_GROUP_BY_PACKAGES" value="false" />
+    <option name="UPDATE_GROUP_BY_CHANGELIST" value="false" />
+    <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
+    <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
+    <MESSAGE value="Version&#10;&#10;- changed to 3.0.0 to be gemspec compliant" />
+    <MESSAGE value="gemspec&#10;&#10;- removed dependencies which are already in the ruby standard library" />
+    <MESSAGE value="Merge remote-tracking branch 'origin/master' into plugfest-results&#10;&#10;Conflicts:&#10;&#9;lib/occi/core/entity.rb&#10;" />
+    <MESSAGE value="Model&#10;&#10;- removed unnecessary require statements" />
+    <MESSAGE value="rspec&#10;&#10;- fixed requires in spec files" />
+    <MESSAGE value="Gems&#10;&#10;- added rubygems to required gems" />
+    <MESSAGE value="Category&#10;&#10;- fix for ruby 1.8.7 when checking for existing constants" />
+    <MESSAGE value="Example&#10;&#10;- updated examples regarding storagelink and networkinterface" />
+    <MESSAGE value="Documentation&#10;&#10;- improved documentation of core classes" />
+    <MESSAGE value="Entity&#10;&#10;- fixed rendering of occi.core.id" />
+    <MESSAGE value="Entity&#10;&#10;- fixed rendering of occi.core.id&#10;- fixed rendering of links" />
+    <MESSAGE value="Resource&#10;&#10;- fixed link rendering" />
+    <MESSAGE value="Link&#10;&#10;- removed creation of ID" />
+    <MESSAGE value="Collection&#10;&#10;- fixed handling of links in collection" />
+    <MESSAGE value="Parser&#10;&#10;- fixed parsing of links when only one resource is provided in request" />
+    <MESSAGE value="Parser&#10;&#10;- fixed parsing of mixins" />
+    <MESSAGE value="Link and Resource&#10;&#10;- fixed some issues with the initialization of Link and Resource" />
+    <MESSAGE value="Version&#10;&#10;- minor bump" />
+    <MESSAGE value="Gemfile&#10;&#10;- updated with latest version of gems" />
+    <MESSAGE value="OCCI&#10;&#10;- removed empty kind method from occi.rb as it doesn't make sense" />
+    <MESSAGE value="OCCI Core functionality&#10;&#10;- all kinds and mixins are now ruby objects. If a type identifier is added as kind or mixin to an entity, the corresponding object will be used&#10;- improvements to rspec tests&#10;- improvements and bug fixes in the OCCI core classes" />
+    <MESSAGE value="Merge branch 'master' of github.com:gwdg/rOCCI into core_updates&#10;&#10;Conflicts:&#10;&#9;spec/occi/parser_spec.rb&#10;" />
+    <MESSAGE value="Mixins&#10;&#10;- fixed mixin problem in os_tpl and resource_tpl&#10;- added sets to Collection" />
+    <MESSAGE value="Categories and Model&#10;&#10;- all lists of kinds, actions, mixins, categories and related categories are now specific classes and take care of converting type identifier strings to category instances if they are either implemented as a class in rOCCI or available in the associated model&#10;- a model can be added to a collection. Adding it updates all categories in the collection (also within the entities) with the corresponding category from the model. categories not present in the model are currently not removed&#10;- added rspec tests for the categories class and updated the tests for category and entity class&#10;- several bug fixes" />
+    <MESSAGE value="Client&#10;&#10;- reverted to previous commit as there was an unintended change" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="2" />
+    </breakpoint-manager>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/lib/occi/core/mixin.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="50" selection-start="720" selection-end="773" vertical-scroll-proportion="-13.44">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/occi/core/category.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="85" column="25" selection-start="3224" selection-end="3224" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/occi/core/kind.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="34" column="13" selection-start="1118" selection-end="1118" vertical-scroll-proportion="-9.8">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/occi/infrastructure/compute.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/occi/core/links.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/occi/core/link.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="8" column="48" selection-start="195" selection-end="222" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/occi/core/resource.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="46" selection-start="215" selection-end="215" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/occi/infrastructure/storagelink.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="3.2">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/occi/parser.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="83" column="33" selection-start="4339" selection-end="4339" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/spec/occi/core/categories_spec.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="28" selection-start="745" selection-end="745" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/occi/core/categories.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="71" selection-start="559" selection-end="559" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/occi/core/entities.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="42" selection-start="189" selection-end="189" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/occi/collection.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="23" selection-start="2282" selection-end="2282" vertical-scroll-proportion="-19.346153">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/spec/occi/core/entity_spec.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="38" selection-start="1014" selection-end="1014" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/features/core/discover_capabilities.feature">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="8" column="28" selection-start="307" selection-end="307" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/occi/core/entity.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="36" column="10" selection-start="968" selection-end="968" vertical-scroll-proportion="-2.2585437">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
+

@@ -1,0 +1,504 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<title>
+  File: README
+  
+    &mdash; Documentation of the OCCI gem
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'><h1>rOCCI - A Ruby OCCI Framework</h1>
+
+<p><a href="http://travis-ci.org/gwdg/rOCCI"><img src="https://secure.travis-ci.org/gwdg/rOCCI.png" alt="Build Status"></a> <a href="https://gemnasium.com/gwdg/rOCCI"><img src="https://gemnasium.com/gwdg/rOCCI.png" alt="Dependency Status"></a></p>
+
+<h2>Requirements</h2>
+
+<p>The following setup is recommended</p>
+
+<ul>
+<li>usage of the Ruby Version Manager</li>
+<li>Ruby 1.9.3</li>
+<li>RubyGems installed</li>
+</ul>
+
+<h2>Installation</h2>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_gem'>gem</span> <span class='id identifier rubyid_install'>install</span> <span class='id identifier rubyid_occi'>occi</span>
+</code></pre>
+
+<h2>Usage</h2>
+
+<h3>Client</h3>
+
+<p>The OCCI gem includes a client you can use directly from shell with the following auth methods: x509 (with --password, --user-cred and --ca-path), basic (with --username and --password), digest (with --username and --password), none. If you won&#39;t set a password using --password, the client will ask for it later on. There is also an interactive mode, which will allow you to interact with the client through menus and answers to simple questions (this feature is still experimental).</p>
+
+<p>To find out more about available options and defaults use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_occi'>occi</span> <span class='op'>-</span><span class='op'>-</span><span class='id identifier rubyid_help'>help</span>
+</code></pre>
+
+<p>To run the client in an interactive mode use</p>
+
+<pre class="code ruby"><code>occi --interactive
+occi --interactive --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/
+</code></pre>
+
+<p>To list available resources use</p>
+
+<pre class="code ruby"><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action list --resource compute --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action list --resource storage --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action list --resource network --auth x509
+</code></pre>
+
+<p>To describe available resources use</p>
+
+<pre class="code ruby"><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource compute --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource storage --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource network --auth x509
+</code></pre>
+
+<p>To describe specific resources use</p>
+
+<pre class="code ruby"><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/compute/&lt;OCCI_ID&gt; --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/storage/&lt;OCCI_ID&gt; --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/network/&lt;OCCI_ID&gt; --auth x509
+</code></pre>
+
+<p>To list available OS templates or Resource templates use</p>
+
+<pre class="code ruby"><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action list --resource os_tpl --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action list --resource resource_tpl --auth x509
+</code></pre>
+
+<p>To describe a specific OS template or Resource template use</p>
+
+<pre class="code ruby"><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource os_tpl#debian6 --auth x509
+occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action describe --resource resource_tpl#small --auth x509
+</code></pre>
+
+<p>To create a compute resource with mixins use</p>
+
+<pre class="code ruby"><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action create --resource compute --mixin os_tpl#debian6 --mixin resource_tpl#small --resource-title &quot;My rOCCI VM&quot; --auth x509
+</code></pre>
+
+<p>To delete a compute resource use</p>
+
+<pre class="code ruby"><code>occi --endpoint https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/ --action delete --resource https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/compute/&lt;OCCI_ID&gt; --auth x509
+</code></pre>
+
+<h3>Client scripting</h3>
+
+<h4>Auth</h4>
+
+<p>For Basic auth use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_auth'>auth</span> <span class='op'>=</span> <span class='const'>Hashie</span><span class='op'>::</span><span class='const'>Mash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+<span class='id identifier rubyid_auth'>auth</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>basic</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_auth'>auth</span><span class='period'>.</span><span class='id identifier rubyid_username'>username</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>user</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_auth'>auth</span><span class='period'>.</span><span class='id identifier rubyid_password'>password</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>mypass</span><span class='tstring_end'>'</span></span>
+</code></pre>
+
+<p>For Digest auth use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_auth'>auth</span> <span class='op'>=</span> <span class='const'>Hashie</span><span class='op'>::</span><span class='const'>Mash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+<span class='id identifier rubyid_auth'>auth</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>digest</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_auth'>auth</span><span class='period'>.</span><span class='id identifier rubyid_username'>username</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>user</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_auth'>auth</span><span class='period'>.</span><span class='id identifier rubyid_password'>password</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>mypass</span><span class='tstring_end'>'</span></span>
+</code></pre>
+
+<p>For X.509 auth use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_auth'>auth</span> <span class='op'>=</span> <span class='const'>Hashie</span><span class='op'>::</span><span class='const'>Mash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+<span class='id identifier rubyid_auth'>auth</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>x509</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_auth'>auth</span><span class='period'>.</span><span class='id identifier rubyid_user_cert'>user_cert</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/Path/To/My/usercert.pem</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_auth'>auth</span><span class='period'>.</span><span class='id identifier rubyid_user_cert_password'>user_cert_password</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>MyPassword</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_auth'>auth</span><span class='period'>.</span><span class='id identifier rubyid_ca_path'>ca_path</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/Path/To/root-certificates</span><span class='tstring_end'>'</span></span>
+</code></pre>
+
+<h4>DSL</h4>
+
+<p>In your scripts, you can use the OCCI client DSL.</p>
+
+<p>To include the DSL definitions in your script use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_extend'>extend</span> <span class='const'>Occi</span><span class='op'>::</span><span class='const'>DSL</span>
+</code></pre>
+
+<p>To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_connect'>connect</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>http://localhost:3300</span><span class='tstring_end'>'</span></span><span class='comma'>,</span><span class='id identifier rubyid_auth'>auth</span><span class='op'>||=</span><span class='kw'>nil</span><span class='rparen'>)</span>
+</code></pre>
+
+<p>To get the list of available resource types or mixin types use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_resource_types'>resource_types</span>
+<span class='id identifier rubyid_mixin_types'>mixin_types</span>
+</code></pre>
+
+<p>To get compute, storage or network descriptions use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_describe'>describe</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>compute</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_describe'>describe</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>storage</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_describe'>describe</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>network</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<p>To get the location of compute, storage or network resources use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_list'>list</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>compute</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_list'>list</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>storage</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_list'>list</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>network</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<p>To get the identifiers of specific mixins in specific mixin types use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_mixin'>mixin</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>my_template</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>os_tpl</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_mixin'>mixin</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>small</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>resource_tpl</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<p>To get the identifiers of specific mixins with unknown types use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_mixin'>mixin</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>medium</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<p>To get mixin descriptions use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_mixin'>mixin</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>medium</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='kw'>true</span>
+<span class='id identifier rubyid_mixin'>mixin</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>my_template</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>os_tpl</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='kw'>true</span>
+</code></pre>
+
+<p>To get a list of names of all / OS templates / Resource templates mixins use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_mixins'>mixins</span>
+<span class='id identifier rubyid_mixins'>mixins</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>os_tpl</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_mixins'>mixins</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>resource_tpl</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<p>To create a new compute resource use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_os'>os</span> <span class='op'>=</span> <span class='id identifier rubyid_mixin'>mixin</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>my_os</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>os_tpl</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_size'>size</span> <span class='op'>=</span> <span class='id identifier rubyid_mixin'>mixin</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>large</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>resource_tpl</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_cmpt'>cmpt</span> <span class='op'>=</span> <span class='id identifier rubyid_resource'>resource</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>compute</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_cmpt'>cmpt</span><span class='period'>.</span><span class='id identifier rubyid_mixins'>mixins</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_os'>os</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_size'>size</span>
+<span class='id identifier rubyid_cmpt'>cmpt</span><span class='period'>.</span><span class='id identifier rubyid_title'>title</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>My VM</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_create'>create</span> <span class='id identifier rubyid_cmpt'>cmpt</span>
+</code></pre>
+
+<p>To get a description of a specific resource use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_describe'>describe</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/compute/&lt;OCCI_ID&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_describe'>describe</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/storage/&lt;OCCI_ID&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_describe'>describe</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/network/&lt;OCCI_ID&gt;</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<p>To delete a specific resource use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_delete'>delete</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/compute/&lt;OCCI_ID&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_delete'>delete</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/storage/&lt;OCCI_ID&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_delete'>delete</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/network/&lt;OCCI_ID&gt;</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<h4>API</h4>
+
+<p>If you need low level access to parts of the OCCI client or need to use more than one instance
+at a time, you should use the OCCI client API directly.</p>
+
+<p>To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_client'>client</span> <span class='op'>=</span> <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Client</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>http://localhost:3300</span><span class='tstring_end'>'</span></span><span class='comma'>,</span><span class='id identifier rubyid_auth'>auth</span><span class='op'>||=</span><span class='kw'>nil</span><span class='rparen'>)</span>
+</code></pre>
+
+<p>All available categories are automatically registered to the OCCI model during client initialization. You can get them via</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_model'>model</span>
+</code></pre>
+
+<p>To get the list of available resource types or mixin types use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_get_resource_types'>get_resource_types</span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_get_mixin_types'>get_mixin_types</span>
+</code></pre>
+
+<p>To get compute, storage or network descriptions use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_describe'>describe</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>compute</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_describe'>describe</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>storage</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_describe'>describe</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>network</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<p>To get the location of compute, storage or network resources use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_list'>list</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>compute</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_list'>list</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>storage</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_list'>list</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>network</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<p>To get the identifiers of specific mixins in specific mixin types use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_find_mixin'>find_mixin</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>my_template</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>os_tpl</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_find_mixin'>find_mixin</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>small</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>resource_tpl</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<p>To get the identifiers of specific mixins with unknown types use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_find_mixin'>find_mixin</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>medium</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<p>To get mixin descriptions use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_find_mixin'>find_mixin</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>medium</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='kw'>true</span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_find_mixin'>find_mixin</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>my_template</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>os_tpl</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='kw'>true</span>
+</code></pre>
+
+<p>To get a list of names of all / OS templates / Resource templates mixins use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_get_mixins'>get_mixins</span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_get_mixins'>get_mixins</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>os_tpl</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_get_mixins'>get_mixins</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>resource_tpl</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<p>To create a new compute resource use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_os'>os</span> <span class='op'>=</span> <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_find_mixin'>find_mixin</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>my_os</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>os_tpl</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_size'>size</span> <span class='op'>=</span> <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_find_mixin'>find_mixin</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>large</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>resource_tpl</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_cmpt'>cmpt</span> <span class='op'>=</span> <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_get_resource'>get_resource</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>compute</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_cmpt'>cmpt</span><span class='period'>.</span><span class='id identifier rubyid_mixins'>mixins</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_os'>os</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_size'>size</span>
+<span class='id identifier rubyid_cmpt'>cmpt</span><span class='period'>.</span><span class='id identifier rubyid_title'>title</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>My VM</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_create'>create</span> <span class='id identifier rubyid_cmpt'>cmpt</span>
+</code></pre>
+
+<p>To get a description of a specific resource use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_describe'>describe</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/compute/&lt;OCCI_ID&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_describe'>describe</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/storage/&lt;OCCI_ID&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_describe'>describe</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/network/&lt;OCCI_ID&gt;</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<p>To delete a specific resource use</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/compute/&lt;OCCI_ID&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/storage/&lt;OCCI_ID&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>https://&lt;ENDPOINT&gt;:&lt;PORT&gt;/network/&lt;OCCI_ID&gt;</span><span class='tstring_end'>&quot;</span></span>
+</code></pre>
+
+<h4>Logging</h4>
+
+<p>The OCCI gem includes its own logging mechanism using a message queue. By default, no one is listening to that queue.
+A new OCCI Logger can be initialized by specifying the log destination (either a filename or an IO object like
+STDOUT) and the log level.</p>
+
+<pre class="code ruby"><code><span class='const'>Occi</span><span class='op'>::</span><span class='const'>Log</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='const'>STDOUT</span><span class='comma'>,</span><span class='const'>Occi</span><span class='op'>::</span><span class='const'>Log</span><span class='op'>::</span><span class='const'>INFO</span><span class='rparen'>)</span>
+</code></pre>
+
+<p>You can create multiple Loggers to receive the log output.</p>
+
+<p>You can always, even if there is no logger defined, log output using the class methods of OCCI::Log e.g.</p>
+
+<pre class="code ruby"><code><span class='const'>Occi</span><span class='op'>::</span><span class='const'>Log</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Test message</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+</code></pre>
+
+<h4>Registering categories in the OCCI Model</h4>
+
+<p>Before the parser may be used, the available categories have to be registered in the OCCI Model.</p>
+
+<p>For categories already specified by the OCCI WG a method exists in the OCCI Model class to register them:</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_model'>model</span> <span class='op'>=</span> <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Model</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+<span class='id identifier rubyid_model'>model</span><span class='period'>.</span><span class='id identifier rubyid_register_infrastructure'>register_infrastructure</span>
+</code></pre>
+
+<p>Further categories can either be registered from files which include OCCI collections in JSON formator or from parsed
+ JSON objects (e.g. from the query interface of an OCCI service endpoint).</p>
+
+<h4>Parsing OCCI messages</h4>
+
+<p>The OCCI gem includes a Parser to easily parse OCCI messages. With a given media type (e.g. json,
+xml or plain text) the parser analyses the content of the message body and, if supplied,
+the message header. As the text/plain and text/occi media type do not clearly distinguish between a message with a
+category and a message with an entity which has a kind, it has to be specified if the message contains a category (e
+.g. for user defined mixins)</p>
+
+<p>OCCI messages can be parsed to an OCCI collection for example like</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_media_type'>media_type</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>text/plain</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_body'>body</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>%Q|</span><span class='tstring_content'>Category: compute; scheme=&quot;http://schemas.ogf.org/occi/infrastructure#&quot;; class=&quot;kind&quot;</span><span class='tstring_end'>|</span></span>
+<span class='id identifier rubyid_collection'>collection</span><span class='op'>=</span><span class='const'>Occi</span><span class='op'>::</span><span class='const'>Parser</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_media_type'>media_type</span><span class='comma'>,</span> <span class='id identifier rubyid_body'>body</span><span class='rparen'>)</span>
+</code></pre>
+
+<h4>Parsing OVF / OVA files</h4>
+
+<p>Parsing of OVF/OVA files is partly supported and will be improved in future versions.</p>
+
+<p>The example in <a href="http://www.dmtf.org/sites/default/files/standards/documents/DSP2021_1.0.0.tar">DMTF DSP 2021</a> is
+bundled with rOCCI and can be parsed to an OCCI collection with</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>open-uri</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_ova'>ova</span><span class='op'>=</span><span class='id identifier rubyid_open'>open</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>https://raw.github.com/gwdg/rOCCI/master/spec/occi/test.ova</span><span class='tstring_end'>'</span></span>
+<span class='id identifier rubyid_collection'>collection</span><span class='op'>=</span><span class='const'>Occi</span><span class='op'>::</span><span class='const'>Parser</span><span class='period'>.</span><span class='id identifier rubyid_ova'>ova</span><span class='lparen'>(</span><span class='id identifier rubyid_ova'>ova</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='rparen'>)</span>
+</code></pre>
+
+<p>Currently only the following entries of OVF files are parsed</p>
+
+<ul>
+<li>File in References</li>
+<li>Disk in the DiskSection</li>
+<li>Network in the NetworkSection</li>
+<li>in the VirutalSystemSection:
+** Info
+** in the VirtualHardwareSection the items regarding
+*** Processor
+*** Memory
+*** Ethernet Adapter
+*** Parallel port</li>
+</ul>
+
+<h3>Using the OCCI model</h3>
+
+<p>The OCCI gem includes all OCCI Core classes necessary to handly arbitrary OCCI objects.</p>
+
+<h2>Changelog</h2>
+
+<h3>version 2.5</h3>
+
+<ul>
+<li>improved OCCI Client</li>
+<li>improved documentation</li>
+<li>several bugfixes</li>
+</ul>
+
+<h3>Version 2.4</h3>
+
+<ul>
+<li>Changed OCCI attribute properties from lowercase to first letter uppercase (e.g. type -&gt; Type, default -&gt; Default, ...)</li>
+</ul>
+
+<h3>Version 2.3</h3>
+
+<ul>
+<li>OCCI objects are now initialized with a list of attributes instead of a hash. Thus it is easier to check which
+attributes are expected by a class and helps prevent errors.</li>
+<li>Parsing of a subset of the OVF specification is supported. Further parts of the specification will be covered in
+future versions of rOCCI.</li>
+</ul>
+
+<h3>Version 2.2</h3>
+
+<ul>
+<li>OCCI Client added. The client simplifies the execution of OCCI commands and provides shortcuts for often used steps.</li>
+</ul>
+
+<h3>Version 2.1</h3>
+
+<ul>
+<li>Several improvements to the gem structure and code documentation. First rSpec test were added. Readme has been extended to include instructions how the gem can be used.</li>
+</ul>
+
+<h3>Version 2.0</h3>
+
+<ul>
+<li>Starting with version 2.0 Florian Feldhaus and Piotr Kasprzak took over the development of the OCCI gem. The codebase was taken from the rOCCI framework and improved to be bundled as a standalone gem.</li>
+</ul>
+
+<h3>Version 1.X</h3>
+
+<ul>
+<li>Version 1.X of the OCCI gem has been developed by retr0h and served as a simple way to access the first OpenNebula OCCI implementation.</li>
+</ul>
+
+<h2>Development</h2>
+
+<p>Checkout latest version from GIT:</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_git'>git</span> <span class='id identifier rubyid_clone'>clone</span> <span class='label'>git:</span><span class='tstring'><span class='regexp_beg'>/</span><span class='regexp_end'>/github</span></span><span class='period'>.</span><span class='id identifier rubyid_com'>com</span><span class='op'>/</span><span class='id identifier rubyid_gwdg'>gwdg</span><span class='op'>/</span><span class='id identifier rubyid_rOCCI'>rOCCI</span><span class='period'>.</span><span class='id identifier rubyid_git'>git</span>
+</code></pre>
+
+<p>Change to rOCCI folder</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_cd'>cd</span> <span class='id identifier rubyid_rOCCI'>rOCCI</span>
+</code></pre>
+
+<p>Install dependencies for deployment</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_bundle'>bundle</span> <span class='id identifier rubyid_install'>install</span> <span class='op'>-</span><span class='op'>-</span><span class='id identifier rubyid_deployment'>deployment</span>
+</code></pre>
+
+<h3>Code Documentation</h3>
+
+<p><a href="http://rubydoc.info/github/gwdg/rOCCI/">Code Documentation for rOCCI by YARD</a></p>
+
+<h3>Continuous integration</h3>
+
+<p><a href="http://travis-ci.org/gwdg/rOCCI/">Continuous integration for rOCCI by Travis-CI</a></p>
+
+<h3>Contribute</h3>
+
+<ol>
+<li>Fork it.</li>
+<li>Create a branch (git checkout -b my_markup)</li>
+<li>Commit your changes (git commit -am &quot;My changes&quot;)</li>
+<li>Push to the branch (git push origin my_markup)</li>
+<li>Create an Issue with a link to your branch</li>
+</ol>
+</div></div>
+
+    <div id="footer">
+  Generated on Fri Nov  2 09:35:44 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.3 (ruby-1.9.3).
+</div>
+
+  </body>
+</html>

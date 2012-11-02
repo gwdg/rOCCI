@@ -1,0 +1,900 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Occi::Model
+  
+    &mdash; Documentation of the OCCI gem
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../';
+  framesUrl = "../frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (M)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Occi.html" title="Occi (module)">Occi</a></span></span>
+     &raquo; 
+    <span class="title">Model</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Class: Occi::Model
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName"><span class='object_link'><a href="Collection.html" title="Occi::Collection (class)">Collection</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="Collection.html" title="Occi::Collection (class)">Collection</a></span></li>
+          
+            <li class="next">Occi::Model</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/occi/model.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+
+
+
+
+
+
+  <h2>Instance Attribute Summary</h2>
+  
+  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="Collection.html" title="Occi::Collection (class)">Collection</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Collection.html#action-instance_method" title="Occi::Collection#action (method)">#action</a></span>, <span class='object_link'><a href="Collection.html#actions-instance_method" title="Occi::Collection#actions (method)">#actions</a></span>, <span class='object_link'><a href="Collection.html#kinds-instance_method" title="Occi::Collection#kinds (method)">#kinds</a></span>, <span class='object_link'><a href="Collection.html#links-instance_method" title="Occi::Collection#links (method)">#links</a></span>, <span class='object_link'><a href="Collection.html#mixins-instance_method" title="Occi::Collection#mixins (method)">#mixins</a></span>, <span class='object_link'><a href="Collection.html#model-instance_method" title="Occi::Collection#model (method)">#model</a></span>, <span class='object_link'><a href="Collection.html#resources-instance_method" title="Occi::Collection#resources (method)">#resources</a></span></p>
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get-instance_method" title="#get (instance method)">- (Occi::Collection) <strong>get</strong>(filter = nil) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return all categories from model.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (Model) <strong>initialize</strong>(collection = nil) </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A new instance of Model.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register-instance_method" title="#register (instance method)">- (Object) <strong>register</strong>(category) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_collection-instance_method" title="#register_collection (instance method)">- (Object) <strong>register_collection</strong>(collection) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>register OCCI categories from OCCI collection.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_core-instance_method" title="#register_core (instance method)">- (Object) <strong>register_core</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>register Occi Core categories enitity, resource and link.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_files-instance_method" title="#register_files (instance method)">- (Object) <strong>register_files</strong>(path, scheme_base_url = 'http://localhost') </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>register OCCI categories from files.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_infrastructure-instance_method" title="#register_infrastructure (instance method)">- (Object) <strong>register_infrastructure</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>register Occi Infrastructure categories.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#reset-instance_method" title="#reset (instance method)">- (Object) <strong>reset</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>clear all entities from all categories.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#unregister-instance_method" title="#unregister (instance method)">- (Object) <strong>unregister</strong>(category) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="Collection.html" title="Occi::Collection (class)">Collection</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Collection.html#as_json-instance_method" title="Occi::Collection#as_json (method)">#as_json</a></span>, <span class='object_link'><a href="Collection.html#categories-instance_method" title="Occi::Collection#categories (method)">#categories</a></span>, <span class='object_link'><a href="Collection.html#empty%3F-instance_method" title="Occi::Collection#empty? (method)">#empty?</a></span>, <span class='object_link'><a href="Collection.html#entities-instance_method" title="Occi::Collection#entities (method)">#entities</a></span>, <span class='object_link'><a href="Collection.html#get_by_id-instance_method" title="Occi::Collection#get_by_id (method)">#get_by_id</a></span>, <span class='object_link'><a href="Collection.html#get_by_location-instance_method" title="Occi::Collection#get_by_location (method)">#get_by_location</a></span>, <span class='object_link'><a href="Collection.html#inspect-instance_method" title="Occi::Collection#inspect (method)">#inspect</a></span>, <span class='object_link'><a href="Collection.html#intersect-instance_method" title="Occi::Collection#intersect (method)">#intersect</a></span>, <span class='object_link'><a href="Collection.html#intersect%21-instance_method" title="Occi::Collection#intersect! (method)">#intersect!</a></span>, <span class='object_link'><a href="Collection.html#merge-instance_method" title="Occi::Collection#merge (method)">#merge</a></span>, <span class='object_link'><a href="Collection.html#merge%21-instance_method" title="Occi::Collection#merge! (method)">#merge!</a></span>, <span class='object_link'><a href="Collection.html#to_header-instance_method" title="Occi::Collection#to_header (method)">#to_header</a></span>, <span class='object_link'><a href="Collection.html#to_text-instance_method" title="Occi::Collection#to_text (method)">#to_text</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    - (<tt><span class='object_link'><a href="" title="Occi::Model (class)">Model</a></span></tt>) <strong>initialize</strong>(collection = nil) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>A new instance of Model</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>collection</span>
+      
+      
+        <span class='type'>(<tt>Occi::Core::Collection</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+5
+6
+7
+8
+9</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/occi/model.rb', line 5</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_collection'>collection</span><span class='op'>=</span><span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='kw'>super</span>
+  <span class='id identifier rubyid_register_core'>register_core</span>
+  <span class='id identifier rubyid_register_collection'>register_collection</span> <span class='id identifier rubyid_collection'>collection</span> <span class='kw'>if</span> <span class='id identifier rubyid_collection'>collection</span><span class='period'>.</span><span class='id identifier rubyid_kind_of?'>kind_of?</span> <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Collection</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="get-instance_method">
+  
+    - (<tt><span class='object_link'><a href="Collection.html" title="Occi::Collection (class)">Occi::Collection</a></span></tt>) <strong>get</strong>(filter = nil) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return all categories from model. If filter is present, return only the categories specified by filter</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>filter</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Collection.html" title="Occi::Collection (class)">Occi::Collection</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Collection.html" title="Occi::Collection (class)">Occi::Collection</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>collection</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+77
+78
+79
+80
+81
+82
+83</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/occi/model.rb', line 77</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='id identifier rubyid_filter'>filter</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_filter'>filter</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_intersect'>intersect</span> <span class='id identifier rubyid_filter'>filter</span>
+  <span class='kw'>else</span>
+    <span class='kw'>self</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register-instance_method">
+  
+    - (<tt>Object</tt>) <strong>register</strong>(category) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>category</span>
+      
+      
+        <span class='type'>(<tt>Occi::Core::Category</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+56
+57
+58
+59
+60
+61
+62
+63</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/occi/model.rb', line 56</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register'>register</span><span class='lparen'>(</span><span class='id identifier rubyid_category'>category</span><span class='rparen'>)</span>
+  <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Log</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>### Registering category </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_category'>category</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='comment'># add model to category as back reference
+</span>  <span class='id identifier rubyid_category'>category</span><span class='period'>.</span><span class='id identifier rubyid_model'>model</span> <span class='op'>=</span> <span class='kw'>self</span>
+  <span class='ivar'>@kinds</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_category'>category</span> <span class='kw'>unless</span> <span class='id identifier rubyid_get_by_id'>get_by_id</span><span class='lparen'>(</span><span class='id identifier rubyid_category'>category</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_category'>category</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_ancestors'>ancestors</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span> <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Core</span><span class='op'>::</span><span class='const'>Kind</span>
+  <span class='ivar'>@mixins</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_category'>category</span> <span class='kw'>unless</span> <span class='id identifier rubyid_get_by_id'>get_by_id</span><span class='lparen'>(</span><span class='id identifier rubyid_category'>category</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_category'>category</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_ancestors'>ancestors</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span> <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Core</span><span class='op'>::</span><span class='const'>Mixin</span>
+  <span class='ivar'>@actions</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_category'>category</span> <span class='kw'>unless</span> <span class='id identifier rubyid_get_by_id'>get_by_id</span><span class='lparen'>(</span><span class='id identifier rubyid_category'>category</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_category'>category</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_ancestors'>ancestors</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span> <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Core</span><span class='op'>::</span><span class='const'>Action</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_collection-instance_method">
+  
+    - (<tt>Object</tt>) <strong>register_collection</strong>(collection) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>register OCCI categories from OCCI collection</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+43
+44
+45
+46
+47
+48</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/occi/model.rb', line 43</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_collection'>register_collection</span><span class='lparen'>(</span><span class='id identifier rubyid_collection'>collection</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_collection'>collection</span><span class='period'>.</span><span class='id identifier rubyid_kinds'>kinds</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_kind'>kind</span><span class='op'>|</span> <span class='id identifier rubyid_kind'>kind</span><span class='period'>.</span><span class='id identifier rubyid_model'>model</span> <span class='op'>=</span> <span class='kw'>self</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_collection'>collection</span><span class='period'>.</span><span class='id identifier rubyid_mixins'>mixins</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_mixin'>mixin</span><span class='op'>|</span> <span class='id identifier rubyid_mixin'>mixin</span><span class='period'>.</span><span class='id identifier rubyid_model'>model</span> <span class='op'>=</span> <span class='kw'>self</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_collection'>collection</span><span class='period'>.</span><span class='id identifier rubyid_actions'>actions</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_action'>action</span><span class='op'>|</span> <span class='id identifier rubyid_action'>action</span><span class='period'>.</span><span class='id identifier rubyid_model'>model</span> <span class='op'>=</span> <span class='kw'>self</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_merge!'>merge!</span> <span class='id identifier rubyid_collection'>collection</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_core-instance_method">
+  
+    - (<tt>Object</tt>) <strong>register_core</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>register Occi Core categories enitity, resource and link</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+12
+13
+14
+15
+16
+17</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/occi/model.rb', line 12</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_core'>register_core</span>
+  <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Log</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>### Registering OCCI Core categories enitity, resource and link ###</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_register'>register</span> <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Core</span><span class='op'>::</span><span class='const'>Entity</span><span class='period'>.</span><span class='id identifier rubyid_kind'>kind</span>
+  <span class='id identifier rubyid_register'>register</span> <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Core</span><span class='op'>::</span><span class='const'>Resource</span><span class='period'>.</span><span class='id identifier rubyid_kind'>kind</span>
+  <span class='id identifier rubyid_register'>register</span> <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Core</span><span class='op'>::</span><span class='const'>Link</span><span class='period'>.</span><span class='id identifier rubyid_kind'>kind</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_files-instance_method">
+  
+    - (<tt>Object</tt>) <strong>register_files</strong>(path, scheme_base_url = 'http://localhost') 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>register OCCI categories from files</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>path</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>to a folder containing files which include OCCI collections in JSON format. The path is
+recursively searched for files with the extension .json .</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>scheme_base_url</span>
+      
+      
+        <span class='type'>(<tt>Sting</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>'http://localhost'</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>base location for provider specific extensions of the OCCI model</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/occi/model.rb', line 30</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_files'>register_files</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_scheme_base_url'>scheme_base_url</span><span class='op'>=</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>http://localhost</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
+  <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Log</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>### Initializing OCCI Model from </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='rbrace'>}</span><span class='tstring_content'> ###</span><span class='tstring_end'>&quot;</span></span>
+  <span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_glob'>glob</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/**/*.json</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_file'>file</span><span class='op'>|</span>
+    <span class='id identifier rubyid_collection'>collection</span> <span class='op'>=</span> <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Collection</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='const'>JSON</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='id identifier rubyid_file'>file</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='rparen'>)</span>
+    <span class='comment'># add location of service provider to scheme if it has a relative location
+</span>    <span class='id identifier rubyid_collection'>collection</span><span class='period'>.</span><span class='id identifier rubyid_kinds'>kinds</span><span class='period'>.</span><span class='id identifier rubyid_collect'>collect</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_kind'>kind</span><span class='op'>|</span> <span class='id identifier rubyid_kind'>kind</span><span class='period'>.</span><span class='id identifier rubyid_scheme'>scheme</span> <span class='op'>=</span> <span class='id identifier rubyid_scheme_base_url'>scheme_base_url</span> <span class='op'>+</span> <span class='id identifier rubyid_kind'>kind</span><span class='period'>.</span><span class='id identifier rubyid_scheme'>scheme</span> <span class='kw'>if</span> <span class='id identifier rubyid_kind'>kind</span><span class='period'>.</span><span class='id identifier rubyid_scheme'>scheme</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_collection'>collection</span><span class='period'>.</span><span class='id identifier rubyid_kinds'>kinds</span>
+    <span class='id identifier rubyid_collection'>collection</span><span class='period'>.</span><span class='id identifier rubyid_mixins'>mixins</span><span class='period'>.</span><span class='id identifier rubyid_collect'>collect</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_mixin'>mixin</span><span class='op'>|</span> <span class='id identifier rubyid_mixin'>mixin</span><span class='period'>.</span><span class='id identifier rubyid_scheme'>scheme</span> <span class='op'>=</span> <span class='id identifier rubyid_scheme_base_url'>scheme_base_url</span> <span class='op'>+</span> <span class='id identifier rubyid_mixin'>mixin</span><span class='period'>.</span><span class='id identifier rubyid_scheme'>scheme</span> <span class='kw'>if</span> <span class='id identifier rubyid_mixin'>mixin</span><span class='period'>.</span><span class='id identifier rubyid_scheme'>scheme</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_collection'>collection</span><span class='period'>.</span><span class='id identifier rubyid_mixins'>mixins</span>
+    <span class='id identifier rubyid_collection'>collection</span><span class='period'>.</span><span class='id identifier rubyid_actions'>actions</span><span class='period'>.</span><span class='id identifier rubyid_collect'>collect</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_action'>action</span><span class='op'>|</span> <span class='id identifier rubyid_action'>action</span><span class='period'>.</span><span class='id identifier rubyid_scheme'>scheme</span> <span class='op'>=</span> <span class='id identifier rubyid_scheme_base_url'>scheme_base_url</span> <span class='op'>+</span> <span class='id identifier rubyid_action'>action</span><span class='period'>.</span><span class='id identifier rubyid_scheme'>scheme</span> <span class='kw'>if</span> <span class='id identifier rubyid_action'>action</span><span class='period'>.</span><span class='id identifier rubyid_scheme'>scheme</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/</span><span class='tstring_end'>'</span></span> <span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_collection'>collection</span><span class='period'>.</span><span class='id identifier rubyid_actions'>actions</span>
+    <span class='id identifier rubyid_register_collection'>register_collection</span> <span class='id identifier rubyid_collection'>collection</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_infrastructure-instance_method">
+  
+    - (<tt>Object</tt>) <strong>register_infrastructure</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>register Occi Infrastructure categories</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+20
+21
+22
+23</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/occi/model.rb', line 20</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_infrastructure'>register_infrastructure</span>
+  <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Log</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>### Registering OCCI Infrastructure categories ###</span><span class='tstring_end'>&quot;</span></span>
+  <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Infrastructure</span><span class='period'>.</span><span class='id identifier rubyid_categories'>categories</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_category'>category</span><span class='op'>|</span> <span class='id identifier rubyid_register'>register</span> <span class='id identifier rubyid_category'>category</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="reset-instance_method">
+  
+    - (<tt>Object</tt>) <strong>reset</strong> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>clear all entities from all categories</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+51
+52
+53</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/occi/model.rb', line 51</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_reset'>reset</span><span class='lparen'>(</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_categories'>categories</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_category'>category</span><span class='op'>|</span> <span class='id identifier rubyid_category'>category</span><span class='period'>.</span><span class='id identifier rubyid_entities'>entities</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_category'>category</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span> <span class='symbol'>:entities</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="unregister-instance_method">
+  
+    - (<tt>Object</tt>) <strong>unregister</strong>(category) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>category</span>
+      
+      
+        <span class='type'>(<tt>Occi::Core::Category</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+66
+67
+68
+69
+70
+71</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/occi/model.rb', line 66</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_unregister'>unregister</span><span class='lparen'>(</span><span class='id identifier rubyid_category'>category</span><span class='rparen'>)</span>
+  <span class='const'>Occi</span><span class='op'>::</span><span class='const'>Log</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>### Unregistering category </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_category'>category</span><span class='period'>.</span><span class='id identifier rubyid_type_identifier'>type_identifier</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='ivar'>@kinds</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span> <span class='id identifier rubyid_category'>category</span>
+  <span class='ivar'>@mixins</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span> <span class='id identifier rubyid_category'>category</span>
+  <span class='ivar'>@actions</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span> <span class='id identifier rubyid_category'>category</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Fri Nov  2 09:35:44 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.3 (ruby-1.9.3).
+</div>
+
+  </body>
+</html>

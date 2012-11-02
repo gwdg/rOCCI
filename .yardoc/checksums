@@ -1,0 +1,9 @@
+lib/occi/collection.rb 94d0ac28e22d100c9d6362111d0bc5d1a532a82e
+lib/occi/core.rb 54e8c7115254aa2e9839e60282c59d1db08853ef
+lib/occi/infrastructure.rb 35560202d9561b6ebfd46e6af843a2a8619996c9
+lib/occi/log.rb 218f379af1f2697787ebb5b03faa1c3960b88a39
+lib/occi/model.rb df1b02c8527de4186d5a8b4763524107b6cc719a
+lib/occi/parser.rb c281b9977fcab2118afd4faf493af700581076c7
+lib/occi/version.rb ca05a88ec2e10f6d0e6bbe51f84c8bfdfcaf7290
+lib/occiantlr/OCCIANTLRLexer.rb e6eecbcbefee00b8467e2adea21d79fa440a6a08
+lib/occiantlr/OCCIANTLRParser.rb 3805c367024a6e148c29132edda53ea397e5c42f
