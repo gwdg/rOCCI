@@ -3,18 +3,15 @@ Bundler::GemHelper.install_tasks
 
 task :default => 'rcov:all'
 
-require 'rspec/core/rake_task'
-#require 'cucumber/rake/task'
-
 namespace :rcov do
 
-=begin
+  require 'rspec/core/rake_task'
+  require 'cucumber/rake/task'
+
   Cucumber::Rake::Task.new(:cucumber) do |t|
     t.cucumber_opts = "--format pretty"
-
     ENV['COVERAGE'] = "true"
   end
-=end
 
   RSpec::Core::RakeTask.new(:rspec) do |t|
     ENV['COVERAGE'] = "true"
@@ -24,6 +21,13 @@ namespace :rcov do
   task :all do |t|
     rm "coverage/coverage.data" if File.exist?("coverage/coverage.data")
     Rake::Task['rcov:rspec'].invoke
-#    Rake::Task["rcov:cucumber"].invoke
+    Rake::Task["rcov:cucumber"].invoke
   end
+
+end
+
+require 'yard'
+YARD::Rake::YardocTask.new(:yard) do |t|
+  t.files   = ['features/**/*.feature', 'features/**/*.rb']
+  t.options = ['--any', '--extra', '--opts'] # optional
 end
