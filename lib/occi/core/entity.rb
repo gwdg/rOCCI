@@ -37,6 +37,7 @@ module Occi
           related         = [self.kind]
         else
           type_identifier = self.kind.type_identifier
+          related         = nil
         end
         scheme, term = type_identifier.split '#'
 
@@ -112,7 +113,7 @@ module Occi
       # @return [Occi::Model]
       def model=(model)
         @model = model
-        @kind  &&= model.get_by_id kind.type_identifier
+        @kind  = (model.get_by_id(@kind.type_identifier) || @kind)
         @kind.entities << self
         @mixins.model = model
         @mixins.each { |mixin| mixin.entities << self }
@@ -126,9 +127,9 @@ module Occi
 
       # check attributes against their definitions and set defaults
       # @param [Occi::Model] model representation of the Occi model to check the attributes against
-      def check(model)
-        raise "No kind defined" unless @kind
-        definitions = model.get_by_id(@kind).attributes
+      def check
+        raise "No model associated" unless @model
+        definitions = model.get_by_id(@kind.to_s).attributes
         @mixins.each do |mixin_id|
           mixin = model.get_by_id(mixin_id)
           next if mixin.nil?
@@ -140,31 +141,34 @@ module Occi
 
       # @param [Occi::Core::Attributes] attributes
       # @param [Occi::Core::Attributes] definitions
+      # @param [true,false] set_defaults
       # @return [Occi::Core::Attributes] attributes with their defaults set
-      def self.check(attributes, definitions)
+      def self.check(attributes, definitions, set_defaults=false)
         attributes = Occi::Core::Attributes.new(attributes)
         definitions.each_key do |key|
-          properties = definitions[key]
-          value      = attributes[key] ||= properties.default
-          if properties.key? :type
+          if definitions[key].kind_of? Occi::Core::Attributes
+            attributes[key] = check(attributes[key], definitions[key])
+          else
+            properties = definitions[key]
+            value = attributes[key]
+            value ||= properties.default if set_defaults or properties.required
             raise "required attribute #{key} not found" if value.nil? && properties.required
-            next if value.nil? && !properties.required
+            next if value.nil? and not properties.required
             case properties.type
               when 'number'
-                Occi::Log.warn "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless value.kind_of?(Numeric)
+                raise "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless value.kind_of?(Numeric)
               when 'boolean'
-                Occi::Log.warn "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless !!value == value
+                raise "attribute #{key} value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless !!value == value
+              when 'string'
+                raise "attribute #{key} with value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless value.kind_of?(String)
               else
-                Occi::Log.warn "attribute #{key} with value #{value} from class #{value.class.name} does not match attribute property type #{properties.type}" unless value.kind_of?(String)
+                raise "property type #{properties.type} is not one of the allowed types number, boolean or string"
             end
             Occi::Log.warn "attribute #{key} with value #{value} does not match pattern #{properties.pattern}" if value.to_s.scan(Regexp.new(properties.pattern)).empty? if properties.pattern
             attributes[key] = value
-          else
-            attributes[key] = check(value, definitions[key])
           end
         end
-        attributes.delete_if { |_, v| v.nil? } # remove empty attributes
-        @checked = true
+        attributes.delete_if { |_, v| v.empty? } # remove empty attributes
         attributes
       end
 

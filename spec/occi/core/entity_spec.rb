@@ -26,6 +26,18 @@ module Occi
       end
 
       # TODO: check adding of model
+      it "checks the attributes against their definition in its kind and associated mixins"    do
+        entity = Occi::Core::Entity.new
+        expect { entity.check }.to raise_error
+        entity.model = Occi::Model.new
+        entity.title = 'test'
+        uuid = UUIDTools::UUID.random_create.to_s
+        entity.id = uuid
+        expect { entity.check }.to_not raise_error
+        entity.id = 0
+        expect { entity.check }.to raise_error
+      end
+
 
     end
   end

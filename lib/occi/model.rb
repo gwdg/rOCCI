@@ -3,9 +3,13 @@ module Occi
 
     # @param [Occi::Core::Collection] collection
     def initialize(collection=nil)
-      super
+      super(nil, nil) # model must be empty for model class
       register_core
       register_collection collection if collection.kind_of? Occi::Collection
+    end
+
+    def model=(model)
+      # will not assign a model inside a model
     end
 
     # register Occi Core categories enitity, resource and link
@@ -75,11 +79,7 @@ module Occi
     # @param [Occi::Collection] filter
     # @return [Occi::Collection] collection
     def get(filter = nil)
-      if filter
-        self.intersect filter
-      else
-        self
-      end
+      filter ? intersect(filter) : self
     end
 
   end
