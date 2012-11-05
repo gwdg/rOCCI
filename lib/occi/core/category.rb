@@ -14,7 +14,7 @@ module Occi
       # @param [Hash] attributes
       def initialize(scheme='http://schemas.ogf.org/occi/core#',
           term='category',
-          title='',
+          title=nil,
           attributes=Occi::Core::Attributes.new)
         @scheme     = scheme
         @term       = term

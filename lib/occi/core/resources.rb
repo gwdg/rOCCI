@@ -6,6 +6,7 @@ module Occi
         resource       = Occi::Core::Resource.new(*args)
         resource.model = @model
         self << resource
+        resource
       end
 
     end

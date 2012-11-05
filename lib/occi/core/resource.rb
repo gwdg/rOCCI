@@ -1,9 +1,8 @@
 module Occi
   module Core
-    class Resource < Entity
+    class Resource < Occi::Core::Entity
 
       attr_accessor :links
-
 
       @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'resource')
 
@@ -17,16 +16,16 @@ module Occi
       # @param [Array] mixins
       # @param [Occi::Core::Attributes,Hash] attributes
       # @param [Array] links
+      # @return [Occi::Core::Resource]
       def initialize(kind=self.kind, mixins=[], attributes={ }, actions=[], links=[])
         super(kind, mixins, attributes, actions)
-        @links = links
-        @links ||= []
+        @links = Occi::Core::Links.new(links)
+        @links = Occi::Core::Links.new
       end
 
-      # set id for resource and update the the source of all links
-      # @param [UUIDTools::UUID] id
-      def id=(id)
-        super(id)
+      def model=(model)
+        super model
+        @links.model = model
       end
 
       # @return [String] summary attribute of the resource
@@ -49,6 +48,19 @@ module Occi
         link.mixins     = mixins
         @links << link
         link
+      end
+
+      # @return [String] text representation
+      def to_text
+        text = super
+        @links.each { |link| text << link.to_text_link + "\n" }
+        text
+      end
+
+      # @return [Hash] hash containing the HTTP headers of the text/occi rendering
+      def to_header
+        header = super
+        header['Links'] = @links.join(',')
       end
 
       # @param [Hash] options

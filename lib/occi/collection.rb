@@ -25,6 +25,10 @@ module Occi
       @action = Occi::Core::Action.new(collection.action.scheme, collection.action.term, collection.action.title, collection.action.attributes) if collection.action
     end
 
+    def ==(category)
+      not intersect(category).empty?
+    end
+
     # @return [Array] categories combined list of all kinds, mixins and actions
     def categories
       @kinds + @mixins + @actions
@@ -120,13 +124,19 @@ module Occi
 
     # @return [Hashie::Mash] json representation
     def as_json(options = { })
-      collection = Hashie::Mash.new
+      collection = Hashie::Mash.new(:kinds => [], :mixins => [], :actions => [], :resources => [], :links => [], :action => nil)
       collection.kinds = @kinds.collect { |kind| kind.as_json } if @kinds.any?
       collection.mixins = @mixins.collect { |mixin| mixin.as_json } if @mixins.any?
       collection.actions = @actions.collect { |action_category| action_category.as_json } if actions.any?
       collection.resources = @resources.collect { |resource| resource.as_json } if @resources.any?
-      @links.merge(@resources.collect { |resource| resource.links.select { |link| link.kind_of? Occi::Core::Link } }.flatten)
-      collection.links = @links.collect { |link| link.as_json } if @links.any?
+      # if there is only one resource and the links inside the resource have no location,
+      # then these links must be rendered as separate links inside the collection
+      if collection.resources.size == 1
+        lnks = @resources.first.links if collection.resources.first.links.blank? && @links.empty?
+      else
+        lnks = @links
+      end
+      collection.links = lnks.collect { |link| link.as_json } if lnks.present?
       collection.action = @action.as_json if @action
       collection
     end

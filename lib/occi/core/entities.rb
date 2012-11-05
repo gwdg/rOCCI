@@ -26,6 +26,7 @@ module Occi
         entity = Occi::Core::Entity.new(*args)
         entity.model = @model if @model
         self << entity
+        entity
       end
 
       def <<(entity)

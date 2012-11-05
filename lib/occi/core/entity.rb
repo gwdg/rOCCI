@@ -51,6 +51,8 @@ module Occi
       # @param [String] kind
       # @param [String] mixins
       # @param [Occi::Core::Attributes] attributes
+      # @param [Occi::Core::Actions] actions
+      # @return [Occi::Core::Entity]
       def initialize(kind = self.kind, mixins=[], attributes={ }, actions=[])
         @kind       = self.class.kind.clone
         @mixins     = Occi::Core::Mixins.new mixins
@@ -150,7 +152,7 @@ module Occi
             attributes[key] = check(attributes[key], definitions[key])
           else
             properties = definitions[key]
-            value = attributes[key]
+            value      = attributes[key]
             value ||= properties.default if set_defaults or properties.required
             raise "required attribute #{key} not found" if value.nil? && properties.required
             next if value.nil? and not properties.required

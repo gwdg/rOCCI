@@ -12,16 +12,16 @@ module Occi
       # @param [Array] actions
       def initialize(scheme='http://schemas.ogf.org/occi/core#',
           term='kind',
-          title='',
+          title=nil,
           attributes=Occi::Core::Attributes.new,
           related=Occi::Core::Categories.new,
           actions=Occi::Core::Actions.new,
-          location='')
+          location=nil)
         super(scheme, term, title, attributes)
         @related  = Occi::Core::Related.new(related)
         @actions  = Occi::Core::Actions.new(actions)
         @entities = Occi::Core::Entities.new
-        location.to_s.empty? ? @location = '/' + term + '/' : @location = location
+        location.blank? ? @location = '/' + term + '/' : @location = location
       end
 
       def entity_type

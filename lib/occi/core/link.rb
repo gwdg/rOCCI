@@ -1,6 +1,6 @@
 module Occi
   module Core
-    class Link < Entity
+    class Link < Occi::Core::Entity
 
       attr_accessor :rel, :source, :target
 
@@ -24,7 +24,8 @@ module Occi
       # @param [String,Occi::Core::Entity] source
       def initialize(kind=self.kind, mixins=[], attributes={ }, actions=[], rel=nil, target=nil, source=nil)
         super(kind, mixins, attributes, actions)
-        @rel = rel if rel
+        @rel = Occi::Core::Resource.new rel if rel.kind_of? String
+        @rel ||= Occi::Core::Resource.kind
         self.source = source if source
         self.target = target
       end
@@ -63,7 +64,7 @@ module Occi
       # @return [Hashie::Mash] json representation
       def as_json(options={ })
         link = super
-        link.rel = @rel if @rel
+        link.rel = @rel.to_s if @rel
         link.source = self.source.to_s if self.source.kind_of? String if self.source
         link.target = self.target.to_s if self.target
         link
@@ -72,9 +73,9 @@ module Occi
       # @return [String] text representation of link reference
       def to_string
         string = '<' + self.target.to_s + '>'
-        string << ';rel=' + @rel.inspect
+        string << ';rel=' + @rel.to_s.inspect
         string << ';self=' + self.location.inspect if self.location
-        categories = [@kind] + @mixins
+        categories = [@kind] + @mixins.join(',').split(',')
         string << ';category=' + categories.join(' ').inspect
         string << ';'
         @attributes.combine.each_pair do |name, value|

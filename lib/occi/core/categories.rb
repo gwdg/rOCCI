@@ -5,9 +5,7 @@ module Occi
       attr_accessor :model
 
       def initialize(categories=[])
-        categories.to_a.collect! do |category|
-          convert category
-        end
+        categories.collect! { |category| convert category } if categories
         super categories
       end
 
@@ -23,7 +21,7 @@ module Occi
       # @return [Occi::Model]
       def model=(model)
         @model = model
-        collect! { |category| model.get_by_id category.to_s or category}
+        collect! { |category| model.get_by_id category.to_s or category }
       end
 
       # @param [Hash] options

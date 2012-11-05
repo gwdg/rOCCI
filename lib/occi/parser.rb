@@ -163,7 +163,7 @@ module Occi
         entity.source = links.first.attributes!.occi!.core!.source
         cats          = entity.categories.split(' ')
         kind          = cats.reverse!.pop
-        mixins        = cats.categories
+        mixins        = cats
         collection.links << Occi::Core::Link.new(kind, mixins, entity.attributes)
       elsif entity_type == Occi::Core::Resource
         links.each do |link|
