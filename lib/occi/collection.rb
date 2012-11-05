@@ -124,7 +124,7 @@ module Occi
 
     # @return [Hashie::Mash] json representation
     def as_json(options = { })
-      collection = Hashie::Mash.new(:kinds => [], :mixins => [], :actions => [], :resources => [], :links => [], :action => nil)
+      collection = Hashie::Mash.new
       collection.kinds = @kinds.collect { |kind| kind.as_json } if @kinds.any?
       collection.mixins = @mixins.collect { |mixin| mixin.as_json } if @mixins.any?
       collection.actions = @actions.collect { |action_category| action_category.as_json } if actions.any?
@@ -132,11 +132,11 @@ module Occi
       # if there is only one resource and the links inside the resource have no location,
       # then these links must be rendered as separate links inside the collection
       if collection.resources.size == 1
-        lnks = @resources.first.links if collection.resources.first.links.blank? && @links.empty?
+        lnks = @resources.first.links if collection.resources.first.links.to_a.map(&:to_s).empty? && @links.empty?
       else
         lnks = @links
       end
-      collection.links = lnks.collect { |link| link.as_json } if lnks.present?
+      collection.links = lnks.collect { |link| link.as_json } if lnks.to_a.any?
       collection.action = @action.as_json if @action
       collection
     end

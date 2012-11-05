@@ -105,10 +105,9 @@ module Occi
           else
             link.attributes!.occi!.core!.target = link.target
 
-            link.category ||= 'http://schemas.ogf.org/occi/core#link'
-            cats          = link.category.split(' ')
-            kind          = cats.reverse!.pop
-            mixins        = cats
+            link.categories = (link.categories.presence || %w'http://schemas.ogf.org/occi/core#link')
+            kind            = link.categories.reverse!.pop
+            mixins          = link.categories
 
             entity.links << Occi::Core::Link.new(kind, mixins, link.attributes, link.actions, link.rel, link.target, link.source)
           end
@@ -166,19 +165,20 @@ module Occi
         mixins        = cats
         collection.links << Occi::Core::Link.new(kind, mixins, entity.attributes)
       elsif entity_type == Occi::Core::Resource
+        entity.links = []
         links.each do |link|
           if link.rel.include? 'action#'
             entity.actions = [link.rel] + entity.actions.to_a
           else
             link.attributes!.occi!.core!.target = link.target
-            link.category                       ||= 'http://schemas.ogf.org/occi/core#link'
-            cats                                = link.category.split(' ')
-            kind                                = cats.reverse!.pop
-            mixins                              = cats
+
+            link.categories = (link.categories.presence || %w'http://schemas.ogf.org/occi/core#link')
+            cats            = link.categories
+            kind            = link.categories.reverse!.pop
+            mixins          = link.categories
 
             link = Occi::Core::Link.new(kind, mixins, link.attributes, link.actions, link.rel, link.target, link.source)
-            collection.links << link
-            entity.links = [link.id] + entity.links.to_a
+            entity.links << link
           end
         end
         collection.resources << Occi::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.actions, entity.links)
@@ -351,12 +351,12 @@ module Occi
                 alloc_units = resource_alloc.xpath("item:AllocationUnits/text()", 'item' => "#{Parser::RASD}").to_s
                 Occi::Log.debug('allocated units in ovf file: ' + alloc_units)
                 alloc_unit_bytes = self.alloc_units_bytes(alloc_units)
-                capacity = self.calculate_capacity_bytes(resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}").to_s, alloc_unit_bytes)
-                capacity_gb = self.calculate_capacity_gb(capacity)
+                capacity         = self.calculate_capacity_bytes(resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}").to_s, alloc_unit_bytes)
+                capacity_gb      = self.calculate_capacity_gb(capacity)
                 Occi::Log.debug('virtual quantity of memory configured in gb: ' + capacity_gb.to_s)
                 compute.attributes.occi!.compute!.memory = capacity_gb
-                #  compute.attributes.occi!.compute!.memory = resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}").to_s.to_i
-                # 3 is the ResourceType for processor in the CIM_ResourceAllocationSettingData
+              #  compute.attributes.occi!.compute!.memory = resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}").to_s.to_i
+              # 3 is the ResourceType for processor in the CIM_ResourceAllocationSettingData
               when "3" then
                 compute.attributes.occi!.compute!.cores = resource_alloc.xpath("item:VirtualQuantity/text()", 'item' => "#{Parser::RASD}").to_s.to_i
               when "10" then

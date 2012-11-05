@@ -20,7 +20,6 @@ module Occi
       def initialize(kind=self.kind, mixins=[], attributes={ }, actions=[], links=[])
         super(kind, mixins, attributes, actions)
         @links = Occi::Core::Links.new(links)
-        @links = Occi::Core::Links.new
       end
 
       def model=(model)
