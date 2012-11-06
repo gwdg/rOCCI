@@ -7,7 +7,7 @@ module Occi
       @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'link')
 
       @kind.related << Occi::Core::Entity.kind
-      @kind.title   = "link"
+      @kind.title = "link"
 
       @kind.attributes.occi!.core!.target = Occi::Core::AttributeProperties.new(
           { :mutable => true })
@@ -24,10 +24,13 @@ module Occi
       # @param [String,Occi::Core::Entity] source
       def initialize(kind=self.kind, mixins=[], attributes={ }, actions=[], rel=nil, target=nil, source=nil)
         super(kind, mixins, attributes, actions)
-        @rel = Occi::Core::Resource.new rel if rel.kind_of? String
+        if rel.kind_of? String
+          scheme, term = rel.to_s.split('#')
+          @rel         = Occi::Core::Category.get_class(scheme, term).kind if scheme && term
+        end
         @rel ||= Occi::Core::Resource.kind
-        self.source = source if source
-        self.target = target
+        @source = source if source
+        @target = target
       end
 
       # @return [String] target attribute of the link
