@@ -17,7 +17,7 @@ CA_PATH            = '/etc/grid-security/certificates'
 ENDPOINT           = 'https://localhost:3300'
 
 ## establish a connection
-connect(ENDPOINT,
+connect(:http, ENDPOINT,
         { :type               => "x509",
           :user_cert          => USER_CERT,
           :user_cert_password => USER_CERT_PASSWORD,

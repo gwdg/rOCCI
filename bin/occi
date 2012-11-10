@@ -81,7 +81,7 @@ end
 # no effect on the non-interactive one
 begin
   Occi::Log.info "Establishing a connection to #{options.endpoint} ..."
-  connect options.endpoint, options.auth, options.log, true, options.media_type
+  connect :http, options.endpoint, options.auth, options.log, true, options.media_type
 rescue OpenSSL::SSL::SSLError => ssl_ex
   # generic SSL error raised whilst establishing a connection
   # possibly an untrusted server cert or invalid user credentials 

@@ -7,7 +7,6 @@ module Occi
       it "initializes itself successfully" do
         entity = Occi::Core::Entity.new
         entity.should be_kind_of Occi::Core::Entity
-        puts entity.kind == Occi::Core::Entity.kind
       end
 
       it "initializes a subclass successfully" do

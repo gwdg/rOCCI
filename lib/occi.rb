@@ -26,13 +26,14 @@ require 'occi/collection'
 require 'occi/parser'
 require 'occi/model'
 require 'occi/log'
-require 'occi/api/dsl'
-require 'occi/api/client'
 require 'occi/core'
 require 'occi/infrastructure'
 
 require 'occiantlr/OCCIANTLRLexer'
 require 'occiantlr/OCCIANTLRParser'
+
+require 'occi/api/dsl'
+require 'occi/api/client'
 
 module Occi
 
