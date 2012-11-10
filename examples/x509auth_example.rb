@@ -14,7 +14,7 @@ CA_PATH            = '/etc/grid-security/certificates'
 ENDPOINT           = 'https://localhost:3300'
 
 ## get an OCCI::Client instance
-client = Occi::Client.new(ENDPOINT,
+client = Occi::API::Client.new(ENDPOINT,
         { :type               => "x509",
           :user_cert          => USER_CERT,
           :user_cert_password => USER_CERT_PASSWORD,
