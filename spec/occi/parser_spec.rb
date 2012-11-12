@@ -12,7 +12,7 @@ describe "Parser" do
     # render collection to text/plain MIME type
     rendered_collection = collection.to_text
     # parse rendered collection and compare with original collection
-    Occi::Parser.parse('text/plain',rendered_collection).last.should == collection
+    Occi::Parser.parse('text/plain',rendered_collection).should == collection
 
     # add attributes to resource
     resource.id = UUIDTools::UUID.random_create.to_s
@@ -21,7 +21,7 @@ describe "Parser" do
     # render collection to text/plain MIME type
     rendered_collection = collection.to_text
     # parse rendered collection and compare with original collection
-    Occi::Parser.parse('text/plain',rendered_collection).last.should == collection
+    Occi::Parser.parse('text/plain',rendered_collection).should == collection
 
     # add mixin to resource
     resource.mixins << Occi::Core::Mixin.new
@@ -29,7 +29,7 @@ describe "Parser" do
     # render collection to text/plain MIME type
     rendered_collection = collection.to_text
     # parse rendered collection and compare with original collection
-    Occi::Parser.parse('text/plain',rendered_collection).last.should == collection
+    Occi::Parser.parse('text/plain',rendered_collection).should == collection
 
     # add link to resource
     link = resource.links.create
@@ -38,7 +38,7 @@ describe "Parser" do
     # render collection to text/plain MIME type
     rendered_collection = collection.to_text
     # parse rendered collection and compare with original collection
-    Occi::Parser.parse('text/plain',rendered_collection).last.should == collection
+    Occi::Parser.parse('text/plain',rendered_collection).should == collection
   end
 
   it "should parse an OCCI message with MIME type application/occi+json containing an OCCI resource" do
@@ -50,7 +50,7 @@ describe "Parser" do
     # render collection to text/plain MIME type
     rendered_collection = collection.to_json
     # parse rendered collection and compare with original collection
-    Occi::Parser.parse('application/occi+json',rendered_collection).last.should == collection
+    Occi::Parser.parse('application/occi+json',rendered_collection).should == collection
 
     # add attributes to resource
     resource.id = UUIDTools::UUID.random_create.to_s
@@ -59,7 +59,7 @@ describe "Parser" do
     # render collection to text/plain MIME type
     rendered_collection = collection.to_json
     # parse rendered collection and compare with original collection
-    Occi::Parser.parse('application/occi+json',rendered_collection).last.should == collection
+    Occi::Parser.parse('application/occi+json',rendered_collection).should == collection
 
     # add mixin to resource
     resource.mixins << Occi::Core::Mixin.new
@@ -67,7 +67,7 @@ describe "Parser" do
     # render collection to text/plain MIME type
     rendered_collection = collection.to_json
     # parse rendered collection and compare with original collection
-    Occi::Parser.parse('application/occi+json',rendered_collection).last.should == collection
+    Occi::Parser.parse('application/occi+json',rendered_collection).should == collection
 
     # add link to resource
     link = resource.links.create
@@ -76,13 +76,13 @@ describe "Parser" do
     # render collection to text/plain MIME type
     rendered_collection = collection.to_json
     # parse rendered collection and compare with original collection
-    Occi::Parser.parse('application/occi+json',rendered_collection).last.should == collection
+    Occi::Parser.parse('application/occi+json',rendered_collection).should == collection
   end
 
   it "should parse an OVF file" do
     media_type        = 'application/ovf+xml'
     body              = File.read('spec/occi/test.ovf')
-    _, collection     = Occi::Parser.parse(media_type, body)
+    collection     = Occi::Parser.parse(media_type, body)
     storage_resources = collection.resources.select { |resource| resource.kind.to_s == 'http://schemas.ogf.org/occi/infrastructure#storage' }
     storage_resources.should have(1).storage_resource
     storage_resources.first.title.should == 'lamp'
@@ -98,7 +98,7 @@ describe "Parser" do
   it "should parse an OVA container" do
     media_type            = 'application/ova'
     body                  = File.read('spec/occi/test.ova')
-    locations, collection = Occi::Parser.parse(media_type, body)
+    collection = Occi::Parser.parse(media_type, body)
     storage_resources     = collection.resources.select { |resource| resource.kind.to_s == 'http://schemas.ogf.org/occi/infrastructure#storage' }
     storage_resources.should have(1).storage_resource
     storage_resources.first.title.should == 'lamp'

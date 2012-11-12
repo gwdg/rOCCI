@@ -14,22 +14,20 @@ module Occi
     # @param [true, false] category for text/plain and text/occi media types information e.g. from the HTTP request location is needed to determine if the OCCI message includes a category or an entity
     # @param [Occi::Core::Resource,Occi::Core::Link] entity_type entity type to use for parsing of text plain entities
     # @param [Hash] header optional header of the OCCI message
-    # @return [Array<Array, Occi::Collection>] list consisting of an array of locations and the OCCI object collection
+    # @return [Occi::Collection] list consisting of an array of locations and the OCCI object collection
     def self.parse(media_type, body, category=false, entity_type=Occi::Core::Resource, header={ })
-      Occi::Log.debug '### Parsing request data to Occi data structure ###'
+      Occi::Log.debug '### Parsing request data to OCCI Collection ###'
       collection = Occi::Collection.new
 
-      locations = self.header_locations(header)
-      category ? collection = self.header_categories(header) : collection = self.header_entity(header, entity_type) if locations.empty?
+      category ? collection = self.header_categories(header) : collection = self.header_entity(header, entity_type)
 
       case media_type
         when 'text/uri-list'
-          body.each_line { |line| locations << URI.parse(line.chomp) }
+          nil
         when 'text/occi'
           nil
         when 'text/plain', nil
-          locations.concat self.text_locations(body)
-          category ? collection = self.text_categories(body) : collection = self.text_entity(body, entity_type) if locations.empty? && collection.empty?
+          category ? collection = self.text_categories(body) : collection = self.text_entity(body, entity_type) if collection.empty?
         when 'application/occi+json', 'application/json'
           collection = self.json(body)
         when 'application/occi+xml', 'application/xml'
@@ -41,7 +39,20 @@ module Occi
         else
           raise "Content Type not supported"
       end
-      return locations, collection
+      collection
+    end
+
+    def self.locations(media_type, body, header)
+      locations = self.header_locations(header)
+      case media_type
+        when 'text/uri-list'
+          body.each_line { |line| locations << URI.parse(line.chomp) }
+        when 'text/plain', nil
+          locations.concat self.text_locations(body)
+        else
+          nil
+      end
+      locations
     end
 
     private
