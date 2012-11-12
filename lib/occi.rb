@@ -28,6 +28,7 @@ require 'occi/model'
 require 'occi/log'
 require 'occi/api/dsl'
 require 'occi/api/client'
+require 'occi/api/client_amqp'
 require 'occi/core'
 require 'occi/infrastructure'
 
