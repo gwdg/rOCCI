@@ -25,5 +25,5 @@ group :development do
   gem "rspec-http"
   gem "redcarpet"
   gem "vcr"
-  gem "webmock"
+  gem "webmock", "=1.8.11"
 end
