@@ -12,6 +12,7 @@ gem "rake"
 gem "httparty"
 gem "highline"
 gem "i18n"
+gem "amqp"
 
 # development related gems
 group :development do

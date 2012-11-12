@@ -131,7 +131,7 @@ module Occi
       collection.resources = @resources.collect { |resource| resource.as_json } if @resources.any?
       # if there is only one resource and the links inside the resource have no location,
       # then these links must be rendered as separate links inside the collection
-      if collection.resources.any? && collection.resources.size == 1
+      if !collection.resources.nil? && collection.resources.size == 1
         lnks = @resources.first.links if collection.resources.first.links.blank? && @links.empty?
       else
         lnks = @links
