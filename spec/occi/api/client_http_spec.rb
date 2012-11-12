@@ -6,126 +6,114 @@ module Occi
 
     describe ClientHttp do
 
-      context "using media type text/plain" do
+      describe "using media type text/plain" do
+
         use_vcr_cassette "client_http_text_plain"
 
+        before(:each) do
+          @client = Occi::Api::ClientHttp.new(
+           'https://localhost:3300',
+           { :type  => "none" },
+           { :out   => "/dev/null",
+             :level => Occi::Log::DEBUG },
+           true,
+           "text/plain,text/occi"
+          )
+        end
+
         it "should establish connection" do
-          expect{Occi::Api::Helpers::conn_helper}.to_not raise_error
+          @client.connected.should be_true
         end
 
         it "should create a compute resource" do
-          client = Occi::Api::Helpers::conn_helper
-
-          client.get_resource "compute"
-          client.get_resource "http://schemas.ogf.org/occi/infrastructure#compute"
+          @client.get_resource "compute"
+          @client.get_resource "http://schemas.ogf.org/occi/infrastructure#compute"
         end
 
         it "should create a network resource" do
-          client = Occi::Api::Helpers::conn_helper
-
-          client.get_resource "network"
-          client.get_resource "http://schemas.ogf.org/occi/infrastructure#network"
+          @client.get_resource "network"
+          @client.get_resource "http://schemas.ogf.org/occi/infrastructure#network"
         end
 
         it "should create a storage resource" do
-          client = Occi::Api::Helpers::conn_helper
-
-          client.get_resource "storage"
-          client.get_resource "http://schemas.ogf.org/occi/infrastructure#storage"
+          @client.get_resource "storage"
+          @client.get_resource "http://schemas.ogf.org/occi/infrastructure#storage"
         end
 
         it "should list all available resource types" do
-          client = Occi::Api::Helpers::conn_helper
-
-          client.get_resource_types
+          @client.get_resource_types
         end
 
         it "should list all available resource type identifiers" do
-          client = Occi::Api::Helpers::conn_helper
-
-          client.get_resource_type_identifiers
+          @client.get_resource_type_identifiers
         end
 
         it "should list all available mixin types" do
-          client = Occi::Api::Helpers::conn_helper
-
-          client.get_mixin_types
+          @client.get_mixin_types
         end
 
         it "should list all available mixin type identifiers" do
-          client = Occi::Api::Helpers::conn_helper
-
-          client.get_mixin_type_identifiers
+          @client.get_mixin_type_identifiers
         end
 
         it "should list compute resources" do
-          client = Occi::Api::Helpers::conn_helper
-
-          expect{client.list "compute"}.to_not raise_error
+          @client.list "compute"
         end
 
         it "should list network resources" do
-          client = Occi::Api::Helpers::conn_helper
-
-          expect{client.list "network"}.to_not raise_error
+          @client.list "network"
         end
 
         it "should list storage resources" do
-          client = Occi::Api::Helpers::conn_helper
-
-          expect{client.list "storage"}.to_not raise_error
+          @client.list "storage"
         end
 
         it "should list all available mixins" do
-          client = Occi::Api::Helpers::conn_helper
-
-          expect{client.get_mixins}.to_not raise_error
+          @client.get_mixins
         end
 
         it "should list os_tpl mixins" do
-          client = Occi::Api::Helpers::conn_helper
-
-          expect{client.get_mixins "os_tpl"}.to_not raise_error
+          @client.get_mixins "os_tpl"
         end
 
         it "should list resource_tpl mixins" do
-          client = Occi::Api::Helpers::conn_helper
-
-          expect{client.get_mixins "resource_tpl"}.to_not raise_error
+          @client.get_mixins "resource_tpl"
         end
 
         it "should describe compute resources" do
-          client = Occi::Api::Helpers::conn_helper
-
-          expect{client.describe "compute"}.to_not raise_error
+          @client.describe "compute"
         end
 
         it "should describe network resources" do
-          client = Occi::Api::Helpers::conn_helper
-
-          expect{client.describe "network"}.to_not raise_error
+          @client.describe "network"
         end
 
         it "should describe storage resources" do
-          client = Occi::Api::Helpers::conn_helper
-
-          expect{client.describe "storage"}.to_not raise_error
+          @client.describe "storage"
         end
 
         it "should describe all available mixins" do
-          client = Occi::Api::Helpers::conn_helper
+          @client.get_mixins.each do |mixin|
+            mixin_short = mixin.split("/").last
+            @client.find_mixin mixin_short.split("#").last, mixin_short.split("#").first, true
+          end
         end
 
         it "should describe os_tpl mixins" do
-          client = Occi::Api::Helpers::conn_helper
+          @client.get_mixins("os_tpl").each do |mixin|
+            mixin_short = mixin.split("/").last
+            @client.find_mixin mixin_short.split("#").last, "os_tpl", true
+          end
         end
 
         it "should describe resource_tpl mixins" do
-          client = Occi::Api::Helpers::conn_helper
+          @client.get_mixins("resource_tpl").each do |mixin|
+            mixin_short = mixin.split("/").last
+            @client.find_mixin mixin_short.split("#").last, "resource_tpl", true
+          end
         end
 
         it "should create a new compute resource" do
-          client = Occi::Api::Helpers::conn_helper
         end
 
         it "should create a new storage resource" do
@@ -164,13 +152,29 @@ module Occi
         end
 
         it "should refresh its model" do
-          client = Occi::Api::Helpers::conn_helper
-          expect{client.refresh}.to_not raise_error
+          @client.refresh
         end
+
       end
 
-      context "using media type application/occi+json" do
+    end
+
+    describe ClientHttp do
+
+      describe "using media type application/occi+json" do
+
         use_vcr_cassette "client_http_application_occi_json"
+
+        before(:each) do
+          #@client = Occi::Api::ClientHttp.new(
+          #  'https://localhost:3300',
+          #  { :type  => "none" },
+          #  { :out   => "/dev/null",
+          #    :level => Occi::Log::DEBUG },
+          #  true,
+          #  "application/occi+json"
+          #)
+        end
 
         it "should establish connection" do
           # TODO
@@ -241,6 +245,7 @@ module Occi
 
         it "should refresh its model" do
         end
+
       end
 
     end
