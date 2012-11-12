@@ -633,13 +633,7 @@ module Occi
         end
 
         Occi::Log.debug "Parser call: #{response.content_type} #{entity_type} #{path.include?('-/')}"
-        _, collection = Occi::Parser.parse(response.content_type, response.body, path.include?('-/'), entity_type)
-
-        # parse Links for Resource
-        #if entity_type == Occi::Core::Resource
-        #  _, link_collection = Occi::Parser.parse(response.content_type, response.body, false, Occi::Core::Link)
-        #  collection.links.merge link_collection.links
-        #end
+        collection = Occi::Parser.parse(response.content_type, response.body, path.include?('-/'), entity_type)
 
         Occi::Log.debug "Parsed collection: empty? #{collection.empty?}"
         collection
@@ -704,7 +698,7 @@ module Occi
         response_msg = response_message response
         raise "HTTP PUT failed! #{response_msg}" unless response.code.between? 200, 300
 
-        _, collection = Occi::Parser.parse(response.content_type, response.body)
+        collection = Occi::Parser.parse(response.content_type, response.body)
 
         collection
       end
