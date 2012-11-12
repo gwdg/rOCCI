@@ -2,7 +2,7 @@ require 'json'
 require 'erb'
 
 module Occi
-  module API
+  module Api
 
     class ResourceOutputFactory
 

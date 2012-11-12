@@ -2,7 +2,7 @@ require 'rubygems'
 require 'httparty'
 
 module Occi
-  module API
+  module Api
     class ClientHttp
 
       # HTTParty for raw HTTP requests
@@ -66,14 +66,14 @@ module Occi
       # from the server.
       #
       # @example
-      #    Occi::API::Client.new # => #<Occi::API::Client>
+      #    Occi::Api::ClientHttp.new # => #<Occi::Api::ClientHttp>
       #
       # @param [String] endpoint URI
       # @param [Hash] auth options in a hash
       # @param [Hash] logging options in a hash
       # @param [Boolean] enable autoconnect
       # @param [String] media type identifier
-      # @return [Occi::API::Client] client instance
+      # @return [Occi::Api::ClientHttp] client instance
       def initialize(endpoint = "http://localhost:3000/", auth_options = { :type => "none" },
                      log_options = { :out => STDERR, :level => Occi::Log::WARN, :logger => nil },
                      auto_connect = true, media_type = nil)

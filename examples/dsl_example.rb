@@ -3,7 +3,7 @@ require 'pp'
 
 # load and include rOCCI client DSL
 require 'occi'
-extend Occi::API::DSL
+extend Occi::Api::DSL
 
                               ## options
 use_os_temlate = true         # use OS_TEMPLATE or NETWORK + STORAGE + INSTANCE TYPE

@@ -3,7 +3,7 @@ require 'optparse'
 require 'occi/api/client/resource_output_factory'
 
 module Occi
-  module API
+  module Api
 
     class OcciOpts
 
@@ -149,7 +149,7 @@ module Occi
 
           opts.on("-o",
                   "--output-format FORMAT",
-                  Occi::API::ResourceOutputFactory.allowed_formats,
+                  Occi::Api::ResourceOutputFactory.allowed_formats,
                   "Output format, defaults to human-readable 'plain'") do |output_format|
             options.output_format = output_format
           end
