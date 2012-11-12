@@ -1,36 +1,30 @@
 module Occi
   module Core
-    class Resource < Entity
+    class Resource < Occi::Core::Entity
 
       attr_accessor :links
 
-      # @return [Occi::Core::Kind] kind definition of Resource type
-      def self.kind
-        kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'resource')
+      @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'resource')
 
-        kind.related = %w{http://schemas.ogf.org/occi/core#entity}
-        kind.title   = 'resource'
+      @kind.related << Occi::Core::Entity.kind
+      @kind.title   = 'resource'
 
-        kind.attributes.occi!.core!.summary = Occi::Core::AttributeProperties.new(
-            { :mutable => true })
-
-        kind
-      end
+      @kind.attributes.occi!.core!.summary = Occi::Core::AttributeProperties.new(
+          { :mutable => true })
 
       # @param [String] kind
       # @param [Array] mixins
       # @param [Occi::Core::Attributes,Hash] attributes
       # @param [Array] links
-      def initialize(kind, mixins=[], attributes={ }, actions=[], links=[])
+      # @return [Occi::Core::Resource]
+      def initialize(kind=self.kind, mixins=[], attributes={ }, actions=[], links=[])
         super(kind, mixins, attributes, actions)
-        @links = links
-        @links ||= []
+        @links = Occi::Core::Links.new(links)
       end
 
-      # set id for resource and update the the source of all links
-      # @param [UUIDTools::UUID] id
-      def id=(id)
-        super(id)
+      def model=(model)
+        super model
+        @links.model = model
       end
 
       # @return [String] summary attribute of the resource
@@ -55,10 +49,23 @@ module Occi
         link
       end
 
+      # @return [String] text representation
+      def to_text
+        text = super
+        @links.each { |link| text << link.to_text_link + "\n" }
+        text
+      end
+
+      # @return [Hash] hash containing the HTTP headers of the text/occi rendering
+      def to_header
+        header = super
+        header['Links'] = @links.join(',')
+      end
+
       # @param [Hash] options
       # @return [Hashie::Mash] link as Hashie::Mash to be parsed into a JSON object
       def as_json(options={ })
-        resource = super
+        resource     = super
         link_strings = @links.collect { |link| link.to_s if link.to_s }.compact
         resource.links = link_strings unless link_strings.empty?
         resource

@@ -1,23 +1,32 @@
 module Occi
   class Collection
-    attr_accessor :kinds, :mixins, :actions, :resources, :links, :action
+
+    attr_accessor :kinds, :mixins, :actions, :resources, :links, :action, :model
 
     # Initialize a new OCCI Collection by initializing all supplied OCCI objects
     #
     # @param [Hash] collection including one or more of the keys kinds, mixins, actions, resources, links
-    def initialize(collection={ })
+    def initialize(collection={ }, model = Occi::Model.new)
       collection = Hashie::Mash.new(collection) unless collection.kind_of? Occi::Collection
-      @kinds     = []
-      @mixins    = []
-      @actions   = []
-      @resources = []
-      @links     = []
-      @kinds = collection.kinds.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) } if collection.kinds.instance_of? Array
-      @mixins = collection.mixins.collect { |mixin| Occi::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) } if collection.mixins.instance_of? Array
-      @actions = collection.actions.collect { |action| Occi::Core::Action.new(action.scheme, action.term, action.title, action.attributes) } if collection.actions.instance_of? Array
-      @resources = collection.resources.collect { |resource| Occi::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.links) } if collection.resources.instance_of? Array
-      @links = collection.links { |link| Occi::Core::Link.new(link.kind, link.mixins, link.attributes) } if collection.links.instance_of? Array
+
+      @kinds     = Occi::Core::Kinds.new
+      @mixins    = Occi::Core::Mixins.new
+      @actions   = Occi::Core::Actions.new
+      @resources = Occi::Core::Resources.new
+      @links     = Occi::Core::Links.new
+
+      self.model = model if model
+
+      @kinds.merge collection.kinds.to_a.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) }
+      @mixins.merge collection.mixins.to_a.collect { |mixin| Occi::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) }
+      @actions.merge collection.actions.to_a.collect { |action| Occi::Core::Action.new(action.scheme, action.term, action.title, action.attributes) }
+      @resources.merge collection.resources.to_a.collect { |resource| Occi::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.links) }
+      @links.merge collection.links.to_a.collect { |link| Occi::Core::Link.new(link.kind, link.mixins, link.attributes) }
       @action = Occi::Core::Action.new(collection.action.scheme, collection.action.term, collection.action.title, collection.action.attributes) if collection.action
+    end
+
+    def ==(category)
+      not intersect(category).empty?
     end
 
     # @return [Array] categories combined list of all kinds, mixins and actions
@@ -30,30 +39,58 @@ module Occi
       @resources + @links
     end
 
+    # @param [Occi::Core::Model] model
+    # @return [Occi::Core::Model]
+    def model=(model)
+      @model           = model
+      @kinds.model     = model
+      @mixins.model    = model
+      @actions.model   = model
+      @resources.model = model
+      @links.model     = model
+    end
+
+    def check
+      @resources.check
+      @links.check
+      # TODO: check action instance format, should check be applicable?
+      #@action.check
+    end
+
+    # @param [Occi::Collection] other_collection
+    # @return [Occi::Collection]
     def merge!(other_collection)
       merge other_collection, self
     end
 
+    # @param [Occi::Collection] other_collection
+    # @param [Occi::Collection] collection
+    # @return [Occi::Collection]
     def merge(other_collection, collection=self.clone)
-      collection.kinds.concat other_collection.kinds.select { |kind| get_by_id(kind.type_identifier).nil? }
-      collection.mixins.concat other_collection.mixins.select { |mixin| get_by_id(mixin.type_identifier).nil? }
-      collection.actions.concat other_collection.actions.select { |action| get_by_id(action.type_identifier).nil? }
-      collection.resources.concat other_collection.resources.select { |resource| get_by_id(resource.id).nil? }
-      collection.links.concat other_collection.links.select { |link| get_by_id(link.type_identifier).nil? }
+      collection.kinds.merge other_collection.kinds.select { |kind| get_by_id(kind.type_identifier).nil? }
+      collection.mixins.merge other_collection.mixins.select { |mixin| get_by_id(mixin.type_identifier).nil? }
+      collection.actions.merge other_collection.actions.select { |action| get_by_id(action.type_identifier).nil? }
+      collection.resources.merge other_collection.resources.select { |resource| get_by_id(resource.id).nil? }
+      collection.links.merge other_collection.links.select { |link| get_by_id(link.type_identifier).nil? }
       collection.action = other_collection.action if other_collection.action
       collection
     end
 
+    # @param [Occi::Collection] other_collection
+    # @return [Occi::Collection]
     def intersect!(other_collection)
       intersect other_collection, self
     end
 
+    # @param [Occi::Collection] other_collection
+    # @param [Occi::Collection] collection
+    # @return [Occi::Collection]
     def intersect(other_collection, collection=self.clone)
-      collection.kinds     = other_collection.kinds.select { |kind| get_by_id(kind.type_identifier) }
-      collection.mixins    = other_collection.mixins.select { |mixin| get_by_id(mixin.type_identifier) }
-      collection.actions   = other_collection.actions.select { |action| get_by_id(action.type_identifier) }
-      collection.resources = other_collection.resources.select { |resource| get_by_id(resource.id) }
-      collection.links     = other_collection.links.select { |link| get_by_id(link.type_identifier) }
+      collection.kinds.replace other_collection.kinds.select { |kind| get_by_id(kind.type_identifier) }
+      collection.mixins.replace other_collection.mixins.select { |mixin| get_by_id(mixin.type_identifier) }
+      collection.actions.replace other_collection.actions.select { |action| get_by_id(action.type_identifier) }
+      collection.resources.replace other_collection.resources.select { |resource| get_by_id(resource.id) }
+      collection.links.replace other_collection.links.select { |link| get_by_id(link.type_identifier) }
       if collection.action == other_collection.action
         collection.action = other_collection.action
       else
@@ -92,9 +129,14 @@ module Occi
       collection.mixins = @mixins.collect { |mixin| mixin.as_json } if @mixins.any?
       collection.actions = @actions.collect { |action_category| action_category.as_json } if actions.any?
       collection.resources = @resources.collect { |resource| resource.as_json } if @resources.any?
-      @links.concat(@resources.collect { |resource| resource.links.select { |link| link.kind_of? Occi::Core::Link } }.flatten)
-      @links.uniq!
-      collection.links = @links.collect { |link| link.as_json } if @links.any?
+      # if there is only one resource and the links inside the resource have no location,
+      # then these links must be rendered as separate links inside the collection
+      if collection.resources.size == 1
+        lnks = @resources.first.links if collection.resources.first.links.blank? && @links.empty?
+      else
+        lnks = @links
+      end
+      collection.links = lnks.collect { |link| link.as_json } if lnks.to_a.any?
       collection.action = @action.as_json if @action
       collection
     end

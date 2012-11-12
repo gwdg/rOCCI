@@ -16,7 +16,7 @@ module Occi
       end
 
       # @param [Hash] properties
-      # @return [Occi::Core::AttributeProperties] parsed Attribute Properties
+      # @return [Occi::Core::Attributes] parsed Attribute Properties
       def self.parse(properties)
         properties ||= Hashie::Mash.new
         if [:Type, :Required, :Mutable, :Default, :Description, :Pattern, :type, :required, :mutable, :default, :description, :pattern].any? { |k| properties.key?(k) and not properties[k].kind_of? Hash }

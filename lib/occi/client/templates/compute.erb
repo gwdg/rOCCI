@@ -7,9 +7,9 @@ Available COMPUTE resources:
     TITLE:        <%= compute.resources.first.attributes.occi.core.title %>
     STATE:        <%= compute.resources.first.attributes.occi.compute.state %>
     LINKS:
-    <% compute.links.each do |link| %>
+    <% if compute.links %><% compute.links.each do |link| %>
       LINK "<%= link.attributes.occi.core.target.split("/")[1] %>":
         ID:     <%= link.attributes.occi.core.id %>
         TARGET: <%= link.attributes.occi.core.target %>
-    <% end %>
+    <% end %><% end %>
 <% end %>

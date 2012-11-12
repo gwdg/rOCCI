@@ -1,4 +1,6 @@
 require 'rubygems'
+
+require 'set'
 require 'hashie/mash'
 
 require 'active_support/json'
@@ -33,20 +35,17 @@ require 'occiantlr/OCCIANTLRLexer'
 require 'occiantlr/OCCIANTLRParser'
 
 module Occi
-  def kind
-    nil
-  end
 
   def kinds
-    []
+    Occi::Core::Kinds.new
   end
 
   def mixins
-    []
+    Occi::Core::Mixins.new
   end
 
   def actions
-    []
+    Occi::Core::Actions.new
   end
 
   # @return [Array] list of Occi::Core::Categories

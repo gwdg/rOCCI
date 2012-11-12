@@ -409,15 +409,20 @@ module Occi
       raise "#{entity} not an entity" unless entity.kind_of? Occi::Core::Entity
 
       # is this entity valid?
-      entity.check(@model)
-      kind = @model.get_by_id(entity.kind)
+      entity.model = @model
+      entity.check
+
+      Occi::Log.debug "Entity kind: #{entity.kind}"
+      kind = entity.kind
       raise "No kind found for #{entity}" unless kind
 
       # get location for this kind of entity
-      location   = @model.get_by_id(entity.kind).location
+      Occi::Log.debug "Kind location: #{entity.kind.location}"
+      location   = kind.location
       collection = Occi::Collection.new
 
       # is this entity a Resource or a Link?
+      Occi::Log.debug "Entity class: #{entity.class.name}"
       collection.resources << entity if entity.kind_of? Occi::Core::Resource
       collection.links << entity if entity.kind_of? Occi::Core::Link
 
@@ -616,10 +621,26 @@ module Occi
       response_msg = response_message response
       raise "HTTP GET failed! #{response_msg}" unless response.code.between? 200, 300
 
+      Occi::Log.debug "Response location: #{('/' + path).match(/\/.*\//).to_s}"
       kind = @model.get_by_location(('/' + path).match(/\/.*\//).to_s) if @model
-      kind ? entity_type = kind.entity_type : entity_type = nil
-      _, collection = Occi::Parser.parse(response.content_type, response.body, path.include?('-/'), entity_type)
 
+      Occi::Log.debug "Response kind: #{kind}"
+
+      if kind
+        kind.related_to? Occi::Core::Resource ? entity_type = Occi::Core::Resource : entity_type = nil
+        entity_type = Occi::Core::Link if kind.related_to? Occi::Core::Link
+      end
+
+      Occi::Log.debug "Parser call: #{response.content_type} #{entity_type} #{path.include?('-/')}"
+      collection = Occi::Parser.parse(response.content_type, response.body, path.include?('-/'), entity_type)
+
+      # parse Links for Resource
+      #if entity_type == Occi::Core::Resource
+      #  link_collection = Occi::Parser.parse(response.content_type, response.body, false, Occi::Core::Link)
+      #  collection.links.merge link_collection.links
+      #end
+
+      Occi::Log.debug "Parsed collection: empty? #{collection.empty?}"
       collection
     end
 
@@ -682,7 +703,7 @@ module Occi
       response_msg = response_message response
       raise "HTTP PUT failed! #{response_msg}" unless response.code.between? 200, 300
 
-      _, collection = Occi::Parser.parse(response.content_type, response.body)
+      collection = Occi::Parser.parse(response.content_type, response.body)
 
       collection
     end

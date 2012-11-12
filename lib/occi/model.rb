@@ -3,9 +3,13 @@ module Occi
 
     # @param [Occi::Core::Collection] collection
     def initialize(collection=nil)
-      super
+      super(nil, nil) # model must be empty for model class
       register_core
       register_collection collection if collection.kind_of? Occi::Collection
+    end
+
+    def model=(model)
+      # will not assign a model inside a model
     end
 
     # register Occi Core categories enitity, resource and link
@@ -54,17 +58,12 @@ module Occi
 
     # @param [Occi::Core::Category] category
     def register(category)
-      Occi::Log.debug "### Registering category #{category.type_identifier}"
+      Occi::Log.debug "### Registering category #{category}"
       # add model to category as back reference
       category.model = self
-      case category.class.name
-        when Occi::Core::Kind.to_s
-          @kinds << category unless get_by_id(category.type_identifier)
-        when Occi::Core::Mixin.to_s
-          @mixins << category unless get_by_id(category.type_identifier)
-        when Occi::Core::Action.to_s
-          @actions << category unless get_by_id(category.type_identifier)
-      end
+      @kinds << category unless get_by_id(category.to_s) if category.class.ancestors.include? Occi::Core::Kind
+      @mixins << category unless get_by_id(category.to_s) if category.class.ancestors.include? Occi::Core::Mixin
+      @actions << category unless get_by_id(category.to_s) if category.class.ancestors.include? Occi::Core::Action
     end
 
     # @param [Occi::Core::Category] category
@@ -80,11 +79,7 @@ module Occi
     # @param [Occi::Collection] filter
     # @return [Occi::Collection] collection
     def get(filter = nil)
-      if filter
-        self.intersect filter
-      else
-        self
-      end
+      filter ? intersect(filter) : self
     end
 
   end

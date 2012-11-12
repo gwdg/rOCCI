@@ -12,30 +12,15 @@ module Occi
     extend Occi
 
     def self.kinds
-      kinds = []
-      kinds << Occi::Infrastructure::Compute.kind
-      kinds << Occi::Infrastructure::Storage.kind
-      kinds << Occi::Infrastructure::Network.kind
-      kinds << Occi::Infrastructure::Networkinterface.kind
-      kinds << Occi::Infrastructure::Storagelink.kind
-      kinds.compact.reject { |entry| entry == [] }
+      Occi::Core::Kinds.new << Occi::Infrastructure::Compute.kind << Occi::Infrastructure::Storage.kind << Occi::Infrastructure::Network.kind << Occi::Infrastructure::Networkinterface.kind << Occi::Infrastructure::Storagelink.kind
     end
 
     def self.mixins
-      mixins = []
-      mixins.concat Occi::Infrastructure::Os_tpl.mixins
-      mixins.concat Occi::Infrastructure::Resource_tpl.mixins
-      mixins.concat Occi::Infrastructure::Network.mixins
-      mixins.concat Occi::Infrastructure::Networkinterface.mixins
-      mixins.compact.reject { |entry| entry == [] }
+      Occi::Infrastructure::Compute.mixins + Occi::Infrastructure::Storage.mixins + Occi::Infrastructure::Network.mixins + Occi::Infrastructure::Networkinterface.mixins + Occi::Infrastructure::Storagelink.mixins
     end
 
     def self.actions
-      actions = []
-      actions.concat Occi::Infrastructure::Compute.actions
-      actions.concat Occi::Infrastructure::Storage.actions
-      actions.concat Occi::Infrastructure::Network.actions
-      actions.compact.reject { |entry| entry == [] }
+      Occi::Infrastructure::Compute.actions + Occi::Infrastructure::Storage.actions + Occi::Infrastructure::Network.actions + Occi::Infrastructure::Networkinterface.actions + Occi::Infrastructure::Storagelink.actions
     end
 
   end
