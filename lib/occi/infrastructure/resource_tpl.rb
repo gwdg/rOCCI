@@ -1,20 +1,19 @@
 module Occi
   module Infrastructure
-    module Resource_tpl
+    class Resource_tpl < Occi::Core::Mixin
 
-      extend Occi
+      def initialize(scheme='http://schemas.ogf.org/occi/infrastructure#',
+          term='resource_tpl',
+          title='resource template',
+          attributes=Occi::Core::Attributes.new,
+          related=Occi::Core::Categories.new,
+          actions=Occi::Core::Actions.new,
+          location='/mixins/resource_tpl/')
 
-      def self.mixins
-        mixin = Occi::Core::Mixin.new('http://schemas.ogf.org/occi/infrastructure#', 'resource_tpl')
-
-        mixin.title = "resource template"
-
-        mixin.related << Occi::Infrastructure::Compute.type_identifier
-
-        mixin.location = '/mixins/resource_tpl/'
-
-        [mixin]
+        super(scheme, term, title, attributes, related, actions, location)
+        self.related << Occi::Infrastructure::Compute.kind
       end
+
     end
   end
 end

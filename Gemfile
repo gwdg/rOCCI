@@ -19,5 +19,8 @@ group :development do
   gem "simplecov"
   gem "yard"
   gem "yard-sinatra"
+  gem "yard-rspec"
+  gem "yard-cucumber"
   gem "rspec-http"
+  gem "redcarpet"
 end

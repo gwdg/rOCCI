@@ -2,7 +2,7 @@ module Occi
   module Core
     class Kind < Occi::Core::Category
 
-      attr_accessor :entities, :related, :actions, :location, :entity_type
+      attr_accessor :entities, :related, :actions, :location
 
       # @param [String ] scheme
       # @param [String] term
@@ -10,21 +10,30 @@ module Occi
       # @param [Hash] attributes
       # @param [Array] related
       # @param [Array] actions
-      def initialize(scheme, term, title=nil, attributes={}, related=[], actions=[],location=nil)
+      def initialize(scheme='http://schemas.ogf.org/occi/core#',
+          term='kind',
+          title=nil,
+          attributes=Occi::Core::Attributes.new,
+          related=Occi::Core::Categories.new,
+          actions=Occi::Core::Actions.new,
+          location=nil)
         super(scheme, term, title, attributes)
-        @related  = related.to_a.flatten
-        @actions  = actions.to_a.flatten
-        @location = location ||= '/' + term + '/'
-        @entities = []
-        @entity_type = self.class.get_class scheme, term, related
+        @related  = Occi::Core::Related.new(related)
+        @actions  = Occi::Core::Actions.new(actions)
+        @entities = Occi::Core::Entities.new
+        location.blank? ? @location = '/' + term + '/' : @location = location
+      end
+
+      def entity_type
+        self.class.get_class @scheme, @term, @related
       end
 
       # @param [Hash] options
       # @return [Hashie::Mash] json representation
       def as_json(options={ })
         kind = Hashie::Mash.new
-        kind.related = @related if @related.any?
-        kind.actions = @actions if @actions.any?
+        kind.related = @related.join(' ').split(' ') if @related.any?
+        kind.actions = @actions.join(' ').split(' ') if @actions.any?
         kind.location = @location if @location
         kind.merge! super
         kind

@@ -1,8 +1,12 @@
+*.gem
 *.swp
 .project
 .idea
 .yardoc
 .bundle
+.rvmrc
+lib/occiantlr/output/
+pkg
 tmp
 log
 coverage

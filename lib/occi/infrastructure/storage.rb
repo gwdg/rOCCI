@@ -2,52 +2,77 @@ module Occi
   module Infrastructure
     class Storage < Occi::Core::Resource
 
-      extend Occi
+      class Online < Occi::Core::Action
+        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
+            term='online',
+            title='activate storage')
+          super
+        end
+      end
 
-      def self.kind
-        kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/infrastructure#', 'storage')
+      class Offline < Occi::Core::Action
+        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
+            term='offline',
+            title='deactivate storage')
+          super
+        end
+      end
 
-        kind.title = "storage resource"
+      class Backup < Occi::Core::Action
+        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
+            term='backup',
+            title='backup storage')
+          super
+        end
+      end
 
-        kind.related << Occi::Core::Resource.type_identifier
+      class Snapshot < Occi::Core::Action
+        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
+            term='snapshot',
+            title='snapshot storage')
+          super
+        end
+      end
 
-        kind.attributes.occi!.storage!.size = Occi::Core::AttributeProperties.new(
+      class Resize < Occi::Core::Action
+        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
+            term='resize',
+            title='resize storage')
+          super
+          @attributes.size = Occi::Core::AttributeProperties.new(
+              { :type    => 'number',
+                :mutable => true })
+        end
+      end
+
+      def self.actions
+        Occi::Core::Actions.new << Online.new << Offline.new << Backup.new << Snapshot.new
+      end
+
+      begin
+        @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/infrastructure#', 'storage')
+
+        @kind.title = "storage resource"
+
+        @kind.related << Occi::Core::Resource.kind
+
+        @kind.attributes.occi!.storage!.size = Occi::Core::AttributeProperties.new(
             { :type    => 'number',
               :mutable => true })
 
-        kind.attributes.occi!.storage!.state = Occi::Core::AttributeProperties.new(
+        @kind.attributes.occi!.storage!.state = Occi::Core::AttributeProperties.new(
             { :pattern => 'online|offline|backup|snapshot|resize|degraded',
               :default => 'offline' })
 
-        kind.location = '/storage/'
+        @kind.location = '/storage/'
 
-        kind.actions = [
+        @kind.actions = [
             "http://schemas.ogf.org/occi/infrastructure/storage/action#online",
             "http://schemas.ogf.org/occi/infrastructure/storage/action#offline",
             "http://schemas.ogf.org/occi/infrastructure/storage/action#backup",
             "http://schemas.ogf.org/occi/infrastructure/storage/action#snapshot",
             "http://schemas.ogf.org/occi/infrastructure/storage/action#resize"
         ]
-
-        kind
-      end
-
-      def self.actions
-        online = Occi::Core::Action.new('http://schemas.ogf.org/occi/infrastructure/storage/action#', 'online', 'activate storage')
-
-        offline = Occi::Core::Action.new('http://schemas.ogf.org/occi/infrastructure/storage/action#', 'offline', 'deactivate storage')
-
-        backup = Occi::Core::Action.new('http://schemas.ogf.org/occi/infrastructure/storage/action#', 'backup', 'backup storage')
-
-        snapshot = Occi::Core::Action.new('http://schemas.ogf.org/occi/infrastructure/storage/action#', 'snapshot', 'snapshot storage')
-
-        resize = Occi::Core::Action.new('http://schemas.ogf.org/occi/infrastructure/storage/action#', 'resize', 'resize storage')
-
-        resize.attributes.size = Occi::Core::AttributeProperties.new(
-            { :type    => 'number',
-              :mutable => true })
-
-        [online, offline, backup, snapshot]
       end
 
       def size
@@ -65,7 +90,7 @@ module Occi
       def state=(state)
         @attributes.occi!.storage!.state = state
       end
-      
+
     end
   end
 end
