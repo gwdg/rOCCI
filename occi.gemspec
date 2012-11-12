@@ -27,6 +27,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'httparty'
   gem.add_dependency 'highline'
   gem.add_dependency 'i18n'
+  gem.add_dependency 'amqp'
 
   gem.required_ruby_version     = ">= 1.8.7"
 end

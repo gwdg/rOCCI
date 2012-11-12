@@ -1,0 +1,1066 @@
+---
+http_interactions:
+- request:
+    method: head
+    uri: https://localhost:3300/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/plain,text/occi;q=0.2
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:16:26 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFZTlhYjhkYzc3YzdlMDg5NDE1ODQ5%0AOTM2MzhjODM2ZjdmODJkYTYxNjA1ODVjNGJlOTc5MTg1Yzk4NjMwZjMxNUki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--87bb13c73d0d8239daffd33c85501e34fc79397e;
+        path=/; HttpOnly
+      Content-Length:
+      - '983'
+      Status:
+      - '200'
+      Vary:
+      - Accept-Encoding
+      Content-Type:
+      - text/plain;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ''
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:16:32 GMT
+- request:
+    method: get
+    uri: https://localhost:3300/-/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/plain,text/occi
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:16:32 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFYjhkNTgxZWFjYzExMzQzNDc4NDc1%0AMTgwZjJkMTdkMGZkN2U1YzI3ODU4YWI3ZDFlZjE1ZmVhM2I0YTgyYjM0N0ki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--49e71e22cc92cb4cb7597096861144b1ea4c7f6e;
+        path=/; HttpOnly
+      Content-Length:
+      - '10310'
+      Status:
+      - '200'
+      Vary:
+      - Accept-Encoding
+      Content-Type:
+      - text/plain;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! 'Category: entity;scheme="http://schemas.ogf.org/occi/core#";class="kind";title="Entity";location="/entity/";attributes="occi.core.id
+        occi.core.title"
+
+        Category: resource;scheme="http://schemas.ogf.org/occi/core#";class="kind";title="Resource";rel="http://schemas.ogf.org/occi/core#entity";location="/resource/";attributes="occi.core.summary"
+
+        Category: link;scheme="http://schemas.ogf.org/occi/core#";class="kind";title="Link";rel="http://schemas.ogf.org/occi/core#entity";location="/link/";attributes="occi.core.target
+        occi.core.source"
+
+        Category: compute;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind";title="Compute
+        Resource";rel="http://schemas.ogf.org/occi/core#resource";location="/compute/";attributes="occi.compute.architecture
+        occi.compute.cores occi.compute.hostname occi.compute.speed occi.compute.memory
+        occi.compute.state org.opennebula.compute.cpu org.opennebula.compute.kernel
+        org.opennebula.compute.initrd org.opennebula.compute.root org.opennebula.compute.kernel_cmd
+        org.opennebula.compute.bootloader org.opennebula.compute.boot";actions="http://schemas.ogf.org/occi/infrastructure/compute/action#start
+        http://schemas.ogf.org/occi/infrastructure/compute/action#stop http://schemas.ogf.org/occi/infrastructure/compute/action#restart
+        http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"
+
+        Category: storagelink;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind";title="Storage
+        Link";rel="http://schemas.ogf.org/occi/core#link";location="/storagelink/";attributes="occi.storagelink.deviceid
+        occi.storagelink.mountpoint occi.storagelink.state org.opennebula.storagelink.bus
+        org.opennebula.storagelink.driver"
+
+        Category: network;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind";title="Network
+        Resource";rel="http://schemas.ogf.org/occi/core#resource";location="/network/";attributes="occi.network.vlan
+        occi.network.label occi.network.state org.opennebula.network.id org.opennebula.network.bridge
+        org.opennebula.network.vlan org.opennebula.network.phydev org.opennebula.network.ip_start
+        org.opennebula.network.ip_end";actions="http://schemas.ogf.org/occi/infrastructure/network/action#up
+        http://schemas.ogf.org/occi/infrastructure/network/action#down"
+
+        Category: storage;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind";title="Storage
+        Resource";rel="http://schemas.ogf.org/occi/core#resource";location="/storage/";attributes="occi.storage.size
+        occi.storage.state org.opennebula.storage.id org.opennebula.storage.type org.opennebula.storage.persistent
+        org.opennebula.storage.dev_prefix org.opennebula.storage.bus org.opennebula.storage.driver
+        org.opennebula.storage.fstype";actions="http://schemas.ogf.org/occi/infrastructure/storage/action#online
+        http://schemas.ogf.org/occi/infrastructure/storage/action#offline http://schemas.ogf.org/occi/infrastructure/storage/action#backup
+        http://schemas.ogf.org/occi/infrastructure/storage/action#snapshot http://schemas.ogf.org/occi/infrastructure/storage/action#resize"
+
+        Category: networkinterface;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind";title="Networkinterface";rel="http://schemas.ogf.org/occi/core#link";location="/networkinterface/";attributes="occi.networkinterface.interface
+        occi.networkinterface.mac occi.networkinterface.state occi.networkinterface.address
+        occi.networkinterface.gateway occi.networkinterface.allocation org.opennebula.networkinterface.bridge
+        org.opennebula.networkinterface.script org.opennebula.networkinterface.model
+        org.opennebula.networkinterface.white_ports_tcp org.opennebula.networkinterface.black_ports_tcp
+        org.opennebula.networkinterface.white_ports_udp org.opennebula.networkinterface.black_ports_udp
+        org.opennebula.networkinterface.icmp"
+
+        Category: console;scheme="http://schemas.ogf.org/occi/infrastructure/compute#";class="kind";title="Link
+        to the VM''s console";rel="http://schemas.ogf.org/occi/core#link";location="/console/"
+
+        Category: os_tpl;scheme="http://schemas.ogf.org/occi/infrastructure#";class="mixin";title="Operating
+        System Template";location="/mixins/os_tpl/"
+
+        Category: ipnetwork;scheme="http://schemas.ogf.org/occi/infrastructure/network#";class="mixin";title="IP
+        Network Mixin";location="/mixins/ipnetwork/";attributes="occi.network.address
+        occi.network.gateway occi.network.allocation occi.network.state"
+
+        Category: ipnetworkinterface;scheme="http://schemas.ogf.org/occi/infrastructure/networkinterface#";class="mixin";title="IP
+        Networkinterface Mixin";location="/mixins/ipnetworkinterface/";attributes="occi.networkinterface.address
+        occi.networkinterface.gateway occi.networkinterface.allocation occi.networkinterface.state"
+
+        Category: resource_tpl;scheme="http://schemas.ogf.org/occi/infrastructure#";class="mixin";title="Resource
+        Template";location="/mixins/resource_tpl/"
+
+        Category: compute;scheme="http://opennebula.org/occi/infrastructure#";class="mixin";title="OpenNebula
+        specific Compute attributes";location="/mixins/compute/";attributes="org.opennebula.compute.cpu
+        org.opennebula.compute.kernel org.opennebula.compute.initrd org.opennebula.compute.root
+        org.opennebula.compute.kernel_cmd org.opennebula.compute.bootloader org.opennebula.compute.boot"
+
+        Category: storagelink;scheme="http://opennebula.org/occi/infrastructure#";class="mixin";title="OpenNebula
+        specific Storagelink attributes";location="/mixins/storagelink/";attributes="org.opennebula.storagelink.bus
+        org.opennebula.storagelink.driver"
+
+        Category: network;scheme="http://opennebula.org/occi/infrastructure#";class="mixin";title="OpenNebula
+        specific Network attributes";location="/mixins/network/";attributes="org.opennebula.network.id
+        org.opennebula.network.bridge org.opennebula.network.vlan org.opennebula.network.phydev
+        org.opennebula.network.ip_start org.opennebula.network.ip_end"
+
+        Category: storage;scheme="http://opennebula.org/occi/infrastructure#";class="mixin";title="OpenNebula
+        specific Storage attributes";location="/mixins/storage/";attributes="org.opennebula.storage.id
+        org.opennebula.storage.type org.opennebula.storage.persistent org.opennebula.storage.dev_prefix
+        org.opennebula.storage.bus org.opennebula.storage.driver org.opennebula.storage.fstype"
+
+        Category: networkinterface;scheme="http://opennebula.org/occi/infrastructure#";class="mixin";title="OpenNebula
+        specific Networkinterface attributes";location="/mixins/networkinterface/";attributes="org.opennebula.networkinterface.bridge
+        org.opennebula.networkinterface.script org.opennebula.networkinterface.model
+        org.opennebula.networkinterface.white_ports_tcp org.opennebula.networkinterface.black_ports_tcp
+        org.opennebula.networkinterface.white_ports_udp org.opennebula.networkinterface.black_ports_udp
+        org.opennebula.networkinterface.icmp"
+
+        Category: large;scheme="https://occi.localhost/occi/infrastructure/resource_tpl#";class="mixin";title="Large
+        Instance";rel="http://schemas.ogf.org/occi/infrastructure#resource_tpl";location="/mixins/large/";attributes="occi.compute.architecture
+        occi.compute.cores occi.compute.speed occi.compute.memory"
+
+        Category: extra_large;scheme="https://occi.localhost/occi/infrastructure/resource_tpl#";class="mixin";title="Extra
+        Large Instance";rel="http://schemas.ogf.org/occi/infrastructure#resource_tpl";location="/mixins/extra_large/";attributes="occi.compute.architecture
+        occi.compute.cores occi.compute.speed occi.compute.memory"
+
+        Category: medium;scheme="https://occi.localhost/occi/infrastructure/resource_tpl#";class="mixin";title="Medium
+        Instance";rel="http://schemas.ogf.org/occi/infrastructure#resource_tpl";location="/mixins/medium/";attributes="occi.compute.architecture
+        occi.compute.cores occi.compute.speed occi.compute.memory"
+
+        Category: small;scheme="https://occi.localhost/occi/infrastructure/resource_tpl#";class="mixin";title="Small
+        Instance";rel="http://schemas.ogf.org/occi/infrastructure#resource_tpl";location="/mixins/small/";attributes="occi.compute.architecture
+        occi.compute.cores occi.compute.speed occi.compute.memory"
+
+        Category: monitoring;scheme="https://occi.localhost/occi/infrastructure/os_tpl#";class="mixin";title="monitoring";rel="http://schemas.ogf.org/occi/infrastructure#os_tpl";location="/mixins/monitoring/"
+
+        Category: debianvm;scheme="https://occi.localhost/occi/infrastructure/os_tpl#";class="mixin";title="debianvm";rel="http://schemas.ogf.org/occi/infrastructure#os_tpl";location="/mixins/debianvm/"
+
+        Category: egicf2012_demo;scheme="https://occi.localhost/occi/infrastructure/os_tpl#";class="mixin";title="egicf2012-demo";rel="http://schemas.ogf.org/occi/infrastructure#os_tpl";location="/mixins/egicf2012_demo/"
+
+        Category: oxfordcorpusserver;scheme="https://occi.localhost/occi/infrastructure/os_tpl#";class="mixin";title="OxfordCorpusServer";rel="http://schemas.ogf.org/occi/infrastructure#os_tpl";location="/mixins/oxfordcorpusserver/"
+
+        Category: start;scheme="http://schemas.ogf.org/occi/infrastructure/compute/action#";class="action";title="Start
+        Compute instance"
+
+        Category: stop;scheme="http://schemas.ogf.org/occi/infrastructure/compute/action#";class="action";title="Stop
+        Compute instance";attributes="method"
+
+        Category: restart;scheme="http://schemas.ogf.org/occi/infrastructure/compute/action#";class="action";title="Restart
+        Compute instance";attributes="method"
+
+        Category: suspend;scheme="http://schemas.ogf.org/occi/infrastructure/compute/action#";class="action";title="Suspend
+        Compute instance";attributes="method"
+
+        Category: up;scheme="http://schemas.ogf.org/occi/infrastructure/network/action#";class="action";title="Activate
+        network"
+
+        Category: down;scheme="http://schemas.ogf.org/occi/infrastructure/network/action#up";class="action";title="Activate
+        network"
+
+        Category: online;scheme="http://schemas.ogf.org/occi/infrastructure/storage/action#";class="action";title="Activate
+        Storage"
+
+        Category: offline;scheme="http://schemas.ogf.org/occi/infrastructure/storage/action#";class="action";title="Deactivate
+        Storage"
+
+        Category: backup;scheme="http://schemas.ogf.org/occi/infrastructure/storage/action#";class="action";title="Backup
+        Storage"
+
+        Category: snapshot;scheme="http://schemas.ogf.org/occi/infrastructure/storage/action#";class="action";title="Snapshot
+        Storage"
+
+        Category: resize;scheme="http://schemas.ogf.org/occi/infrastructure/storage/action#";class="action";title="Resize
+        Storage";attributes="size"
+
+'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:16:37 GMT
+- request:
+    method: get
+    uri: https://localhost:3300/compute/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/uri-list
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:16:40 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFMjVlMjUyYjM4OGZjYzk3ZmFkYzI1%0ANTM1OGE4OWU3OTViZDVlYjdkNmJlYjY5NjhmM2JjMTAzMTlhNjEwNGM4NUki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--eb68242fefa7fa7a2aeeea09a15f0cfbe516815b;
+        path=/; HttpOnly
+      Content-Length:
+      - '78'
+      Status:
+      - '200'
+      Content-Type:
+      - text/uri-list;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: https://localhost:3300/compute/6c5f673c-e2e6-4fad-856c-d650587f0579
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:16:46 GMT
+- request:
+    method: get
+    uri: https://localhost:3300/network/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/uri-list
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:16:46 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFOGUzMTE2ZDYxMTcwYzc2YTUyMzFi%0AMTNmZjU3ODA0NTQzOGY1MWE5MTliYTUzZGE1ZjA1ZTE2NTUxYWJkMTdkZUki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--cdb3e2ddc6a177a642041f2b9eef9b5a93c5d673;
+        path=/; HttpOnly
+      Content-Length:
+      - '236'
+      Status:
+      - '200'
+      Content-Type:
+      - text/uri-list;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! 'https://localhost:3300/network/e4bd81c4-adda-5626-840d-39bb7959db97
+
+        https://localhost:3300/network/d71df087-9a55-5228-822b-1f1a57107851
+
+        https://localhost:3300/network/1b30d837-7262-5936-8320-9694d3613ff6'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:16:52 GMT
+- request:
+    method: get
+    uri: https://localhost:3300/storage/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/uri-list
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:16:52 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFMmZmMmZlMTEyNDdmOThiZGIxYWNm%0ANGQzNmViZDI1Y2UzZWFmNzFjOTlkMmM3ZmMxOWNkYTZlMTc0MjkwMmM2NEki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--b67d8bf88213cc5e1463f426f4086d5fcba2a11e;
+        path=/; HttpOnly
+      Content-Length:
+      - '315'
+      Status:
+      - '200'
+      Content-Type:
+      - text/uri-list;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! 'https://localhost:3300/storage/e60aa2b8-0c86-5973-b93e-30c5c46d6eac
+
+        https://localhost:3300/storage/e7db6669-d819-5e20-a7ee-90be46591490
+
+        https://localhost:3300/storage/de48d92c-6288-5a81-bc12-d3f9fedc1ec8
+
+        https://localhost:3300/storage/a39a1d08-bff8-5a62-ba68-a1cd76bb4511'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:16:58 GMT
+- request:
+    method: get
+    uri: https://localhost:3300/compute/6c5f673c-e2e6-4fad-856c-d650587f0579
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/plain,text/occi
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:16:59 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFOGJmODMxYTY4ZTc5M2M2MmYwNTVi%0AMjlmMGJkMDBlOTJlMTExNTdhNWEzMWJhN2U1YjFmZTc3ZTM1MDI2Mzc2ZUki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--d8c11c5e4d2de5a3dd0d926b2b49bd3fb473c52a;
+        path=/; HttpOnly
+      Content-Length:
+      - '1744'
+      Status:
+      - '200'
+      Vary:
+      - Accept-Encoding
+      Content-Type:
+      - text/plain;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! 'Category: compute;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind"
+
+        Category: compute;scheme="http://opennebula.org/occi/infrastructure#";class="mixin"
+
+        Category: monitoring;scheme="https://occi.localhost/occi/infrastructure/os_tpl#";class="mixin"
+
+        Category: small;scheme="https://occi.localhost/occi/infrastructure/resource_tpl#";class="mixin"
+
+        X-OCCI-Attribute: occi.core.id="6c5f673c-e2e6-4fad-856c-d650587f0579"
+
+        X-OCCI-Attribute: occi.core.title="MyRocciCompute"
+
+        X-OCCI-Attribute: occi.compute.cores=1
+
+        X-OCCI-Attribute: occi.compute.memory=0.256
+
+        X-OCCI-Attribute: occi.compute.architecture="x86"
+
+        X-OCCI-Attribute: occi.compute.speed=1
+
+        X-OCCI-Attribute: occi.compute.state="active"
+
+        X-OCCI-Attribute: org.opennebula.compute.cpu=1.0
+
+        Link: </storage/e60aa2b8-0c86-5973-b93e-30c5c46d6eac>;rel="http://schemas.ogf.org/occi/infrastructure#storage";self="/storagelink/b2f7f1de-c60c-5b08-879c-81f52429c4ef";category="http://schemas.ogf.org/occi/infrastructure#storagelink";occi.core.id="b2f7f1de-c60c-5b08-879c-81f52429c4ef"
+        occi.core.title="monitoring" occi.storagelink.deviceid="xvda" occi.storagelink.state="inactive"
+        org.opennebula.storagelink.bus="ide" org.opennebula.storagelink.driver="tap2:tapdisk:aio:"
+
+        Link: </network/e4bd81c4-adda-5626-840d-39bb7959db97>;rel="http://schemas.ogf.org/occi/infrastructure#network";self="/networkinterface/e75ab249-9325-511c-82b8-a7e4430381e3";category="http://schemas.ogf.org/occi/infrastructure#networkinterface";occi.core.id="e75ab249-9325-511c-82b8-a7e4430381e3"
+        occi.core.title="monitoring" occi.networkinterface.address="192.168.254.4"
+        occi.networkinterface.mac="02:00:c0:a8:fe:04" occi.networkinterface.state="inactive"
+        org.opennebula.networkinterface.bridge="xenbr0"
+
+'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:17:05 GMT
+- request:
+    method: get
+    uri: https://localhost:3300/network/e4bd81c4-adda-5626-840d-39bb7959db97
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/plain,text/occi
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:17:06 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFMmUwZjM2M2VlNzU2MGFlY2Y0ZWE2%0AZmJlMTFhZTBmMjRhZjUzYjBjMTc4ZDYyZDFiYjEwNjYwYzI0OGJkYzE1Ykki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--eeb7b8329b91623c58c20494a3f320887207d919;
+        path=/; HttpOnly
+      Content-Length:
+      - '681'
+      Status:
+      - '200'
+      Vary:
+      - Accept-Encoding
+      Content-Type:
+      - text/plain;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! 'Category: network;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind"
+
+        Category: network;scheme="http://opennebula.org/occi/infrastructure#";class="mixin"
+
+        Category: ipnetwork;scheme="http://schemas.ogf.org/occi/infrastructure#";class="mixin"
+
+        X-OCCI-Attribute: occi.core.id="e4bd81c4-adda-5626-840d-39bb7959db97"
+
+        X-OCCI-Attribute: occi.core.title="monitoring"
+
+        X-OCCI-Attribute: occi.network.address="192.168.254.0"
+
+        X-OCCI-Attribute: occi.network.allocation="dynamic"
+
+        X-OCCI-Attribute: occi.network.state="active"
+
+        X-OCCI-Attribute: org.opennebula.network.id="6"
+
+        X-OCCI-Attribute: org.opennebula.network.bridge="xenbr0"
+
+        X-OCCI-Attribute: org.opennebula.network.vlan="NO"
+
+'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:17:11 GMT
+- request:
+    method: get
+    uri: https://localhost:3300/network/d71df087-9a55-5228-822b-1f1a57107851
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/plain,text/occi
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:17:11 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFYzEyYzZkNzlkMjBjMWQzM2RlYTYx%0AMzg0NWQxNDc1MGI1NzU5ZTViMDI1YjJlYWRhOTA2YWIyNDUyYWRmMGNkNkki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--7b48ebf371a0f07b6143cb389a03e5cab11866b8;
+        path=/; HttpOnly
+      Content-Length:
+      - '621'
+      Status:
+      - '200'
+      Vary:
+      - Accept-Encoding
+      Content-Type:
+      - text/plain;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! 'Category: network;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind"
+
+        Category: network;scheme="http://opennebula.org/occi/infrastructure#";class="mixin"
+
+        Category: ipnetwork;scheme="http://schemas.ogf.org/occi/infrastructure#";class="mixin"
+
+        X-OCCI-Attribute: occi.core.id="d71df087-9a55-5228-822b-1f1a57107851"
+
+        X-OCCI-Attribute: occi.core.title="public"
+
+        X-OCCI-Attribute: occi.network.allocation="static"
+
+        X-OCCI-Attribute: occi.network.state="active"
+
+        X-OCCI-Attribute: org.opennebula.network.id="4"
+
+        X-OCCI-Attribute: org.opennebula.network.bridge="xenbr0"
+
+        X-OCCI-Attribute: org.opennebula.network.vlan="NO"
+
+'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:17:16 GMT
+- request:
+    method: get
+    uri: https://localhost:3300/network/1b30d837-7262-5936-8320-9694d3613ff6
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/plain,text/occi
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:17:17 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFYWM0MjllNmVkMDVmYzI4ZjI4Y2E3%0ANDA5ZDg4ZWUxMjEyMzNlYmJiMTRiZDRlZTg4ZjViMDNhMGViNjE2MjcwYUki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--e2d1ecf91e2a283f29ed5feeb2f02688e380ec18;
+        path=/; HttpOnly
+      Content-Length:
+      - '673'
+      Status:
+      - '200'
+      Vary:
+      - Accept-Encoding
+      Content-Type:
+      - text/plain;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! 'Category: network;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind"
+
+        Category: network;scheme="http://opennebula.org/occi/infrastructure#";class="mixin"
+
+        Category: ipnetwork;scheme="http://schemas.ogf.org/occi/infrastructure#";class="mixin"
+
+        X-OCCI-Attribute: occi.core.id="1b30d837-7262-5936-8320-9694d3613ff6"
+
+        X-OCCI-Attribute: occi.core.title="private"
+
+        X-OCCI-Attribute: occi.network.address="10.4.1.0"
+
+        X-OCCI-Attribute: occi.network.allocation="dynamic"
+
+        X-OCCI-Attribute: occi.network.state="active"
+
+        X-OCCI-Attribute: org.opennebula.network.id="8"
+
+        X-OCCI-Attribute: org.opennebula.network.bridge="xenbr0"
+
+        X-OCCI-Attribute: org.opennebula.network.vlan="NO"
+
+'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:17:22 GMT
+- request:
+    method: get
+    uri: https://localhost:3300/storage/e60aa2b8-0c86-5973-b93e-30c5c46d6eac
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/plain,text/occi
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:17:23 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFMjg1NTc4OGM2YTQyNzRkNTQzM2Iz%0AZTRiODVmY2UyNDliMzFhNmZlNmJhNWY1ZGZlNzU0NDM1YjQyNTRmZGE1Nkki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--8a04cb89d139dbf7df0edc38fe9e0c4e9bf53472;
+        path=/; HttpOnly
+      Content-Length:
+      - '652'
+      Status:
+      - '200'
+      Vary:
+      - Accept-Encoding
+      Content-Type:
+      - text/plain;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! 'Category: storage;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind"
+
+        Category: storage;scheme="http://opennebula.org/occi/infrastructure#";class="mixin"
+
+        X-OCCI-Attribute: occi.core.id="e60aa2b8-0c86-5973-b93e-30c5c46d6eac"
+
+        X-OCCI-Attribute: occi.core.title="monitoring"
+
+        X-OCCI-Attribute: occi.core.summary="Monitoring image"
+
+        X-OCCI-Attribute: occi.storage.state="online"
+
+        X-OCCI-Attribute: org.opennebula.storage.id="30"
+
+        X-OCCI-Attribute: org.opennebula.storage.type="OS"
+
+        X-OCCI-Attribute: org.opennebula.storage.dev_prefix="xvd"
+
+        X-OCCI-Attribute: org.opennebula.storage.bus="ide"
+
+        X-OCCI-Attribute: org.opennebula.storage.persistent="NO"
+
+'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:17:28 GMT
+- request:
+    method: get
+    uri: https://localhost:3300/storage/e7db6669-d819-5e20-a7ee-90be46591490
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/plain,text/occi
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:17:28 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFNzU3MGRkMzQ3ODAyODY0ODZjNWEy%0AMzEzZjQ0YjNiOWRkOTc3YWZkNTEwNTY2ZWU4ZGQ2ZmY0NDFlZTIxYjc5Zkki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--e1890dfc73dbc0de4568082e3b6d918bb776b2da;
+        path=/; HttpOnly
+      Content-Length:
+      - '653'
+      Status:
+      - '200'
+      Vary:
+      - Accept-Encoding
+      Content-Type:
+      - text/plain;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! 'Category: storage;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind"
+
+        Category: storage;scheme="http://opennebula.org/occi/infrastructure#";class="mixin"
+
+        X-OCCI-Attribute: occi.core.id="e7db6669-d819-5e20-a7ee-90be46591490"
+
+        X-OCCI-Attribute: occi.core.title="debian6"
+
+        X-OCCI-Attribute: occi.core.summary="Debian6 sample image"
+
+        X-OCCI-Attribute: occi.storage.state="online"
+
+        X-OCCI-Attribute: org.opennebula.storage.id="31"
+
+        X-OCCI-Attribute: org.opennebula.storage.type="OS"
+
+        X-OCCI-Attribute: org.opennebula.storage.dev_prefix="xvd"
+
+        X-OCCI-Attribute: org.opennebula.storage.bus="ide"
+
+        X-OCCI-Attribute: org.opennebula.storage.persistent="NO"
+
+'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:17:34 GMT
+- request:
+    method: get
+    uri: https://localhost:3300/storage/de48d92c-6288-5a81-bc12-d3f9fedc1ec8
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/plain,text/occi
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:17:34 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFYjIxZTVmZDBhMTJjMDk3YTgyYWZl%0AZGIwYzY5NzM3NTJkZDY1NjZmMDE0OWYyOTlmZTQ3ZmRhZjg2ZDRhYjk1MUki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--d712d328dd31cacda99e6f6f244e7901131062a0;
+        path=/; HttpOnly
+      Content-Length:
+      - '550'
+      Status:
+      - '200'
+      Vary:
+      - Accept-Encoding
+      Content-Type:
+      - text/plain;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! 'Category: storage;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind"
+
+        Category: storage;scheme="http://opennebula.org/occi/infrastructure#";class="mixin"
+
+        X-OCCI-Attribute: occi.core.id="de48d92c-6288-5a81-bc12-d3f9fedc1ec8"
+
+        X-OCCI-Attribute: occi.core.title="egicf2012-demo"
+
+        X-OCCI-Attribute: occi.storage.state="online"
+
+        X-OCCI-Attribute: org.opennebula.storage.id="32"
+
+        X-OCCI-Attribute: org.opennebula.storage.dev_prefix="xvd"
+
+        X-OCCI-Attribute: org.opennebula.storage.bus="ide"
+
+        X-OCCI-Attribute: org.opennebula.storage.persistent="NO"
+
+'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:17:39 GMT
+- request:
+    method: get
+    uri: https://localhost:3300/storage/a39a1d08-bff8-5a62-ba68-a1cd76bb4511
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/plain,text/occi
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:17:40 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFMjNmNGZlMWFjOWQzN2QxOWU1NjQz%0AMThmMWUxYzVmY2NlZWQ1OTJjM2RkYmYyNzUwYWNmODQyNDU2MzVmMmQxMEki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--f37e46f1e1d9630d782337517a711990ba132e93;
+        path=/; HttpOnly
+      Content-Length:
+      - '671'
+      Status:
+      - '200'
+      Vary:
+      - Accept-Encoding
+      Content-Type:
+      - text/plain;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! 'Category: storage;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind"
+
+        Category: storage;scheme="http://opennebula.org/occi/infrastructure#";class="mixin"
+
+        X-OCCI-Attribute: occi.core.id="a39a1d08-bff8-5a62-ba68-a1cd76bb4511"
+
+        X-OCCI-Attribute: occi.core.title="corpus-server"
+
+        X-OCCI-Attribute: occi.core.summary="Image converted from vmdk format"
+
+        X-OCCI-Attribute: occi.storage.state="online"
+
+        X-OCCI-Attribute: org.opennebula.storage.id="33"
+
+        X-OCCI-Attribute: org.opennebula.storage.type="OS"
+
+        X-OCCI-Attribute: org.opennebula.storage.dev_prefix="xvd"
+
+        X-OCCI-Attribute: org.opennebula.storage.bus="ide"
+
+        X-OCCI-Attribute: org.opennebula.storage.persistent="NO"
+
+'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:17:45 GMT
+- request:
+    method: get
+    uri: https://localhost:3300/-/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/plain,text/occi
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Mon, 12 Nov 2012 17:17:52 GMT
+      Server:
+      - Apache/2.2.20 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.13
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFMjlmYmNiZWJmZmVmY2Q5ZGM5MWZi%0AOWUwNjc5OTljNDYzZWQ3ODI2Mzk1MmQ4MzBhMmY2MzkyMmI0ZDhjZGE3YUki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--1271c71b9f0b129f8f24f9aa7504de21248cb7c7;
+        path=/; HttpOnly
+      Content-Length:
+      - '10310'
+      Status:
+      - '200'
+      Vary:
+      - Accept-Encoding
+      Content-Type:
+      - text/plain;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! 'Category: entity;scheme="http://schemas.ogf.org/occi/core#";class="kind";title="Entity";location="/entity/";attributes="occi.core.id
+        occi.core.title"
+
+        Category: resource;scheme="http://schemas.ogf.org/occi/core#";class="kind";title="Resource";rel="http://schemas.ogf.org/occi/core#entity";location="/resource/";attributes="occi.core.summary"
+
+        Category: link;scheme="http://schemas.ogf.org/occi/core#";class="kind";title="Link";rel="http://schemas.ogf.org/occi/core#entity";location="/link/";attributes="occi.core.target
+        occi.core.source"
+
+        Category: compute;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind";title="Compute
+        Resource";rel="http://schemas.ogf.org/occi/core#resource";location="/compute/";attributes="occi.compute.architecture
+        occi.compute.cores occi.compute.hostname occi.compute.speed occi.compute.memory
+        occi.compute.state org.opennebula.compute.cpu org.opennebula.compute.kernel
+        org.opennebula.compute.initrd org.opennebula.compute.root org.opennebula.compute.kernel_cmd
+        org.opennebula.compute.bootloader org.opennebula.compute.boot";actions="http://schemas.ogf.org/occi/infrastructure/compute/action#start
+        http://schemas.ogf.org/occi/infrastructure/compute/action#stop http://schemas.ogf.org/occi/infrastructure/compute/action#restart
+        http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"
+
+        Category: storagelink;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind";title="Storage
+        Link";rel="http://schemas.ogf.org/occi/core#link";location="/storagelink/";attributes="occi.storagelink.deviceid
+        occi.storagelink.mountpoint occi.storagelink.state org.opennebula.storagelink.bus
+        org.opennebula.storagelink.driver"
+
+        Category: network;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind";title="Network
+        Resource";rel="http://schemas.ogf.org/occi/core#resource";location="/network/";attributes="occi.network.vlan
+        occi.network.label occi.network.state org.opennebula.network.id org.opennebula.network.bridge
+        org.opennebula.network.vlan org.opennebula.network.phydev org.opennebula.network.ip_start
+        org.opennebula.network.ip_end";actions="http://schemas.ogf.org/occi/infrastructure/network/action#up
+        http://schemas.ogf.org/occi/infrastructure/network/action#down"
+
+        Category: storage;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind";title="Storage
+        Resource";rel="http://schemas.ogf.org/occi/core#resource";location="/storage/";attributes="occi.storage.size
+        occi.storage.state org.opennebula.storage.id org.opennebula.storage.type org.opennebula.storage.persistent
+        org.opennebula.storage.dev_prefix org.opennebula.storage.bus org.opennebula.storage.driver
+        org.opennebula.storage.fstype";actions="http://schemas.ogf.org/occi/infrastructure/storage/action#online
+        http://schemas.ogf.org/occi/infrastructure/storage/action#offline http://schemas.ogf.org/occi/infrastructure/storage/action#backup
+        http://schemas.ogf.org/occi/infrastructure/storage/action#snapshot http://schemas.ogf.org/occi/infrastructure/storage/action#resize"
+
+        Category: networkinterface;scheme="http://schemas.ogf.org/occi/infrastructure#";class="kind";title="Networkinterface";rel="http://schemas.ogf.org/occi/core#link";location="/networkinterface/";attributes="occi.networkinterface.interface
+        occi.networkinterface.mac occi.networkinterface.state occi.networkinterface.address
+        occi.networkinterface.gateway occi.networkinterface.allocation org.opennebula.networkinterface.bridge
+        org.opennebula.networkinterface.script org.opennebula.networkinterface.model
+        org.opennebula.networkinterface.white_ports_tcp org.opennebula.networkinterface.black_ports_tcp
+        org.opennebula.networkinterface.white_ports_udp org.opennebula.networkinterface.black_ports_udp
+        org.opennebula.networkinterface.icmp"
+
+        Category: console;scheme="http://schemas.ogf.org/occi/infrastructure/compute#";class="kind";title="Link
+        to the VM''s console";rel="http://schemas.ogf.org/occi/core#link";location="/console/"
+
+        Category: os_tpl;scheme="http://schemas.ogf.org/occi/infrastructure#";class="mixin";title="Operating
+        System Template";location="/mixins/os_tpl/"
+
+        Category: ipnetwork;scheme="http://schemas.ogf.org/occi/infrastructure/network#";class="mixin";title="IP
+        Network Mixin";location="/mixins/ipnetwork/";attributes="occi.network.address
+        occi.network.gateway occi.network.allocation occi.network.state"
+
+        Category: ipnetworkinterface;scheme="http://schemas.ogf.org/occi/infrastructure/networkinterface#";class="mixin";title="IP
+        Networkinterface Mixin";location="/mixins/ipnetworkinterface/";attributes="occi.networkinterface.address
+        occi.networkinterface.gateway occi.networkinterface.allocation occi.networkinterface.state"
+
+        Category: resource_tpl;scheme="http://schemas.ogf.org/occi/infrastructure#";class="mixin";title="Resource
+        Template";location="/mixins/resource_tpl/"
+
+        Category: compute;scheme="http://opennebula.org/occi/infrastructure#";class="mixin";title="OpenNebula
+        specific Compute attributes";location="/mixins/compute/";attributes="org.opennebula.compute.cpu
+        org.opennebula.compute.kernel org.opennebula.compute.initrd org.opennebula.compute.root
+        org.opennebula.compute.kernel_cmd org.opennebula.compute.bootloader org.opennebula.compute.boot"
+
+        Category: storagelink;scheme="http://opennebula.org/occi/infrastructure#";class="mixin";title="OpenNebula
+        specific Storagelink attributes";location="/mixins/storagelink/";attributes="org.opennebula.storagelink.bus
+        org.opennebula.storagelink.driver"
+
+        Category: network;scheme="http://opennebula.org/occi/infrastructure#";class="mixin";title="OpenNebula
+        specific Network attributes";location="/mixins/network/";attributes="org.opennebula.network.id
+        org.opennebula.network.bridge org.opennebula.network.vlan org.opennebula.network.phydev
+        org.opennebula.network.ip_start org.opennebula.network.ip_end"
+
+        Category: storage;scheme="http://opennebula.org/occi/infrastructure#";class="mixin";title="OpenNebula
+        specific Storage attributes";location="/mixins/storage/";attributes="org.opennebula.storage.id
+        org.opennebula.storage.type org.opennebula.storage.persistent org.opennebula.storage.dev_prefix
+        org.opennebula.storage.bus org.opennebula.storage.driver org.opennebula.storage.fstype"
+
+        Category: networkinterface;scheme="http://opennebula.org/occi/infrastructure#";class="mixin";title="OpenNebula
+        specific Networkinterface attributes";location="/mixins/networkinterface/";attributes="org.opennebula.networkinterface.bridge
+        org.opennebula.networkinterface.script org.opennebula.networkinterface.model
+        org.opennebula.networkinterface.white_ports_tcp org.opennebula.networkinterface.black_ports_tcp
+        org.opennebula.networkinterface.white_ports_udp org.opennebula.networkinterface.black_ports_udp
+        org.opennebula.networkinterface.icmp"
+
+        Category: large;scheme="https://occi.localhost/occi/infrastructure/resource_tpl#";class="mixin";title="Large
+        Instance";rel="http://schemas.ogf.org/occi/infrastructure#resource_tpl";location="/mixins/large/";attributes="occi.compute.architecture
+        occi.compute.cores occi.compute.speed occi.compute.memory"
+
+        Category: extra_large;scheme="https://occi.localhost/occi/infrastructure/resource_tpl#";class="mixin";title="Extra
+        Large Instance";rel="http://schemas.ogf.org/occi/infrastructure#resource_tpl";location="/mixins/extra_large/";attributes="occi.compute.architecture
+        occi.compute.cores occi.compute.speed occi.compute.memory"
+
+        Category: medium;scheme="https://occi.localhost/occi/infrastructure/resource_tpl#";class="mixin";title="Medium
+        Instance";rel="http://schemas.ogf.org/occi/infrastructure#resource_tpl";location="/mixins/medium/";attributes="occi.compute.architecture
+        occi.compute.cores occi.compute.speed occi.compute.memory"
+
+        Category: small;scheme="https://occi.localhost/occi/infrastructure/resource_tpl#";class="mixin";title="Small
+        Instance";rel="http://schemas.ogf.org/occi/infrastructure#resource_tpl";location="/mixins/small/";attributes="occi.compute.architecture
+        occi.compute.cores occi.compute.speed occi.compute.memory"
+
+        Category: monitoring;scheme="https://occi.localhost/occi/infrastructure/os_tpl#";class="mixin";title="monitoring";rel="http://schemas.ogf.org/occi/infrastructure#os_tpl";location="/mixins/monitoring/"
+
+        Category: debianvm;scheme="https://occi.localhost/occi/infrastructure/os_tpl#";class="mixin";title="debianvm";rel="http://schemas.ogf.org/occi/infrastructure#os_tpl";location="/mixins/debianvm/"
+
+        Category: egicf2012_demo;scheme="https://occi.localhost/occi/infrastructure/os_tpl#";class="mixin";title="egicf2012-demo";rel="http://schemas.ogf.org/occi/infrastructure#os_tpl";location="/mixins/egicf2012_demo/"
+
+        Category: oxfordcorpusserver;scheme="https://occi.localhost/occi/infrastructure/os_tpl#";class="mixin";title="OxfordCorpusServer";rel="http://schemas.ogf.org/occi/infrastructure#os_tpl";location="/mixins/oxfordcorpusserver/"
+
+        Category: start;scheme="http://schemas.ogf.org/occi/infrastructure/compute/action#";class="action";title="Start
+        Compute instance"
+
+        Category: stop;scheme="http://schemas.ogf.org/occi/infrastructure/compute/action#";class="action";title="Stop
+        Compute instance";attributes="method"
+
+        Category: restart;scheme="http://schemas.ogf.org/occi/infrastructure/compute/action#";class="action";title="Restart
+        Compute instance";attributes="method"
+
+        Category: suspend;scheme="http://schemas.ogf.org/occi/infrastructure/compute/action#";class="action";title="Suspend
+        Compute instance";attributes="method"
+
+        Category: up;scheme="http://schemas.ogf.org/occi/infrastructure/network/action#";class="action";title="Activate
+        network"
+
+        Category: down;scheme="http://schemas.ogf.org/occi/infrastructure/network/action#up";class="action";title="Activate
+        network"
+
+        Category: online;scheme="http://schemas.ogf.org/occi/infrastructure/storage/action#";class="action";title="Activate
+        Storage"
+
+        Category: offline;scheme="http://schemas.ogf.org/occi/infrastructure/storage/action#";class="action";title="Deactivate
+        Storage"
+
+        Category: backup;scheme="http://schemas.ogf.org/occi/infrastructure/storage/action#";class="action";title="Backup
+        Storage"
+
+        Category: snapshot;scheme="http://schemas.ogf.org/occi/infrastructure/storage/action#";class="action";title="Snapshot
+        Storage"
+
+        Category: resize;scheme="http://schemas.ogf.org/occi/infrastructure/storage/action#";class="action";title="Resize
+        Storage";attributes="size"
+
+'
+    http_version: 
+  recorded_at: Mon, 12 Nov 2012 17:17:57 GMT
+recorded_with: VCR 2.3.0

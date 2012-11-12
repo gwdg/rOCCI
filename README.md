@@ -98,11 +98,11 @@ In your scripts, you can use the OCCI client DSL.
 
 To include the DSL definitions in your script use
 
-    extend Occi::DSL
+    extend Occi::Api::DSL
 
-To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )
+To connect to an OCCI endpoint/server (e.g. running on http://localhost:3300/ )
 
-    connect('http://localhost:3300',auth||=nil)
+    connect(:http, 'http://localhost:3300',auth||=nil)
 
 To get the list of available resource types or mixin types use
 
@@ -168,7 +168,7 @@ at a time, you should use the OCCI client API directly.
 
 To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )
 
-    client = Occi::Client.new('http://localhost:3300',auth||=nil)
+    client = Occi::Api::ClientHttp.new('http://localhost:3300',auth||=nil)
 
 All available categories are automatically registered to the OCCI model during client initialization. You can get them via
 
