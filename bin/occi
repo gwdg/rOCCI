@@ -21,14 +21,14 @@ require 'highline/import'
 require 'openssl'
 
 # OcciOpts, ResourceOutputFactory and Helper are not part of the occi core required above
-require 'occi/client/occi_opts'
-require 'occi/client/resource_output_factory'
-require 'occi/client/helper'
+require 'occi/api/client/occi_opts'
+require 'occi/api/client/resource_output_factory'
+require 'occi/api/client/helpers'
 
-extend Occi::DSL
+extend Occi::Api::DSL
 
 # get arguments and validate/parse them to an ostruct
-options = OcciOpts.parse ARGV
+options = Occi::Api::OcciOpts.parse ARGV
 
 # initialize logger
 logger = Occi::Log.new(options.log[:out])
@@ -36,7 +36,7 @@ logger.level = options.log[:level]
 options.log[:logger] = logger
 
 # initialize output factory
-output = ResourceOutputFactory.new options.output_format
+output = Occi::Api::ResourceOutputFactory.new options.output_format
 
 Occi::Log.info "Starting OCCI client ..."
 Occi::Log.debug "Options: #{options}"
@@ -56,7 +56,7 @@ if options.interactive
   choose do |menu|
     menu.prompt = "Which auth method should I use? "
 
-    OcciOpts::AUTH_METHODS.each do |auth_m|
+    Occi::Api::OcciOpts::AUTH_METHODS.each do |auth_m|
       menu.choice(auth_m) { options.auth[:type] = auth_m.to_s }
     end
   end
@@ -81,7 +81,7 @@ end
 # no effect on the non-interactive one
 begin
   Occi::Log.info "Establishing a connection to #{options.endpoint} ..."
-  connect options.endpoint, options.auth, options.log, true, options.media_type
+  connect :http, options.endpoint, options.auth, options.log, true, options.media_type
 rescue OpenSSL::SSL::SSLError => ssl_ex
   # generic SSL error raised whilst establishing a connection
   # possibly an untrusted server cert or invalid user credentials 
@@ -116,14 +116,14 @@ begin
   # that need to be set here: options.action and options.resource
   if options.interactive
 
-    Occi::Log.debug "Running is an interactive mode ..."
+    Occi::Log.debug "Running in an interactive mode ..."
 
     # reset action and resource, just to be sure
     options.action = nil
     options.resource = nil
 
     # offer just the resource types we will be able to process
-    menu_resources = ResourceOutputFactory.allowed_resource_types
+    menu_resources = Occi::Api::ResourceOutputFactory.allowed_resource_types
 
     # separate menus from each other
     say("\n")
@@ -295,7 +295,7 @@ begin
   when :list
     found = helper_list options
 
-    valid = ResourceOutputFactory.allowed_resource_types.include? options.resource.to_sym
+    valid = Occi::Api::ResourceOutputFactory.allowed_resource_types.include? options.resource.to_sym
     Occi::Log.error "Not printing, the resource type is not supported!" unless valid
 
     puts output.format(found, :locations, options.resource.to_sym) if valid
@@ -310,7 +310,7 @@ begin
       resource_type = options.resource.to_sym
     end
 
-    valid = ResourceOutputFactory.allowed_resource_types.include? resource_type
+    valid = Occi::Api::ResourceOutputFactory.allowed_resource_types.include? resource_type
     Occi::Log.error "Not printing, the resource type is not supported!" unless valid
 
     puts output.format(found, :resources, resource_type) if valid
