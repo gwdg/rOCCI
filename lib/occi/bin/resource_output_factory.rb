@@ -2,8 +2,7 @@ require 'json'
 require 'erb'
 
 module Occi
-  module Api
-    module Bin
+  module Bin
 
     class ResourceOutputFactory
 
@@ -87,6 +86,5 @@ module Occi
 
     end
 
-    end
   end
 end
