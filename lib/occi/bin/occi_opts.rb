@@ -1,6 +1,6 @@
 require 'ostruct'
 require 'optparse'
-require 'occi/api/bin/resource_output_factory'
+require 'occi/bin/resource_output_factory'
 
 module Occi
   module Bin
