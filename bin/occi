@@ -21,9 +21,9 @@ require 'highline/import'
 require 'openssl'
 
 # OcciOpts, ResourceOutputFactory and Helper are not part of the occi core required above
-require 'occi/api/bin/occi_opts'
-require 'occi/api/bin/resource_output_factory'
-require 'occi/api/bin/helpers'
+require 'occi/bin/occi_opts'
+require 'occi/bin/resource_output_factory'
+require 'occi/bin/helpers'
 
 extend Occi::Api::Dsl
 
