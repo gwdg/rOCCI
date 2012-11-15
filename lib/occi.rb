@@ -33,7 +33,8 @@ require 'occiantlr/OCCIANTLRLexer'
 require 'occiantlr/OCCIANTLRParser'
 
 require 'occi/api/dsl'
-require 'occi/api/client'
+require 'occi/api/client/client_http'
+require 'occi/api/client/client_amqp'
 
 module Occi
 

@@ -4,6 +4,8 @@ require "json"
 
 module Occi
   module Api
+    module Client
+
     class ClientAmqp
       attr_reader :endpoint, :auth_options, :connected, :last_response_status
       attr_accessor :media_type, :model
@@ -65,14 +67,14 @@ module Occi
       # from the server.
       #
       # @example
-      #    Occi::Client.new # => #<Occi::Client>
+      #    Occi::Api::Client::ClientAmqp.new # => #<Occi::Api::Client::ClientAmqp>
       #
       # @param [String] endpoint URI
       # @param [Hash] auth options in a hash
       # @param [Hash] logging options in a hash
       # @param [Boolean] enable autoconnect
       # @param [String] media type identifier
-      # @return [Occi::Client] client instance
+      # @return [Occi::Api::Client::ClientAmqp] client instance
       def initialize(endpoint = "http://localhost:3000/", auth_options = { :type => "none" },
           log_options = { :out => STDERR, :level => Occi::Log::WARN, :logger => nil },
           media_type = "text/plain")
@@ -746,6 +748,9 @@ module Occi
         @endpoint       = endpoint.chomp('/') + '/'
         @endpoint_queue = "amqp.occi.#{@endpoint}"
       end
+
+    end
+
     end
   end
 end

@@ -98,7 +98,7 @@ In your scripts, you can use the OCCI client DSL.
 
 To include the DSL definitions in your script use
 
-    extend Occi::Api::DSL
+    extend Occi::Api::Dsl
 
 To connect to an OCCI endpoint/server (e.g. running on http://localhost:3300/ )
 
@@ -166,9 +166,9 @@ To delete a specific resource use
 If you need low level access to parts of the OCCI client or need to use more than one instance
 at a time, you should use the OCCI client API directly.
 
-To connect to an OCCI endpoint/server (e.g. running on http://localhost:3000/ )
+To connect to an OCCI endpoint/server (e.g. running on http://localhost:3300/ )
 
-    client = Occi::Api::ClientHttp.new('http://localhost:3300',auth||=nil)
+    client = Occi::Api::Client::ClientHttp.new('http://localhost:3300',auth||=nil)
 
 All available categories are automatically registered to the OCCI model during client initialization. You can get them via
 

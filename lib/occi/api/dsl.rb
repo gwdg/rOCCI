@@ -1,14 +1,14 @@
 module Occi
   module Api
-    module DSL
+    module Dsl
 
       def connect(protocol, *args)
 
         case protocol
         when :http 
-          @client = Occi::Api::ClientHttp.new(*args)
+          @client = Occi::Api::Client::ClientHttp.new(*args)
         when :amqp
-          @client = Occi::Api::ClientAmqp.new(*args)
+          @client = Occi::Api::Client::ClientAmqp.new(*args)
         else
           raise "Protocol #{protocol.to_s} is not supported!"
         end
