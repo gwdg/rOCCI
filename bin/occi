@@ -21,14 +21,14 @@ require 'highline/import'
 require 'openssl'
 
 # OcciOpts, ResourceOutputFactory and Helper are not part of the occi core required above
-require 'occi/api/client/occi_opts'
-require 'occi/api/client/resource_output_factory'
-require 'occi/api/client/helpers'
+require 'occi/bin/occi_opts'
+require 'occi/bin/resource_output_factory'
+require 'occi/bin/helpers'
 
-extend Occi::Api::DSL
+extend Occi::Api::Dsl
 
 # get arguments and validate/parse them to an ostruct
-options = Occi::Api::OcciOpts.parse ARGV
+options = Occi::Bin::OcciOpts.parse ARGV
 
 # initialize logger
 logger = Occi::Log.new(options.log[:out])
@@ -36,7 +36,7 @@ logger.level = options.log[:level]
 options.log[:logger] = logger
 
 # initialize output factory
-output = Occi::Api::ResourceOutputFactory.new options.output_format
+output = Occi::Bin::ResourceOutputFactory.new options.output_format
 
 Occi::Log.info "Starting OCCI client ..."
 Occi::Log.debug "Options: #{options}"
@@ -56,7 +56,7 @@ if options.interactive
   choose do |menu|
     menu.prompt = "Which auth method should I use? "
 
-    Occi::Api::OcciOpts::AUTH_METHODS.each do |auth_m|
+    Occi::Bin::OcciOpts::AUTH_METHODS.each do |auth_m|
       menu.choice(auth_m) { options.auth[:type] = auth_m.to_s }
     end
   end
@@ -123,7 +123,7 @@ begin
     options.resource = nil
 
     # offer just the resource types we will be able to process
-    menu_resources = Occi::Api::ResourceOutputFactory.allowed_resource_types
+    menu_resources = Occi::Bin::ResourceOutputFactory.allowed_resource_types
 
     # separate menus from each other
     say("\n")
@@ -295,7 +295,7 @@ begin
   when :list
     found = helper_list options
 
-    valid = Occi::Api::ResourceOutputFactory.allowed_resource_types.include? options.resource.to_sym
+    valid = Occi::Bin::ResourceOutputFactory.allowed_resource_types.include? options.resource.to_sym
     Occi::Log.error "Not printing, the resource type is not supported!" unless valid
 
     puts output.format(found, :locations, options.resource.to_sym) if valid
@@ -310,7 +310,7 @@ begin
       resource_type = options.resource.to_sym
     end
 
-    valid = Occi::Api::ResourceOutputFactory.allowed_resource_types.include? resource_type
+    valid = Occi::Bin::ResourceOutputFactory.allowed_resource_types.include? resource_type
     Occi::Log.error "Not printing, the resource type is not supported!" unless valid
 
     puts output.format(found, :resources, resource_type) if valid
