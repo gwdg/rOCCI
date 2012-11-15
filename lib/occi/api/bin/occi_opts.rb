@@ -1,9 +1,10 @@
 require 'ostruct'
 require 'optparse'
-require 'occi/api/client/resource_output_factory'
+require 'occi/api/bin/resource_output_factory'
 
 module Occi
   module Api
+    module Bin
 
     class OcciOpts
 
@@ -149,7 +150,7 @@ module Occi
 
           opts.on("-o",
                   "--output-format FORMAT",
-                  Occi::Api::ResourceOutputFactory.allowed_formats,
+                  Occi::Api::Bin::ResourceOutputFactory.allowed_formats,
                   "Output format, defaults to human-readable 'plain'") do |output_format|
             options.output_format = output_format
           end
@@ -220,5 +221,6 @@ module Occi
 
     end
 
+    end
   end
 end

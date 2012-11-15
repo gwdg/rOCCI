@@ -5,6 +5,8 @@ require "occi"
 
 module Occi
   module Api
+    module Client
+
     describe ClientAmqp do
 
       it "should do something" do
@@ -13,7 +15,7 @@ module Occi
       end
 =begin
       before(:all) do
-        @client = Occi::Api::ClientAmqp.new("http://localhost:9292/", auth_options = { :type => "none" },
+        @client = Occi::Api::Client::ClientAmqp.new("http://localhost:9292/", auth_options = { :type => "none" },
                                             log_options = { :out => STDERR, :level => Occi::Log::WARN, :logger => nil },
                                             media_type = "application/occi+json")
       end
@@ -139,6 +141,8 @@ module Occi
         list.count.should == 0
       end
 =end
+    end
+
     end
   end
 end
