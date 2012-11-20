@@ -23,7 +23,6 @@ group :development do
   gem "yard-rspec"
   gem "yard-cucumber"
   gem "rspec-http"
-  gem "redcarpet"
   gem "vcr"
   gem "webmock", "=1.8.11"
 end
