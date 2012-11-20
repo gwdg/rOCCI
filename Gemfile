@@ -26,3 +26,7 @@ group :development do
   gem "vcr"
   gem "webmock", "=1.8.11"
 end
+
+platforms :jruby do
+  gem 'jruby-openssl'
+end
