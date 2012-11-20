@@ -3,6 +3,7 @@ require 'occi'
 
 module Occi
   module Api
+    module Client
 
     describe ClientHttp do
 
@@ -11,7 +12,7 @@ module Occi
         use_vcr_cassette "client_http_text_plain"
 
         before(:each) do
-          @client = Occi::Api::ClientHttp.new(
+          @client = Occi::Api::Client::ClientHttp.new(
            'https://localhost:3300',
            { :type  => "none" },
            { :out   => "/dev/null",
@@ -250,5 +251,6 @@ module Occi
 
     end
 
+    end
   end
 end

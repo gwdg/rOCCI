@@ -3,6 +3,8 @@ require 'httparty'
 
 module Occi
   module Api
+    module Client
+
     class ClientHttp
 
       # HTTParty for raw HTTP requests
@@ -66,14 +68,14 @@ module Occi
       # from the server.
       #
       # @example
-      #    Occi::Api::ClientHttp.new # => #<Occi::Api::ClientHttp>
+      #    Occi::Api::Client::ClientHttp.new # => #<Occi::Api::Client::ClientHttp>
       #
       # @param [String] endpoint URI
       # @param [Hash] auth options in a hash
       # @param [Hash] logging options in a hash
       # @param [Boolean] enable autoconnect
       # @param [String] media type identifier
-      # @return [Occi::Api::ClientHttp] client instance
+      # @return [Occi::Api::Client::ClientHttp] client instance
       def initialize(endpoint = "http://localhost:3000/", auth_options = { :type => "none" },
                      log_options = { :out => STDERR, :level => Occi::Log::WARN, :logger => nil },
                      auto_connect = true, media_type = nil)
@@ -868,6 +870,8 @@ module Occi
       def reason_phrase(code)
         HTTP_CODES[code.to_s]
       end
+
+    end
 
     end
   end

@@ -1,3 +1,6 @@
+require 'rspec'
+require 'occi'
+
 module Occi
   module Core
     describe Categories do
