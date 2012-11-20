@@ -19,8 +19,12 @@ module Occi
 
       # subscribe to log messages and send to logger
       @log_subscriber = ActiveSupport::Notifications.subscribe("log") do |name, start, finish, id, payload|
-        @logger.log(payload[:level], payload[:message])
+        @logger.log(payload[:level], payload[:message]) if @logger
       end
+    end
+
+    def close
+      ActiveSupport::Notifications.unsubscribe(@log_subscriber)
     end
 
     # @param [Logger::Severity] severity

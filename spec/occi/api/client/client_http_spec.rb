@@ -22,6 +22,10 @@ module Occi
           )
         end
 
+        after(:each) do
+          @client.logger.close
+        end
+
         it "should establish connection" do
           @client.connected.should be_true
         end

@@ -19,6 +19,7 @@ module Occi
       attr_accessor :media_type
       attr_reader :connected
       attr_accessor :model
+      attr_reader :logger
 
       # hash mapping HTTP response codes to human-readable messages
       HTTP_CODES = {
@@ -549,8 +550,8 @@ module Occi
       # @param [Hash] logger options
       def set_logger(log_options)
         if log_options[:logger].nil? or (not log_options[:logger].kind_of? Occi::Log)
-          logger       = Occi::Log.new(log_options[:out])
-          logger.level = log_options[:level]
+          @logger       = Occi::Log.new(log_options[:out])
+          @logger.level = log_options[:level]
         end
 
         self.class.debug_output $stderr if log_options[:level] == Occi::Log::DEBUG

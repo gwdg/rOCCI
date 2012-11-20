@@ -10,6 +10,7 @@ module Occi
       logger.level = Occi::Log::INFO
       Occi::Log.info("Test")
       r.readline.include?("Test")
+      logger.close
     end
 
   end
