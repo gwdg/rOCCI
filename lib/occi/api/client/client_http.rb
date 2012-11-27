@@ -587,6 +587,12 @@ module Occi
 
             self.class.pem File.read(@auth_options[:user_cert]), @auth_options[:user_cert_password]
             self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil? or @auth_options[:ca_path].empty?
+
+            if @auth_options[:ca_file].nil? or @auth_options[:ca_file].empty?
+              self.class.ssl_ca_file @auth_options[:user_cert]
+            else
+              self.class.ssl_ca_file @auth_options[:ca_file]
+            end
           when "none", nil
             # do nothing
           else

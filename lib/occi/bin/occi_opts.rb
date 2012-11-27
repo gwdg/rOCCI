@@ -32,6 +32,7 @@ module Occi
         options.auth[:user_cert] = ENV['HOME'] + "/.globus/usercred.pem"
         options.auth[:ca_path] = "/etc/grid-security/certificates"
         options.auth[:username] = "anonymous"
+        options.auth[:ca_file] = options.auth[:user_cert]
 
         options.output_format = :plain
         
@@ -81,8 +82,13 @@ module Occi
           end
 
           opts.on("-c",
-                  "--ca-path PATH", String, "Path to CA certificates, defaults to '#{options.auth[:ca_path]}'") do |ca_path|
+                  "--ca-path PATH", String, "Path to CA certificates directory, defaults to '#{options.auth[:ca_path]}'") do |ca_path|
             options.auth[:ca_path] = ca_path
+          end
+
+          opts.on("-f",
+                  "--ca-file PATH", String, "Path to CA certificates in a file, defaults to '#{options.auth[:ca_file]}'") do |ca_file|
+            options.auth[:ca_file] = ca_file
           end
 
           opts.on("-x",
