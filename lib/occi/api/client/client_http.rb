@@ -1,5 +1,7 @@
 require 'rubygems'
 require 'httparty'
+require 'occi/api/client/net_http_fix'
+require 'occi/api/client/httparty_fix'
 
 module Occi
   module Api
@@ -9,6 +11,7 @@ module Occi
 
       # HTTParty for raw HTTP requests
       include HTTParty
+
       # TODO: uncomment the following line as JSON is properly implemented in OpenStack
       # headers 'Accept' => 'application/occi+json,text/plain;q=0.8,text/occi;q=0.2'
       headers 'Accept' => 'text/plain,text/occi;q=0.2'
