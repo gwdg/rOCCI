@@ -1,7 +1,8 @@
 require 'rubygems'
 require 'httparty'
-require 'occi/api/client/net_http_fix'
-require 'occi/api/client/httparty_fix'
+require 'openssl'
+require 'occi/api/client/http/net_http_fix'
+require 'occi/api/client/http/httparty_fix'
 
 module Occi
   module Api
@@ -590,17 +591,23 @@ module Occi
 
             self.class.pem File.read(@auth_options[:user_cert]), @auth_options[:user_cert_password]
             self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil? or @auth_options[:ca_path].empty?
-
-            if @auth_options[:ca_file].nil? or @auth_options[:ca_file].empty?
-              self.class.ssl_ca_file @auth_options[:user_cert]
-            else
-              self.class.ssl_ca_file @auth_options[:ca_file]
-            end
+            self.class.ssl_ca_file @auth_options[:ca_file] unless @auth_options[:ca_file].nil? or @auth_options[:ca_file].empty?
+            self.class.ssl_proxy_ca chain_to_file_array(@auth_options[:proxy_ca]) unless @auth_options[:proxy_ca].nil? or @auth_options[:proxy_ca].empty?
           when "none", nil
             # do nothing
           else
             raise ArgumentError, "Unknown AUTH method [#{@auth_options[:type]}]!"
         end
+      end
+
+      # Reads X.509 certificates from a file to an array.
+      #
+      # @example
+      #
+      # @param [String]
+      # @return [Array<File>]
+      def chain_to_file_array(ca_file)
+        [] << File.read(ca_file)
       end
 
       # Performs GET request and parses the responses to collections.
