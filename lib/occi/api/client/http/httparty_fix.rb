@@ -15,10 +15,10 @@ module HTTParty
         end
 
         # Set chain of client certificates
-        if options[:ssl_proxy_ca]
+        if options[:ssl_extra_chain_cert]
           http.extra_chain_cert = []
 
-          options[:ssl_proxy_ca].each do |p_ca|
+          options[:ssl_extra_chain_cert].each do |p_ca|
             http.extra_chain_cert << OpenSSL::X509::Certificate.new(p_ca)
           end
         end
@@ -45,8 +45,8 @@ module HTTParty
 
   module ClassMethods
 
-    def ssl_proxy_ca(array_of_certs)
-      default_options[:ssl_proxy_ca] = array_of_certs
+    def ssl_extra_chain_cert(ary_of_certs)
+      default_options[:ssl_extra_chain_cert] = ary_of_certs
     end
 
   end
