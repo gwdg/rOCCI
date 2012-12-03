@@ -1,5 +1,7 @@
 require 'rubygems'
 require 'httparty'
+require 'occi/api/client/http/net_http_fix'
+require 'occi/api/client/http/httparty_fix'
 
 module Occi
   module Api
@@ -9,6 +11,7 @@ module Occi
 
       # HTTParty for raw HTTP requests
       include HTTParty
+
       # TODO: uncomment the following line as JSON is properly implemented in OpenStack
       # headers 'Accept' => 'application/occi+json,text/plain;q=0.8,text/occi;q=0.2'
       headers 'Accept' => 'text/plain,text/occi;q=0.2'
@@ -586,12 +589,27 @@ module Occi
             raise ArgumentError, "The file specified in 'user_cert' does not exist!" unless File.exists? @auth_options[:user_cert]
 
             self.class.pem File.read(@auth_options[:user_cert]), @auth_options[:user_cert_password]
-            self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil? or @auth_options[:ca_path].empty?
+            self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil?
+            self.class.ssl_ca_file @auth_options[:ca_file] unless @auth_options[:ca_file].nil?
+            self.class.ssl_extra_chain_cert certs_to_file_ary(@auth_options[:proxy_ca]) unless @auth_options[:proxy_ca].nil?
           when "none", nil
             # do nothing
           else
             raise ArgumentError, "Unknown AUTH method [#{@auth_options[:type]}]!"
         end
+      end
+
+      # Reads X.509 certificates from a file to an array.
+      #
+      # @example
+      #    certs_to_file_ary "~/.globus/usercert.pem"
+      #      # => [#<String>, #<String>, ...]
+      #
+      # @param [String] Path to a PEM file containing certificates 
+      # @return [Array<String>] An array of read certificates
+      def certs_to_file_ary(ca_file)
+        # TODO: read and separate multiple certificates
+        [] << File.read(ca_file)
       end
 
       # Performs GET request and parses the responses to collections.
