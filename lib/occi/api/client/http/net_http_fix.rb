@@ -2,6 +2,9 @@
 ## Net::HTTP hack allowing the use of X.509 proxy certificates.
 ##############################################################################
 
+# When running Ruby 1.8.x, RUBY_ENGINE is not defined
+RUBY_ENGINE = "ruby" unless defined? RUBY_ENGINE
+
 # detect jRuby
 if RUBY_ENGINE == 'jruby'
   #TODO: add jRuby support, this doesn't work
