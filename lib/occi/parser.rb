@@ -19,6 +19,9 @@ module Occi
       Occi::Log.debug '### Parsing request data to OCCI Collection ###'
       collection = Occi::Collection.new
 
+      # remove trailing HTTP_ prefix if present
+      header = Hash[header.map {|k, v| [k.gsub('HTTP_',''), v] }]
+
       category ? collection = self.header_categories(header) : collection = self.header_entity(header, entity_type)
 
       case media_type
