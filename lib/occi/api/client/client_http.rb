@@ -23,6 +23,7 @@ module Occi
       attr_reader :connected
       attr_accessor :model
       attr_reader :logger
+      attr_reader :last_response
 
       # hash mapping HTTP response codes to human-readable messages
       HTTP_CODES = {
@@ -876,6 +877,7 @@ module Occi
       # @param [HTTParty::Response] HTTParty response object
       # @return [String] message
       def response_message(response)
+        @last_response = response
         'HTTP Response status: [' + response.code.to_s + '] ' + reason_phrase(response.code)
       end
 
