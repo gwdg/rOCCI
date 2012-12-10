@@ -12,13 +12,15 @@ module Occi
 
 
             @client = Occi::Api::Client::ClientHttp.new(
-             'http://141.5.99.82',
+             'http://141.5.99.69', #141.5.99.69 #141.5.99.82
              { :type  => "none" },
              { :out   => "/dev/null",
                :level => Occi::Log::DEBUG },
              true,
              "application/occi+json"#"text/plain,text/occi"
             )
+
+
 
 
 
@@ -258,6 +260,22 @@ module Occi
 
             it "should replaced the description of the OCCI Resource on the OCCI Server" do
 
+            end
+          end
+
+          #TD/OCCI/CORE/DELETE/002
+          describe "Delete all OCCI Resources belonging to an OCCI Kind" do
+            it "should send a HTTP DELETE request" do
+              @client.delete "compute"
+            end
+
+            it "should receipt a HTTP 200 (OK) response" do
+              @client.last_response.code.should == 200
+            end
+
+            it "should has deleted all OCCI Resource belonging to the OCCI Kind" do
+              uri_list = @client.list "compute"
+              uri_list.should be_empty
             end
           end
         end
