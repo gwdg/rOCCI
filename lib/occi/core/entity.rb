@@ -77,14 +77,17 @@ module Occi
 
       # @param [Array] mixins
       def mixins=(mixins)
-        @checked = false
-        @mixins  = mixins
+        @mixins = Occi::Core::Mixins.new mixins
       end
 
       # @param [Occi::Core::Attributes] attributes
       def attributes=(attributes)
-        @checked    = false
-        @attributes = attributes
+        @attributes = Occi::Core::Attributes.new attributes
+      end
+
+      # @param [Occi::Core::Actions] actions
+      def actions=(actions)
+        @actions = Occi::Core::Actions.new actions
       end
 
       # set id for entity
