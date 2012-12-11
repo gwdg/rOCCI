@@ -25,8 +25,8 @@ When /^OCCI Client request all OCCI Categories supported by the OCCI Server$/ do
   )
 end
 
-Then /^the Client should have the response code "([^"]*)"$/ do |arg|
-  @client.last_response.code.should == 200
+Then /^the Client should have the response code (.*)$/ do |response_code|
+  @client.last_response.code.should == response_code.to_i
 end
 
 Then /^OCCI Client should display the OCCI Categories received from the OCCI Server$/ do
