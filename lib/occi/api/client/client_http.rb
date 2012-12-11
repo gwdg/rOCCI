@@ -655,7 +655,7 @@ module Occi
         end
 
         Occi::Log.debug "Parser call: #{response.content_type} #{entity_type} #{path.include?('-/')}"
-        collection = Occi::Parser.parse(response.content_type, response.body, path.include?('-/'), entity_type)
+        collection = Occi::Parser.parse(response.content_type, response.body, path.include?('-/'), entity_type, response.headers)
 
         Occi::Log.debug "Parsed collection: empty? #{collection.empty?}"
         collection
