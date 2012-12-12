@@ -22,7 +22,9 @@ module Occi
         options.log = {}
         options.log[:out] = STDERR
         options.log[:level] = Occi::Log::WARN
-        
+
+        options.dump_model = false
+
         options.interactive = false
 
         options.endpoint = "https://localhost:3300/"
@@ -165,6 +167,12 @@ module Occi
             options.output_format = output_format
           end
 
+          opts.on_tail("-m",
+                       "--dump-model",
+                       "Contact the endpoint and dump its model") do |dump_model|
+            options.dump_model = dump_model
+          end
+
           opts.on_tail("-d",
                        "--debug",
                        "Enable debugging messages") do |debug|
@@ -203,7 +211,14 @@ module Occi
           exit!
         end
 
-        if not options.interactive
+        if options.interactive && options.dump_model
+          puts "You cannot use '--dump-model' and '--interactive' at the same time!"
+          puts opts
+
+          exit!
+        end
+
+        if !(options.interactive or options.dump_model)
           mandatory = []
 
           if options.action == :trigger
@@ -222,6 +237,7 @@ module Occi
           if not missing.empty?
             puts "Missing required arguments: #{missing.join(', ')}"
             puts opts
+
             exit!
           end
         end
