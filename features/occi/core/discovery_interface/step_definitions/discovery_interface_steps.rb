@@ -17,8 +17,6 @@ Given /^category filter : (.*)$/ do |category_filter|
 end
 
 When /^OCCI Client request all OCCI Categories supported by the OCCI Server$/ do
-  require 'occi'
-
   @client = Occi::Api::Client::ClientHttp.new(
       @endpoint, #141.5.99.69 #11.5.99.82
       { :type  => "none" },
