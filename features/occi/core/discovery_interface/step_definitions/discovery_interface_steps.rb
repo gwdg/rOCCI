@@ -1,15 +1,19 @@
-Given /^I use endpoint (.*)$/ do |endpoint|
+Given /^endpoint : (.*)$/ do |endpoint|
   @endpoint = endpoint
   @endpoint =~ URI::ABS_URI
   @endpoint.should_not be_nil
 end
 
-Given /^as protocol (http|amqp)$/ do |protocol|
+Given /^transfer_protocol : (http|amqp)$/ do |protocol|
   @transfer_protocol = protocol
 end
 
-Given /^the clients accept type is (text\/occi|text\/plain|application\/json)$/ do |accept_type|
+Given /^accept type : (text\/occi|text\/plain|application\/json)$/ do |accept_type|
   @accept_type = accept_type
+end
+
+Given /^category filter : (.*)$/ do |category_filter|
+  @category_filter = category_filter
 end
 
 When /^OCCI Client request all OCCI Categories supported by the OCCI Server$/ do
@@ -23,6 +27,12 @@ When /^OCCI Client request all OCCI Categories supported by the OCCI Server$/ do
       true,
       @accept_type#"text/plain,text/occi"
   )
+  if @category_filter.length > 0
+    @category_filter   = @category_filter.pluralize
+    @selected_category = @client.model.send @category_filter.to_sym
+    @selected_category.should have_at_least(1).bla
+    pending
+  end
 end
 
 Then /^the Client should have the response code (.*)$/ do |response_code|
@@ -37,9 +47,3 @@ Then /^OCCI Client should display the OCCI Categories received from the OCCI Ser
   @client.model.links    .should be_empty
   @client.model.resources.should be_empty
 end
-
-#Given /^select "([^"]*)" Category from the OCCI Server$/ do |category|
-#  category = category.pluralize
-#  @selected_category = @client.model.send category.to_sym
-#  @selected_category.should have_at_least(1).bla
-#end

@@ -6,18 +6,21 @@ Feature: Discovery Interface
   I want to receive all OCCI Categories supported by the OCCI Server
 
   Scenario Outline: Retrieving all OCCI Categories supported by the OCCI Server
-    Given I use endpoint <endpoint>
-    And as protocol <protocol>
-    And the clients accept type is <accept_type>
+    Given endpoint : <endpoint>
+    And transfer_protocol : <protocol>
+    And accept type : <accept_type>
+    And category filter : <category_filter>
     When OCCI Client request all OCCI Categories supported by the OCCI Server
     Then the Client should have the response code <response_code>
     And OCCI Client should display the OCCI Categories received from the OCCI Server
 
   Scenarios:
-   | protocol | endpoint                  | accept_type | response_code |
-   | http     | http://141.5.99.69/       | text/occi   |      200      |
-   | http     | http://141.5.99.69/       | text/plain  |      200      |
-   | http     | http://46.231.128.85:8086/| text/occi   |      200      |
+  | protocol | endpoint                  | accept_type       | response_code | category_filter |
+  | http     | http://141.5.99.69/       | application/json  |      200      |                 |
+  | http     | http://141.5.99.69/       | text/occi         |      200      |                 |
+  | http     | http://141.5.99.69/       | text/plain        |      200      |                 |
+  | http     | http://46.231.128.85:8086/| text/occi         |      200      |                 |
+  | http     | http://141.5.99.69/       | text/plain        |      200      | action          |
 
   #Scenario: Retrieving the OCCI Categories with an OCCI Category filter from the OCCI Server
   #  Given an "http" OCCI Server with endpoint "http://141.5.99.69/"
