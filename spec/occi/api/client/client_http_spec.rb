@@ -6,7 +6,6 @@ module Occi
     module Client
 
     describe ClientHttp do
-=begin
       describe "using media type text/plain" do
 
         use_vcr_cassette "client_http_text_plain"
@@ -252,7 +251,6 @@ module Occi
         end
 
       end
-=end
     end
 
     end
