@@ -10,6 +10,7 @@ Feature: Discovery Interface
     And transfer_protocol : <protocol>
     And accept type : <accept_type>
     And category filter : <category_filter>
+    And have an initialize Client
     When OCCI Client request all OCCI Categories supported by the OCCI Server
     Then the Client should have the response code <response_code>
     And OCCI Client should display the OCCI Categories received from the OCCI Server

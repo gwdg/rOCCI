@@ -16,9 +16,7 @@ Given /^category filter : (.*)$/ do |category_filter|
   @category_filter = category_filter
 end
 
-When /^OCCI Client request all OCCI Categories supported by the OCCI Server$/ do
-  require 'occi'
-
+Given /^have an initialize Client$/ do
   @client = Occi::Api::Client::ClientHttp.new(
       @endpoint, #141.5.99.69 #11.5.99.82
       { :type  => "none" },
@@ -27,11 +25,16 @@ When /^OCCI Client request all OCCI Categories supported by the OCCI Server$/ do
       true,
       @accept_type#"text/plain,text/occi"
   )
+end
+
+When /^OCCI Client request all OCCI Categories supported by the OCCI Server$/ do
   if @category_filter.length > 0
     @category_filter   = @category_filter.pluralize
     @selected_category = @client.model.send @category_filter.to_sym
     @selected_category.should have_at_least(1).bla
     pending
+  else
+    @client.refresh
   end
 end
 
