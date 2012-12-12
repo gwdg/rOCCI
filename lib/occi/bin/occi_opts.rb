@@ -7,7 +7,7 @@ module Occi
 
     class OcciOpts
 
-      AUTH_METHODS = [:x509, :basic, :digest, :none].freeze
+      AUTH_METHODS = [:x509, :basic, :digest, :keystone, :none].freeze
       MEDIA_TYPES = ["application/occi+json", "application/occi+xml", "text/plain,text/occi", "text/plain"].freeze
       ACTIONS = [:list, :describe, :create, :delete, :trigger].freeze
       LOG_OUTPUTS = [:stdout, :stderr].freeze
