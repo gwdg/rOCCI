@@ -30,3 +30,8 @@ end
 Then /^the Client should have the response code (.*)$/ do |response_code|
   @client.last_response.code.should == response_code.to_i
 end
+
+When /^OCCI Kind (.*) is selected$/ do |occi_kind_identifier|
+  @selected_kind = @client.model.kinds.select{ |kind| kind.type_identifier == occi_kind_identifier}.first
+  @selected_kind.should_not be_nil
+end

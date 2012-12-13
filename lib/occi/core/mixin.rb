@@ -25,6 +25,10 @@ module Occi
         location.blank? ? @location = '/mixins/' + term + '/' : @location = location
       end
 
+      def location
+        @location.clone
+      end
+
       # @param [Hash] options
       # @return [Hashie::Mash] json representation
       def as_json(options={ })

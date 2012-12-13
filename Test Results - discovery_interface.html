@@ -572,8 +572,8 @@ jQuery.cookie = function(name, value, options) {
 <body>
 <div id="container">
 <div id="header">
-<div class="time">20.93 s</div>
-<h1>discovery_interface: <strong><span class="total">18 total, </span><span class="error">3 error, </span><span class="ignored">3 ignored, </span><span class="passed">12 passed</span></strong>
+<div class="time">1 m 20 s</div>
+<h1>discovery_interface: <strong><span class="total">40 total, </span><span class="failed">2 failed, </span><span class="ignored">9 ignored, </span><span class="passed">29 passed</span></strong>
 </h1>
 <div id="treecontrol">
 <ul>
@@ -591,252 +591,306 @@ jQuery.cookie = function(name, value, options) {
 <ul id="tree">
 <li xmlns="" class="level top failed open">
 <span><em class="time">
-<div class="time">20.93 s</div>
+<div class="time">1 m 20 s</div>
 </em>Feature: Discovery Interface</span>
 <ul>
 <li class="level suite failed open">
 <span><em class="time">
-<div class="time">20.93 s</div>
+<div class="time">1 m 20 s</div>
 </em>Scenario Outline: Retrieving all OCCI Categories supported by the OCCI Server</span>
 <ul>
 <li class="level suite failed open">
 <span><em class="time">
-<div class="time">20.93 s</div>
+<div class="time">1 m 20 s</div>
 </em>Scenarios: </span>
 <ul>
-<li class="level suite failed open">
+<li class="level suite open">
 <span><em class="time">
-<div class="time">2.80 s</div>
-</em>Scenario: Line: 18</span>
-<ul>
-<li class="level test">
-<span><em class="time">
-<div class="time">11 ms</div>
-</em><em class="status">passed</em>Given  I use endpoint http://141.5.99.69/</span>
-</li>
-<li class="level test">
-<span><em class="time">
-<div class="time">12 ms</div>
-</em><em class="status">passed</em>And  as protocol http</span>
-</li>
-<li class="level test">
-<span><em class="time">
-<div class="time">12 ms</div>
-</em><em class="status">passed</em>And  the clients accept type is text/occi</span>
-</li>
-<li class="level test">
-<span><em class="time">
-<div class="time">921 ms</div>
-</em><em class="status">passed</em>When  OCCI Client request all OCCI Categories supported by the OCCI Server</span>
-</li>
-<li class="level test failed open">
-<span><em class="time">
-<div class="time">922 ms</div>
-</em><em class="status">error</em>Then  the Client should have the response code 200</span>
-<ul>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout"> <br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout">You can implement step definitions for undefined steps with these snippets:<br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout">Then /^the Client should have the response code (\d+)$/ do |arg1|<br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout">  pending # express the regexp above with the code you wish you had<br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout">end<br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stderr">opening connection to 141.5.99.69...<br/></span>
-</li>
-</ul>
-</li>
-<li class="level test ignored open">
-<span><em class="time">
-<div class="time">923 ms</div>
-</em><em class="status">ignored</em>And  OCCI Client should display the OCCI Categories received from the OCCI Server</span>
-<ul>
-<li class="text">
-<span class="stdout">Skipped step<br/></span>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="level suite failed open">
-<span><em class="time">
-<div class="time">7.60 s</div>
-</em>Scenario: Line: 19</span>
-<ul>
-<li class="level test">
-<span><em class="time">
-<div class="time">924 ms</div>
-</em><em class="status">passed</em>Given  I use endpoint http://141.5.99.69</span>
-</li>
-<li class="level test">
-<span><em class="time">
-<div class="time">924 ms</div>
-</em><em class="status">passed</em>And  as protocol http</span>
-</li>
-<li class="level test">
-<span><em class="time">
-<div class="time">925 ms</div>
-</em><em class="status">passed</em>And  the clients accept type is text/plain</span>
-</li>
-<li class="level test">
-<span><em class="time">
-<div class="time">1.61 s</div>
-</em><em class="status">passed</em>When  OCCI Client request all OCCI Categories supported by the OCCI Server</span>
-</li>
-<li class="level test failed open">
-<span><em class="time">
-<div class="time">1.61 s</div>
-</em><em class="status">error</em>Then  the Client should have the response code 200</span>
-<ul>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout"> <br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout">You can implement step definitions for undefined steps with these snippets:<br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout">Then /^the Client should have the response code (\d+)$/ do |arg1|<br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout">  pending # express the regexp above with the code you wish you had<br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout">end<br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-</ul>
-</li>
-<li class="level test ignored open">
-<span><em class="time">
-<div class="time">1.61 s</div>
-</em><em class="status">ignored</em>And  OCCI Client should display the OCCI Categories received from the OCCI Server</span>
-<ul>
-<li class="text">
-<span class="stdout">Skipped step<br/></span>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="level suite failed open">
-<span><em class="time">
-<div class="time">10.53 s</div>
+<div class="time">4.57 s</div>
 </em>Scenario: Line: 20</span>
 <ul>
 <li class="level test">
 <span><em class="time">
-<div class="time">1.61 s</div>
-</em><em class="status">passed</em>Given  I use endpoint http://46.231.128.85:8086/</span>
-<ul>
-<li class="text">
-<span class="stdout"></span>
+<div class="time">13 ms</div>
+</em><em class="status">passed</em>Given  endpoint : http://141.5.99.69/</span>
 </li>
-<li class="text">
-<span class="stderr">opening connection to 46.231.128.85...<br/></span>
+<li class="level test">
+<span><em class="time">
+<div class="time">13 ms</div>
+</em><em class="status">passed</em>And  transfer_protocol : http</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">14 ms</div>
+</em><em class="status">passed</em>And  accept type : application/json</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">14 ms</div>
+</em><em class="status">passed</em>And  category filter : </span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">831 ms</div>
+</em><em class="status">passed</em>And  have an initialize Client</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">1.20 s</div>
+</em><em class="status">passed</em>When  OCCI Client request all OCCI Categories supported by the OCCI Server</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">1.20 s</div>
+</em><em class="status">passed</em>Then  the Client should have the response code 200</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">1.28 s</div>
+</em><em class="status">passed</em>And  OCCI Client should display the OCCI Categories received from the OCCI Server</span>
 </li>
 </ul>
 </li>
+<li class="level suite failed open">
+<span><em class="time">
+<div class="time">12.01 s</div>
+</em>Scenario: Line: 21</span>
+<ul>
 <li class="level test">
 <span><em class="time">
-<div class="time">1.61 s</div>
-</em><em class="status">passed</em>And  as protocol http</span>
+<div class="time">1.29 s</div>
+</em><em class="status">passed</em>Given  endpoint : http://141.5.99.69/</span>
 </li>
 <li class="level test">
 <span><em class="time">
-<div class="time">1.61 s</div>
-</em><em class="status">passed</em>And  the clients accept type is text/occi</span>
+<div class="time">1.29 s</div>
+</em><em class="status">passed</em>And  transfer_protocol : http</span>
 </li>
 <li class="level test">
 <span><em class="time">
-<div class="time">1.90 s</div>
-</em><em class="status">passed</em>When  OCCI Client request all OCCI Categories supported by the OCCI Server</span>
+<div class="time">1.29 s</div>
+</em><em class="status">passed</em>And  accept type : text/occi</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">1.29 s</div>
+</em><em class="status">passed</em>And  category filter : </span>
 </li>
 <li class="level test failed open">
 <span><em class="time">
-<div class="time">1.90 s</div>
-</em><em class="status">error</em>Then  the Client should have the response code 200</span>
+<div class="time">1.72 s</div>
+</em><em class="status">failed</em>And  have an initialize Client</span>
 <ul>
 <li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout"> <br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout">You can implement step definitions for undefined steps with these snippets:<br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout">Then /^the Client should have the response code (\d+)$/ do |arg1|<br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout">  pending # express the regexp above with the code you wish you had<br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
-</li>
-<li class="text">
-<span class="stdout">end<br/></span>
-</li>
-<li class="text">
-<span class="stdout"></span>
+<span class="stderr">NoMethodError: undefined method `+&#39; for nil:NilClass<br/>./lib/occiantlr/OCCIANTLRParser.rb:352:in `category_value&#39;<br/>./lib/occiantlr/OCCIANTLRParser.rb:158:in `category&#39;<br/>./lib/occi/parser.rb:76:in `block in header_categories&#39;<br/>./lib/occi/parser.rb:75:in `each&#39;<br/>./lib/occi/parser.rb:75:in `header_categories&#39;<br/>./lib/occi/parser.rb:25:in `parse&#39;<br/>./lib/occi/api/client/client_http.rb:658:in `get&#39;<br/>./lib/occi/api/client/client_http.rb:814:in `set_model&#39;<br/>./lib/occi/api/client/client_http.rb:110:in `initialize&#39;<br/>./features/common/step_definitions/common_steps.rb:20:in `new&#39;<br/>./features/common/step_definitions/common_steps.rb:20:in `/^have an initialize Client$/&#39;<br/>./features/occi/core/discovery_interface/discovery_interface.feature:13:in `And have an initialize Client&#39;<br/></span>
 </li>
 </ul>
 </li>
 <li class="level test ignored open">
 <span><em class="time">
-<div class="time">1.90 s</div>
+<div class="time">1.72 s</div>
+</em><em class="status">ignored</em>When  OCCI Client request all OCCI Categories supported by the OCCI Server</span>
+<ul>
+<li class="text">
+<span class="stdout">Skipped step<br/></span>
+</li>
+</ul>
+</li>
+<li class="level test ignored open">
+<span><em class="time">
+<div class="time">1.72 s</div>
+</em><em class="status">ignored</em>Then  the Client should have the response code 200</span>
+<ul>
+<li class="text">
+<span class="stdout">Skipped step<br/></span>
+</li>
+</ul>
+</li>
+<li class="level test ignored open">
+<span><em class="time">
+<div class="time">1.72 s</div>
+</em><em class="status">ignored</em>And  OCCI Client should display the OCCI Categories received from the OCCI Server</span>
+<ul>
+<li class="text">
+<span class="stdout">Skipped step<br/></span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="level suite open">
+<span><em class="time">
+<div class="time">16.68 s</div>
+</em>Scenario: Line: 22</span>
+<ul>
+<li class="level test">
+<span><em class="time">
+<div class="time">1.72 s</div>
+</em><em class="status">passed</em>Given  endpoint : http://141.5.99.69/</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">1.72 s</div>
+</em><em class="status">passed</em>And  transfer_protocol : http</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">1.72 s</div>
+</em><em class="status">passed</em>And  accept type : text/plain</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">1.72 s</div>
+</em><em class="status">passed</em>And  category filter : </span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">2.20 s</div>
+</em><em class="status">passed</em>And  have an initialize Client</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">2.52 s</div>
+</em><em class="status">passed</em>When  OCCI Client request all OCCI Categories supported by the OCCI Server</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">2.54 s</div>
+</em><em class="status">passed</em>Then  the Client should have the response code 200</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">2.54 s</div>
+</em><em class="status">passed</em>And  OCCI Client should display the OCCI Categories received from the OCCI Server</span>
+</li>
+</ul>
+</li>
+<li class="level suite failed open">
+<span><em class="time">
+<div class="time">21.84 s</div>
+</em>Scenario: Line: 23</span>
+<ul>
+<li class="level test">
+<span><em class="time">
+<div class="time">2.54 s</div>
+</em><em class="status">passed</em>Given  endpoint : http://46.231.128.85:8086/</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">2.54 s</div>
+</em><em class="status">passed</em>And  transfer_protocol : http</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">2.54 s</div>
+</em><em class="status">passed</em>And  accept type : text/occi</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">2.54 s</div>
+</em><em class="status">passed</em>And  category filter : </span>
+</li>
+<li class="level test failed open">
+<span><em class="time">
+<div class="time">2.92 s</div>
+</em><em class="status">failed</em>And  have an initialize Client</span>
+<ul>
+<li class="text">
+<span class="stderr">NoMethodError: undefined method `+&#39; for nil:NilClass<br/>./lib/occi/core/category.rb:78:in `type_identifier&#39;<br/>./lib/occi/collection.rb:70:in `block in merge&#39;<br/>/Users/msrba/.rvm/rubies/ruby-1.9.3-p194/lib/ruby/1.9.1/set.rb:222:in `block in each&#39;<br/>/Users/msrba/.rvm/rubies/ruby-1.9.3-p194/lib/ruby/1.9.1/set.rb:222:in `each_key&#39;<br/>/Users/msrba/.rvm/rubies/ruby-1.9.3-p194/lib/ruby/1.9.1/set.rb:222:in `each&#39;<br/>./lib/occi/collection.rb:70:in `select&#39;<br/>./lib/occi/collection.rb:70:in `merge&#39;<br/>./lib/occi/collection.rb:63:in `merge!&#39;<br/>./lib/occi/model.rb:51:in `register_collection&#39;<br/>./lib/occi/model.rb:8:in `initialize&#39;<br/>./lib/occi/api/client/client_http.rb:815:in `new&#39;<br/>./lib/occi/api/client/client_http.rb:815:in `set_model&#39;<br/>./lib/occi/api/client/client_http.rb:110:in `initialize&#39;<br/>./features/common/step_definitions/common_steps.rb:20:in `new&#39;<br/>./features/common/step_definitions/common_steps.rb:20:in `/^have an initialize Client$/&#39;<br/>./features/occi/core/discovery_interface/discovery_interface.feature:13:in `And have an initialize Client&#39;<br/></span>
+</li>
+</ul>
+</li>
+<li class="level test ignored open">
+<span><em class="time">
+<div class="time">2.92 s</div>
+</em><em class="status">ignored</em>When  OCCI Client request all OCCI Categories supported by the OCCI Server</span>
+<ul>
+<li class="text">
+<span class="stderr">opening connection to 141.5.99.69...<br/></span>
+</li>
+<li class="text">
+<span class="stdout">Skipped step<br/></span>
+</li>
+</ul>
+</li>
+<li class="level test ignored open">
+<span><em class="time">
+<div class="time">2.92 s</div>
+</em><em class="status">ignored</em>Then  the Client should have the response code 200</span>
+<ul>
+<li class="text">
+<span class="stdout">Skipped step<br/></span>
+</li>
+</ul>
+</li>
+<li class="level test ignored open">
+<span><em class="time">
+<div class="time">2.92 s</div>
+</em><em class="status">ignored</em>And  OCCI Client should display the OCCI Categories received from the OCCI Server</span>
+<ul>
+<li class="text">
+<span class="stdout">Skipped step<br/></span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="level suite ignored open">
+<span><em class="time">
+<div class="time">25.22 s</div>
+</em>Scenario: Line: 24</span>
+<ul>
+<li class="level test">
+<span><em class="time">
+<div class="time">2.92 s</div>
+</em><em class="status">passed</em>Given  endpoint : http://141.5.99.69/</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">2.92 s</div>
+</em><em class="status">passed</em>And  transfer_protocol : http</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">2.92 s</div>
+</em><em class="status">passed</em>And  accept type : text/plain</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">2.92 s</div>
+</em><em class="status">passed</em>And  category filter : action</span>
+</li>
+<li class="level test">
+<span><em class="time">
+<div class="time">3.38 s</div>
+</em><em class="status">passed</em>And  have an initialize Client</span>
+</li>
+<li class="level test ignored open">
+<span><em class="time">
+<div class="time">3.38 s</div>
+</em><em class="status">ignored</em>When  OCCI Client request all OCCI Categories supported by the OCCI Server</span>
+<ul>
+<li class="text">
+<span class="stdout">TODO (Cucumber::Pending exception)<br/></span>
+</li>
+<li class="text">
+<span class="stderr">./features/occi/core/discovery_interface/step_definitions/discovery_interface_steps.rb:6:in `/^OCCI Client request all OCCI Categories supported by the OCCI Server$/&#39;<br/>./features/occi/core/discovery_interface/discovery_interface.feature:14:in `When OCCI Client request all OCCI Categories supported by the OCCI Server&#39;<br/></span>
+</li>
+</ul>
+</li>
+<li class="level test ignored open">
+<span><em class="time">
+<div class="time">3.39 s</div>
+</em><em class="status">ignored</em>Then  the Client should have the response code 200</span>
+<ul>
+<li class="text">
+<span class="stdout">Skipped step<br/></span>
+</li>
+</ul>
+</li>
+<li class="level test ignored open">
+<span><em class="time">
+<div class="time">3.39 s</div>
 </em><em class="status">ignored</em>And  OCCI Client should display the OCCI Categories received from the OCCI Server</span>
 <ul>
 <li class="text">
@@ -856,7 +910,7 @@ jQuery.cookie = function(name, value, options) {
 </div>
 </div>
 <div id="footer">
-<p>Generated by JetBrains RubyMine on 11.12.12 23:23</p>
+<p>Generated by JetBrains RubyMine on 12.12.12 11:42</p>
 </div>
 </body>
 </html>
