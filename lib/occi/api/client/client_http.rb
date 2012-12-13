@@ -483,21 +483,11 @@ module Occi
       # @return [Boolean] status
       def delete(resource_type_identifier)
         # convert type to type identifier
-        if @model.kinds.select { |kind| kind.term == resource_type_identifier }.any?
-          type_identifier          = @model.kinds.select {
-            |kind| kind.term == resource_type_identifier
-          }.first.type_identifier
-
-          location                 = @model.get_by_id(type_identifier).location
-          resource_type_identifier = @endpoint + location
-        end
-
-        # check some basic pre-conditions
         raise "Endpoint is not connected!" unless @connected
-        raise "Unknown resource identifier! #{resource_type_identifier}" unless resource_type_identifier.start_with? @endpoint
 
-        # make the request
-        del(sanitize_resource_link(resource_type_identifier))
+        path = path_for_resource_type resource_type_identifier
+
+        del path
       end
 
       # Triggers given action on a specific resource.
@@ -802,6 +792,34 @@ module Occi
         raise "Resource link #{resource_link} is not valid!" unless resource_link.start_with? @endpoint
 
         resource_link.gsub @endpoint, '/'
+      end
+
+      # @describe find the path for the resource type identifier
+      #
+      # @example
+      #
+      #
+      # @param [String] resource_type_identifier
+      #
+      # @return [String]
+      def path_for_resource_type(resource_type_identifier)
+        if resource_type_identifier.nil? || resource_type_identifier == "/"
+          #we got all
+          path = "/"
+        else
+          kinds = @model.kinds.select { |kind| kind.term == resource_type_identifier }
+          if kinds.any?
+            #we got an type identifier
+            path = "/" + kinds.first.type_identifier.split('#').last + "/"
+          elsif resource_type_identifier.start_with? @endpoint
+            #we got an resource link
+            path = sanitize_resource_link(resource_type_identifier)
+          else
+            raise "Unknown resource identifier! #{resource_type_identifier}"
+          end
+        end
+
+        path
       end
 
       # Creates an Occi::Model from data retrieved from the server.
