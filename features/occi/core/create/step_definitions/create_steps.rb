@@ -1,8 +1,9 @@
 After do |scenario|
-  if @uri.lenght > 0
+   if @uri.length > 0
     #delete the created resource
-    @client.delete @uri
-  end
+    #step
+     @client.delete @uri
+   end
 end
 
 When /^OCCI Client requests OCCI Server to create OCCI Resource with the given kind$/ do
