@@ -52,6 +52,12 @@ module Occi
         @client.refresh
       end
 
+      def model
+        check
+
+        @client.model
+      end
+
       ###
 
       def resource_types

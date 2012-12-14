@@ -64,7 +64,7 @@ end
 
 # running with an empty password, we should ask the user for one
 # if auth method is not "none"
-if options.auth[:password].nil? or options.auth[:user_cert_password].nil?
+if options.auth[:password].nil? or options.auth[:user_cert_password].nil? or options.auth[:token].nil?
   Occi::Log.debug "Password is not set, asking for it now ..."
 
   say("\n")
@@ -104,6 +104,50 @@ rescue Errno::ECONNREFUSED
   # there is nothing we can do ...
   Occi::Log.error "Connection refused!"
   exit!
+rescue Exception => ex
+  # something went wrong during the execution
+  # hide the stack trace in non-debug modes
+  Occi::Log.error "An error occurred! Message: #{ex.message}"
+
+  raise ex if options.debug
+  exit!
+end
+
+# dump the occi model provided by the server and exit
+if options.dump_model
+
+  if !model.respond_to? :instance_variables
+    puts "Your Ruby doesn't support 'instance_variables' calls!"
+    exit!
+  end
+
+  # iterate through available instance variables
+  model.instance_variables.each do |inst_var_sym|
+    puts "#"*79
+    puts "Dumping #{inst_var_sym.to_s}:"
+
+    inst_var = model.instance_variable_get(inst_var_sym)
+    next unless inst_var.respond_to? :each
+
+    # iterate through collection elements
+    inst_var.each do |coll_elm|
+      # respect user's output-format preferences
+      if options.output_format == :json and coll_elm.respond_to? :as_json
+        puts "\n"
+        pp coll_elm.as_json
+        puts "\n"
+      elsif coll_elm.respond_to? :to_string
+        puts "\n#{coll_elm.to_string}\n"
+      else
+        puts "\n#{coll_elm.inspect}\n"
+      end
+    end
+
+    #
+    puts "#"*79
+  end
+
+  exit! true
 end
 
 # start of the main loop, this part of the code is responsible for

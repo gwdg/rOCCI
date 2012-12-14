@@ -560,6 +560,7 @@ module Occi
       #    change_auth { :type => "digest", :username => "123", :password => "321" }
       #    change_auth { :type => "x509", :user_cert => "~/cert.pem",
       #                  :user_cert_password => "321", :ca_path => nil }
+      #    change_auth { :type => "keystone", :token => "005c8a5d7f2c437a9999302c458afbda" }
       #
       # @param [Hash] authentication options
       def change_auth(auth_options)
@@ -583,6 +584,10 @@ module Occi
             self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil?
             self.class.ssl_ca_file @auth_options[:ca_file] unless @auth_options[:ca_file].nil?
             self.class.ssl_extra_chain_cert certs_to_file_ary(@auth_options[:proxy_ca]) unless @auth_options[:proxy_ca].nil?
+          when "keystone"
+            # set up OpenStack Keystone token based auth
+            raise ArgumentError, "Missing required option 'token' for OpenStack Keystone auth!" unless @auth_options[:token]
+            self.class.headers['X-Auth-Token'] = @auth_options[:token]
           when "none", nil
             # do nothing
           else
