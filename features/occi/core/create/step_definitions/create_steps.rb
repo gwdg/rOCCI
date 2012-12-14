@@ -1,5 +1,5 @@
 After do |scenario|
-   if @uri.length > 0
+   if !@uri.nil? && @uri.length > 0
     #delete the created resource
     #step
      @client.delete @uri
