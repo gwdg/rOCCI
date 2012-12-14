@@ -6,10 +6,6 @@ module Occi
     module Client
 
     describe ClientHttp do
-<<<<<<< HEAD
-=======
-
->>>>>>> remotes/upstream/master
       describe "using media type text/plain" do
 
         use_vcr_cassette "client_http_text_plain"

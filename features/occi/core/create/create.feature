@@ -17,7 +17,7 @@ Feature:
   Scenarios:
     | protocol  | endpoint                  | accept_type       | response_code | occi_kind_identifier                                |
     |  http     | http://141.5.99.82/       | text/plain        | 201           | http://schemas.ogf.org/occi/infrastructure#compute  |
-  #  | http      | http://46.231.128.85:8086/| text/plain        | 200           | http://schemas.ogf.org/occi/infrastructure#compute  |
-  #  |  http     | http://141.5.99.69/       | text/plain        | 201           | http://schemas.ogf.org/occi/infrastructure#storage  |
+ #   | http      | http://46.231.128.85:8086/| text/plain        | 201           | http://schemas.ogf.org/occi/infrastructure#compute  |
+ #   |  http     | http://141.5.99.69/       | text/plain        | 201           | http://schemas.ogf.org/occi/infrastructure#storage  |
 
 

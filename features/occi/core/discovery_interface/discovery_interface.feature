@@ -18,18 +18,8 @@ Feature: Discovery Interface
   Scenarios:
   | protocol | endpoint                  | accept_type       | response_code | category_filter |
   | http     | http://141.5.99.69/       | application/json  |      200      |                 |
-  | http     | http://141.5.99.69/       | text/occi         |      200      |                 |
-  | http     | http://141.5.99.69/       | text/plain        |      200      |                 |
-  | http     | http://46.231.128.85:8086/| text/occi         |      200      |                 |
-  | http     | http://141.5.99.69/       | text/plain        |      200      | action          |
-
-  #Scenario: Retrieving the OCCI Categories with an OCCI Category filter from the OCCI Server
-  #  Given an "http" OCCI Server with endpoint "http://141.5.99.69/"
-  #  And the client accept "text/plain"
-  #  And OCCI Client requests all OCCI Categories supported by the OCCI Server
-  #  And select "action" Category from the OCCI Server
-  #  When OCCI Client requests from the OCCI Server the OCCI Categories related to the selected OCCI Category
-  #  Then OCCI Client should display the OCCI Categories received from the OCCI Server
-  #  And displayed Categories should related to the selected OCCI Category
-  #  And should be some
+ # | http     | http://141.5.99.69/       | text/occi         |      200      |                 |
+ # | http     | http://141.5.99.69/       | text/plain        |      200      |                 |
+ # | http     | http://46.231.128.85:8086/| text/occi         |      200      |                 |
+ # | http     | http://141.5.99.69/       | text/plain        |      200      | action          |
 
