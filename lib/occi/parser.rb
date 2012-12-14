@@ -20,7 +20,7 @@ module Occi
       collection = Occi::Collection.new
 
       # remove trailing HTTP_ prefix if present
-      header = Hash[header.map {|k, v| [k.gsub('HTTP_',''), v] }]
+      header = Hash[header.map {|k, v| [k.gsub('HTTP_','').upcase, v] }]
 
       category ? collection = self.header_categories(header) : collection = self.header_entity(header, entity_type)
 

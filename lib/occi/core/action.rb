@@ -2,6 +2,17 @@ module Occi
   module Core
     class Action < Occi::Core::Category
 
+      # @param [String ] scheme
+      # @param [String] term
+      # @param [String] title
+      # @param [Hash] attributes
+      def initialize(scheme='http://schemas.ogf.org/occi/core#',
+          term='action',
+          title=nil,
+          attributes=Occi::Core::Attributes.new)
+        super scheme, term, title, attributes
+      end
+
       # @return [String] text representation
       def to_text
         text = super

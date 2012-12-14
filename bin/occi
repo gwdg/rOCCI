@@ -64,7 +64,7 @@ end
 
 # running with an empty password, we should ask the user for one
 # if auth method is not "none"
-if options.auth[:password].nil? or options.auth[:user_cert_password].nil?
+if options.auth[:password].nil? or options.auth[:user_cert_password].nil? or options.auth[:token].nil?
   Occi::Log.debug "Password is not set, asking for it now ..."
 
   say("\n")
