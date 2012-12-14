@@ -33,7 +33,7 @@ module Occi
       # @return [Object] new instance of this class
       def self.new(*args)
         if args.size > 0
-          type_identifier = args[0]
+          type_identifier = args[0].to_s
           related         = [self.kind]
         else
           type_identifier = self.kind.type_identifier
