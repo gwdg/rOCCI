@@ -78,9 +78,10 @@ module Occi
           opts.on("-p",
                   "--password PASSWORD",
                   String,
-                  "Password for basic, digest or x509 authentication") do |password|
+                  "Password for basic, digest and x509 authentication or an auth. token for KeyStone") do |password|
             options.auth[:password] = password
             options.auth[:user_cert_password] = password
+            options.auth[:token] = password
           end
 
           opts.on("-c",
