@@ -11,7 +11,9 @@ if RUBY_ENGINE == 'jruby'
   module Net
     class HTTP
 
+      old_verbose, $VERBOSE = $VERBOSE, nil
       SSL_ATTRIBUTES = SSL_ATTRIBUTES.concat %w(extra_chain_cert)
+      $VERBOSE = old_verbose
 
       # An Array of certificates that will be sent to the client.
       attr_accessor :extra_chain_cert
@@ -35,7 +37,9 @@ else
     module Net
       class HTTP
 
+        old_verbose, $VERBOSE = $VERBOSE, nil
         SSL_ATTRIBUTES = SSL_ATTRIBUTES.concat %w(extra_chain_cert)
+        $VERBOSE = old_verbose
 
         # An Array of certificates that will be sent to the client.
         attr_accessor :extra_chain_cert
