@@ -110,7 +110,6 @@ module Occi
         mixins        = cats.categories
         collection.links << Occi::Core::Link.new(kind, mixins, entity.attributes)
       elsif entity_type == Occi::Core::Resource
-        entity.links = []
         link_strings = header['LINK'].to_s.split(',')
         link_strings.each do |link_string|
           link = OCCIANTLR::Parser.new('Link: ' + link_string).link
@@ -123,10 +122,10 @@ module Occi
             kind            = link.categories.reverse!.pop
             mixins          = link.categories
 
-            entity.links << Occi::Core::Link.new(kind, mixins, link.attributes, link.actions, link.rel, link.target, link.source)
+            collection.links << Occi::Core::Link.new(kind, mixins, link.attributes, link.actions, link.rel, link.target, link.source)
           end
         end
-        collection.resources << Occi::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.actions, entity.links)
+        collection.resources << Occi::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.actions, collection.links)
       end
       collection
     end
@@ -179,7 +178,6 @@ module Occi
         mixins        = cats
         collection.links << Occi::Core::Link.new(kind, mixins, entity.attributes)
       elsif entity_type == Occi::Core::Resource
-        entity.links = []
         links.each do |link|
           if link.rel.include? 'action#'
             entity.actions = [link.rel] + entity.actions.to_a
@@ -192,10 +190,10 @@ module Occi
             mixins          = link.categories
 
             link = Occi::Core::Link.new(kind, mixins, link.attributes, link.actions, link.rel, link.target, link.source)
-            entity.links << link
+            collection.links << link
           end
         end
-        collection.resources << Occi::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.actions, entity.links)
+        collection.resources << Occi::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.actions, collection.links)
       end unless entity.kind.nil?
       collection
     end
