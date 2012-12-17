@@ -140,13 +140,13 @@ cmpt_data = client.describe cmpt_loc
 pp cmpt_data
 
 ## wait until the resource is "active"
-while cmpt_data.resources.first.attributes.occi.compute.state == "inactive"
+while cmpt_data[0].resources.first.attributes.occi.compute.state == "inactive"
   puts "\nCompute resource #{cmpt_loc} is inactive, waiting ..."
   sleep 1
   cmpt_data = client.describe cmpt_loc
 end
 
-puts "\nCompute resource #{cmpt_loc} is #{cmpt_data.resources.first.attributes.occi.compute.state}"
+puts "\nCompute resource #{cmpt_loc} is #{cmpt_data[0].resources.first.attributes.occi.compute.state}"
 
 ## delete the resource and exit
 if clean_up_compute
