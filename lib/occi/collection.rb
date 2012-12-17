@@ -132,7 +132,11 @@ module Occi
       # if there is only one resource and the links inside the resource have no location,
       # then these links must be rendered as separate links inside the collection
       if !collection.resources.nil? && collection.resources.size == 1
-        lnks = @resources.first.links if collection.resources.first.links.blank? && @links.empty?
+        if collection.resources.first.links.blank? && @links.empty?
+          lnks = @resources.first.links
+        else
+          lnks = @links
+        end
       else
         lnks = @links
       end
