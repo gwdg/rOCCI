@@ -83,7 +83,7 @@ link returns [hash]
 	link_category  returns [array] @init {array = Array.new}
 	                                : SEMICOLON WS? CATEGORY EQUALS QUOTE kind=uri { array << $kind.text } (WS mixin=uri { array << $mixin.text })* QUOTE;
 	link_attributes  returns [hash] @init {hash = Hashie::Mash.new}
-					: (SEMICOLON WS? attribute { hash.merge!($attribute.hash) } )*;
+					: SEMICOLON (WS? attribute { hash.merge!($attribute.hash) } )*;
 
 /*
 e.g.
