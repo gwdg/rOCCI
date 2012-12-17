@@ -9,7 +9,7 @@ Feature:
     And transfer_protocol : <protocol>
     And accept type : <accept_type>
     And have an initialize Client
-    When
+    When the Client makes a create request
     Then the Client should have the response code <response_code>
 
   Scenarios:
