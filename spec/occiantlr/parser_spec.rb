@@ -46,7 +46,7 @@ module OCCIANTLR
           attributes.occi!.networkinterface!.interface = 'eth0'
           attributes.occi!.networkinterface!.mac       = '00:11:22:33:44:55'
           attributes.occi!.networkinterface!.state     = 'active'
-          attributes_string                            = %Q{occi.networkinterface.interface="eth0";occi.networkinterface.mac="00:11:22:33:44:55";occi.networkinterface.state="active"}
+          attributes_string                            = %Q{occi.networkinterface.interface="eth0" occi.networkinterface.mac="00:11:22:33:44:55" occi.networkinterface.state="active"}
           link_string                                  = %Q{Link: <#{target}>; rel="#{rel}"; self="#{self_location}"; category="#{kind}"; #{attributes_string}}
 
           link = OCCIANTLR::Parser.new(link_string).link
