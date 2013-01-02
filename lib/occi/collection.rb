@@ -6,14 +6,14 @@ module Occi
     # Initialize a new OCCI Collection by initializing all supplied OCCI objects
     #
     # @param [Hash] collection including one or more of the keys kinds, mixins, actions, resources, links
-    def initialize(collection={ }, model = Occi::Model.new)
+    def initialize(collection={}, model = Occi::Model.new)
       collection = Hashie::Mash.new(collection) unless collection.kind_of? Occi::Collection
 
-      @kinds     = Occi::Core::Kinds.new
-      @mixins    = Occi::Core::Mixins.new
-      @actions   = Occi::Core::Actions.new
+      @kinds = Occi::Core::Kinds.new
+      @mixins = Occi::Core::Mixins.new
+      @actions = Occi::Core::Actions.new
       @resources = Occi::Core::Resources.new
-      @links     = Occi::Core::Links.new
+      @links = Occi::Core::Links.new
 
       self.model = model if model
 
@@ -29,25 +29,25 @@ module Occi
       not intersect(category).empty?
     end
 
-    # @return [Array] categories combined list of all kinds, mixins and actions
+    # @return [Occi::Core::Categories] categories combined list of all kinds, mixins and actions
     def categories
-      @kinds + @mixins + @actions
+      Occi::Core::Categories.new(@kinds + @mixins + @actions)
     end
 
-    # @return [Array] entities combined list of all resources and links
+    # @return [Occi::Core::Entities] entities combined list of all resources and links
     def entities
-      @resources + @links
+      Occi::Core::Entities.new(@resources + @links)
     end
 
     # @param [Occi::Core::Model] model
     # @return [Occi::Core::Model]
     def model=(model)
-      @model           = model
-      @kinds.model     = model
-      @mixins.model    = model
-      @actions.model   = model
+      @model = model
+      @kinds.model = model
+      @mixins.model = model
+      @actions.model = model
       @resources.model = model
-      @links.model     = model
+      @links.model = model
     end
 
     def check
@@ -122,8 +122,19 @@ module Occi
       @kinds.empty? && @mixins.empty? && @actions.empty? && @resources.empty? && @links.empty? && @action.nil?
     end
 
+    # Returns a collection with all categories related to the specified category
+    #
+    # @param [Occi::Core::Category] category
+    # @return [Occi::Core::Collection]
+    def get_related_to(category)
+      collection = self.class.new
+      collection.kinds = @kinds.get_related_to(category)
+      collection.mixins = @mixins.get_related_to(category)
+      collection
+    end
+
     # @return [Hashie::Mash] json representation
-    def as_json(options = { })
+    def as_json(options = {})
       collection = Hashie::Mash.new
       collection.kinds = @kinds.collect { |kind| kind.as_json } if @kinds.any?
       collection.mixins = @mixins.collect { |mixin| mixin.as_json } if @mixins.any?
