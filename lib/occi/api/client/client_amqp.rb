@@ -11,11 +11,10 @@ module Occi
       attr_accessor :media_type, :model
 
       CONNECTION_SETTING = {
-          :host => '141.5.99.83', #IP of the MessageBroker (RabbitMQ)
+          :host => 'localhost', #IP of the MessageBroker (RabbitMQ)
           :port => 5672,
-          :password => "demo",
-          :vhost => "/occi_server",
-          :user => "occi_server"
+          :vhost => '/' ,
+          :password => 'password'
       }
 
       # hash mapping HTTP response codes to human-readable messages
@@ -747,7 +746,7 @@ module Occi
         raise 'Endpoint not a valid URI' if (endpoint =~ URI::ABS_URI).nil?
 
         @endpoint       = endpoint.chomp('/') + '/'
-        @endpoint_queue = "amqp.occi.#{@endpoint}" #amqp.occi.http://localhost/
+        @endpoint_queue = "amqp.occi.#{@endpoint}"
       end
 
     end

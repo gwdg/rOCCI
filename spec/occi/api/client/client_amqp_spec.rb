@@ -13,9 +13,9 @@ module Occi
 
         # TODO: Implement scenarios for client
       end
-
+=begin
       before(:all) do
-        @client = Occi::Api::Client::ClientAmqp.new("http://141.5.99.83/", auth_options = { :type => "none" },
+        @client = Occi::Api::Client::ClientAmqp.new("http://localhost:9292/", auth_options = { :type => "none" },
                                             log_options = { :out => STDERR, :level => Occi::Log::WARN, :logger => nil },
                                             media_type = "application/occi+json")
       end
@@ -30,7 +30,7 @@ module Occi
         @client.model.resources.should be_empty
 
       end
-=begin
+
       it "create compute" do
         res = Occi::Infrastructure::Compute.new
         res.title = "MyComputeResource1"

@@ -7,7 +7,7 @@ module Occi
 
     class OcciOpts
 
-      AUTH_METHODS = [:x509, :basic, :digest, :none].freeze
+      AUTH_METHODS = [:x509, :basic, :digest, :keystone, :none].freeze
       MEDIA_TYPES = ["application/occi+json", "application/occi+xml", "text/plain,text/occi", "text/plain"].freeze
       ACTIONS = [:list, :describe, :create, :delete, :trigger].freeze
       LOG_OUTPUTS = [:stdout, :stderr].freeze
@@ -22,7 +22,9 @@ module Occi
         options.log = {}
         options.log[:out] = STDERR
         options.log[:level] = Occi::Log::WARN
-        
+
+        options.dump_model = false
+
         options.interactive = false
 
         options.endpoint = "https://localhost:3300/"
@@ -76,9 +78,10 @@ module Occi
           opts.on("-p",
                   "--password PASSWORD",
                   String,
-                  "Password for basic, digest or x509 authentication") do |password|
+                  "Password for basic, digest and x509 authentication or an auth. token for KeyStone") do |password|
             options.auth[:password] = password
             options.auth[:user_cert_password] = password
+            options.auth[:token] = password
           end
 
           opts.on("-c",
@@ -165,6 +168,12 @@ module Occi
             options.output_format = output_format
           end
 
+          opts.on_tail("-m",
+                       "--dump-model",
+                       "Contact the endpoint and dump its model") do |dump_model|
+            options.dump_model = dump_model
+          end
+
           opts.on_tail("-d",
                        "--debug",
                        "Enable debugging messages") do |debug|
@@ -203,7 +212,14 @@ module Occi
           exit!
         end
 
-        if not options.interactive
+        if options.interactive && options.dump_model
+          puts "You cannot use '--dump-model' and '--interactive' at the same time!"
+          puts opts
+
+          exit!
+        end
+
+        if !(options.interactive or options.dump_model)
           mandatory = []
 
           if options.action == :trigger
@@ -222,6 +238,7 @@ module Occi
           if not missing.empty?
             puts "Missing required arguments: #{missing.join(', ')}"
             puts opts
+
             exit!
           end
         end

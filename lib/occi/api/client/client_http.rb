@@ -483,21 +483,11 @@ module Occi
       # @return [Boolean] status
       def delete(resource_type_identifier)
         # convert type to type identifier
-        if @model.kinds.select { |kind| kind.term == resource_type_identifier }.any?
-          type_identifier          = @model.kinds.select {
-            |kind| kind.term == resource_type_identifier
-          }.first.type_identifier
-
-          location                 = @model.get_by_id(type_identifier).location
-          resource_type_identifier = @endpoint + location
-        end
-
-        # check some basic pre-conditions
         raise "Endpoint is not connected!" unless @connected
-        raise "Unknown resource identifier! #{resource_type_identifier}" unless resource_type_identifier.start_with? @endpoint
 
-        # make the request
-        del(sanitize_resource_link(resource_type_identifier))
+        path = path_for_resource_type resource_type_identifier
+
+        del path
       end
 
       # Triggers given action on a specific resource.
@@ -570,6 +560,7 @@ module Occi
       #    change_auth { :type => "digest", :username => "123", :password => "321" }
       #    change_auth { :type => "x509", :user_cert => "~/cert.pem",
       #                  :user_cert_password => "321", :ca_path => nil }
+      #    change_auth { :type => "keystone", :token => "005c8a5d7f2c437a9999302c458afbda" }
       #
       # @param [Hash] authentication options
       def change_auth(auth_options)
@@ -593,6 +584,10 @@ module Occi
             self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil?
             self.class.ssl_ca_file @auth_options[:ca_file] unless @auth_options[:ca_file].nil?
             self.class.ssl_extra_chain_cert certs_to_file_ary(@auth_options[:proxy_ca]) unless @auth_options[:proxy_ca].nil?
+          when "keystone"
+            # set up OpenStack Keystone token based auth
+            raise ArgumentError, "Missing required option 'token' for OpenStack Keystone auth!" unless @auth_options[:token]
+            self.class.headers['X-Auth-Token'] = @auth_options[:token]
           when "none", nil
             # do nothing
           else
@@ -655,7 +650,7 @@ module Occi
         end
 
         Occi::Log.debug "Parser call: #{response.content_type} #{entity_type} #{path.include?('-/')}"
-        collection = Occi::Parser.parse(response.content_type, response.body, path.include?('-/'), entity_type)
+        collection = Occi::Parser.parse(response.content_type, response.body, path.include?('-/'), entity_type, response.headers)
 
         Occi::Log.debug "Parsed collection: empty? #{collection.empty?}"
         collection
@@ -802,6 +797,34 @@ module Occi
         raise "Resource link #{resource_link} is not valid!" unless resource_link.start_with? @endpoint
 
         resource_link.gsub @endpoint, '/'
+      end
+
+      # @describe find the path for the resource type identifier
+      #
+      # @example
+      #
+      #
+      # @param [String] resource_type_identifier
+      #
+      # @return [String]
+      def path_for_resource_type(resource_type_identifier)
+        if resource_type_identifier.nil? || resource_type_identifier == "/"
+          #we got all
+          path = "/"
+        else
+          kinds = @model.kinds.select { |kind| kind.term == resource_type_identifier }
+          if kinds.any?
+            #we got an type identifier
+            path = "/" + kinds.first.type_identifier.split('#').last + "/"
+          elsif resource_type_identifier.start_with? @endpoint
+            #we got an resource link
+            path = sanitize_resource_link(resource_type_identifier)
+          else
+            raise "Unknown resource identifier! #{resource_type_identifier}"
+          end
+        end
+
+        path
       end
 
       # Creates an Occi::Model from data retrieved from the server.

@@ -252,7 +252,6 @@ module Occi
         end
 
       end
-
     end
 
     end

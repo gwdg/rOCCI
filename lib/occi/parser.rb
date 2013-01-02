@@ -19,6 +19,9 @@ module Occi
       Occi::Log.debug '### Parsing request data to OCCI Collection ###'
       collection = Occi::Collection.new
 
+      # remove trailing HTTP_ prefix if present
+      header = Hash[header.map {|k, v| [k.gsub('HTTP_','').upcase, v] }]
+
       category ? collection = self.header_categories(header) : collection = self.header_entity(header, entity_type)
 
       case media_type
@@ -60,7 +63,7 @@ module Occi
     # @param [Hash] header
     # @return [Array] list of URIs
     def self.header_locations(header)
-      x_occi_location_strings = header['HTTP_X_OCCI_LOCATION'].to_s.split(',')
+      x_occi_location_strings = header['X_OCCI_LOCATION'].to_s.split(',')
       x_occi_location_strings.collect { |loc| OCCIANTLR::Parser.new('X-OCCI-Location: ' + loc).x_occi_location }
     end
 
@@ -68,7 +71,7 @@ module Occi
     # @return [Occi::Collection]
     def self.header_categories(header)
       collection       = Occi::Collection.new
-      category_strings = header['HTTP_CATEGORY'].to_s.split(',')
+      category_strings = header['CATEGORY'].to_s.split(',')
       category_strings.each do |cat|
         category = OCCIANTLR::Parser.new('Category: ' + cat).category
         collection.kinds.merge category.kinds.collect { |kind| Occi::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) }
@@ -84,9 +87,9 @@ module Occi
     def self.header_entity(header, entity_type)
       collection       = Occi::Collection.new
       entity           = Hashie::Mash.new
-      category_strings = header['HTTP_CATEGORY'].to_s.split(',')
+      category_strings = header['CATEGORY'].to_s.split(',')
       return collection if category_strings.empty?
-      attribute_strings = header['HTTP_X_OCCI_ATTRIBUTE'].to_s.split(',')
+      attribute_strings = header['X_OCCI_ATTRIBUTE'].to_s.split(',')
       categories        = Hashie::Mash.new({ :kinds => [], :mixins => [], :actions => [] })
       category_strings.each do |category|
         cat = OCCIANTLR::Parser.new('Category: ' + category).category
@@ -107,8 +110,7 @@ module Occi
         mixins        = cats.categories
         collection.links << Occi::Core::Link.new(kind, mixins, entity.attributes)
       elsif entity_type == Occi::Core::Resource
-        entity.links = []
-        link_strings = header['HTTP_LINK'].to_s.split(',')
+        link_strings = header['LINK'].to_s.split(',')
         link_strings.each do |link_string|
           link = OCCIANTLR::Parser.new('Link: ' + link_string).link
           if link.rel.include? 'action#'
@@ -120,10 +122,10 @@ module Occi
             kind            = link.categories.reverse!.pop
             mixins          = link.categories
 
-            entity.links << Occi::Core::Link.new(kind, mixins, link.attributes, link.actions, link.rel, link.target, link.source)
+            collection.links << Occi::Core::Link.new(kind, mixins, link.attributes, link.actions, link.rel, link.target, link.source)
           end
         end
-        collection.resources << Occi::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.actions, entity.links)
+        collection.resources << Occi::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.actions, collection.links)
       end
       collection
     end
@@ -176,7 +178,6 @@ module Occi
         mixins        = cats
         collection.links << Occi::Core::Link.new(kind, mixins, entity.attributes)
       elsif entity_type == Occi::Core::Resource
-        entity.links = []
         links.each do |link|
           if link.rel.include? 'action#'
             entity.actions = [link.rel] + entity.actions.to_a
@@ -189,10 +190,10 @@ module Occi
             mixins          = link.categories
 
             link = Occi::Core::Link.new(kind, mixins, link.attributes, link.actions, link.rel, link.target, link.source)
-            entity.links << link
+            collection.links << link
           end
         end
-        collection.resources << Occi::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.actions, entity.links)
+        collection.resources << Occi::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.actions, collection.links)
       end unless entity.kind.nil?
       collection
     end

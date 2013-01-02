@@ -28,6 +28,10 @@ module Occi
         self.class.get_class @scheme, @term, @related
       end
 
+      def location
+        @location.clone
+      end
+
       # @param [Hash] options
       # @return [Hashie::Mash] json representation
       def as_json(options={ })
