@@ -190,6 +190,10 @@ module OCCI
         header
       end
 
+      def to_s
+        self.location
+      end
+
       def inspect
         JSON.pretty_generate(JSON.parse(to_json))
       end
