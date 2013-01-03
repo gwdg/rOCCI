@@ -41,37 +41,38 @@ output = Occi::Bin::ResourceOutputFactory.new options.output_format
 Occi::Log.info "Starting OCCI client ..."
 Occi::Log.debug "Options: #{options}"
 
+# TODO: this part isn't necessary, just annoying
 # to make the interactive mode completely self-sufficient
 # ask for endpoint and auth method (provide defaults)
-if options.interactive
-  Occi::Log.debug "Checking for endpoint and auth changes ..."
-
-  options.endpoint = ask("What endpoint should I use? ") {
-      |q| q.default = options.endpoint
-  }
-
-  # separate menus
-  say "\n"
-
-  choose do |menu|
-    menu.prompt = "Which auth method should I use? "
-
-    Occi::Bin::OcciOpts::AUTH_METHODS.each do |auth_m|
-      menu.choice(auth_m) { options.auth[:type] = auth_m.to_s }
-    end
-  end
-end
+#if options.interactive
+#  Occi::Log.debug "Checking for endpoint and auth changes ..."
+#
+# options.endpoint = ask("What endpoint should I use? ") {
+#     |q| q.default = options.endpoint
+# }
+#
+# # separate menus
+# say "\n"
+#
+# choose do |menu|
+#   menu.prompt = "Which auth method should I use? "
+#
+#   Occi::Bin::OcciOpts::AUTH_METHODS.each do |auth_m|
+#     menu.choice(auth_m) { options.auth[:type] = auth_m.to_s }
+#   end
+# end
+#end
 
 # running with an empty password, we should ask the user for one
 # if auth method is not "none"
-if options.auth[:password].nil? or options.auth[:user_cert_password].nil? or options.auth[:token].nil?
+if options.auth[:password].nil? || options.auth[:user_cert_password].nil? || options.auth[:token].nil?
   Occi::Log.debug "Password or token is not set, asking for it now ..."
 
   say("\n")
 
   options.auth[:user_cert_password] = ask("Enter a password or an auth. token: ") {
       |q| q.echo = false
-  } unless options.auth[:type] == "none"
+  } unless options.auth[:type] == "none" || (options.auth[:proxy_ca] && options.auth[:type] == "x509")
 
   options.auth[:token] = options.auth[:password] = options.auth[:user_cert_password]
 end
@@ -102,7 +103,7 @@ rescue OpenSSL::PKey::RSAError => key_ex
 rescue Errno::ECONNREFUSED
   # the remote server has refused our connection attempt(s)
   # there is nothing we can do ...
-  Occi::Log.error "Connection refused!"
+  Occi::Log.error "Connection refused by #{options.endpoint}!"
   exit!
 rescue Exception => ex
   # something went wrong during the execution
@@ -384,7 +385,7 @@ begin
 rescue Errno::ECONNREFUSED
   # remote server refused our connection attempt(s)
   # even though initial connect was successful
-  Occi::Log.error "Connection refused!"
+  Occi::Log.error "Connection refused by #{options.endpoint}!"
   exit!
 rescue Exception => ex
   # something went wrong during the execution
