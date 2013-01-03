@@ -142,6 +142,45 @@ module Occi
 
       end
 
+      # Retrieves all entity type identifiers related to a given type identifier
+      #
+      # @example
+      #    client.get_entity_type_identifiers_related_to 'network'
+      #    # => [ "http://schemas.ogf.org/occi/infrastructure#network",
+      #    #      "http://schemas.ogf.org/occi/infrastructure#ipnetwork" ]
+      #
+      # @param [String] type_identifier
+      # @return [Array<String>] list of available entity type identifiers related to given type identifier in a human-readable format
+      def get_entity_types_related_to(type_identifier)
+        Occi::Log.debug("Getting entity type identifiers related to #{type_identifier}")
+        collection = @model.get type_identifier
+        collection.kinds.collect { |kind| kind.type_identifier }
+      end
+
+      # Retrieves all available entity types.
+      #
+      # @example
+      #    client.get_entity_types # => [ "compute", "storage", "network" ]
+      #
+      # @return [Array<String>] list of available entity types in a human-readable format
+      def get_entity_types
+        Occi::Log.debug("Getting entity types ...")
+        @model.kinds.collect { |kind| kind.term }
+      end
+
+      # Retrieves all available entity type identifiers.
+      #
+      # @example
+      #    client.get_entity_type_identifiers
+      #    # => [ "http://schemas.ogf.org/occi/infrastructure#compute",
+      #    #      "http://schemas.ogf.org/occi/infrastructure#storage",
+      #    #      "http://schemas.ogf.org/occi/infrastructure#network" ]
+      #
+      # @return [Array<String>] list of available entity types in a OCCI ID format
+      def get_entity_type_identifiers
+        get_entity_types_related_to Occi::Core::Entity.kind.type_identifier
+      end
+
       # Retrieves all available resource types.
       #
       # @example
@@ -150,25 +189,50 @@ module Occi
       # @return [Array<String>] list of available resource types in a human-readable format
       def get_resource_types
         Occi::Log.debug("Getting resource types ...")
-        @model.kinds.collect { |kind| kind.term }
+        collection = @model.get Occi::Core::Resource.kind
+        collection.kinds.collect { |kind| kind.term }
       end
 
       # Retrieves all available resource type identifiers.
       #
       # @example
-      #    client.get_resource_type_identifiers 
+      #    client.get_resource_type_identifiers
       #    # => [ "http://schemas.ogf.org/occi/infrastructure#compute",
       #    #      "http://schemas.ogf.org/occi/infrastructure#storage",
       #    #      "http://schemas.ogf.org/occi/infrastructure#network" ]
       #
       # @return [Array<String>] list of available resource types in a Occi ID format
       def get_resource_type_identifiers
-        Occi::Log.debug("Getting resource identifiers ...")
-        @model.kinds.collect { |kind| kind.type_identifier }
+        get_entity_types_related_to Occi::Core::Resource.kind.type_identifier
+
+      end
+
+      # Retrieves all available link types.
+      #
+      # @example
+      #    client.get_link_types # => [ "storagelink", "networkinterface" ]
+      #
+      # @return [Array<String>] list of available link types in a human-readable format
+      def get_link_types
+        Occi::Log.debug("Getting link types ...")
+        collection = @model.get Occi::Core::Link.kind
+        collection.kinds.collect { |kind| kind.term }
+      end
+
+      # Retrieves all available link type identifiers.
+      #
+      # @example
+      #    client.get_link_type_identifiers
+      #    # => [ "http://schemas.ogf.org/occi/infrastructure#storagelink",
+      #    #      "http://schemas.ogf.org/occi/infrastructure#networkinterface" ]
+      #
+      # @return [Array<String>] list of available link types in a OCCI ID format
+      def get_link_type_identifiers
+        get_entity_types_related_to Occi::Core::Link.kind.type_identifier
       end
 
       # Looks up a mixin using its name and, optionally, a type as well.
-      # Will return mixin's full location (a link) or a description. 
+      # Will return mixin's full location (a link) or a description.
       #
       # @example
       #    client.find_mixin "debian6"
@@ -286,7 +350,7 @@ module Occi
       # @example
       #    client.get_mixin_type_identifiers
       #     # => ['http://schemas.ogf.org/occi/infrastructure#os_tpl',
-      #     #     'http://schemas.ogf.org/occi/infrastructure#resource_tpl'] 
+      #     #     'http://schemas.ogf.org/occi/infrastructure#resource_tpl']
       #
       # @return [Array<String>] list of available mixin type identifiers
       def get_mixin_type_identifiers
@@ -345,7 +409,7 @@ module Occi
       # Retrieves descriptions for available resources specified by a type
       # identifier or resource location. If no type identifier or location
       # is specified, all available resources in all available resource types
-      # will be described. 
+      # will be described.
       #
       # @example
       #    client.describe
@@ -397,7 +461,7 @@ module Occi
 
       # Creates a new resource on the server. Resource must be provided
       # as an instance of Occi::Core::Entity, e.g. instantiated using
-      # the get_resource method. 
+      # the get_resource method.
       #
       # @example
       #    res = client.get_resource "compute"
@@ -477,7 +541,7 @@ module Occi
       # @example
       #    client.delete "compute" # => true
       #    client.delete "http://schemas.ogf.org/occi/infrastructure#compute" # => true
-      #    client.delete "http://localhost:3300/compute/245j42594...98s9df8s9f" # => true 
+      #    client.delete "http://localhost:3300/compute/245j42594...98s9df8s9f" # => true
       #
       # @param [String] resource type identifier, type name or location
       # @return [Boolean] status
@@ -552,7 +616,7 @@ module Occi
       end
 
       # Sets auth method and appropriate httparty attributes. Supported auth methods
-      # are: ["basic", "digest", "x509", "none"] 
+      # are: ["basic", "digest", "x509", "none"]
       #
       # @example
       #    change_auth { :type => "none" }
@@ -601,7 +665,7 @@ module Occi
       #    certs_to_file_ary "~/.globus/usercert.pem"
       #      # => [#<String>, #<String>, ...]
       #
-      # @param [String] Path to a PEM file containing certificates 
+      # @param [String] Path to a PEM file containing certificates
       # @return [Array<String>] An array of read certificates
       def certs_to_file_ary(ca_file)
         # TODO: read and separate multiple certificates
@@ -756,7 +820,7 @@ module Occi
       # @param [String] type identifier of the linked resource
       # @param [Occi::Core::Attributes] link attributes
       # @param [Array<String>] link mixins
-      # @return [Occi::Core::Link] link instance 
+      # @return [Occi::Core::Link] link instance
       def link(kind, source, target_location, target_kind, attributes=Occi::Core::Attributes.new, mixins=[])
         link            = Occi::Core::Link.new(kind)
         link.mixins     = mixins
@@ -774,10 +838,10 @@ module Occi
       # Checks whether the given endpoint URI is valid and adds a trailing
       # slash if necessary.
       #
-      # @example 
+      # @example
       #    prepare_endpoint "http://localhost:3300" # => "http://localhost:3300/"
       #
-      # @param [String] endpoint URI in a non-canonical string 
+      # @param [String] endpoint URI in a non-canonical string
       # @return [String] canonical endpoint URI in a string, with a trailing slash
       def prepare_endpoint(endpoint)
         raise 'Endpoint not a valid URI' if (endpoint =~ URI::ABS_URI).nil?
@@ -891,7 +955,7 @@ module Occi
                       end
       end
 
-      # Generates a human-readable response message based on the HTTP response code. 
+      # Generates a human-readable response message based on the HTTP response code.
       #
       # @example
       #    response_message self.class.delete(@endpoint + path)

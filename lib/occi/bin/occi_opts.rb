@@ -23,6 +23,7 @@ module Occi
         options.log[:out] = STDERR
         options.log[:level] = Occi::Log::WARN
 
+        options.filter = nil
         options.dump_model = false
 
         options.interactive = false
@@ -92,6 +93,11 @@ module Occi
           opts.on("-f",
                   "--ca-file PATH", String, "Path to CA certificates in a file") do |ca_file|
             options.auth[:ca_file] = ca_file
+          end
+
+          opts.on("-F",
+                  "--filter CATEGORY", String, "Category type identifier to filter categories from model. Must be used together with the -m option") do |filter|
+            options.filter = filter
           end
 
           opts.on("-x",
