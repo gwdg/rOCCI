@@ -17,6 +17,14 @@ module Occi
         self.to_a.join(separator)
       end
 
+      # Returns a Set with all categories related to the specified category
+      #
+      # @param [Occi::Core::Category] category
+      # @return [Occi::Core::Categories]
+      def get_related_to(category)
+        self.class.new select { |cat| cat.related_to? category }
+      end
+
       # @param [Occi::Model] model
       # @return [Occi::Model]
       def model=(model)
@@ -26,7 +34,7 @@ module Occi
 
       # @param [Hash] options
       # @return [Hashie::Mash] json representation
-      def as_json(options={ })
+      def as_json(options={})
         self.to_a.as_json
       end
 
