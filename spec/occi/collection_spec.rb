@@ -28,5 +28,14 @@ module Occi
       expect { collection.check }.to_not raise_error
     end
 
+    it 'successfully gets all categories related to a category' do
+      collection = Occi::Collection.new
+      collection.kinds << Occi::Core::Resource.kind
+      collection.kinds << Occi::Core::Link.kind
+      collection.get_related_to(Occi::Core::Entity.kind).should == collection
+      collection.get_related_to(Occi::Core::Resource.kind).kinds.first.should == Occi::Core::Resource.kind
+      collection.get_related_to(Occi::Core::Link.kind).kinds.first.should == Occi::Core::Link.kind
+    end
+
   end
 end

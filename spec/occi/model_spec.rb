@@ -38,15 +38,11 @@ describe "Model" do
   it "returns categories with filter" do
     model = Occi::Model.new
     model.register_infrastructure
-    compute = Occi::Core::Kind.new('http://schemas.ogf.org/occi/infrastructure#','compute')
-    ipnetwork = Occi::Core::Mixin.new('http://schemas.ogf.org/occi/infrastructure/network#','ipnetwork')
-    filter = Occi::Collection.new
-    filter.kinds << compute
-    filter.mixins << ipnetwork
-    collection = model.get(filter)
+    compute = Occi::Infrastructure::Compute.kind
+    collection = model.get(compute)
     collection.kind_of? Occi::Collection
-    collection.kinds.first.attributes.should be_kind_of Occi::Core::Attributes
-    collection.mixins.first.attributes.should be_kind_of Occi::Core::Attributes
+    collection.kinds.first.should == compute
+    collection.mixins.should have_at_least(2).mixins
     collection.actions.should be_empty
     collection.resources.should be_empty
     collection.links.should be_empty
