@@ -190,11 +190,28 @@ module OCCI
     # @return [OCCI::Collection]
     def self.json(json)
       collection = OCCI::Collection.new
-      hash       = Hashie::Mash.new(JSON.parse(json))
+      hash = Hashie::Mash.new(JSON.parse(json))
       collection.kinds.concat hash.kinds.collect { |kind| OCCI::Core::Kind.new(kind.scheme, kind.term, kind.title, kind.attributes, kind.related, kind.actions) } if hash.kinds
       collection.mixins.concat hash.mixins.collect { |mixin| OCCI::Core::Mixin.new(mixin.scheme, mixin.term, mixin.title, mixin.attributes, mixin.related, mixin.actions) } if hash.mixins
+      collection.actions.concat hash.actions.collect { |action| OCCI::Core::Action.new(action.scheme, action.term, action.title, action.attributes) } if hash.actions
       collection.resources.concat hash.resources.collect { |resource| OCCI::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.actions, resource.links) } if hash.resources
-      collection.links.concat hash.links.collect { |link| OCCI::Core::Link.new(link.kind, link.mixins, link.attributes) } if hash.links
+      collection.links.concat hash.links.collect { |link| OCCI::Core::Link.new(link.kind, link.mixins, link.attributes, [], nil, link.target) } if hash.links
+
+      if collection.resources.size == 1 && collection.links.size > 0
+        if collection.resources.first.links.empty?
+          collection.links.each { |link| link.source = collection.resources.first }
+          collection.resources.first.links = collection.links
+        end
+      end
+
+      # TODO: replace the following mechanism with one in the Links class
+      # replace link locations with link objects in all resources
+      collection.resources.each do |resource|
+        resource.links.collect! do |resource_link|
+          lnk = collection.links.select { |link| resource_link == link.to_s }.first
+          lnk ||= resource_link
+        end
+      end
       collection
     end
 

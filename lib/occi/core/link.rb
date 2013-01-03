@@ -77,7 +77,7 @@ module OCCI
       def as_json(options={ })
         link = super
         link.rel = @rel if @rel
-        link.source = self.source.to_s if self.source.kind_of? String if self.source
+        link.source = self.source.to_s if self.source.to_s
         link.target = self.target.to_s if self.target
         link
       end
