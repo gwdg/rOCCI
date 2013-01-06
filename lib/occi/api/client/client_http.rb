@@ -402,8 +402,10 @@ module Occi
             path = '/'
           end
 
-          self.class.get(@endpoint + path,
-                         :headers => {"Accept" => 'text/uri-list'}).body.split("\n").compact
+          headers = self.class.headers.clone
+          headers['Accept'] = 'text/uri-list'
+
+          self.class.get(@endpoint + path, :headers => headers).body.split("\n").compact
         end
 
         # Retrieves descriptions for available resources specified by a type
