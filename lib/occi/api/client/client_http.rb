@@ -741,23 +741,38 @@ module Occi
           # remove the leading slash
           path.gsub!(/\A\//, '')
 
-          response = if @media_type == 'application/occi+json'
-                       self.class.post(@endpoint + path,
-                                       :body => collection.to_json,
-                                       :headers => {'Accept' => 'text/uri-list', 'Content-Type' => 'application/occi+json'})
-                     elsif @media_type == 'text/occi'
-                       self.class.post(@endpoint + path,
-                                       :headers => collection.to_header.merge({'Accept' => 'text/uri-list', 'Content-Type' => 'text/occi'}))
-                     else
-                       self.class.post(@endpoint + path,
-                                       :body => collection.to_text,
-                                       :headers => {'Accept' => 'text/uri-list', 'Content-Type' => 'text/plain'})
+          headers = self.class.headers.clone
+          headers['Content-Type'] = @media_type
+
+          response = case @media_type
+                       when 'application/occi+json'
+                         self.class.post(@endpoint + path,
+                                         :body => collection.to_json,
+                                         :headers => headers)
+                       when 'text/occi'
+                         self.class.post(@endpoint + path,
+                                         :headers => collection.to_header.merge(headers))
+                       else
+                         self.class.post(@endpoint + path,
+                                         :body => collection.to_text,
+                                         :headers => headers)
                      end
 
           response_msg = response_message response
-          raise "HTTP POST failed! #{response_msg}" unless response.code.between? 200, 300
 
-          URI.parse(response.body).to_s
+          case response.code
+            when 200
+              collection = Occi::Parser.parse(@media_type, response)
+              if collection.empty?
+                Occi::Parser.locations(@media_type, response.body, response.header)
+              else
+                collection
+              end
+            when 201
+              URI.parse(response.header['Location']).to_s
+            else
+              raise "HTTP POST failed! #{response_msg}"
+          end
         end
 
         # Performs PUT requests and parses responses to collections.
@@ -772,18 +787,38 @@ module Occi
           # remove the leading slash
           path.gsub!(/\A\//, '')
 
-          response = if @media_type == 'application/occi+json'
-                       self.class.post(@endpoint + path, :body => collection.to_json, :headers => {'Content-Type' => 'application/occi+json'})
-                     else
-                       self.class.post(@endpoint + path, {:body => collection.to_text, :headers => {'Content-Type' => 'text/plain'}})
+          headers = self.class.headers.clone
+          headers['Content-Type'] = @media_type
+
+          response = case @media_type
+                       when 'application/occi+json'
+                         self.class.post(@endpoint + path,
+                                         :body => collection.to_json,
+                                         :headers => headers)
+                       when 'text/occi'
+                         self.class.post(@endpoint + path,
+                                         :headers => collection.to_header.merge(headers))
+                       else
+                         self.class.post(@endpoint + path,
+                                         :body => collection.to_text,
+                                         :headers => headers)
                      end
 
           response_msg = response_message response
-          raise "HTTP PUT failed! #{response_msg}" unless response.code.between? 200, 300
 
-          collection = Occi::Parser.parse(response.content_type, response.body)
-
-          collection
+          case response.code
+            when 200
+              collection = Occi::Parser.parse(@media_type, response)
+              if collection.empty?
+                Occi::Parser.locations(@media_type, response.body, response.header)
+              else
+                collection
+              end
+            when 201
+              URI.parse(response.header['Location']).to_s
+            else
+              raise "HTTP POST failed! #{response_msg}"
+          end
         end
 
         # Performs DELETE requests and returns True on success.
