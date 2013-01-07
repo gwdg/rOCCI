@@ -84,13 +84,43 @@ module Occi
         @client.get_mixin_types
       end
 
+      def entity_types
+        check
+
+        @client.get_entity_types
+      end
+
+      def entity_type_identifiers
+        check
+
+        @client.get_entity_type_identifiers
+      end
+
+      def entity_types_related_to(*args)
+        check
+
+        @client.get_entity_types_related_to(*args)
+      end
+
+      def link_types
+        check
+
+        @client.get_link_types
+      end
+
+      def link_type_identifiers
+        check
+
+        @client.get_link_type_identifiers
+      end
+
+      ###
+
       def mixins(*args)
         check
 
         @client.get_mixins(*args)
       end
-
-      ###
 
       def resource(*args)
         check
