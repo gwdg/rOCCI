@@ -53,6 +53,22 @@ module Occi
           @client.get_resource_type_identifiers
         end
 
+        it "should list all available entity types" do
+          @client.get_entity_types
+        end
+
+        it "should list all available entity type identifiers" do
+          @client.get_entity_type_identifiers
+        end
+
+        it "should list all available link types" do
+          @client.get_link_types
+        end
+
+        it "should list all available link type identifiers" do
+          @client.get_link_type_identifiers
+        end
+
         it "should list all available mixin types" do
           @client.get_mixin_types
         end

@@ -36,6 +36,7 @@ module Occi
         options.auth[:ca_path] = "/etc/grid-security/certificates"
         options.auth[:username] = "anonymous"
         options.auth[:ca_file] = nil
+        options.auth[:proxy_ca] = nil
 
         options.output_format = :plain
         
@@ -96,7 +97,7 @@ module Occi
           end
 
           opts.on("-F",
-                  "--filter CATEGORY", String, "Category type identifier to filter categories from model. Must be used together with the -m option") do |filter|
+                  "--filter CATEGORY", String, "Category type identifier to filter categories from model, must be used together with the -m option") do |filter|
             options.filter = filter
           end
 
@@ -176,7 +177,7 @@ module Occi
 
           opts.on_tail("-m",
                        "--dump-model",
-                       "Contact the endpoint and dump its model") do |dump_model|
+                       "Contact the endpoint and dump its model, cannot be used with the interactive mode") do |dump_model|
             options.dump_model = dump_model
           end
 
@@ -220,6 +221,13 @@ module Occi
 
         if options.interactive && options.dump_model
           puts "You cannot use '--dump-model' and '--interactive' at the same time!"
+          puts opts
+
+          exit!
+        end
+
+        if !options.dump_model && options.filter
+          puts "You cannot use '--filter' without '--dump-model'!"
           puts opts
 
           exit!
