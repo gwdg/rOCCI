@@ -764,9 +764,9 @@ module Occi
             when 200
               collection = Occi::Parser.parse(@media_type, response)
               if collection.empty?
-                Occi::Parser.locations(@media_type, response.body, response.header)
+                Occi::Parser.locations(@media_type, response.body, response.header).first
               else
-                collection
+                collection.resources.first.location if collection.resources.first
               end
             when 201
               URI.parse(response.header['Location']).to_s
@@ -807,15 +807,8 @@ module Occi
           response_msg = response_message response
 
           case response.code
-            when 200
-              collection = Occi::Parser.parse(@media_type, response)
-              if collection.empty?
-                Occi::Parser.locations(@media_type, response.body, response.header)
-              else
-                collection
-              end
-            when 201
-              URI.parse(response.header['Location']).to_s
+            when 200, 201
+              Occi::Parser.parse(@media_type, response)
             else
               raise "HTTP POST failed! #{response_msg}"
           end
