@@ -18,9 +18,9 @@ Feature: Discovery Interface
   Scenarios:
   | protocol | endpoint                  | accept_type       | response_code | category_filter |
   | http     | http://141.5.99.69/       | application/json  |      200      |                 |
-  | http     | http://141.5.99.69/       | text/occi         |      200      |                 |
+  #| http     | http://141.5.99.69/       | text/occi         |      200      |                 |
   | http     | http://141.5.99.69/       | text/plain        |      200      |                 |
-  | http     | http://46.231.128.85:8086/| text/occi         |      200      |                 |
+  #| http     | http://46.231.128.85:8086/| text/occi         |      200      |                 |
   | http     | http://141.5.99.69/       | text/plain        |      200      | action          |
 
   #Scenario: Retrieving the OCCI Categories with an OCCI Category filter from the OCCI Server
