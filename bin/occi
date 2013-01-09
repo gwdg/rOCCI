@@ -41,39 +41,40 @@ output = Occi::Bin::ResourceOutputFactory.new options.output_format
 Occi::Log.info "Starting OCCI client ..."
 Occi::Log.debug "Options: #{options}"
 
+# TODO: this part isn't necessary, just annoying
 # to make the interactive mode completely self-sufficient
 # ask for endpoint and auth method (provide defaults)
-if options.interactive
-  Occi::Log.debug "Checking for endpoint and auth changes ..."
-
-  options.endpoint = ask("What endpoint should I use? ") {
-    |q| q.default = options.endpoint
-  }
-
-  # separate menus
-  say "\n"
-
-  choose do |menu|
-    menu.prompt = "Which auth method should I use? "
-
-    Occi::Bin::OcciOpts::AUTH_METHODS.each do |auth_m|
-      menu.choice(auth_m) { options.auth[:type] = auth_m.to_s }
-    end
-  end
-end
+#if options.interactive
+#  Occi::Log.debug "Checking for endpoint and auth changes ..."
+#
+# options.endpoint = ask("What endpoint should I use? ") {
+#     |q| q.default = options.endpoint
+# }
+#
+# # separate menus
+# say "\n"
+#
+# choose do |menu|
+#   menu.prompt = "Which auth method should I use? "
+#
+#   Occi::Bin::OcciOpts::AUTH_METHODS.each do |auth_m|
+#     menu.choice(auth_m) { options.auth[:type] = auth_m.to_s }
+#   end
+# end
+#end
 
 # running with an empty password, we should ask the user for one
 # if auth method is not "none"
-if options.auth[:password].nil? or options.auth[:user_cert_password].nil? or options.auth[:token].nil?
-  Occi::Log.debug "Password is not set, asking for it now ..."
+if options.auth[:password].nil? || options.auth[:user_cert_password].nil? || options.auth[:token].nil?
+  Occi::Log.debug "Password or token is not set, asking for it now ..."
 
   say("\n")
 
-  options.auth[:user_cert_password] = ask("Enter password: ") {
-    |q| q.echo = false
-  } unless options.auth[:type] == "none"
+  options.auth[:user_cert_password] = ask("Enter a password or an auth. token: ") {
+      |q| q.echo = false
+  } unless options.auth[:type] == "none" || (options.auth[:proxy_ca] && options.auth[:type] == "x509")
 
-  options.auth[:password] = options.auth[:user_cert_password]
+  options.auth[:token] = options.auth[:password] = options.auth[:user_cert_password]
 end
 
 # establish a connection before entering the loop
@@ -102,7 +103,7 @@ rescue OpenSSL::PKey::RSAError => key_ex
 rescue Errno::ECONNREFUSED
   # the remote server has refused our connection attempt(s)
   # there is nothing we can do ...
-  Occi::Log.error "Connection refused!"
+  Occi::Log.error "Connection refused by #{options.endpoint}!"
   exit!
 rescue Exception => ex
   # something went wrong during the execution
@@ -121,12 +122,14 @@ if options.dump_model
     exit!
   end
 
+  collection = model.get options.filter
+
   # iterate through available instance variables
-  model.instance_variables.each do |inst_var_sym|
+  collection.instance_variables.each do |inst_var_sym|
     puts "#"*79
     puts "Dumping #{inst_var_sym.to_s}:"
 
-    inst_var = model.instance_variable_get(inst_var_sym)
+    inst_var = collection.instance_variable_get(inst_var_sym)
     next unless inst_var.respond_to? :each
 
     # iterate through collection elements
@@ -195,7 +198,7 @@ begin
       }
 
       # describe action requires a resource type or a resource location
-      menu.choice(:describe) { 
+      menu.choice(:describe) {
         options.action = :describe
 
         # separate menus from each other
@@ -260,7 +263,7 @@ begin
         if options.action == :create
           options.resource_title = ask("What name should I give to the new resource? ")
           number_of_mixins = ask("How many mixins do you wish me to mix into this resource? ",
-                                  Integer) { |q| q.in = 0..2 }
+                                 Integer) { |q| q.in = 0..2 }
 
           options.mixin = {}
           (1..number_of_mixins).each do |mixin_number|
@@ -336,59 +339,59 @@ begin
 
   # call the appropriate helper and then format its output
   case options.action
-  when :list
-    found = helper_list options
+    when :list
+      found = helper_list options
 
-    valid = Occi::Bin::ResourceOutputFactory.allowed_resource_types.include? options.resource.to_sym
-    Occi::Log.error "Not printing, the resource type is not supported!" unless valid
+      valid = Occi::Bin::ResourceOutputFactory.allowed_resource_types.include? options.resource.to_sym
+      Occi::Log.error "Not printing, the resource type is not supported!" unless valid
 
-    puts output.format(found, :locations, options.resource.to_sym) if valid
-  when :describe
-    found = helper_describe options
+      puts output.format(found, :locations, options.resource.to_sym) if valid
+    when :describe
+      found = helper_describe options
 
-    if options.resource.start_with? options.endpoint
-      resource_type = options.resource.split("/")[3].to_sym
-    elsif mixin_types.include? options.resource.split('#').first
-      resource_type = options.resource.split('#').first.to_sym
+      if options.resource.start_with? options.endpoint
+        resource_type = options.resource.split("/")[3].to_sym
+      elsif mixin_types.include? options.resource.split('#').first
+        resource_type = options.resource.split('#').first.to_sym
+      else
+        resource_type = options.resource.to_sym
+      end
+
+      valid = Occi::Bin::ResourceOutputFactory.allowed_resource_types.include? resource_type
+      Occi::Log.error "Not printing, the resource type is not supported!" unless valid
+
+      puts output.format(found, :resources, resource_type) if valid
+    when :create
+      location = helper_create options
+      puts location
+    when :delete
+      result = helper_delete options
+
+      if result
+        puts "Resource #{options.resource} successfully removed!"
+      else
+        puts "Failed to remove resource #{options.resource}!"
+      end
+    when :trigger
+      helper_trigger options
+    when :refresh
+      refresh
+    when :skip
+      Occi::Log.info "Skipping this action, probably not implemented yet!"
     else
-      resource_type = options.resource.to_sym
-    end
-
-    valid = Occi::Bin::ResourceOutputFactory.allowed_resource_types.include? resource_type
-    Occi::Log.error "Not printing, the resource type is not supported!" unless valid
-
-    puts output.format(found, :resources, resource_type) if valid
-  when :create
-    location = helper_create options
-    puts location
-  when :delete
-    result = helper_delete options
-    
-    if result
-      puts "Resource #{options.resource} successfully removed!"
-    else
-      puts "Failed to remove resource #{options.resource}!"
-    end
-  when :trigger
-    helper_trigger options
-  when :refresh
-    refresh
-  when :skip
-    Occi::Log.info "Skipping this action, probably not implemented yet!"
-  else
-    raise "Unknown action [#{options.action}]!"
+      raise "Unknown action [#{options.action}]!"
   end
 
 rescue Errno::ECONNREFUSED
   # remote server refused our connection attempt(s)
   # even though initial connect was successful
-  Occi::Log.error "Connection refused!"
+  Occi::Log.error "Connection refused by #{options.endpoint}!"
   exit!
 rescue Exception => ex
   # something went wrong during the execution
   # hide the stack trace in non-debug modes
   Occi::Log.error "An error occurred! Message: #{ex.message}"
-  
+
   raise ex if options.debug
   exit!
 end while options.interactive

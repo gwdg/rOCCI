@@ -16,9 +16,9 @@ module Occi
           term='category',
           title=nil,
           attributes=Occi::Core::Attributes.new)
-        @scheme     = scheme
-        @term       = term
-        @title      = title
+        @scheme = scheme
+        @term = term
+        @title = title
         @attributes = Occi::Core::AttributeProperties.parse attributes
       end
 
@@ -36,7 +36,7 @@ module Occi
           parent = related.first.class
         else
           related_scheme, related_term = related.first.to_s.split '#'
-          parent                       = self.get_class related_scheme, related_term
+          parent = self.get_class related_scheme, related_term
         end
 
         uri = URI.parse(scheme)
@@ -62,7 +62,7 @@ module Occi
           end
         else
           klass = namespace.const_set term.classify, Class.new(parent)
-          klass.kind = Occi::Core::Kind.new scheme, term, nil, { }, related unless parent.ancestors.include? Occi::Core::Category
+          klass.kind = Occi::Core::Kind.new scheme, term, nil, {}, related unless parent.ancestors.include? Occi::Core::Category
         end
 
         klass
@@ -79,18 +79,25 @@ module Occi
       end
 
       # check if category is related to another category
+      # a category is related to another category
+      # if it is included in @related or
+      # if it is the category itself
+      #
       # @param [String, Category] category Related Category or its type identifier
       # @return [true,false] true if category is related to category_id else false
       def related_to?(category)
-        self.related.each do |cat|
-          return true if cat.to_s == category.to_s
-        end if @related
+        if @related
+          self.related.each do |cat|
+            return true if cat.to_s == category.to_s
+          end
+          return true if self.to_s == category.to_s
+        end
         false
       end
 
       # @param [Hash] options
       # @return [Hashie::Mash] json representation
-      def as_json(options={ })
+      def as_json(options={})
         category = Hashie::Mash.new
         category.scheme = @scheme if @scheme
         category.term = @term if @term
@@ -118,7 +125,7 @@ module Occi
 
       # @return [Hash] hash containing the HTTP headers of the text/occi rendering
       def to_header
-        { :Category => self.to_string }
+        {:Category => self.to_string}
       end
 
       # @return [String] json representation

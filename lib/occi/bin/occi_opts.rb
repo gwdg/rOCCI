@@ -23,6 +23,7 @@ module Occi
         options.log[:out] = STDERR
         options.log[:level] = Occi::Log::WARN
 
+        options.filter = nil
         options.dump_model = false
 
         options.interactive = false
@@ -35,6 +36,7 @@ module Occi
         options.auth[:ca_path] = "/etc/grid-security/certificates"
         options.auth[:username] = "anonymous"
         options.auth[:ca_file] = nil
+        options.auth[:proxy_ca] = nil
 
         options.output_format = :plain
         
@@ -78,9 +80,10 @@ module Occi
           opts.on("-p",
                   "--password PASSWORD",
                   String,
-                  "Password for basic, digest or x509 authentication") do |password|
+                  "Password for basic, digest and x509 authentication or an auth. token for KeyStone") do |password|
             options.auth[:password] = password
             options.auth[:user_cert_password] = password
+            options.auth[:token] = password
           end
 
           opts.on("-c",
@@ -91,6 +94,11 @@ module Occi
           opts.on("-f",
                   "--ca-file PATH", String, "Path to CA certificates in a file") do |ca_file|
             options.auth[:ca_file] = ca_file
+          end
+
+          opts.on("-F",
+                  "--filter CATEGORY", String, "Category type identifier to filter categories from model, must be used together with the -m option") do |filter|
+            options.filter = filter
           end
 
           opts.on("-x",
@@ -169,7 +177,7 @@ module Occi
 
           opts.on_tail("-m",
                        "--dump-model",
-                       "Contact the endpoint and dump its model") do |dump_model|
+                       "Contact the endpoint and dump its model, cannot be used with the interactive mode") do |dump_model|
             options.dump_model = dump_model
           end
 
@@ -213,6 +221,13 @@ module Occi
 
         if options.interactive && options.dump_model
           puts "You cannot use '--dump-model' and '--interactive' at the same time!"
+          puts opts
+
+          exit!
+        end
+
+        if !options.dump_model && options.filter
+          puts "You cannot use '--filter' without '--dump-model'!"
           puts opts
 
           exit!

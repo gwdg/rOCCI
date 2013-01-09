@@ -1,7 +1,9 @@
 rOCCI - A Ruby OCCI Framework
 =================================
 
-[![Build Status](https://secure.travis-ci.org/gwdg/rOCCI.png)](http://travis-ci.org/gwdg/rOCCI) [![Dependency Status](https://gemnasium.com/gwdg/rOCCI.png)](https://gemnasium.com/gwdg/rOCCI)
+[![Build Status](https://secure.travis-ci.org/gwdg/rOCCI.png)](http://travis-ci.org/gwdg/rOCCI)
+[![Dependency Status](https://gemnasium.com/gwdg/rOCCI.png)](https://gemnasium.com/gwdg/rOCCI)
+[![Gem Version](https://fury-badge.herokuapp.com/rb/occi.png)](https://badge.fury.io/rb/occi)
 
 Requirements
 ------------
@@ -14,8 +16,16 @@ The following setup is recommended
 
 Installation
 ------------
-
+To install the most recent stable version
     gem install occi
+
+To install the most recent beta version
+    gem install occi --pre
+
+To build and install the bleeding edge version from master
+    git clone git://github.com/gwdg/rOCCI.git
+    cd rOCCI
+    rake install
 
 Usage
 -----
@@ -30,6 +40,7 @@ To run the client in an interactive mode use
 
     occi --interactive
     occi --interactive --endpoint https://<ENDPOINT>:<PORT>/
+    occi --interactive --endpoint https://<ENDPOINT>:<PORT>/ --auth x509
 
 To list available resources use
 
@@ -104,10 +115,12 @@ To connect to an OCCI endpoint/server (e.g. running on http://localhost:3300/ )
 
     connect(:http, 'http://localhost:3300',auth||=nil)
 
-To get the list of available resource types or mixin types use
+To get the list of available resource, mixin, entity or link types use
 
     resource_types
     mixin_types
+    entity_types
+    link_types
 
 To get compute, storage or network descriptions use
 
@@ -174,10 +187,12 @@ All available categories are automatically registered to the OCCI model during c
 
     client.model
 
-To get the list of available resource types or mixin types use
+To get the list of available resource, mixin, entity or link types use
 
     client.get_resource_types
     client.get_mixin_types
+    client.get_entity_types
+    client.get_link_types
 
 To get compute, storage or network descriptions use
 

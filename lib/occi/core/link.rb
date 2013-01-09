@@ -28,7 +28,6 @@ module Occi
           scheme, term = rel.to_s.split('#')
           @rel         = Occi::Core::Category.get_class(scheme, term).kind if scheme && term
         end
-        @rel ||= Occi::Core::Resource.kind
         @source = source if source
         @target = target
       end
@@ -68,7 +67,7 @@ module Occi
       def as_json(options={ })
         link = super
         link.rel = @rel.to_s if @rel
-        link.source = self.source.to_s if self.source.kind_of? String if self.source
+        link.source = self.source.to_s if self.source.to_s
         link.target = self.target.to_s if self.target
         link
       end
@@ -86,7 +85,7 @@ module Occi
           string << name + '=' + value + ';'
         end
         string << 'occi.core.target=' + self.target.to_s.inspect
-        string << 'occi.core.source=' + self.source.to_s.inspect if self.source.kind_of? String if self.source
+        string << 'occi.core.source=' + self.source.to_s.inspect if self.source.to_s
 
         string
       end

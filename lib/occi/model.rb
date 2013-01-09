@@ -76,10 +76,10 @@ module Occi
 
     # Return all categories from model. If filter is present, return only the categories specified by filter
     #
-    # @param [Occi::Collection] filter
+    # @param [Occi::Collection,Occi::Core::Category,String] filter
     # @return [Occi::Collection] collection
     def get(filter = nil)
-      filter ? intersect(filter) : self
+      filter ? self.get_related_to(filter) : self
     end
 
   end
