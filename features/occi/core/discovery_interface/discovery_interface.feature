@@ -5,6 +5,7 @@ Feature: Discovery Interface
   As an OCCI Client
   I want to receive all OCCI Categories supported by the OCCI Server
 
+  @vcr_record
   Scenario Outline: Retrieving all OCCI Categories supported by the OCCI Server
     Given endpoint : <endpoint>
     And transfer_protocol : <protocol>
@@ -15,6 +16,7 @@ Feature: Discovery Interface
     Then the Client should have the response code <response_code>
     And OCCI Client should display the OCCI Categories received from the OCCI Server
 
+  @vcr_record
   Scenarios:
   | protocol | endpoint                  | accept_type       | response_code | category_filter |
   | http     | http://141.5.99.69/       | application/json  |      200      |                 |
