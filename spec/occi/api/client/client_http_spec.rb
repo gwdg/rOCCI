@@ -7,9 +7,8 @@ module Occi
 
     describe ClientHttp do
 
-      describe "using media type text/plain" do
-
-        use_vcr_cassette "client_http_text_plain"
+      vcr_options = { :cassette_name => "client_http_text_plain", :record => :new_episodes }
+      describe "using media type text/plain", :vcr => vcr_options do
 
         before(:each) do
           @client = Occi::Api::Client::ClientHttp.new(
@@ -182,9 +181,8 @@ module Occi
 
     describe ClientHttp do
 
-      describe "using media type application/occi+json" do
-
-        use_vcr_cassette "client_http_application_occi_json"
+      vcr_options = { :cassette_name => "client_http_application_occi_json", :record => :new_episodes }
+      describe "using media type application/occi+json", :vcr => vcr_options do
 
         before(:each) do
           #@client = Occi::Api::ClientHttp.new(
