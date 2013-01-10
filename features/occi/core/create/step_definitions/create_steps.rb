@@ -9,6 +9,7 @@ end
 When /^OCCI Client requests OCCI Server to create OCCI Resource with the given kind$/ do
   res = Occi::Core::Resource.new @selected_kind
   @uri = @client.create res
+  @uri = @uri.to_s
 end
 
 When /^get the URI of the created OCCI Resource$/ do
