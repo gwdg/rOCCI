@@ -160,7 +160,7 @@ module Occi
         # Retrieves all available entity types.
         #
         # @example
-        #    client.get_entity_types # => [ "compute", "storage", "network" ]
+        #    client.get_entity_types # => [ "entity", "resource", "link" ]
         #
         # @return [Array<String>] list of available entity types in a human-readable format
         def get_entity_types
@@ -172,9 +172,9 @@ module Occi
         #
         # @example
         #    client.get_entity_type_identifiers
-        #    # => [ "http://schemas.ogf.org/occi/infrastructure#compute",
-        #    #      "http://schemas.ogf.org/occi/infrastructure#storage",
-        #    #      "http://schemas.ogf.org/occi/infrastructure#network" ]
+        #    # => [ "http://schemas.ogf.org/occi/core#entity",
+        #    #      "http://schemas.ogf.org/occi/core#resource",
+        #    #      "http://schemas.ogf.org/occi/core#link" ]
         #
         # @return [Array<String>] list of available entity types in a OCCI ID format
         def get_entity_type_identifiers

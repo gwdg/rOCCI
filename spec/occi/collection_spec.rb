@@ -4,7 +4,7 @@ require 'occi'
 module Occi
   describe Collection do
 
-    it "should create a new Occi collection including the Occi base objects" do
+    it "creates a new Occi collection including the Occi base objects" do
       collection = Occi::Collection.new
       collection.kinds << "http://schemas.ogf.org/occi/infrastructure#compute"
       collection.mixins << "http://example.com/occi/tags#my_mixin"

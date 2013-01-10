@@ -3,7 +3,7 @@ require 'occi'
 
 describe "Parser" do
 
-  it "should parse an OCCI message with MIME type text/plain containing an OCCI resource" do
+  it "parses an OCCI message with MIME type text/plain containing an OCCI resource" do
     # create new collection
     collection = Occi::Collection.new
     # create new resource within collection
@@ -41,7 +41,7 @@ describe "Parser" do
     Occi::Parser.parse('text/plain',rendered_collection).should == collection
   end
 
-  it "should parse an OCCI message with MIME type application/occi+json containing an OCCI resource" do
+  it "parses an OCCI message with MIME type application/occi+json containing an OCCI resource" do
     # create new collection
     collection = Occi::Collection.new
     # create new resource within collection
@@ -79,7 +79,7 @@ describe "Parser" do
     Occi::Parser.parse('application/occi+json',rendered_collection).should == collection
   end
 
-  it "should parse an OVF file" do
+  it "parses an OVF file" do
     media_type        = 'application/ovf+xml'
     body              = File.read('spec/occi/test.ovf')
     collection     = Occi::Parser.parse(media_type, body)
@@ -95,7 +95,7 @@ describe "Parser" do
     compute_resources.first.attributes.occi!.compute!.memory.should == 0.25
   end
 
-  it "should parse an OVA container" do
+  it "parses an OVA container" do
     media_type            = 'application/ova'
     body                  = File.read('spec/occi/test.ova')
     collection = Occi::Parser.parse(media_type, body)
