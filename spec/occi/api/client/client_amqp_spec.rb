@@ -9,10 +9,18 @@ module Occi
 
     describe ClientAmqp do
 
-      it "should do something" do
+      context "using media type application/occi+json" do
 
-        # TODO: Implement scenarios for client
+        it "should do something"
+
       end
+
+      context "using media type text/plain" do
+
+        it "should do something"
+
+      end
+
 =begin
       before(:all) do
         @client = Occi::Api::Client::ClientAmqp.new("http://localhost:9292/", auth_options = { :type => "none" },

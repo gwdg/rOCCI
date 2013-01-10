@@ -8,7 +8,7 @@ module Occi
     vcr_options = { :record => :new_episodes }
     describe ClientHttp, :vcr => vcr_options do
 
-      describe "using media type text/plain" do
+      context "using media type text/plain" do
 
         before(:each) do
           @client = Occi::Api::Client::ClientHttp.new(
@@ -29,17 +29,17 @@ module Occi
           @client.connected.should be_true
         end
 
-        it "should create a compute resource" do
+        it "should instantiate a compute resource" do
           @client.get_resource "compute"
           @client.get_resource "http://schemas.ogf.org/occi/infrastructure#compute"
         end
 
-        it "should create a network resource" do
+        it "should instantiate a network resource" do
           @client.get_resource "network"
           @client.get_resource "http://schemas.ogf.org/occi/infrastructure#network"
         end
 
-        it "should create a storage resource" do
+        it "should instantiate a storage resource" do
           @client.get_resource "storage"
           @client.get_resource "http://schemas.ogf.org/occi/infrastructure#storage"
         end
@@ -133,43 +133,25 @@ module Occi
           end
         end
 
-        it "should create a new compute resource" do
-        end
+        it "should create a new compute resource"
 
-        it "should create a new storage resource" do
-          # TODO
-        end
+        it "should create a new storage resource"
 
-        it "should create a new network resource" do
-          # TODO
-        end
+        it "should create a new network resource"
 
-        it "should deploy an instance based on OVF/OVA file" do
-          # TODO
-        end
+        it "should deploy an instance based on OVF/OVA file"
 
-        it "should delete a compute resource" do
-        end
+        it "should delete a compute resource"
 
-        it "should delete a network resource" do
-          # TODO
-        end
+        it "should delete a network resource"
 
-        it "should delete a storage resource" do
-          # TODO
-        end
+        it "should delete a storage resource"
 
-        it "should trigger an action on a compute resource" do
-          # TODO
-        end
+        it "should trigger an action on a compute resource"
 
-        it "should trigger an action on a storage resource" do
-          # TODO
-        end
+        it "should trigger an action on a storage resource"
 
-        it "should trigger an action on a network resource" do
-          # TODO
-        end
+        it "should trigger an action on a network resource"
 
         it "should refresh its model" do
           @client.refresh
@@ -177,12 +159,7 @@ module Occi
 
       end
 
-    end
-
-    vcr_options = { :record => :new_episodes }
-    describe ClientHttp, :vcr => vcr_options do
-
-      describe "using media type application/occi+json" do
+      context "using media type application/occi+json" do
 
         before(:each) do
           #@client = Occi::Api::ClientHttp.new(
@@ -195,75 +172,51 @@ module Occi
           #)
         end
 
-        it "should establish connection" do
-          # TODO
-        end
+        it "should establish connection"
 
-        it "should list compute resources" do
-        end
+        it "should list compute resources"
 
-        it "should list network resources" do
-        end
+        it "should list network resources"
 
-        it "should list storage resources" do
-        end
+        it "should list storage resources"
 
-        it "should list all available mixins" do
-        end
+        it "should list all available mixins"
 
-        it "should list os_tpl mixins" do
-        end
+        it "should list os_tpl mixins"
 
-        it "should list resource_tpl mixins" do
-        end
+        it "should list resource_tpl mixins"
 
-        it "should describe compute resources" do
-        end
+        it "should describe compute resources"
 
-        it "should describe network resources" do
-        end
+        it "should describe network resources"
 
-        it "should describe storage resources" do
-        end
+        it "should describe storage resources"
 
-        it "should describe all available mixins" do
-        end
+        it "should describe all available mixins"
 
-        it "should describe os_tpl mixins" do
-        end
+        it "should describe os_tpl mixins"
 
-        it "should describe resource_tpl mixins" do
-        end
+        it "should describe resource_tpl mixins"
 
-        it "should create a new compute resource" do
-        end
+        it "should create a new compute resource"
 
-        it "should create a new storage resource" do
-        end
+        it "should create a new storage resource"
 
-        it "should create a new network resource" do
-        end
+        it "should create a new network resource"
 
-        it "should delete a compute resource" do
-        end
+        it "should delete a compute resource"
 
-        it "should delete a network resource" do
-        end
+        it "should delete a network resource"
 
-        it "should delete a storage resource" do
-        end
+        it "should delete a storage resource"
 
-        it "should trigger an action on a compute resource" do
-        end
+        it "should trigger an action on a compute resource"
 
-        it "should trigger an action on a storage resource" do
-        end
+        it "should trigger an action on a storage resource"
 
-        it "should trigger an action on a network resource" do
-        end
+        it "should trigger an action on a network resource"
 
-        it "should refresh its model" do
-        end
+        it "should refresh its model"
 
       end
     end
