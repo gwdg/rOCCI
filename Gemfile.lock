@@ -1,7 +1,7 @@
 GIT
   remote: git://github.com/arax/vcr.git
-  revision: 73c885cd5439ffab84f6ba83ed847490148a1c9e
-  branch: cucumber_patch
+  revision: e82e843ceddd8822acea59846b015bcabf1906df
+  branch: test_framework_patches
   specs:
     vcr (2.4.0)
 

@@ -5,10 +5,10 @@ module Occi
   module Api
     module Client
 
-    describe ClientHttp do
+    vcr_options = { :record => :new_episodes }
+    describe ClientHttp, :vcr => vcr_options do
 
-      vcr_options = { :cassette_name => "client_http_text_plain", :record => :new_episodes }
-      describe "using media type text/plain", :vcr => vcr_options do
+      describe "using media type text/plain" do
 
         before(:each) do
           @client = Occi::Api::Client::ClientHttp.new(
@@ -179,10 +179,10 @@ module Occi
 
     end
 
-    describe ClientHttp do
+    vcr_options = { :record => :new_episodes }
+    describe ClientHttp, :vcr => vcr_options do
 
-      vcr_options = { :cassette_name => "client_http_application_occi_json", :record => :new_episodes }
-      describe "using media type application/occi+json", :vcr => vcr_options do
+      describe "using media type application/occi+json" do
 
         before(:each) do
           #@client = Occi::Api::ClientHttp.new(
