@@ -5,7 +5,7 @@ module Occi
   module Infrastructure
     describe Compute do
 
-      it "should create a storagelink to an existing storage resource" do
+      it "creates a storagelink to an existing storage resource" do
         compute = Occi::Infrastructure::Compute.new
         target = Occi::Infrastructure::Storage.new
         # create a random ID as the storage resource must already exist and therefore must have an ID assigned
@@ -16,7 +16,7 @@ module Occi
         compute.links.first.target.should be target
       end
 
-      it "should create a networkinterface to an existing network resource" do
+      it "creates a networkinterface to an existing network resource" do
         compute = Occi::Infrastructure::Compute.new
         target = Occi::Infrastructure::Network.new
         # create a random ID as the network resource must already exist and therefore must have an ID assigned

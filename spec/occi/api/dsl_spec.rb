@@ -7,13 +7,13 @@ module Occi
 
         context "using ClientHttp" do
 
-          it "should do something"
+          it "does something"
 
         end
 
         context "using ClientAmqp" do
 
-          it "should do something"
+          it "does something"
 
         end
 

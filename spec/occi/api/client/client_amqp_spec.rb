@@ -11,13 +11,13 @@ module Occi
 
       context "using media type application/occi+json" do
 
-        it "should do something"
+        it "does something"
 
       end
 
       context "using media type text/plain" do
 
-        it "should do something"
+        it "does something"
 
       end
 
