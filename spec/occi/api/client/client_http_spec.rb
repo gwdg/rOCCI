@@ -72,35 +72,35 @@ module Occi
         end
 
         it "lists all available resource types" do
-          @client.get_resource_types
+          @client.get_resource_types.should include("compute", "storage", "network")
         end
 
         it "lists all available resource type identifiers" do
-          @client.get_resource_type_identifiers
+          @client.get_resource_type_identifiers.should include("http://schemas.ogf.org/occi/infrastructure#compute", "http://schemas.ogf.org/occi/infrastructure#network", "http://schemas.ogf.org/occi/infrastructure#storage")
         end
 
         it "lists all available entity types" do
-          @client.get_entity_types
+          @client.get_entity_types.should include("entity", "resource", "link")
         end
 
         it "lists all available entity type identifiers" do
-          @client.get_entity_type_identifiers
+          @client.get_entity_type_identifiers.should include("http://schemas.ogf.org/occi/core#entity", "http://schemas.ogf.org/occi/core#resource", "http://schemas.ogf.org/occi/core#link")
         end
 
         it "lists all available link types" do
-          @client.get_link_types
+          @client.get_link_types.should include("storagelink", "networkinterface")
         end
 
         it "lists all available link type identifiers" do
-          @client.get_link_type_identifiers
+          @client.get_link_type_identifiers.should include("http://schemas.ogf.org/occi/infrastructure#storagelink", "http://schemas.ogf.org/occi/infrastructure#networkinterface")
         end
 
         it "lists all available mixin types" do
-          @client.get_mixin_types
+          @client.get_mixin_types.should include("os_tpl", "resource_tpl")
         end
 
         it "lists all available mixin type identifiers" do
-          @client.get_mixin_type_identifiers
+          @client.get_mixin_type_identifiers.should include("http://schemas.ogf.org/occi/infrastructure#os_tpl", "http://schemas.ogf.org/occi/infrastructure#resource_tpl")
         end
 
         it "lists compute resources" do
