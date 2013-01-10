@@ -769,7 +769,7 @@ module Occi
                 collection.resources.first.location if collection.resources.first
               end
             when 201
-              URI.parse(response.header['Location']).to_s
+              Occi::Parser.locations(@media_type, response.body, response.header).first
             else
               raise "HTTP POST failed! #{response_msg}"
           end

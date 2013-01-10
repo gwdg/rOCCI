@@ -10,13 +10,6 @@ module Occi
       attr_reader :endpoint, :auth_options, :connected, :last_response_status
       attr_accessor :media_type, :model
 
-      CONNECTION_SETTING = {
-          :host => 'localhost', #IP of the MessageBroker (RabbitMQ)
-          :port => 5672,
-          :vhost => '/' ,
-          :password => 'password'
-      }
-
       # hash mapping HTTP response codes to human-readable messages
       HTTP_CODES = {
           "100" => "Continue",
@@ -75,9 +68,16 @@ module Occi
       # @param [Boolean] enable autoconnect
       # @param [String] media type identifier
       # @return [Occi::Api::Client::ClientAmqp] client instance
-      def initialize(endpoint = "http://localhost:3000/", auth_options = { :type => "none" },
+      # @param [Hash] connection_setting
+      # @param [Object] auth_options
+      # @param [Object] log_options
+      # @param [Object] media_type
+      def initialize(connection_setting, endpoint = "http://localhost:3000/", auth_options = { :type => "none" },
           log_options = { :out => STDERR, :level => Occi::Log::WARN, :logger => nil },
           media_type = "text/plain")
+
+
+        @connection_setting = connection_setting
 
         # check the validity and canonize the endpoint URI
         prepare_endpoint endpoint
@@ -488,7 +488,7 @@ module Occi
 
       def run
         begin
-          AMQP.start(CONNECTION_SETTING) do |connection, open_ok|
+          AMQP.start(@connection_setting) do |connection, open_ok|
             @channel  = AMQP::Channel.new(connection)
             @exchange = @channel.default_exchange
 
