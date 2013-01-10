@@ -15,7 +15,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 09 Jan 2013 22:01:49 GMT
+      - Thu, 10 Jan 2013 13:52:01 GMT
       Server:
       - Apache/2.2.22 (Ubuntu)
       X-Powered-By:
@@ -27,10 +27,10 @@ http_interactions:
       Accept:
       - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
       Set-Cookie:
-      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFNjc4NmM1NzA2NDAzZmE3ZTYxYWI3%0ANWIyMDMzMDVlOGRkZmMzYmFiMjczNzUwZjFhNDIxMTBlZjdmODliMjM2Y0ki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--538198e83d66bbcb9bd86205a8c0768b64ac02ca;
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFODY4OGY0YzkxMzg3OGU2ZDExYjRm%0ANWZhMDUzMWQxMDllMjk4YTMyMDRhMWRmODZhMzJlODkzNjA3OGRmYWU0Nkki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--226357119a9d4fc759e9404447c370e9b0500ee5;
         path=/; HttpOnly
       Content-Length:
-      - '410'
+      - '738'
       Status:
       - '200'
       Vary:
@@ -41,7 +41,7 @@ http_interactions:
       encoding: US-ASCII
       string: ''
     http_version: 
-  recorded_at: Wed, 09 Jan 2013 22:02:29 GMT
+  recorded_at: Thu, 10 Jan 2013 13:52:41 GMT
 - request:
     method: get
     uri: http://141.5.99.69/-/
@@ -57,7 +57,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 09 Jan 2013 22:01:49 GMT
+      - Thu, 10 Jan 2013 13:52:01 GMT
       Server:
       - Apache/2.2.22 (Ubuntu)
       X-Powered-By:
@@ -69,7 +69,7 @@ http_interactions:
       Accept:
       - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
       Set-Cookie:
-      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFMzcwNzg3M2Y1MTliM2UxOGYwYWUw%0AMWQwNjM3YWU1ZDAxYTg5ZWQ5OWZmMzhlZGJhNDg3OTA0OGUyODM4NmRhN0ki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--235fe18a9e1ddc1676baf64cdfbf4c5a3d0cf6f8;
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFNDRjNDM5MDFkNWRkNTIzMTJjYzUx%0AM2NjOWYwMWY5YjkwZmNiMGVjOTM4YTQ5ODBjYzVlMzA3NzI1ZjlhNjUwOEki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--c224a47b47b5493715194c2186691ae91fa899e6;
         path=/; HttpOnly
       Content-Length:
       - '6397'
@@ -182,5 +182,5 @@ http_interactions:
 
 '
     http_version: 
-  recorded_at: Wed, 09 Jan 2013 22:02:29 GMT
+  recorded_at: Thu, 10 Jan 2013 13:52:41 GMT
 recorded_with: VCR 2.4.0
