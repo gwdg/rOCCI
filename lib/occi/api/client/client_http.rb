@@ -769,7 +769,9 @@ module Occi
                 collection.resources.first.location if collection.resources.first
               end
             when 201
-              URI.parse(response.header['Location']).to_s
+              # TODO: Isn't this a bug? Should body contain X-OCCI-Locations?
+              body = response.body.gsub "X-OCCI-Location:", ''
+              URI.parse(body.strip).to_s
             else
               raise "HTTP POST failed! #{response_msg}"
           end
