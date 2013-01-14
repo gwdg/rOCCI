@@ -47,6 +47,7 @@ module Occi
 
     def self.locations(media_type, body, header)
       locations = self.header_locations(header)
+      locations << header['Location'] if !header['Location'].nil? && header['Location'].any?
       case media_type
         when 'text/uri-list'
           body.each_line { |line| locations << URI.parse(line.chomp) }
