@@ -32,7 +32,9 @@ module Occi
 
         if related.first.to_s == 'http://schemas.ogf.org/occi/core#entity' or related.first.nil?
           parent = Occi::Core::Entity
-        elsif related.first.kind_of? Occi::Core::Category
+        elsif related.first.kind_of? Occi::Core::Kind
+          parent = related.first.entity_type
+        elsif related.first.kind_of? Occi::Core::Mixin
           parent = related.first.class
         else
           related_scheme, related_term = related.first.to_s.split '#'
