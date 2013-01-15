@@ -57,9 +57,9 @@ module Occi
       end
 
       # @param [Occi::Model] model
-      def check(model)
+      def check
         raise "rel must be provided" unless @rel
-        super(model)
+        super
       end
 
       # @param [Hash] options
