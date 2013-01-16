@@ -17,12 +17,15 @@ The following setup is recommended
 Installation
 ------------
 To install the most recent stable version
+
     gem install occi
 
 To install the most recent beta version
+
     gem install occi --pre
 
 To build and install the bleeding edge version from master
+
     git clone git://github.com/gwdg/rOCCI.git
     cd rOCCI
     rake install

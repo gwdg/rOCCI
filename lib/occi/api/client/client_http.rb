@@ -160,7 +160,7 @@ module Occi
         # Retrieves all available entity types.
         #
         # @example
-        #    client.get_entity_types # => [ "compute", "storage", "network" ]
+        #    client.get_entity_types # => [ "entity", "resource", "link" ]
         #
         # @return [Array<String>] list of available entity types in a human-readable format
         def get_entity_types
@@ -172,9 +172,9 @@ module Occi
         #
         # @example
         #    client.get_entity_type_identifiers
-        #    # => [ "http://schemas.ogf.org/occi/infrastructure#compute",
-        #    #      "http://schemas.ogf.org/occi/infrastructure#storage",
-        #    #      "http://schemas.ogf.org/occi/infrastructure#network" ]
+        #    # => [ "http://schemas.ogf.org/occi/core#entity",
+        #    #      "http://schemas.ogf.org/occi/core#resource",
+        #    #      "http://schemas.ogf.org/occi/core#link" ]
         #
         # @return [Array<String>] list of available entity types in a OCCI ID format
         def get_entity_type_identifiers
@@ -762,14 +762,14 @@ module Occi
 
           case response.code
             when 200
-              collection = Occi::Parser.parse(@media_type, response)
+              collection = Occi::Parser.parse(response.header["content-type"].split(";").first, response)
               if collection.empty?
-                Occi::Parser.locations(@media_type, response.body, response.header).first
+                Occi::Parser.locations(response.header["content-type"].split(";").first, response.body, response.header).first
               else
                 collection.resources.first.location if collection.resources.first
               end
             when 201
-              URI.parse(response.header['Location']).to_s
+              Occi::Parser.locations(response.header["content-type"].split(";").first, response.body, response.header).first
             else
               raise "HTTP POST failed! #{response_msg}"
           end
@@ -808,7 +808,7 @@ module Occi
 
           case response.code
             when 200, 201
-              Occi::Parser.parse(@media_type, response)
+              Occi::Parser.parse(response.header["content-type"].split(";").first, response)
             else
               raise "HTTP POST failed! #{response_msg}"
           end

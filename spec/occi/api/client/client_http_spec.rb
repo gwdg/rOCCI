@@ -5,11 +5,10 @@ module Occi
   module Api
     module Client
 
-    describe ClientHttp do
+    vcr_options = { :record => :new_episodes }
+    describe ClientHttp, :vcr => vcr_options do
 
-      describe "using media type text/plain" do
-
-        use_vcr_cassette "client_http_text_plain"
+      context "using media type text/plain" do
 
         before(:each) do
           @client = Occi::Api::Client::ClientHttp.new(
@@ -26,165 +25,168 @@ module Occi
           @client.logger.close
         end
 
-        it "should establish connection" do
+        it "establishes connection" do
           @client.connected.should be_true
         end
 
-        it "should create a compute resource" do
-          @client.get_resource "compute"
-          @client.get_resource "http://schemas.ogf.org/occi/infrastructure#compute"
+        it "instantiates a compute resource using type name" do
+          compute = @client.get_resource "compute"
+          
+          compute.should be_a_kind_of Occi::Core::Resource
+          compute.kind.type_identifier.should eq "http://schemas.ogf.org/occi/infrastructure#compute"
         end
 
-        it "should create a network resource" do
-          @client.get_resource "network"
-          @client.get_resource "http://schemas.ogf.org/occi/infrastructure#network"
+        it "instantiates a compute resource using type identifier" do
+          compute = @client.get_resource "http://schemas.ogf.org/occi/infrastructure#compute"
+          
+          compute.should be_a_kind_of Occi::Core::Resource
+          compute.kind.type_identifier.should eq "http://schemas.ogf.org/occi/infrastructure#compute"
         end
 
-        it "should create a storage resource" do
-          @client.get_resource "storage"
-          @client.get_resource "http://schemas.ogf.org/occi/infrastructure#storage"
+        it "instantiates a network resource using type name" do
+          network = @client.get_resource "network"
+
+          network.should be_a_kind_of Occi::Core::Resource
+          network.kind.type_identifier.should eq "http://schemas.ogf.org/occi/infrastructure#network"
         end
 
-        it "should list all available resource types" do
-          @client.get_resource_types
+        it "instantiates a network resource using type identifier" do
+          network = @client.get_resource "http://schemas.ogf.org/occi/infrastructure#network"
+
+          network.should be_a_kind_of Occi::Core::Resource
+          network.kind.type_identifier.should eq "http://schemas.ogf.org/occi/infrastructure#network"
         end
 
-        it "should list all available resource type identifiers" do
-          @client.get_resource_type_identifiers
+        it "instantiates a storage resource using type name" do
+          storage = @client.get_resource "storage"
+
+          storage.should be_a_kind_of Occi::Core::Resource
+          storage.kind.type_identifier.should eq "http://schemas.ogf.org/occi/infrastructure#storage"
         end
 
-        it "should list all available entity types" do
-          @client.get_entity_types
+        it "instantiates a storage resource using type identifier" do
+          storage = @client.get_resource "http://schemas.ogf.org/occi/infrastructure#storage"
+
+          storage.should be_a_kind_of Occi::Core::Resource
+          storage.kind.type_identifier.should eq "http://schemas.ogf.org/occi/infrastructure#storage"
         end
 
-        it "should list all available entity type identifiers" do
-          @client.get_entity_type_identifiers
+        it "lists all available resource types" do
+          @client.get_resource_types.should include("compute", "storage", "network")
         end
 
-        it "should list all available link types" do
-          @client.get_link_types
+        it "lists all available resource type identifiers" do
+          @client.get_resource_type_identifiers.should include("http://schemas.ogf.org/occi/infrastructure#compute", "http://schemas.ogf.org/occi/infrastructure#network", "http://schemas.ogf.org/occi/infrastructure#storage")
         end
 
-        it "should list all available link type identifiers" do
-          @client.get_link_type_identifiers
+        it "lists all available entity types" do
+          @client.get_entity_types.should include("entity", "resource", "link")
         end
 
-        it "should list all available mixin types" do
-          @client.get_mixin_types
+        it "lists all available entity type identifiers" do
+          @client.get_entity_type_identifiers.should include("http://schemas.ogf.org/occi/core#entity", "http://schemas.ogf.org/occi/core#resource", "http://schemas.ogf.org/occi/core#link")
         end
 
-        it "should list all available mixin type identifiers" do
-          @client.get_mixin_type_identifiers
+        it "lists all available link types" do
+          @client.get_link_types.should include("storagelink", "networkinterface")
         end
 
-        it "should list compute resources" do
+        it "lists all available link type identifiers" do
+          @client.get_link_type_identifiers.should include("http://schemas.ogf.org/occi/infrastructure#storagelink", "http://schemas.ogf.org/occi/infrastructure#networkinterface")
+        end
+
+        it "lists all available mixin types" do
+          @client.get_mixin_types.should include("os_tpl", "resource_tpl")
+        end
+
+        it "lists all available mixin type identifiers" do
+          @client.get_mixin_type_identifiers.should include("http://schemas.ogf.org/occi/infrastructure#os_tpl", "http://schemas.ogf.org/occi/infrastructure#resource_tpl")
+        end
+
+        it "lists compute resources" do
           @client.list "compute"
         end
 
-        it "should list network resources" do
+        it "lists network resources" do
           @client.list "network"
         end
 
-        it "should list storage resources" do
+        it "lists storage resources" do
           @client.list "storage"
         end
 
-        it "should list all available mixins" do
+        it "lists all available mixins" do
           @client.get_mixins
         end
 
-        it "should list os_tpl mixins" do
+        it "lists os_tpl mixins" do
           @client.get_mixins "os_tpl"
         end
 
-        it "should list resource_tpl mixins" do
+        it "lists resource_tpl mixins" do
           @client.get_mixins "resource_tpl"
         end
 
-        it "should describe compute resources" do
+        it "describes compute resources" do
           @client.describe "compute"
         end
 
-        it "should describe network resources" do
+        it "describes network resources" do
           @client.describe "network"
         end
 
-        it "should describe storage resources" do
+        it "describes storage resources" do
           @client.describe "storage"
         end
 
-        it "should describe all available mixins" do
+        it "describes all available mixins" do
           @client.get_mixins.each do |mixin|
             mixin_short = mixin.split("/").last
             @client.find_mixin mixin_short.split("#").last, mixin_short.split("#").first, true
           end
         end
 
-        it "should describe os_tpl mixins" do
+        it "describes os_tpl mixins" do
           @client.get_mixins("os_tpl").each do |mixin|
             mixin_short = mixin.split("/").last
             @client.find_mixin mixin_short.split("#").last, "os_tpl", true
           end
         end
 
-        it "should describe resource_tpl mixins" do
+        it "describes resource_tpl mixins" do
           @client.get_mixins("resource_tpl").each do |mixin|
             mixin_short = mixin.split("/").last
             @client.find_mixin mixin_short.split("#").last, "resource_tpl", true
           end
         end
 
-        it "should create a new compute resource" do
-        end
+        it "creates a new compute resource"
 
-        it "should create a new storage resource" do
-          # TODO
-        end
+        it "creates a new storage resource"
 
-        it "should create a new network resource" do
-          # TODO
-        end
+        it "creates a new network resource"
 
-        it "should deploy an instance based on OVF/OVA file" do
-          # TODO
-        end
+        it "deploys an instance based on OVF/OVA file"
 
-        it "should delete a compute resource" do
-        end
+        it "deletes a compute resource"
 
-        it "should delete a network resource" do
-          # TODO
-        end
+        it "deletes a network resource"
 
-        it "should delete a storage resource" do
-          # TODO
-        end
+        it "deletes a storage resource"
 
-        it "should trigger an action on a compute resource" do
-          # TODO
-        end
+        it "triggers an action on a compute resource"
 
-        it "should trigger an action on a storage resource" do
-          # TODO
-        end
+        it "triggers an action on a storage resource"
 
-        it "should trigger an action on a network resource" do
-          # TODO
-        end
+        it "triggers an action on a network resource"
 
-        it "should refresh its model" do
+        it "refreshes its model" do
           @client.refresh
         end
 
       end
 
-    end
-
-    describe ClientHttp do
-
-      describe "using media type application/occi+json" do
-
-        use_vcr_cassette "client_http_application_occi_json"
+      context "using media type application/occi+json" do
 
         before(:each) do
           #@client = Occi::Api::ClientHttp.new(
@@ -197,75 +199,51 @@ module Occi
           #)
         end
 
-        it "should establish connection" do
-          # TODO
-        end
+        it "establishes connection"
 
-        it "should list compute resources" do
-        end
+        it "lists compute resources"
 
-        it "should list network resources" do
-        end
+        it "lists network resources"
 
-        it "should list storage resources" do
-        end
+        it "lists storage resources"
 
-        it "should list all available mixins" do
-        end
+        it "lists all available mixins"
 
-        it "should list os_tpl mixins" do
-        end
+        it "lists os_tpl mixins"
 
-        it "should list resource_tpl mixins" do
-        end
+        it "lists resource_tpl mixins"
 
-        it "should describe compute resources" do
-        end
+        it "describes compute resources"
 
-        it "should describe network resources" do
-        end
+        it "describes network resources"
 
-        it "should describe storage resources" do
-        end
+        it "describes storage resources"
 
-        it "should describe all available mixins" do
-        end
+        it "describes all available mixins"
 
-        it "should describe os_tpl mixins" do
-        end
+        it "describes os_tpl mixins"
 
-        it "should describe resource_tpl mixins" do
-        end
+        it "describes resource_tpl mixins"
 
-        it "should create a new compute resource" do
-        end
+        it "creates a new compute resource"
 
-        it "should create a new storage resource" do
-        end
+        it "creates a new storage resource"
 
-        it "should create a new network resource" do
-        end
+        it "creates a new network resource"
 
-        it "should delete a compute resource" do
-        end
+        it "deletes a compute resource"
 
-        it "should delete a network resource" do
-        end
+        it "deletes a network resource"
 
-        it "should delete a storage resource" do
-        end
+        it "deletes a storage resource"
 
-        it "should trigger an action on a compute resource" do
-        end
+        it "triggers an action on a compute resource"
 
-        it "should trigger an action on a storage resource" do
-        end
+        it "triggers an action on a storage resource"
 
-        it "should trigger an action on a network resource" do
-        end
+        it "triggers an action on a network resource"
 
-        it "should refresh its model" do
-        end
+        it "refreshes its model"
 
       end
     end
