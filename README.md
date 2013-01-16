@@ -104,6 +104,12 @@ For X.509 auth use
     auth.user_cert_password = 'MyPassword'
     auth.ca_path = '/Path/To/root-certificates'
 
+For keystone auth use
+
+    auth = Hashie::Mash.new
+    auth.type = 'keystone'
+    auth.token = '887665443383838'
+
 #### DSL
 In your scripts, you can use the OCCI client DSL.
 
@@ -318,7 +324,19 @@ The OCCI gem includes all OCCI Core classes necessary to handly arbitrary OCCI o
 Changelog
 ---------
 
-### version 2.5
+### Version 3.0
+
+* many bugfixes
+* rewrote Core classes to use metaprogramming techniques
+* added VCR cassettes for reliable testing against prerecorded server responses
+* several updates to the OCCI Client
+* started work on an OCCI Client using AMQP as transport protocol
+* added support for keystone authentication to be used with the OpenStack OCCI server
+* updated dependencies
+* updated rspec tests
+* started work on cucumber features
+
+### Version 2.5
 
 * improved OCCI Client
 * improved documentation
