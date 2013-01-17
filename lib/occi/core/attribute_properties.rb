@@ -19,8 +19,8 @@ module OCCI
       # @return [Array] list of full attribute names
       def combine
         array = []
-        self.each_key do |key| || self[key].key?('type')
-          if self[key].key? 'Type'
+        self.each_key do |key|
+          if self[key].key?('Type') || self[key].key?('type')
             array << key
           else
             attribute = self[key]
@@ -35,7 +35,7 @@ module OCCI
       def combine_with_defaults
         hash = { }
         self.each_key do |key|
-          if self[key].include? 'Type' || self[key].include?('type')
+          if self[key].include?('Type') || self[key].include?('type')
             hash[key] = self[key]['Default']
           else
             self[key].combine_with_defaults.each { |k, v| hash[key + '.' + k] = v }
