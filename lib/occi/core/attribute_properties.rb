@@ -7,7 +7,7 @@ module OCCI
       # @param [Hashie::Mash] attributes
       # @param [Hash] default
       def initialize(attributes = nil, default = nil)
-        if [:Type, :Required, :Mutable, :Pattern, :Default, :Minimum, :Maximum, :Description].any? { |k| attributes.key?(k) }
+        if [:Type, :Required, :Mutable, :Pattern, :Default, :Minimum, :Maximum, :Description].any? { |k| attributes.key?(k.capitalize) }
           attributes[:Type]   ||= "string"
           attributes[:Required] ||= false
           attributes[:Mutable]  ||= false
@@ -19,7 +19,7 @@ module OCCI
       # @return [Array] list of full attribute names
       def combine
         array = []
-        self.each_key do |key|
+        self.each_key do |key| || self[key].key?('type')
           if self[key].key? 'Type'
             array << key
           else
@@ -35,7 +35,7 @@ module OCCI
       def combine_with_defaults
         hash = { }
         self.each_key do |key|
-          if self[key].include? 'Type'
+          if self[key].include? 'Type' || self[key].include?('type')
             hash[key] = self[key]['Default']
           else
             self[key].combine_with_defaults.each { |k, v| hash[key + '.' + k] = v }
@@ -66,11 +66,11 @@ module OCCI
           when "="
             key = match[1]
             self[key] = args.first
-            if %w|Type Required Mutable Pattern Default Minimum Maximum Description|.any? { |k| key.to_s == k }
-              self["Type"] = "string" unless key?("Type")
-              self["Required"] = false unless key?("Required")
-              self["Mutable"] = false unless key?("Mutable")
-              self["Pattern"] = ".*" unless key?("Pattern")
+            if %w|Type Required Mutable Pattern Default Minimum Maximum Description|.any? { |k| key.to_s.capitalize == k }
+              self["Type"] = "string" unless key?("Type") || key?("type")
+              self["Required"] = false unless key?("Required") || key?("required")
+              self["Mutable"] = false unless key?("Mutable") || key?("mutable")
+              self["Pattern"] = ".*" unless key?("Pattern") || key?("pattern")
             end
           when "?"
             !!self[match[1]]
@@ -86,11 +86,11 @@ module OCCI
       # into Mashes for nesting purposes.
       def []=(key, value) #:nodoc:
         regular_writer(convert_key(key), convert_value(value))
-        if %w|Type Required Mutable Pattern Default Minimum Maximum Description|.any? { |k| key.to_s == k }
-          self["Type"] = "string" unless key?("Type")
-          self["Required"] = false unless key?("Required")
-          self["Mutable"] = false unless key?("Mutable")
-          self["Pattern"] = ".*" unless key?("Pattern")
+        if %w|Type Required Mutable Pattern Default Minimum Maximum Description|.any? { |k| key.to_s.capitalize == k }
+          self["Type"] = "string" unless key?("Type") || key?("type")
+          self["Required"] = false unless key?("Required") || key?("required")
+          self["Mutable"] = false unless key?("Mutable") || key?("mutable")
+          self["Pattern"] = ".*" unless key?("Pattern") || key?("pattern")
         end
       end
 
