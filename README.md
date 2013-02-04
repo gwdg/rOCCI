@@ -30,6 +30,16 @@ To build and install the bleeding edge version from master
     cd rOCCI
     rake install
 
+To build a Java jar file from master use
+
+    git clone git://github.com/gwdg/rOCCI.git
+    warble
+
+On Linux / Mac OS X you can create the occi executable (still requiring Java) from the jar file using
+
+    echo '#!/usr/bin/java -jar' | cat - occi.jar > occi ; chmod +x occi
+    ./occi --help
+
 Usage
 -----
 ### Client
