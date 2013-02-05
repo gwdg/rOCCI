@@ -14,6 +14,13 @@ The following setup is recommended
 * Ruby 1.9.3
 * RubyGems installed
 
+The following libraries / packages may be required to use rOCCI
+
+* libxslt-dev
+* libxml2-dev
+
+To use rOCCI with Java, you need JRE 6 or 7. To build rOCCI for Java, you need JDK 6 or 7.
+
 Installation
 ------------
 To install the most recent stable version
@@ -24,11 +31,38 @@ To install the most recent beta version
 
     gem install occi --pre
 
+### Installation from source
+
+To use rOCCI from source it is very much recommended to use RVM. [Install RVM](https://rvm.io/rvm/install/) with
+
+    curl -L https://get.rvm.io | bash -s stable --ruby
+
+#### Ruby
+
 To build and install the bleeding edge version from master
 
     git clone git://github.com/gwdg/rOCCI.git
     cd rOCCI
+    rvm install ruby-1.9.3
+    rvm --create --ruby-version use 1.9.3@rOCCI
+    bundle install --deployment
     rake install
+
+#### Java
+
+To build a Java jar file from master use
+
+    git clone git://github.com/gwdg/rOCCI.git
+    cd rOCCI
+    rvm install jruby-1.7.1
+    rvm --create --ruby-version use jruby-1.7.1@rOCCI
+    gem install bundler
+    bundle install
+    warble
+
+For Linux / Mac OS X you can create a OCCI Java executable from the jar file using
+
+    sudo echo '#!/usr/bin/java -jar' | cat - occi.jar > occi ; sudo chmod +x occi
 
 Usage
 -----
@@ -385,7 +419,7 @@ Change to rOCCI folder
 
 Install dependencies for deployment
 
-    bundle install --deployment
+    bundle install
 
 ### Code Documentation
 
