@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'httparty'
+require 'openssl'
 require 'occi/api/client/http/net_http_fix'
 require 'occi/api/client/http/httparty_fix'
 
@@ -646,7 +647,26 @@ module Occi
               raise ArgumentError, "Missing required option 'user_cert' for x509 auth!" unless @auth_options[:user_cert]
               raise ArgumentError, "The file specified in 'user_cert' does not exist!" unless File.exists? @auth_options[:user_cert]
 
-              self.class.pem File.read(@auth_options[:user_cert]), @auth_options[:user_cert_password]
+              # handle PKCS#12 credentials
+              if /\A(.)+\.p12\z/ =~ @auth_options[:user_cert]
+                # decode certificate and its private key
+                if (defined? RUBY_PLATFORM) && RUBY_PLATFORM == 'java'
+                  raise ArgumentError, "Reading credentials from PKCS#12 files is not supported in jRuby!"
+                else
+                  pkcs12 = OpenSSL::PKCS12.new(File.open(@auth_options[:user_cert], 'rb'), @auth_options[:user_cert_password])
+                end
+
+                # store them in a single variable in PEM format
+                pem_from_pkcs12 = ""
+                pem_from_pkcs12 << pkcs12.certificate.to_pem << pkcs12.key.to_pem
+
+                # private key has already been decrypted
+                self.class.pem pem_from_pkcs12, ''
+              else
+                # httparty will handle ordinary PEM formatted credentials
+                self.class.pem File.open(@auth_options[:user_cert], 'rb').read, @auth_options[:user_cert_password]
+              end
+
               self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil?
               self.class.ssl_ca_file @auth_options[:ca_file] unless @auth_options[:ca_file].nil?
               self.class.ssl_extra_chain_cert certs_to_file_ary(@auth_options[:proxy_ca]) unless @auth_options[:proxy_ca].nil?
