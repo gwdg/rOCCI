@@ -1,13 +1,9 @@
 require 'rubygems'
 require 'httparty'
-require 'openssl'
-
-if defined? JRUBY_VERSION
-  require 'java'
-end
 
 require 'occi/api/client/http/net_http_fix'
 require 'occi/api/client/http/httparty_fix'
+require 'occi/api/client/http/authn_utils'
 
 module Occi
   module Api
@@ -655,15 +651,16 @@ module Occi
               # handle PKCS#12 credentials before passing them
               # to httparty
               if /\A(.)+\.p12\z/ =~ @auth_options[:user_cert]
-                self.class.pem extract_pem_from_pkcs12(@auth_options[:user_cert], @auth_options[:user_cert_password]), ''
+                self.class.pem AuthnUtils.extract_pem_from_pkcs12(@auth_options[:user_cert], @auth_options[:user_cert_password]), ''
               else
                 # httparty will handle ordinary PEM formatted credentials
+                # TODO: Issue #49, check PEM credentials in jRuby
                 self.class.pem File.open(@auth_options[:user_cert], 'rb').read, @auth_options[:user_cert_password]
               end
 
               self.class.ssl_ca_path @auth_options[:ca_path] unless @auth_options[:ca_path].nil?
               self.class.ssl_ca_file @auth_options[:ca_file] unless @auth_options[:ca_file].nil?
-              self.class.ssl_extra_chain_cert certs_to_file_ary(@auth_options[:proxy_ca]) unless @auth_options[:proxy_ca].nil?
+              self.class.ssl_extra_chain_cert AuthnUtils.certs_to_file_ary(@auth_options[:proxy_ca]) unless @auth_options[:proxy_ca].nil?
             when "keystone"
               # set up OpenStack Keystone token based auth
               raise ArgumentError, "Missing required option 'token' for OpenStack Keystone auth!" unless @auth_options[:token]
@@ -673,73 +670,6 @@ module Occi
             else
               raise ArgumentError, "Unknown AUTH method [#{@auth_options[:type]}]!"
           end
-        end
-
-        # Reads credentials from a PKCS#12 compliant file. Returns
-        # X.509 certificate and decrypted private key in PEM
-        # formatted string.
-        #
-        # @example
-        #    extract_pem_from_pkcs12 "~/.globus/usercert.p12", "123456"
-        #      # => #<String>
-        #
-        # @param [String] Path to a PKCS#12 file with credentials
-        # @param [String] Password needed to unlock the PKCS#12 file
-        # @return [String] Decrypted credentials in a PEM formatted string
-        def extract_pem_from_pkcs12(path_to_p12_file, p12_password)
-          # decode certificate and its private key
-          pem_from_pkcs12 = ""
-          if defined? JRUBY_VERSION
-            # Java-based Ruby, read PKCS12 manually
-            # using KeyStore
-            keystore = Java::JavaSecurity::KeyStore.getInstance("PKCS12")
-            p12_input_stream = Java::JavaIo::FileInputStream.new(path_to_p12_file)
-            pass_char_array = Java::JavaLang::String.new(p12_password).to_char_array
-
-            # load and unlock PKCS#12 store
-            keystore.load p12_input_stream, pass_char_array
-
-            # read the first certificate and PK
-            cert = keystore.getCertificate("1")
-            pk = keystore.getKey("1", pass_char_array)
-
-            pem_from_pkcs12 << "-----BEGIN CERTIFICATE-----\n"
-            pem_from_pkcs12 << Java::JavaxXmlBind::DatatypeConverter.printBase64Binary(cert.getEncoded())
-            pem_from_pkcs12 << "\n-----END CERTIFICATE-----"
-
-            pem_from_pkcs12 << "\n"
-
-            pem_from_pkcs12 << "-----BEGIN PRIVATE KEY-----\n"
-            pem_from_pkcs12 << Java::JavaxXmlBind::DatatypeConverter.printBase64Binary(pk.getEncoded())
-            pem_from_pkcs12 << "\n-----END PRIVATE KEY-----"
-          else
-            # C-based Ruby, use OpenSSL::PKCS12
-            pkcs12 = OpenSSL::PKCS12.new(
-              File.open(
-                path_to_p12_file,
-                'rb'
-              ),
-              p12_password
-            )
-
-            # store cert and private key in a single PEM formatted string
-            pem_from_pkcs12 << pkcs12.certificate.to_pem << pkcs12.key.to_pem
-          end
-
-          pem_from_pkcs12
-        end
-
-        # Reads X.509 certificates from a file to an array.
-        #
-        # @example
-        #    certs_to_file_ary "~/.globus/usercert.pem"
-        #      # => [#<String>, #<String>, ...]
-        #
-        # @param [String] Path to a PEM file containing certificates
-        # @return [Array<String>] An array of read certificates
-        def certs_to_file_ary(ca_file)
-          # TODO: read and separate multiple certificates
-          [] << File.read(ca_file)
         end
 
         # Performs GET request and parses the responses to collections.
