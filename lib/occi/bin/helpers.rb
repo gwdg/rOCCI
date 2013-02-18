@@ -1,6 +1,6 @@
 # a bunch of OCCI client helpers for bin/occi
 
-def helper_list(options)
+def helper_list(options, output)
   found = []
 
   if resource_types.include? options.resource
@@ -10,17 +10,21 @@ def helper_list(options)
     Occi::Log.debug "#{options.resource} is a mixin type."
     found = mixins options.resource
   else
-    Occi::Log.debug "I have no idea what #{options.resource} is ..."
-    puts "Unknown resource #{options.resource}, there is nothing to list here!"
+    Occi::Log.warn "I have no idea what #{options.resource} is ..."
+    raise "Unknown resource #{options.resource}, there is nothing to list here!"
   end
 
-  found
+  if Occi::Bin::ResourceOutputFactory.allowed_resource_types.include? options.resource.to_sym
+    puts output.format(found, :locations, options.resource.to_sym)
+  else
+    Occi::Log.warn "Not printing, the resource type is not supported!"
+  end
 end
 
-def helper_describe(options)
+def helper_describe(options, output)
   found = []
 
-  if resource_types.include? options.resource or options.resource.start_with? options.endpoint
+  if resource_types.include?(options.resource) || options.resource.start_with?(options.endpoint) || options.resource.start_with?('/')
     Occi::Log.debug "#{options.resource} is a resource type or an actual resource."
 
     found = describe(options.resource)
@@ -37,15 +41,35 @@ def helper_describe(options)
     mxn_type,mxn = options.resource.split('#')
     found << mixin(mxn, mxn_type, true)
   else
-    Occi::Log.debug "I have no idea what #{options.resource} is ..."
-
-    puts "Unknown resource #{options.resource}, there is nothing to describe here!"
+    Occi::Log.warn "I have no idea what #{options.resource} is ..."
+    raise "Unknown resource #{options.resource}, there is nothing to describe here!"
   end
 
-  found
+  if options.resource.start_with? options.endpoint
+    # resource contains full endpoint URI
+    # e.g., http://localhost:3300/network/adfgadf-daf5a6df4afadf-adfad65f4ad
+    resource_type = options.resource.split('/')[3].to_sym
+  elsif options.resource.start_with? '/'
+    # resource contains a path relative to endpoint URI
+    # e.g., /network/adfgadf-daf5a6df4afadf-adfad65f4ad
+    resource_type = options.resource.split('/')[1].to_sym
+  elsif mixin_types.include? options.resource.split('#').first
+    # resource contains a mixin with a type
+    # e.g., os_tpl#debian6
+    resource_type = options.resource.split('#').first.to_sym
+  else
+    # resource probably contains RAW resource_type
+    resource_type = options.resource.to_sym
+  end
+
+  if Occi::Bin::ResourceOutputFactory.allowed_resource_types.include? resource_type
+    puts output.format(found, :resources, resource_type)
+  else
+    Occi::Log.warn "Not printing, the resource type [#{resource_type.to_s}] is not supported!"
+  end
 end
 
-def helper_create(options)
+def helper_create(options, output)
   location = nil
 
   if resource_types.include? options.resource
@@ -75,17 +99,21 @@ def helper_create(options)
 
     location = create res
   else
-    Occi::Log.debug "I have no idea what #{options.resource} is ..."
-    puts "Unknown resource #{options.resource}, there is nothing to create here!"
+    Occi::Log.warn "I have no idea what #{options.resource} is ..."
+    raise "Unknown resource #{options.resource}, there is nothing to create here!"
   end
 
-  location
+  puts location
 end
 
-def helper_delete(options)
-  delete options.resource
+def helper_delete(options, output)
+  if delete(options.resource)
+    puts "Resource #{options.resource} successfully removed!"
+  else
+    raise "Failed to remove resource #{options.resource}!"
+  end
 end
 
-def helper_trigger(options)
+def helper_trigger(options, output)
   raise "Not yet implemented!"
 end
