@@ -150,9 +150,13 @@ For keystone auth use
 #### DSL
 In your scripts, you can use the OCCI client DSL.
 
-To include the DSL definitions in your script use
+To include the DSL definitions in a script use
 
     extend Occi::Api::Dsl
+
+To include the DSL definitions in a class use
+
+    include Occi::Api:Dsl
 
 To connect to an OCCI endpoint/server (e.g. running on http://localhost:3300/ )
 

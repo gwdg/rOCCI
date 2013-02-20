@@ -108,7 +108,7 @@ end
 
 def helper_delete(options, output)
   if delete(options.resource)
-    puts "Resource #{options.resource} successfully removed!"
+    Occi::Log.info "Resource #{options.resource} successfully removed!"
   else
     raise "Failed to remove resource #{options.resource}!"
   end

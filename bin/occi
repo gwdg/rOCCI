@@ -96,7 +96,7 @@ end
 if options.dump_model
 
   if !model.respond_to? :instance_variables
-    puts "Your Ruby doesn't support 'instance_variables' calls!"
+    Occi::Log.error "Your Ruby doesn't support 'instance_variables' calls!"
     exit!
   end
 
