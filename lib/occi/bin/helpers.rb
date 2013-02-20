@@ -1,6 +1,6 @@
 # a bunch of OCCI client helpers for bin/occi
 
-def helper_list(options, output)
+def helper_list(options, output = nil)
   found = []
 
   if resource_types.include? options.resource
@@ -14,6 +14,8 @@ def helper_list(options, output)
     raise "Unknown resource #{options.resource}, there is nothing to list here!"
   end
 
+  return found if output.nil?
+
   if Occi::Bin::ResourceOutputFactory.allowed_resource_types.include? options.resource.to_sym
     puts output.format(found, :locations, options.resource.to_sym)
   else
@@ -21,7 +23,7 @@ def helper_list(options, output)
   end
 end
 
-def helper_describe(options, output)
+def helper_describe(options, output = nil)
   found = []
 
   if resource_types.include?(options.resource) || options.resource.start_with?(options.endpoint) || options.resource.start_with?('/')
@@ -44,6 +46,8 @@ def helper_describe(options, output)
     Occi::Log.warn "I have no idea what #{options.resource} is ..."
     raise "Unknown resource #{options.resource}, there is nothing to describe here!"
   end
+
+  return found if output.nil?
 
   if options.resource.start_with? options.endpoint
     # resource contains full endpoint URI
@@ -69,7 +73,7 @@ def helper_describe(options, output)
   end
 end
 
-def helper_create(options, output)
+def helper_create(options, output = nil)
   location = nil
 
   if resource_types.include? options.resource
@@ -79,11 +83,11 @@ def helper_create(options, output)
     res = resource options.resource
 
     Occi::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
-    Occi::Log.debug "with mixins:#{options.mixin}"
+    Occi::Log.debug "with mixins:#{options.mixins}"
 
-    options.mixin.keys.each do |type|
+    options.mixins.keys.each do |type|
       Occi::Log.debug "Adding mixins of type #{type} to #{options.resource}"
-      options.mixin[type].each do |name|
+      options.mixins[type].each do |name|
         mxn = mixin name, type
 
         raise "Unknown mixin #{type}##{name}, stopping here!" if mxn.nil?
@@ -93,7 +97,7 @@ def helper_create(options, output)
     end
 
     #TODO: set other attributes
-    res.title = options.resource_title
+    res.title = options.attributes[:title]
 
     Occi::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
 
@@ -103,17 +107,21 @@ def helper_create(options, output)
     raise "Unknown resource #{options.resource}, there is nothing to create here!"
   end
 
+  return location if output.nil?
+
   puts location
 end
 
-def helper_delete(options, output)
+def helper_delete(options, output = nil)
   if delete(options.resource)
     Occi::Log.info "Resource #{options.resource} successfully removed!"
   else
     raise "Failed to remove resource #{options.resource}!"
   end
+
+  true
 end
 
-def helper_trigger(options, output)
+def helper_trigger(options, output = nil)
   raise "Not yet implemented!"
 end

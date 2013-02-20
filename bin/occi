@@ -239,17 +239,19 @@ begin
         # if the user didn't choose "Back", ask for details
         # TODO: currently only COMPUTE is supported
         if options.action == :create
-          options.resource_title = ask("What name should I give to the new resource? ")
+          options.attributes = {} if options.attributes.nil?
+
+          options.attributes[:title] = ask("What name should I give to the new resource? ")
           number_of_mixins = ask("How many mixins do you wish me to mix into this resource? ",
                                  Integer) { |q| q.in = 0..2 }
 
-          options.mixin = {}
+          options.mixins = {}
           (1..number_of_mixins).each do |mixin_number|
             mixin = ask("What mixin should I mix in? ") { |q| q.validate = /\A\w+#\w+\Z/ }
             parts = mixin.split("#")
 
-            options.mixin[parts[0]] = [] if options.mixin[parts[0]].nil?
-            options.mixin[parts[0]] << parts[1]
+            options.mixins[parts[0]] = [] if options.mixins[parts[0]].nil?
+            options.mixins[parts[0]] << parts[1]
           end
         end
       }
