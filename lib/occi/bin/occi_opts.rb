@@ -14,7 +14,11 @@ module Occi
       ACTIONS = [:list, :describe, :create, :delete, :trigger].freeze
       LOG_OUTPUTS = [:stdout, :stderr].freeze
 
-      def self.parse(args)
+      @@quiet = false
+
+      def self.parse(args, keep_quiet = false)
+
+        @@quiet = keep_quiet
 
         options = OpenStruct.new
         
@@ -274,24 +278,24 @@ Examples:
           opts.on_tail("-h",
                        "--help",
                        "Show this message") do
-            puts opts
-            exit!(true)
+            puts opts unless @@quiet
+            exit true
           end
 
           opts.on_tail("-v",
                        "--version",
                        "Show version") do
-            puts Occi::VERSION
-            exit!(true)
+            puts Occi::VERSION unless @@quiet
+            exit true
           end
         end
 
         begin
           opts.parse!(args)
         rescue Exception => ex
-          puts ex.message.capitalize
-          puts opts
-          exit!
+          puts ex.message.capitalize unless @@quiet
+          puts opts unless @@quiet
+          exit false
         end
 
         check_restrictions options, opts
@@ -303,17 +307,17 @@ Examples:
 
       def self.check_restrictions(options, opts)
         if options.interactive && options.dump_model
-          puts "You cannot use '--dump-model' and '--interactive' at the same time!"
-          puts opts
+          puts "You cannot use '--dump-model' and '--interactive' at the same time!" unless @@quiet
+          puts opts unless @@quiet
 
-          exit!
+          exit false
         end
 
         if !options.dump_model && options.filter
-          puts "You cannot use '--filter' without '--dump-model'!"
-          puts opts
+          puts "You cannot use '--filter' without '--dump-model'!" unless @@quiet
+          puts opts unless @@quiet
 
-          exit!
+          exit false
         end
 
         return if options.interactive || options.dump_model
@@ -352,10 +356,10 @@ Examples:
 
         missing = mandatory.select{ |param| hash[param].nil? }
         if !missing.empty?
-          puts "Missing required arguments: #{missing.join(', ')}"
-          puts opts
+          puts "Missing required arguments: #{missing.join(', ')}" unless @@quiet
+          puts opts unless @@quiet
 
-          exit!
+          exit false
         end
       end
     end
