@@ -85,6 +85,7 @@ GEM
     rspec-http (0.10.0)
       rspec (~> 2.0)
     rspec-mocks (2.12.1)
+    rubygems-tasks (0.2.3)
     rubyzip (0.9.9)
     simplecov (0.7.1)
       multi_json (~> 1.0)
@@ -114,6 +115,7 @@ DEPENDENCIES
   rake
   rspec
   rspec-http
+  rubygems-tasks
   simplecov
   vcr!
   warbler!
