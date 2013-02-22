@@ -23,6 +23,10 @@ To use rOCCI with Java, you need JRE 6 or 7. To build rOCCI for Java, you need J
 
 Installation
 ------------
+
+**[Mac OS X has some special requirements for the installation. Detailed information can be found in
+doc/macosx.md.](doc/macosx.md)**
+
 To install the most recent stable version
 
     gem install occi
