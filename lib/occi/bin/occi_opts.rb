@@ -14,11 +14,9 @@ module Occi
       ACTIONS = [:list, :describe, :create, :delete, :trigger].freeze
       LOG_OUTPUTS = [:stdout, :stderr].freeze
 
-      @@quiet = false
+      def self.parse(args, test_env = false)
 
-      def self.parse(args, keep_quiet = false)
-
-        @@quiet = keep_quiet
+        @@quiet = test_env
 
         options = OpenStruct.new
         
@@ -278,24 +276,36 @@ Examples:
           opts.on_tail("-h",
                        "--help",
                        "Show this message") do
-            puts opts unless @@quiet
-            exit true
+            if @@quiet
+              exit true
+            else
+              puts opts
+              exit! true
+            end
           end
 
           opts.on_tail("-v",
                        "--version",
                        "Show version") do
-            puts Occi::VERSION unless @@quiet
-            exit true
+            if @@quiet
+              exit true
+            else
+              puts Occi::VERSION
+              exit! true
+            end
           end
         end
 
         begin
           opts.parse!(args)
         rescue Exception => ex
-          puts ex.message.capitalize unless @@quiet
-          puts opts unless @@quiet
-          exit false
+          if @@quiet
+            exit false
+          else
+            puts ex.message.capitalize
+            puts opts
+            exit!
+          end
         end
 
         check_restrictions options, opts
@@ -307,17 +317,23 @@ Examples:
 
       def self.check_restrictions(options, opts)
         if options.interactive && options.dump_model
-          puts "You cannot use '--dump-model' and '--interactive' at the same time!" unless @@quiet
-          puts opts unless @@quiet
-
-          exit false
+          if @@quiet
+            exit false
+          else
+            puts "You cannot use '--dump-model' and '--interactive' at the same time!"
+            puts opts
+            exit!
+          end
         end
 
         if !options.dump_model && options.filter
-          puts "You cannot use '--filter' without '--dump-model'!" unless @@quiet
-          puts opts unless @@quiet
-
-          exit false
+          if @@quiet
+            exit false
+          else
+            puts "You cannot use '--filter' without '--dump-model'!"
+            puts opts
+            exit!
+          end
         end
 
         return if options.interactive || options.dump_model
@@ -356,10 +372,13 @@ Examples:
 
         missing = mandatory.select{ |param| hash[param].nil? }
         if !missing.empty?
-          puts "Missing required arguments: #{missing.join(', ')}" unless @@quiet
-          puts opts unless @@quiet
-
-          exit false
+          if @@quiet
+            exit false
+          else
+            puts "Missing required arguments: #{missing.join(', ')}"
+            puts opts
+            exit!
+          end
         end
       end
     end
