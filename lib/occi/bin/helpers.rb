@@ -88,6 +88,8 @@ def helper_create(options, output = nil)
       Occi::Log.debug "with links: #{options.links}"
 
       options.links.each do |link|
+        link = options.endpoint.chomp('/') + link unless link.start_with? options.endpoint
+
         if link.include? "/storage/"
           Occi::Log.debug "Adding storagelink to #{options.resource}"
           res.storagelink link
