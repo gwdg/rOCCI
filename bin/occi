@@ -41,28 +41,6 @@ output = Occi::Bin::ResourceOutputFactory.new options.output_format
 Occi::Log.info "Starting OCCI client ..."
 Occi::Log.debug "Options: #{options}"
 
-# TODO: this part isn't necessary, just annoying
-# to make the interactive mode completely self-sufficient
-# ask for endpoint and auth method (provide defaults)
-#if options.interactive
-#  Occi::Log.debug "Checking for endpoint and auth changes ..."
-#
-# options.endpoint = ask("What endpoint should I use? ") {
-#     |q| q.default = options.endpoint
-# }
-#
-# # separate menus
-# say "\n"
-#
-# choose do |menu|
-#   menu.prompt = "Which auth method should I use? "
-#
-#   Occi::Bin::OcciOpts::AUTH_METHODS.each do |auth_m|
-#     menu.choice(auth_m) { options.auth[:type] = auth_m.to_s }
-#   end
-# end
-#end
-
 # running with an empty password, we should ask the user for one
 # if auth method is not "none"
 if options.auth[:password].nil? || options.auth[:user_cert_password].nil? || options.auth[:token].nil?
@@ -118,7 +96,7 @@ end
 if options.dump_model
 
   if !model.respond_to? :instance_variables
-    puts "Your Ruby doesn't support 'instance_variables' calls!"
+    Occi::Log.error "Your Ruby doesn't support 'instance_variables' calls!"
     exit!
   end
 
@@ -261,17 +239,19 @@ begin
         # if the user didn't choose "Back", ask for details
         # TODO: currently only COMPUTE is supported
         if options.action == :create
-          options.resource_title = ask("What name should I give to the new resource? ")
+          options.attributes = {} if options.attributes.nil?
+
+          options.attributes[:title] = ask("What name should I give to the new resource? ")
           number_of_mixins = ask("How many mixins do you wish me to mix into this resource? ",
                                  Integer) { |q| q.in = 0..2 }
 
-          options.mixin = {}
+          options.mixins = {}
           (1..number_of_mixins).each do |mixin_number|
             mixin = ask("What mixin should I mix in? ") { |q| q.validate = /\A\w+#\w+\Z/ }
             parts = mixin.split("#")
 
-            options.mixin[parts[0]] = [] if options.mixin[parts[0]].nil?
-            options.mixin[parts[0]] << parts[1]
+            options.mixins[parts[0]] = [] if options.mixins[parts[0]].nil?
+            options.mixins[parts[0]] << parts[1]
           end
         end
       }
@@ -340,40 +320,15 @@ begin
   # call the appropriate helper and then format its output
   case options.action
     when :list
-      found = helper_list options
-
-      valid = Occi::Bin::ResourceOutputFactory.allowed_resource_types.include? options.resource.to_sym
-      Occi::Log.error "Not printing, the resource type is not supported!" unless valid
-
-      puts output.format(found, :locations, options.resource.to_sym) if valid
+      helper_list options, output
     when :describe
-      found = helper_describe options
-
-      if options.resource.start_with? options.endpoint
-        resource_type = options.resource.split("/")[3].to_sym
-      elsif mixin_types.include? options.resource.split('#').first
-        resource_type = options.resource.split('#').first.to_sym
-      else
-        resource_type = options.resource.to_sym
-      end
-
-      valid = Occi::Bin::ResourceOutputFactory.allowed_resource_types.include? resource_type
-      Occi::Log.error "Not printing, the resource type is not supported!" unless valid
-
-      puts output.format(found, :resources, resource_type) if valid
+      helper_describe options, output
     when :create
-      location = helper_create options
-      puts location
+      helper_create options, output
     when :delete
-      result = helper_delete options
-
-      if result
-        puts "Resource #{options.resource} successfully removed!"
-      else
-        puts "Failed to remove resource #{options.resource}!"
-      end
+      helper_delete options, output
     when :trigger
-      helper_trigger options
+      helper_trigger options, output
     when :refresh
       refresh
     when :skip

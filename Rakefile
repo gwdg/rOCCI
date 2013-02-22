@@ -1,7 +1,11 @@
-require 'bundler'
-Bundler::GemHelper.install_tasks
+require 'rubygems/tasks'
 
-task :default => 'rcov:all'
+task :default => 'test'
+
+desc "Run all tests; includes rspec, cucumber and coverage reports"
+task :test => 'rcov:all'
+
+Gem::Tasks.new(:build => {:tar => true, :zip => true}, :sign => {:checksum => true, :pgp => true})
 
 namespace :rcov do
 
