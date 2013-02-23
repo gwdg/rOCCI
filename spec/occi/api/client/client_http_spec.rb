@@ -11,14 +11,14 @@ module Occi
       context "using media type text/plain" do
 
         before(:each) do
-          @client = Occi::Api::Client::ClientHttp.new(
-           'https://localhost:3300',
-           { :type  => "none" },
-           { :out   => "/dev/null",
-             :level => Occi::Log::DEBUG },
-           true,
-           "text/plain,text/occi"
-          )
+          @client = Occi::Api::Client::ClientHttp.new({
+           :endpoint => 'https://localhost:3300',
+           :auth => { :type  => "none" },
+           :log => { :out   => "/dev/null",
+                     :level => Occi::Log::DEBUG },
+           :auto_connect => true,
+           :media_type => "text/plain,text/occi"
+          })
         end
 
         after(:each) do
@@ -189,14 +189,14 @@ module Occi
       context "using media type application/occi+json" do
 
         before(:each) do
-          #@client = Occi::Api::ClientHttp.new(
-          #  'https://localhost:3300',
-          #  { :type  => "none" },
-          #  { :out   => "/dev/null",
-          #    :level => Occi::Log::DEBUG },
-          #  true,
-          #  "application/occi+json"
-          #)
+          #@client = Occi::Api::ClientHttp.new({
+          #  :endpoint => 'https://localhost:3300',
+          #  :auth => { :type  => "none" },
+          #  :log => { :out   => "/dev/null",
+          #            :level => Occi::Log::DEBUG },
+          #  :auto_connect => true,
+          #  :media_type => "application/occi+json"
+          #})
         end
 
         it "establishes connection"
