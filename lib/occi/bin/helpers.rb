@@ -83,16 +83,38 @@ def helper_create(options, output = nil)
     res = resource options.resource
 
     Occi::Log.debug "Creating #{options.resource}:\n#{res.inspect}"
-    Occi::Log.debug "with mixins:#{options.mixins}"
 
-    options.mixins.keys.each do |type|
-      Occi::Log.debug "Adding mixins of type #{type} to #{options.resource}"
-      options.mixins[type].each do |name|
-        mxn = mixin name, type
+    if options.links
+      Occi::Log.debug "with links: #{options.links}"
 
-        raise "Unknown mixin #{type}##{name}, stopping here!" if mxn.nil?
-        Occi::Log.debug "Adding mixin #{mxn} to #{options.resource}"
-        res.mixins << mxn
+      options.links.each do |link|
+        link = options.endpoint.chomp('/') + link unless link.start_with? options.endpoint
+
+        if link.include? "/storage/"
+          Occi::Log.debug "Adding storagelink to #{options.resource}"
+          res.storagelink link
+        elsif link.include? "/network/"
+          Occi::Log.debug "Adding networkinterface to #{options.resource}"
+          res.networkinterface link
+        else
+          raise "Unknown link type #{link}, stopping here!"
+        end
+      end
+    end
+
+    if options.mixins
+      Occi::Log.debug "with mixins: #{options.mixins}"
+
+      options.mixins.keys.each do |type|
+        Occi::Log.debug "Adding mixins of type #{type} to #{options.resource}"
+
+        options.mixins[type].each do |name|
+          mxn = mixin name, type
+
+          raise "Unknown mixin #{type}##{name}, stopping here!" if mxn.nil?
+          Occi::Log.debug "Adding mixin #{mxn} to #{options.resource}"
+          res.mixins << mxn
+        end
       end
     end
 
