@@ -23,9 +23,12 @@ module Occi
 
 =begin
       before(:all) do
-        @client = Occi::Api::Client::ClientAmqp.new("http://localhost:9292/", auth_options = { :type => "none" },
-                                            log_options = { :out => STDERR, :level => Occi::Log::WARN, :logger => nil },
-                                            media_type = "application/occi+json")
+        @client = Occi::Api::Client::ClientAmqp.new({
+          :endpoint => "http://localhost:9292/",
+          :auth => { :type => "none" },
+          :log => { :out => STDERR, :level => Occi::Log::WARN, :logger => nil },
+          :media_type => "application/occi+json"
+        })
       end
 
       it "initialize and connect client" do
