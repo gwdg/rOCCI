@@ -87,6 +87,7 @@ module Occi
             :media_type => "text/plain"
         }
 
+        options = options.marshal_dump if options.is_a? OpenStruct
         options = defaults.merge options
 
         # check the validity and canonize the endpoint URI

@@ -97,6 +97,7 @@ module Occi
             :media_type => nil
           }
 
+          options = options.marshal_dump if options.is_a? OpenStruct
           options = defaults.merge options
 
           # set Occi::Log
