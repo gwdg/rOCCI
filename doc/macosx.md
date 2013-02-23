@@ -2,8 +2,8 @@
 
 ## Installation
 
-To use a recent version of Ruby on Mac OS X, a few preparations are needed. Unfortunately, Apple did complicate the
-process in the past, thus a detailed step by step is provided here:
+To use a recent version of Ruby on Mac OS X, a few preparations are needed. Installing Ruby on Apple Mac OS X is not as 
+straightforward as it is on other platforms, hence following detailed instructions.
 
 1. Install the latest version of Xcode either
 [from the Mac OS X App Store](itms://itunes.apple.com/de/app/xcode/id497799835?mt=12#) or by downloading it from
