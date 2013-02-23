@@ -164,7 +164,16 @@ To include the DSL definitions in a class use
 
 To connect to an OCCI endpoint/server (e.g. running on http://localhost:3300/ )
 
-    connect(:http, 'http://localhost:3300',auth||=nil)
+    # defaults
+    options = {
+      :endpoint => "http://localhost:3300/",
+      :auth => {:type => "none"},
+      :log => {:out => STDERR, :level => Occi::Log::WARN, :logger => nil},
+      :auto_connect => "value", auto_connect => true,
+      :media_type => nil
+    }
+
+    connect(:http, options ||= {})
 
 To get the list of available resource, mixin, entity or link types use
 
@@ -232,7 +241,16 @@ at a time, you should use the OCCI client API directly.
 
 To connect to an OCCI endpoint/server (e.g. running on http://localhost:3300/ )
 
-    client = Occi::Api::Client::ClientHttp.new('http://localhost:3300',auth||=nil)
+    # defaults
+    options = {
+      :endpoint => "http://localhost:3300/",
+      :auth => {:type => "none"},
+      :log => {:out => STDERR, :level => Occi::Log::WARN, :logger => nil},
+      :auto_connect => "value", auto_connect => true,
+      :media_type => nil
+    }
+
+    client = Occi::Api::Client::ClientHttp.new(options ||= {})
 
 All available categories are automatically registered to the OCCI model during client initialization. You can get them via
 

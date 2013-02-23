@@ -75,33 +75,46 @@ module Occi
         # from the server.
         #
         # @example
-        #    Occi::Api::Client::ClientHttp.new # => #<Occi::Api::Client::ClientHttp>
+        #    options = {
+        #      :endpoint => "http://localhost:3300/",
+        #      :auth => {:type => "none"},
+        #      :log => {:out => STDERR, :level => Occi::Log::WARN, :logger => nil},
+        #      :auto_connect => "value", auto_connect => true,
+        #      :media_type => nil
+        #    }
         #
-        # @param [String] endpoint URI
-        # @param [Hash] auth options in a hash
-        # @param [Hash] logging options in a hash
-        # @param [Boolean] enable autoconnect
-        # @param [String] media type identifier
+        #    Occi::Api::Client::ClientHttp.new options # => #<Occi::Api::Client::ClientHttp>
+        #
+        # @param [Hash] options, for available options and defaults see examples
         # @return [Occi::Api::Client::ClientHttp] client instance
-        def initialize(endpoint = "http://localhost:3000/", auth_options = {:type => "none"},
-                       log_options = {:out => STDERR, :level => Occi::Log::WARN, :logger => nil},
-                       auto_connect = true, media_type = nil)
+        def initialize(options = {})
+
+          defaults = {
+            :endpoint => "http://localhost:3300/",
+            :auth => {:type => "none"},
+            :log => {:out => STDERR, :level => Occi::Log::WARN, :logger => nil},
+            :auto_connect => true,
+            :media_type => nil
+          }
+
+          options = defaults.merge options
+
           # set Occi::Log
-          set_logger log_options
+          set_logger options[:log]
 
           # pass auth options to HTTParty
-          change_auth auth_options
+          change_auth options[:auth]
 
           # check the validity and canonize the endpoint URI
-          prepare_endpoint endpoint
+          prepare_endpoint options[:endpoint]
 
           # get accepted media types from HTTParty
           set_media_type
 
           # force media_type if provided
-          if media_type
-            self.class.headers 'Accept' => media_type
-            @media_type = media_type
+          if options[:media_type]
+            self.class.headers 'Accept' => options[:media_type]
+            @media_type = options[:media_type]
           end
 
           Occi::Log.debug("Media Type: #{@media_type}")
@@ -112,7 +125,7 @@ module Occi
           set_model
 
           # auto-connect?
-          @connected = auto_connect
+          @connected = options[:auto_connect]
         end
 
         # Creates a new resource instance, resource should be specified

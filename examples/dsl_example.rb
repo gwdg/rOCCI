@@ -17,13 +17,22 @@ CA_PATH            = '/etc/grid-security/certificates'
 ENDPOINT           = 'https://localhost:3300'
 
 ## establish a connection
-connect(:http, ENDPOINT,
-        { :type               => "x509",
-          :user_cert          => USER_CERT,
-          :user_cert_password => USER_CERT_PASSWORD,
-          :ca_path            => CA_PATH },
-        { :out   => STDERR,
-          :level => Occi::Log::DEBUG })
+connect(
+  :http,
+  {
+    :endpoint => ENDPOINT,
+    :auth     => {
+      :type               => "x509",
+      :user_cert          => USER_CERT,
+      :user_cert_password => USER_CERT_PASSWORD,
+      :ca_path            => CA_PATH
+    },
+    :log => {
+      :out   => STDERR,
+      :level => Occi::Log::DEBUG
+    }
+  }
+)
 
 puts "\n\nListing all available resource types:"
 resource_types.each do |type|
