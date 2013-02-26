@@ -676,6 +676,7 @@ module Occi
             self.class.ssl_ca_file @auth_options[:ca_file] unless @auth_options[:ca_file].nil?
             self.class.ssl_extra_chain_cert AuthnUtils.certs_to_file_ary(@auth_options[:proxy_ca]) unless @auth_options[:proxy_ca].nil?
           when "keystone"
+            Occi::Log.warn "AuthN method 'keystone' is deprecated and you should use it only as a fall-back option!"
             # set up OpenStack Keystone token based auth
             raise ArgumentError, "Missing required option 'token' for OpenStack Keystone auth!" unless @auth_options[:token]
             self.class.headers['X-Auth-Token'] = @auth_options[:token]
@@ -942,7 +943,13 @@ module Occi
         #
         # @example
         #    set_model
+        #
+        # @return [Occi::Model]
         def set_model
+
+          # check credentials and handle OpenStack Keystone
+          # TODO: check expiration dates on Keystone tokens
+          raise "You are not authorized to use this endpoint!" unless check_authn
 
           #
           model = get('/-/')
@@ -962,6 +969,56 @@ module Occi
           get_resource_templates.each do |res_tpl|
             @mixins[:resource_tpl] << res_tpl.type_identifier unless res_tpl.nil? or res_tpl.type_identifier.nil?
           end
+
+          model
+        end
+
+        # Checks provided credentials and attempts transparent
+        # authentication with OS Keystone using the "www-authenticate"
+        # header.
+        #
+        # @example
+        #    check_authn
+        #
+        # @return [true, false]
+        def check_authn
+          response = self.class.get @endpoint
+
+          return true if response.success?
+
+          if response.code == 401 && response.headers["www-authenticate"]
+            if response.headers["www-authenticate"].start_with? "Keystone"
+              keystone_uri = /^Keystone uri='(.+)'$/.match(response.headers["www-authenticate"])[1]
+
+              if keystone_uri
+                if @auth_options[:type] == "x509"
+                  body = { "auth" => { "voms" => true } }
+                else
+                  body = {
+                    "auth" => {
+                      "passwordCredentials" => {
+                        "username" => @auth_options[:username],
+                        "password" => @auth_options[:password]
+                      }
+                    }
+                  }
+                end
+
+                headers = self.class.headers.clone
+                headers['Content-Type'] = "application/json"
+                headers['Accept'] = headers['Content-Type']
+
+                response = self.class.post(keystone_uri + "/v2.0/tokens", :body => body.to_json, :headers => headers)
+
+                if response.success?
+                  self.class.headers['X-Auth-Token'] = response['access']['token']['id']
+                  return true
+                end
+              end
+            end
+          end
+
+          false
         end
 
         # Retrieves available os_tpls from the model.
