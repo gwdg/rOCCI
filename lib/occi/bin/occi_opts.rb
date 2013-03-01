@@ -82,10 +82,7 @@ Examples:
                   "--endpoint URI",
                   String,
                   "OCCI server URI, defaults to '#{options.endpoint}'") do |endpoint|
-            # Do some basic validation of the endpoint URI
-            URI(endpoint)
-
-            options.endpoint = endpoint
+            options.endpoint = URI(endpoint).to_s
           end
 
           opts.on("-n",
