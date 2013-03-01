@@ -18,7 +18,7 @@ GIT
 PATH
   remote: .
   specs:
-    occi (3.1.0.alpha.1)
+    occi (3.1.0.beta.1)
       activesupport
       amqp
       antlr3
@@ -60,7 +60,7 @@ GEM
       json (>= 1.7.6)
     gherkin (2.11.6-java)
       json (>= 1.7.6)
-    hashie (2.0.0)
+    hashie (2.0.2)
     highline (1.6.15)
     httparty (0.10.2)
       multi_json (~> 1.0)
