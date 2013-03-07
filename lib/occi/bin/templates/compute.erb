@@ -1,22 +1,18 @@
-<%# We always get an array of OCCI::Collections %>
-Available COMPUTE resources:
-<% occi_resources.each do |occi_compute| %>
-  <% compute = occi_compute.as_json %>
-  COMPUTE resource "<%= compute.resources.first.attributes.occi.core.title %>":
-    ID:       <%= compute.resources.first.attributes.occi.core.id %>
-    TITLE:    <%= compute.resources.first.attributes.occi.core.title %>
-    STATE:    <%= compute.resources.first.attributes.occi.compute.state %>
-    LINKS:
-    <% if compute.links %><% compute.links.each do |link| %>
-      LINK "<%= link.attributes.occi.core.target.split("/")[1] %>":
-        ID:          <%= link.attributes.occi.core.id %>
-        TITLE:       <%= link.attributes.occi.core.title %>
-        TARGET:      <%= link.attributes.occi.core.target %>
-        <% if link.attributes.occi.networkinterface %>
-        IP ADDRESS:  <%= link.attributes.occi.networkinterface.address %>
-        MAC ADDRESS: <%= link.attributes.occi.networkinterface.mac %>
-        <% elsif link.attributes.occi.storagelink %>
-        MOUNT POINT: <%= link.attributes.occi.storagelink.deviceid %>
-        <% end %>
-    <% end %><% end %>
-<% end %>
+<%# We always get a JSON %>
+COMPUTE:
+  ID:       <%= json_resource.resources.first.attributes.occi.core.id %>
+  TITLE:    <%= json_resource.resources.first.attributes.occi.core.title %>
+  STATE:    <%= json_resource.resources.first.attributes.occi.compute.state %>
+  LINKS:
+  <% if json_resource.links %><% json_resource.links.each do |link| %>
+    LINK "<%= link.attributes.occi.core.target.split("/")[1] %>":
+      ID:          <%= link.attributes.occi.core.id %>
+      TITLE:       <%= link.attributes.occi.core.title %>
+      TARGET:      <%= link.attributes.occi.core.target %>
+      <% if link.attributes.occi.networkinterface %>
+      IP ADDRESS:  <%= link.attributes.occi.networkinterface.address %>
+      MAC ADDRESS: <%= link.attributes.occi.networkinterface.mac %>
+      <% elsif link.attributes.occi.storagelink %>
+      MOUNT POINT: <%= link.attributes.occi.storagelink.deviceid %>
+      <% end %>
+  <% end %><% end %>

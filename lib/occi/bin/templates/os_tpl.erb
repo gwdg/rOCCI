@@ -1,9 +1,7 @@
-<%# We always get an array of OCCI::Collections %>
-Available OS templates:
-<% occi_resources.each do |occi_os_tpl| %>
-  <% os_tpl = occi_os_tpl.as_json %>
-  OS template "os_tpl#<%= os_tpl.term %>":
-    TITLE:        <%= os_tpl.title %>
-    TERM:         <%= os_tpl.term %>
-    LOCATION:     <%= os_tpl.location %>
-<% end %>
+<%# We always get a JSON %>
+OS_TPL:
+  TITLE:        <%= json_resource.title %>
+  TERM:         <%= json_resource.term %>
+  LOCATION:     <%= json_resource.location %>
+
+
