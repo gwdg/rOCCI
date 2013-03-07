@@ -61,7 +61,7 @@ module Occi
 
         occi_resources.each do |occi_resource|
           json_resource = occi_resource.as_json
-          formatted_output << template.result(binding) unless json_resource.empty?
+          formatted_output << template.result(binding) unless json_resource.nil? || json_resource.empty?
         end
 
         formatted_output
