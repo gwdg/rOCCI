@@ -57,7 +57,14 @@ module Occi
         file = File.expand_path("..", __FILE__) + '/templates/' + resource_type.to_s + ".erb"
         template = ERB.new File.new(file).read
 
-        template.result(binding)
+        formatted_output = ""
+
+        occi_resources.each do |occi_resource|
+          json_resource = occi_resource.as_json
+          formatted_output << template.result(binding) unless json_resource.nil? || json_resource.empty?
+        end
+
+        formatted_output
       end
 
       def self.locations_to_json(url_locations, resource_type)

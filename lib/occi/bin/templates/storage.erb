@@ -1,10 +1,8 @@
-<%# We always get an array of OCCI::Collections %>
-Available STORAGE resources:
-<% occi_resources.each do |occi_storage| %>
-  <% storage = occi_storage.as_json %>
-  STORAGE resource "<%= storage.resources.first.attributes.occi.core.title %>":
-    ID:           <%= storage.resources.first.attributes.occi.core.id %>
-    TITLE:        <%= storage.resources.first.attributes.occi.core.title %>
-    STATE:        <%= storage.resources.first.attributes.occi.storage.state%>
-    DESCRIPTION:  <%= storage.resources.first.attributes.occi.core.summary %>
-<% end %>
+<%# We always get a JSON %>
+STORAGE:
+  ID:           <%= json_resource.resources.first.attributes.occi.core.id %>
+  TITLE:        <%= json_resource.resources.first.attributes.occi.core.title %>
+  STATE:        <%= json_resource.resources.first.attributes.occi.storage.state%>
+  DESCRIPTION:  <%= json_resource.resources.first.attributes.occi.core.summary %>
+
+
