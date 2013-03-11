@@ -12,3 +12,4 @@ log
 coverage
 vendor
 collection
+Gemfile.lock

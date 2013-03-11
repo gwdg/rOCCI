@@ -39,8 +39,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "yard-rspec"
   gem.add_development_dependency "yard-cucumber"
   gem.add_development_dependency "rspec-http"
-  gem.add_development_dependency "rubygems-tasks"
-  gem.add_development_dependency "webmock"
+  gem.add_development_dependency "webmock", "~>1.9.3"
 
   gem.required_ruby_version     = ">= 1.8.7"
 end
