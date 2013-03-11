@@ -5,7 +5,7 @@ task :default => 'test'
 desc "Run all tests; includes rspec, cucumber and coverage reports"
 task :test => 'rcov:all'
 
-Gem::Tasks.new(:build => {:tar => true, :zip => true}, :sign => {:checksum => true, :pgp => true})
+Gem::Tasks.new(:build => {:tar => true, :zip => true}, :sign => {:checksum => true, :pgp => false})
 
 namespace :rcov do
 
