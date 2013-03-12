@@ -170,4 +170,164 @@ http_interactions:
         network"}]}'
     http_version: 
   recorded_at: Thu, 10 Jan 2013 13:52:42 GMT
+- request:
+    method: get
+    uri: http://141.5.99.69/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 12 Mar 2013 13:29:42 GMT
+      Server:
+      - Apache/2.2.22 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.18
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFN2E4NTRmNjhmNjU1YjJiNjliOGZk%0AYTI2NDhkN2RjMzE1NGY4MmZlYmQzYjI1ZGUzNjcyNDVkOWFiNWUxYzMwOUki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--f827e521323b9a3df64188e870b7accd57c45170;
+        path=/; HttpOnly
+      Content-Length:
+      - '3444'
+      Status:
+      - '200'
+      Content-Type:
+      - application/json;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! '{"resources":[{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"48e7c51c-5a7d-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"6c706278-5a7d-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"7582ffc4-5a7d-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"8eb0deb2-5a7d-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"8efa93e0-5a7d-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"49cbeaee-5b1d-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"c87fa76c-5b1e-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"1cc544b2-5b1f-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"38e2a6b2-5b1f-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}}]}'
+    http_version: 
+  recorded_at: Tue, 12 Mar 2013 13:29:35 GMT
+- request:
+    method: get
+    uri: http://141.5.99.69/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 12 Mar 2013 13:29:42 GMT
+      Server:
+      - Apache/2.2.22 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.18
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFMDU2MTY4M2VjMjcxMGY1ZGEwOTJi%0AYTI4YWIwZjc1YmIwYTY5ZjE1NmIzYmY4MTA3NjY2MWY0OGMzZTE4MjRhN0ki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--a0539607471f06a5405858228fc124c1744ee77e;
+        path=/; HttpOnly
+      Content-Length:
+      - '3444'
+      Status:
+      - '200'
+      Content-Type:
+      - application/json;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! '{"resources":[{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"48e7c51c-5a7d-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"6c706278-5a7d-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"7582ffc4-5a7d-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"8eb0deb2-5a7d-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"8efa93e0-5a7d-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"49cbeaee-5b1d-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"c87fa76c-5b1e-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"1cc544b2-5b1f-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}},{"kind":"http://schemas.ogf.org/occi/infrastructure#compute","actions":["http://schemas.ogf.org/occi/infrastructure/compute/action#stop","http://schemas.ogf.org/occi/infrastructure/compute/action#restart","http://schemas.ogf.org/occi/infrastructure/compute/action#suspend"],"attributes":{"occi":{"core":{"id":"38e2a6b2-5b1f-11e2-a300-fa163e16d22f"},"compute":{"state":"active"}}}}]}'
+    http_version: 
+  recorded_at: Tue, 12 Mar 2013 13:29:35 GMT
+- request:
+    method: head
+    uri: http://141.5.99.69/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 12 Mar 2013 15:27:53 GMT
+      Server:
+      - Apache/2.2.22 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.18
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFOWU5YjM0OGFmMTc4ODBhMTY1MjYx%0ANTJjZTQ2NzZjMjE4YmY3ODExNDkxZjU5OThmOTRmNDU1NDFjMTZjZmM2ZEki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--197a67fdc50a0952ca986c13e213ec8892b4beff;
+        path=/; HttpOnly
+      Content-Length:
+      - '3444'
+      Status:
+      - '200'
+      Content-Type:
+      - application/json;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ''
+    http_version: 
+  recorded_at: Tue, 12 Mar 2013 15:27:46 GMT
+- request:
+    method: head
+    uri: http://141.5.99.69/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 12 Mar 2013 15:27:54 GMT
+      Server:
+      - Apache/2.2.22 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.18
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFY2NkMGVmNDI4ZGRmMmEyODIyYjAx%0AOTQ5MDdjZTljZjNjMDIwNDZmMmFhMmVhYjBkZGVlM2EzODhjY2NhNzExOEki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--199003590da3d7ad28f69a8be2c88e694c6f479c;
+        path=/; HttpOnly
+      Content-Length:
+      - '3444'
+      Status:
+      - '200'
+      Content-Type:
+      - application/json;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ''
+    http_version: 
+  recorded_at: Tue, 12 Mar 2013 15:27:46 GMT
 recorded_with: VCR 2.4.0

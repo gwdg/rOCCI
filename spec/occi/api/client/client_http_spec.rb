@@ -22,7 +22,7 @@ module Occi
         end
 
         after(:each) do
-          @client.logger.close
+          @client.logger.close if @client && @client.logger
         end
 
         it "establishes connection" do

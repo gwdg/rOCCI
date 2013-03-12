@@ -97,9 +97,9 @@ To describe available resources use
 
 To describe specific resources use
 
-    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource https://<ENDPOINT>:<PORT>/compute/<OCCI_ID> --auth x509
-    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource https://<ENDPOINT>:<PORT>/storage/<OCCI_ID> --auth x509
-    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource https://<ENDPOINT>:<PORT>/network/<OCCI_ID> --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource /compute/<OCCI_ID> --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource /storage/<OCCI_ID> --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action describe --resource /network/<OCCI_ID> --auth x509
 
 To list available OS templates or Resource templates use
 
@@ -113,11 +113,11 @@ To describe a specific OS template or Resource template use
 
 To create a compute resource with mixins use
 
-    occi --endpoint https://<ENDPOINT>:<PORT>/ --action create --resource compute --mixin os_tpl#debian6 --mixin resource_tpl#small --resource-title "My rOCCI VM" --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action create --resource compute --mixin os_tpl#debian6 --mixin resource_tpl#small --attributes title="My rOCCI VM" --auth x509
 
 To delete a compute resource use
 
-    occi --endpoint https://<ENDPOINT>:<PORT>/ --action delete --resource https://<ENDPOINT>:<PORT>/compute/<OCCI_ID> --auth x509
+    occi --endpoint https://<ENDPOINT>:<PORT>/ --action delete --resource /compute/<OCCI_ID> --auth x509
 
 ### Client scripting
 
@@ -145,7 +145,7 @@ For X.509 auth use
     auth.user_cert_password = 'MyPassword'
     auth.ca_path = '/Path/To/root-certificates'
 
-For keystone auth use
+**Deprecated:** For keystone auth use
 
     auth = Hashie::Mash.new
     auth.type = 'keystone'
@@ -225,15 +225,15 @@ To create a new compute resource use
 
 To get a description of a specific resource use
 
-    describe "https://<ENDPOINT>:<PORT>/compute/<OCCI_ID>"
-    describe "https://<ENDPOINT>:<PORT>/storage/<OCCI_ID>"
-    describe "https://<ENDPOINT>:<PORT>/network/<OCCI_ID>"
+    describe "/compute/<OCCI_ID>"
+    describe "/storage/<OCCI_ID>"
+    describe "/network/<OCCI_ID>"
 
 To delete a specific resource use
 
-    delete "https://<ENDPOINT>:<PORT>/compute/<OCCI_ID>"
-    delete "https://<ENDPOINT>:<PORT>/storage/<OCCI_ID>"
-    delete "https://<ENDPOINT>:<PORT>/network/<OCCI_ID>"
+    delete "/compute/<OCCI_ID>"
+    delete "/storage/<OCCI_ID>"
+    delete "/network/<OCCI_ID>"
 
 #### API
 If you need low level access to parts of the OCCI client or need to use more than one instance
@@ -306,15 +306,15 @@ To create a new compute resource use
 
 To get a description of a specific resource use
 
-    client.describe "https://<ENDPOINT>:<PORT>/compute/<OCCI_ID>"
-    client.describe "https://<ENDPOINT>:<PORT>/storage/<OCCI_ID>"
-    client.describe "https://<ENDPOINT>:<PORT>/network/<OCCI_ID>"
+    client.describe "/compute/<OCCI_ID>"
+    client.describe "/storage/<OCCI_ID>"
+    client.describe "/network/<OCCI_ID>"
 
 To delete a specific resource use
 
-    client.delete "https://<ENDPOINT>:<PORT>/compute/<OCCI_ID>"
-    client.delete "https://<ENDPOINT>:<PORT>/storage/<OCCI_ID>"
-    client.delete "https://<ENDPOINT>:<PORT>/network/<OCCI_ID>"
+    client.delete "/compute/<OCCI_ID>"
+    client.delete "/storage/<OCCI_ID>"
+    client.delete "/network/<OCCI_ID>"
 
 #### Logging
 
@@ -386,6 +386,13 @@ The OCCI gem includes all OCCI Core classes necessary to handly arbitrary OCCI o
 
 Changelog
 ---------
+
+### Version 3.1
+* added basic OS Keystone support
+* added support for PKCS12 credentials for X.509 authN
+* updated templates for plain output formatting
+* minor client API changes
+* several bugfixes
 
 ### Version 3.0
 
