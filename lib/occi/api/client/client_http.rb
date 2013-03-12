@@ -421,7 +421,11 @@ module Occi
           headers = self.class.headers.clone
           headers['Accept'] = 'text/uri-list'
 
-          self.class.get(@endpoint + path, :headers => headers).body.split("\n").compact
+          # TODO: remove the gsub OCCI-OS hack
+          response = self.class.get(
+            @endpoint + path,
+            :headers => headers
+          ).body.gsub(/\# uri:\/(compute|storage|network)\/[\n]?/, '').split("\n").compact
         end
 
         # Retrieves descriptions for available resources specified by a type
@@ -962,12 +966,18 @@ module Occi
 
           #
           get_os_templates.each do |os_tpl|
-            @mixins[:os_tpl] << os_tpl.type_identifier unless os_tpl.nil? or os_tpl.type_identifier.nil?
+            unless os_tpl.nil? || os_tpl.type_identifier.nil?
+              tid = os_tpl.type_identifier.strip
+              @mixins[:os_tpl] << tid unless tid.empty?
+            end
           end
 
           #
           get_resource_templates.each do |res_tpl|
-            @mixins[:resource_tpl] << res_tpl.type_identifier unless res_tpl.nil? or res_tpl.type_identifier.nil?
+            unless res_tpl.nil? || res_tpl.type_identifier.nil?
+              tid = res_tpl.type_identifier.strip
+              @mixins[:resource_tpl] << tid unless tid.empty?
+            end
           end
 
           model
@@ -982,7 +992,7 @@ module Occi
         #
         # @return [true, false]
         def check_authn
-          response = self.class.get @endpoint
+          response = self.class.head @endpoint
 
           return true if response.success?
 

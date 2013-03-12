@@ -1,7 +1,7 @@
 ---
 http_interactions:
 - request:
-    method: get
+    method: head
     uri: https://localhost:3300/
     body:
       encoding: US-ASCII
