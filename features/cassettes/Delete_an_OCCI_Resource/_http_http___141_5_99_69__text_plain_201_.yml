@@ -183,4 +183,106 @@ http_interactions:
 '
     http_version: 
   recorded_at: Thu, 10 Jan 2013 13:52:41 GMT
+- request:
+    method: get
+    uri: http://141.5.99.69/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/plain
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 12 Mar 2013 13:29:42 GMT
+      Server:
+      - Apache/2.2.22 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.18
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFOGIwOTNjN2I2YTRhYWNmYWMzOTE1%0ANGJiODUxNTNjOTUyNThkNzM0NjFjOGNiYjA3ZDM4ZDYwOWVjZjAxY2M4NUki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--2a011f27068ccd94899403b26651e4fcfde15436;
+        path=/; HttpOnly
+      Content-Length:
+      - '738'
+      Status:
+      - '200'
+      Vary:
+      - Accept-Encoding
+      Content-Type:
+      - text/plain;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ! 'X-OCCI-Location:  http://141.5.99.69/compute/48e7c51c-5a7d-11e2-a300-fa163e16d22f
+
+        X-OCCI-Location:  http://141.5.99.69/compute/6c706278-5a7d-11e2-a300-fa163e16d22f
+
+        X-OCCI-Location:  http://141.5.99.69/compute/7582ffc4-5a7d-11e2-a300-fa163e16d22f
+
+        X-OCCI-Location:  http://141.5.99.69/compute/8eb0deb2-5a7d-11e2-a300-fa163e16d22f
+
+        X-OCCI-Location:  http://141.5.99.69/compute/8efa93e0-5a7d-11e2-a300-fa163e16d22f
+
+        X-OCCI-Location:  http://141.5.99.69/compute/49cbeaee-5b1d-11e2-a300-fa163e16d22f
+
+        X-OCCI-Location:  http://141.5.99.69/compute/c87fa76c-5b1e-11e2-a300-fa163e16d22f
+
+        X-OCCI-Location:  http://141.5.99.69/compute/1cc544b2-5b1f-11e2-a300-fa163e16d22f
+
+        X-OCCI-Location:  http://141.5.99.69/compute/38e2a6b2-5b1f-11e2-a300-fa163e16d22f
+
+'
+    http_version: 
+  recorded_at: Tue, 12 Mar 2013 13:29:35 GMT
+- request:
+    method: head
+    uri: http://141.5.99.69/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - text/plain
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 12 Mar 2013 15:27:53 GMT
+      Server:
+      - Apache/2.2.22 (Ubuntu)
+      X-Powered-By:
+      - Phusion Passenger (mod_rails/mod_rack) 3.0.18
+      X-Frame-Options:
+      - sameorigin
+      X-Xss-Protection:
+      - 1; mode=block
+      Accept:
+      - application/occi+json,application/json,text/plain,text/uri-list,application/xml,text/xml,application/occi+xml,text/occi
+      Set-Cookie:
+      - rack.session=BAh7B0kiD3Nlc3Npb25faWQGOgZFRiJFYjk4Zjc0NTRhMGUxN2VkMWJhYWEz%0AY2E0OTFjMWE0NWUxZjIwYzBlNWU2MjUyMzYxZGI5MjU4MGZhMjc0OWJhNkki%0ADXRyYWNraW5nBjsARnsISSIUSFRUUF9VU0VSX0FHRU5UBjsARiItZGEzOWEz%0AZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUND%0ARVBUX0VOQ09ESU5HBjsARiItZGEzOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2%0AMDE4OTBhZmQ4MDcwOUkiGUhUVFBfQUNDRVBUX0xBTkdVQUdFBjsARiItZGEz%0AOWEzZWU1ZTZiNGIwZDMyNTViZmVmOTU2MDE4OTBhZmQ4MDcwOQ%3D%3D%0A--4ac5e72fdf64d3b35dbbe65e7c38da3d3311c964;
+        path=/; HttpOnly
+      Content-Length:
+      - '738'
+      Status:
+      - '200'
+      Vary:
+      - Accept-Encoding
+      Content-Type:
+      - text/plain;charset=utf-8
+    body:
+      encoding: US-ASCII
+      string: ''
+    http_version: 
+  recorded_at: Tue, 12 Mar 2013 15:27:46 GMT
 recorded_with: VCR 2.4.0
