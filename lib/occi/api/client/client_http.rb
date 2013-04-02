@@ -995,36 +995,35 @@ module Occi
           response = self.class.head @endpoint
 
           return true if response.success?
+          raise "#{response_message(response)}!" unless response.code == 401
 
-          if response.code == 401 && response.headers["www-authenticate"]
-            if response.headers["www-authenticate"].start_with? "Keystone"
-              keystone_uri = /^Keystone uri='(.+)'$/.match(response.headers["www-authenticate"])[1]
+          if response.headers['www-authenticate'] && response.headers['www-authenticate'].start_with?('Keystone')
+            keystone_uri = /^Keystone uri='(.+)'$/.match(response.headers['www-authenticate'])[1]
 
-              if keystone_uri
-                if @auth_options[:type] == "x509"
-                  body = { "auth" => { "voms" => true } }
-                else
-                  body = {
-                    "auth" => {
-                      "passwordCredentials" => {
-                        "username" => @auth_options[:username],
-                        "password" => @auth_options[:password]
-                      }
-                    }
+            return false unless keystone_uri
+
+            if @auth_options[:type] == "x509"
+              body = { "auth" => { "voms" => true } }
+            else
+              body = {
+                "auth" => {
+                  "passwordCredentials" => {
+                    "username" => @auth_options[:username],
+                    "password" => @auth_options[:password]
                   }
-                end
+                }
+              }
+            end
 
-                headers = self.class.headers.clone
-                headers['Content-Type'] = "application/json"
-                headers['Accept'] = headers['Content-Type']
+            headers = self.class.headers.clone
+            headers['Content-Type'] = "application/json"
+            headers['Accept'] = headers['Content-Type']
 
-                response = self.class.post(keystone_uri + "/v2.0/tokens", :body => body.to_json, :headers => headers)
+            response = self.class.post(keystone_uri + "/v2.0/tokens", :body => body.to_json, :headers => headers)
 
-                if response.success?
-                  self.class.headers['X-Auth-Token'] = response['access']['token']['id']
-                  return true
-                end
-              end
+            if response.success?
+              self.class.headers['X-Auth-Token'] = response['access']['token']['id']
+              return true
             end
           end
 
