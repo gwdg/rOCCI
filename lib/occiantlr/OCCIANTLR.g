@@ -108,7 +108,7 @@ x_occi_location returns [location]
 	: X_OCCI_LOCATION_KEY COLON WS? uri SEMICOLON? { location = URI.parse($uri.text) } ;
 
 uri			: ( LOALPHA | UPALPHA | DIGIT | AT | COLON | PERCENT | UNDERSCORE | BACKSLASH | PLUS | DOT | TILDE | HASH | QUESTION | AMPERSAND | SLASH | EQUALS | DASH | X_OCCI_ATTRIBUTE_KEY | X_OCCI_LOCATION_KEY | reserved_words)+;
-term			: ( LOALPHA | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )*;
+term			: ( LOALPHA | DIGIT | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )*;
 scheme 		        : uri; 
 class_type		: ( KIND | MIXIN | ACTION );
 title			: ( ESC | ~( BACKSLASH | QUOTE | SQUOTE ) | SQUOTE )*;
@@ -188,4 +188,4 @@ ESC     : 	'\\' ( QUOTE | '\'' );
 quoted_string returns [text]
 	:	QUOTE string QUOTE {text = $string.text};	
 string : 	( ESC | ~( '\\' | QUOTE | '\'' ) | '\'' )*; 
-digits	:	DIGIT+;	
+digits	:	DIGIT+;

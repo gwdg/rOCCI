@@ -5,7 +5,7 @@
 # Generated using ANTLR version: 3.2.1-SNAPSHOT Jul 31, 2010 19:34:52
 # Ruby runtime library version: 1.8.11
 # Input grammar file: OCCIANTLR.g
-# Generated at: 2012-12-17 19:22:54
+# Generated at: 2013-04-03 23:54:12
 # 
 
 # ~~~> start load path setup
@@ -1559,7 +1559,7 @@ module OCCIANTLR
     # parser rule term
     # 
     # (in OCCIANTLR.g)
-    # 111:1: term : ( LOALPHA | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )* ;
+    # 111:1: term : ( LOALPHA | DIGIT | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )* ;
     # 
     def term
       # -> uncomment the next line to manually enable rule tracing
@@ -1570,15 +1570,13 @@ module OCCIANTLR
       return_value.start = @input.look
 
       begin
-        # at line 111:10: ( LOALPHA | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )*
-        # at line 111:10: ( LOALPHA | reserved_words )
-        alt_32 = 2
-        look_32_0 = @input.peek( 1 )
-
-        if ( look_32_0 == LOALPHA )
-          alt_32 = 1
-        elsif ( look_32_0 == SCHEME || look_32_0.between?( CLASS, ACTIONS ) || look_32_0.between?( SELF, CATEGORY ) || look_32_0.between?( KIND, ACTION ) || look_32_0.between?( LINK, TERM ) )
-          alt_32 = 2
+        # at line 111:10: ( LOALPHA | DIGIT | reserved_words ) ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )*
+        # at line 111:10: ( LOALPHA | DIGIT | reserved_words )
+        alt_32 = 3
+        case look_32 = @input.peek( 1 )
+        when LOALPHA then alt_32 = 1
+        when DIGIT then alt_32 = 2
+        when SCHEME, CLASS, TITLE, REL, LOCATION, ATTRIBUTES, ACTIONS, SELF, CATEGORY, KIND, MIXIN, ACTION, LINK, TERM then alt_32 = 3
         else
           raise NoViableAlternative( "", 32, 0 )
         end
@@ -1588,13 +1586,17 @@ module OCCIANTLR
           match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_term_923 )
 
         when 2
-          # at line 111:22: reserved_words
-          @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_term_927 )
+          # at line 111:22: DIGIT
+          match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_term_927 )
+
+        when 3
+          # at line 111:30: reserved_words
+          @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_term_931 )
           reserved_words
           @state.following.pop
 
         end
-        # at line 111:39: ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )*
+        # at line 111:47: ( LOALPHA | DIGIT | DASH | UNDERSCORE | DOT | reserved_words )*
         while true # decision 33
           alt_33 = 7
           case look_33 = @input.peek( 1 )
@@ -1607,28 +1609,28 @@ module OCCIANTLR
           end
           case alt_33
           when 1
-            # at line 111:41: LOALPHA
-            match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_term_933 )
+            # at line 111:49: LOALPHA
+            match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_term_937 )
 
           when 2
-            # at line 111:51: DIGIT
-            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_term_937 )
+            # at line 111:59: DIGIT
+            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_term_941 )
 
           when 3
-            # at line 111:59: DASH
-            match( DASH, TOKENS_FOLLOWING_DASH_IN_term_941 )
+            # at line 111:67: DASH
+            match( DASH, TOKENS_FOLLOWING_DASH_IN_term_945 )
 
           when 4
-            # at line 111:66: UNDERSCORE
-            match( UNDERSCORE, TOKENS_FOLLOWING_UNDERSCORE_IN_term_945 )
+            # at line 111:74: UNDERSCORE
+            match( UNDERSCORE, TOKENS_FOLLOWING_UNDERSCORE_IN_term_949 )
 
           when 5
-            # at line 111:79: DOT
-            match( DOT, TOKENS_FOLLOWING_DOT_IN_term_949 )
+            # at line 111:87: DOT
+            match( DOT, TOKENS_FOLLOWING_DOT_IN_term_953 )
 
           when 6
-            # at line 111:85: reserved_words
-            @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_term_953 )
+            # at line 111:93: reserved_words
+            @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_term_957 )
             reserved_words
             @state.following.pop
 
@@ -1670,7 +1672,7 @@ module OCCIANTLR
 
       begin
         # at line 112:20: uri
-        @state.following.push( TOKENS_FOLLOWING_uri_IN_scheme_973 )
+        @state.following.push( TOKENS_FOLLOWING_uri_IN_scheme_977 )
         uri
         @state.following.pop
         # - - - - - - - rule clean up - - - - - - - -
@@ -1811,7 +1813,7 @@ module OCCIANTLR
 
       begin
         # at line 116:6: comp_first= attribute_component ( '.' comp_next= attribute_component )* EQUALS attribute_value
-        @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_1050 )
+        @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_1054 )
         comp_first = attribute_component
         @state.following.pop
         # --> action
@@ -1829,8 +1831,8 @@ module OCCIANTLR
           case alt_35
           when 1
             # at line 117:8: '.' comp_next= attribute_component
-            match( DOT, TOKENS_FOLLOWING_DOT_IN_attribute_1061 )
-            @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_1065 )
+            match( DOT, TOKENS_FOLLOWING_DOT_IN_attribute_1065 )
+            @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_1069 )
             comp_next = attribute_component
             @state.following.pop
             # --> action
@@ -1841,8 +1843,8 @@ module OCCIANTLR
             break # out of loop for decision 35
           end
         end # loop for decision 35
-        match( EQUALS, TOKENS_FOLLOWING_EQUALS_IN_attribute_1076 )
-        @state.following.push( TOKENS_FOLLOWING_attribute_value_IN_attribute_1078 )
+        match( EQUALS, TOKENS_FOLLOWING_EQUALS_IN_attribute_1080 )
+        @state.following.push( TOKENS_FOLLOWING_attribute_value_IN_attribute_1082 )
         attribute_value28 = attribute_value
         @state.following.pop
         # --> action
@@ -1880,7 +1882,7 @@ module OCCIANTLR
 
       begin
         # at line 120:27: comp_first= attribute_component ( '.' comp_next= attribute_component )* ( '{' ( 'mutable' )? ( 'immutable' )? ( 'required' )? '}' )?
-        @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1122 )
+        @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1126 )
         comp_first = attribute_component
         @state.following.pop
         # --> action
@@ -1898,8 +1900,8 @@ module OCCIANTLR
           case alt_36
           when 1
             # at line 121:8: '.' comp_next= attribute_component
-            match( DOT, TOKENS_FOLLOWING_DOT_IN_attribute_name_1133 )
-            @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1137 )
+            match( DOT, TOKENS_FOLLOWING_DOT_IN_attribute_name_1137 )
+            @state.following.push( TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1141 )
             comp_next = attribute_component
             @state.following.pop
             # --> action
@@ -1923,7 +1925,7 @@ module OCCIANTLR
         case alt_40
         when 1
           # at line 123:7: '{' ( 'mutable' )? ( 'immutable' )? ( 'required' )? '}'
-          match( T__48, TOKENS_FOLLOWING_T__48_IN_attribute_name_1157 )
+          match( T__48, TOKENS_FOLLOWING_T__48_IN_attribute_name_1161 )
           # at line 123:11: ( 'mutable' )?
           alt_37 = 2
           look_37_0 = @input.peek( 1 )
@@ -1934,7 +1936,7 @@ module OCCIANTLR
           case alt_37
           when 1
             # at line 123:12: 'mutable'
-            match( T__49, TOKENS_FOLLOWING_T__49_IN_attribute_name_1160 )
+            match( T__49, TOKENS_FOLLOWING_T__49_IN_attribute_name_1164 )
             # --> action
              cur_hash[comp.to_sym][:mutable] = true 
             # <-- action
@@ -1950,7 +1952,7 @@ module OCCIANTLR
           case alt_38
           when 1
             # at line 123:68: 'immutable'
-            match( T__50, TOKENS_FOLLOWING_T__50_IN_attribute_name_1167 )
+            match( T__50, TOKENS_FOLLOWING_T__50_IN_attribute_name_1171 )
             # --> action
              cur_hash[comp.to_sym][:mutable] = false 
             # <-- action
@@ -1966,13 +1968,13 @@ module OCCIANTLR
           case alt_39
           when 1
             # at line 123:127: 'required'
-            match( T__51, TOKENS_FOLLOWING_T__51_IN_attribute_name_1174 )
+            match( T__51, TOKENS_FOLLOWING_T__51_IN_attribute_name_1178 )
             # --> action
              cur_hash[comp.to_sym][:required] = true 
             # <-- action
 
           end
-          match( T__52, TOKENS_FOLLOWING_T__52_IN_attribute_name_1180 )
+          match( T__52, TOKENS_FOLLOWING_T__52_IN_attribute_name_1184 )
 
         end
 
@@ -2021,11 +2023,11 @@ module OCCIANTLR
         case alt_41
         when 1
           # at line 124:25: LOALPHA
-          match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1192 )
+          match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1196 )
 
         when 2
           # at line 124:35: reserved_words
-          @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1196 )
+          @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1200 )
           reserved_words
           @state.following.pop
 
@@ -2043,23 +2045,23 @@ module OCCIANTLR
           case alt_42
           when 1
             # at line 124:53: LOALPHA
-            match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1201 )
+            match( LOALPHA, TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1205 )
 
           when 2
             # at line 124:63: DIGIT
-            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_attribute_component_1205 )
+            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_attribute_component_1209 )
 
           when 3
             # at line 124:71: DASH
-            match( DASH, TOKENS_FOLLOWING_DASH_IN_attribute_component_1209 )
+            match( DASH, TOKENS_FOLLOWING_DASH_IN_attribute_component_1213 )
 
           when 4
             # at line 124:78: UNDERSCORE
-            match( UNDERSCORE, TOKENS_FOLLOWING_UNDERSCORE_IN_attribute_component_1213 )
+            match( UNDERSCORE, TOKENS_FOLLOWING_UNDERSCORE_IN_attribute_component_1217 )
 
           when 5
             # at line 124:91: reserved_words
-            @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1217 )
+            @state.following.push( TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1221 )
             reserved_words
             @state.following.pop
 
@@ -2113,7 +2115,7 @@ module OCCIANTLR
         case alt_43
         when 1
           # at line 125:37: quoted_string
-          @state.following.push( TOKENS_FOLLOWING_quoted_string_IN_attribute_value_1234 )
+          @state.following.push( TOKENS_FOLLOWING_quoted_string_IN_attribute_value_1238 )
           quoted_string29 = quoted_string
           @state.following.pop
           # --> action
@@ -2122,7 +2124,7 @@ module OCCIANTLR
 
         when 2
           # at line 125:85: number
-          @state.following.push( TOKENS_FOLLOWING_number_IN_attribute_value_1240 )
+          @state.following.push( TOKENS_FOLLOWING_number_IN_attribute_value_1244 )
           number30 = number
           @state.following.pop
           # --> action
@@ -2164,7 +2166,7 @@ module OCCIANTLR
         # at line 126:12: ( digits ( DOT digits )? )
         # at line 126:12: ( digits ( DOT digits )? )
         # at line 126:14: digits ( DOT digits )?
-        @state.following.push( TOKENS_FOLLOWING_digits_IN_number_1255 )
+        @state.following.push( TOKENS_FOLLOWING_digits_IN_number_1259 )
         digits
         @state.following.pop
         # at line 126:21: ( DOT digits )?
@@ -2177,8 +2179,8 @@ module OCCIANTLR
         case alt_44
         when 1
           # at line 126:23: DOT digits
-          match( DOT, TOKENS_FOLLOWING_DOT_IN_number_1259 )
-          @state.following.push( TOKENS_FOLLOWING_digits_IN_number_1261 )
+          match( DOT, TOKENS_FOLLOWING_DOT_IN_number_1263 )
+          @state.following.push( TOKENS_FOLLOWING_digits_IN_number_1265 )
           digits
           @state.following.pop
 
@@ -2251,11 +2253,11 @@ module OCCIANTLR
 
       begin
         # at line 189:4: QUOTE string QUOTE
-        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1727 )
-        @state.following.push( TOKENS_FOLLOWING_string_IN_quoted_string_1729 )
+        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1731 )
+        @state.following.push( TOKENS_FOLLOWING_string_IN_quoted_string_1733 )
         string31 = string
         @state.following.pop
-        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1731 )
+        match( QUOTE, TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1735 )
         # --> action
         text = ( string31 && @input.to_s( string31.start, string31.stop ) )
         # <-- action
@@ -2359,7 +2361,7 @@ module OCCIANTLR
           case alt_46
           when 1
             # at line 191:10: DIGIT
-            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_digits_1776 )
+            match( DIGIT, TOKENS_FOLLOWING_DIGIT_IN_digits_1780 )
 
           else
             match_count_46 > 0 and break
@@ -2721,7 +2723,7 @@ module OCCIANTLR
 
     end
     TOKENS_FOLLOWING_CATEGORY_KEY_IN_category_39 = Set[ 5 ]
-    TOKENS_FOLLOWING_COLON_IN_category_41 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_COLON_IN_category_41 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 39, 40, 41, 44, 45 ]
     TOKENS_FOLLOWING_category_value_IN_category_43 = Set[ 1 ]
     TOKENS_FOLLOWING_category_term_IN_category_value_75 = Set[ 6 ]
     TOKENS_FOLLOWING_category_scheme_IN_category_value_77 = Set[ 6 ]
@@ -2732,7 +2734,7 @@ module OCCIANTLR
     TOKENS_FOLLOWING_category_attributes_IN_category_value_90 = Set[ 1, 6 ]
     TOKENS_FOLLOWING_category_actions_IN_category_value_93 = Set[ 1, 6 ]
     TOKENS_FOLLOWING_SEMICOLON_IN_category_value_96 = Set[ 1 ]
-    TOKENS_FOLLOWING_WS_IN_category_term_128 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_WS_IN_category_term_128 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 39, 40, 41, 44, 45 ]
     TOKENS_FOLLOWING_term_IN_category_term_131 = Set[ 1 ]
     TOKENS_FOLLOWING_SEMICOLON_IN_category_scheme_157 = Set[ 7, 8 ]
     TOKENS_FOLLOWING_WS_IN_category_scheme_159 = Set[ 8 ]
@@ -2773,9 +2775,9 @@ module OCCIANTLR
     TOKENS_FOLLOWING_WS_IN_category_attributes_369 = Set[ 15 ]
     TOKENS_FOLLOWING_ATTRIBUTES_IN_category_attributes_372 = Set[ 9 ]
     TOKENS_FOLLOWING_EQUALS_IN_category_attributes_374 = Set[ 10 ]
-    TOKENS_FOLLOWING_QUOTE_IN_category_attributes_376 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_QUOTE_IN_category_attributes_376 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 39, 40, 41, 44, 45 ]
     TOKENS_FOLLOWING_attribute_name_IN_category_attributes_380 = Set[ 7, 10 ]
-    TOKENS_FOLLOWING_WS_IN_category_attributes_395 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_WS_IN_category_attributes_395 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 39, 40, 41, 44, 45 ]
     TOKENS_FOLLOWING_attribute_name_IN_category_attributes_399 = Set[ 7, 10 ]
     TOKENS_FOLLOWING_QUOTE_IN_category_attributes_407 = Set[ 1 ]
     TOKENS_FOLLOWING_SEMICOLON_IN_category_actions_437 = Set[ 7, 16 ]
@@ -2823,12 +2825,12 @@ module OCCIANTLR
     TOKENS_FOLLOWING_WS_IN_link_category_720 = Set[ 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
     TOKENS_FOLLOWING_uri_IN_link_category_724 = Set[ 7, 10 ]
     TOKENS_FOLLOWING_QUOTE_IN_link_category_730 = Set[ 1 ]
-    TOKENS_FOLLOWING_SEMICOLON_IN_link_attributes_753 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_WS_IN_link_attributes_756 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_attribute_IN_link_attributes_759 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_SEMICOLON_IN_link_attributes_753 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_WS_IN_link_attributes_756 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_attribute_IN_link_attributes_759 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 39, 40, 41, 44, 45 ]
     TOKENS_FOLLOWING_X_OCCI_ATTRIBUTE_KEY_IN_x_occi_attribute_780 = Set[ 5 ]
-    TOKENS_FOLLOWING_COLON_IN_x_occi_attribute_782 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_WS_IN_x_occi_attribute_784 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_COLON_IN_x_occi_attribute_782 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_WS_IN_x_occi_attribute_784 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 39, 40, 41, 44, 45 ]
     TOKENS_FOLLOWING_attribute_IN_x_occi_attribute_787 = Set[ 1, 6 ]
     TOKENS_FOLLOWING_SEMICOLON_IN_x_occi_attribute_789 = Set[ 1 ]
     TOKENS_FOLLOWING_X_OCCI_LOCATION_KEY_IN_x_occi_location_809 = Set[ 5 ]
@@ -2857,47 +2859,48 @@ module OCCIANTLR
     TOKENS_FOLLOWING_X_OCCI_LOCATION_KEY_IN_uri_906 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
     TOKENS_FOLLOWING_reserved_words_IN_uri_910 = Set[ 1, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45 ]
     TOKENS_FOLLOWING_LOALPHA_IN_term_923 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_reserved_words_IN_term_927 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_LOALPHA_IN_term_933 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_DIGIT_IN_term_937 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_DASH_IN_term_941 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_UNDERSCORE_IN_term_945 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_DOT_IN_term_949 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_reserved_words_IN_term_953 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_uri_IN_scheme_973 = Set[ 1 ]
-    TOKENS_FOLLOWING_set_IN_class_type_982 = Set[ 1 ]
-    TOKENS_FOLLOWING_set_IN_title_1003 = Set[ 1, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
-    TOKENS_FOLLOWING_attribute_component_IN_attribute_1050 = Set[ 9, 32 ]
-    TOKENS_FOLLOWING_DOT_IN_attribute_1061 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_attribute_component_IN_attribute_1065 = Set[ 9, 32 ]
-    TOKENS_FOLLOWING_EQUALS_IN_attribute_1076 = Set[ 10, 26 ]
-    TOKENS_FOLLOWING_attribute_value_IN_attribute_1078 = Set[ 1 ]
-    TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1122 = Set[ 1, 32, 48 ]
-    TOKENS_FOLLOWING_DOT_IN_attribute_name_1133 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1137 = Set[ 1, 32, 48 ]
-    TOKENS_FOLLOWING_T__48_IN_attribute_name_1157 = Set[ 49, 50, 51, 52 ]
-    TOKENS_FOLLOWING_T__49_IN_attribute_name_1160 = Set[ 50, 51, 52 ]
-    TOKENS_FOLLOWING_T__50_IN_attribute_name_1167 = Set[ 51, 52 ]
-    TOKENS_FOLLOWING_T__51_IN_attribute_name_1174 = Set[ 52 ]
-    TOKENS_FOLLOWING_T__52_IN_attribute_name_1180 = Set[ 1 ]
-    TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1192 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1196 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1201 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_DIGIT_IN_attribute_component_1205 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_DASH_IN_attribute_component_1209 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_UNDERSCORE_IN_attribute_component_1213 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1217 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
-    TOKENS_FOLLOWING_quoted_string_IN_attribute_value_1234 = Set[ 1 ]
-    TOKENS_FOLLOWING_number_IN_attribute_value_1240 = Set[ 1 ]
-    TOKENS_FOLLOWING_digits_IN_number_1255 = Set[ 1, 32 ]
-    TOKENS_FOLLOWING_DOT_IN_number_1259 = Set[ 10, 26 ]
-    TOKENS_FOLLOWING_digits_IN_number_1261 = Set[ 1 ]
-    TOKENS_FOLLOWING_set_IN_reserved_words_1274 = Set[ 1 ]
-    TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1727 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
-    TOKENS_FOLLOWING_string_IN_quoted_string_1729 = Set[ 10 ]
-    TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1731 = Set[ 1 ]
-    TOKENS_FOLLOWING_set_IN_string_1742 = Set[ 1, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
-    TOKENS_FOLLOWING_DIGIT_IN_digits_1776 = Set[ 1, 26 ]
+    TOKENS_FOLLOWING_DIGIT_IN_term_927 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_reserved_words_IN_term_931 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_LOALPHA_IN_term_937 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_DIGIT_IN_term_941 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_DASH_IN_term_945 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_UNDERSCORE_IN_term_949 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_DOT_IN_term_953 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_reserved_words_IN_term_957 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 32, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_uri_IN_scheme_977 = Set[ 1 ]
+    TOKENS_FOLLOWING_set_IN_class_type_986 = Set[ 1 ]
+    TOKENS_FOLLOWING_set_IN_title_1007 = Set[ 1, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
+    TOKENS_FOLLOWING_attribute_component_IN_attribute_1054 = Set[ 9, 32 ]
+    TOKENS_FOLLOWING_DOT_IN_attribute_1065 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_attribute_component_IN_attribute_1069 = Set[ 9, 32 ]
+    TOKENS_FOLLOWING_EQUALS_IN_attribute_1080 = Set[ 10, 26 ]
+    TOKENS_FOLLOWING_attribute_value_IN_attribute_1082 = Set[ 1 ]
+    TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1126 = Set[ 1, 32, 48 ]
+    TOKENS_FOLLOWING_DOT_IN_attribute_name_1137 = Set[ 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_attribute_component_IN_attribute_name_1141 = Set[ 1, 32, 48 ]
+    TOKENS_FOLLOWING_T__48_IN_attribute_name_1161 = Set[ 49, 50, 51, 52 ]
+    TOKENS_FOLLOWING_T__49_IN_attribute_name_1164 = Set[ 50, 51, 52 ]
+    TOKENS_FOLLOWING_T__50_IN_attribute_name_1171 = Set[ 51, 52 ]
+    TOKENS_FOLLOWING_T__51_IN_attribute_name_1178 = Set[ 52 ]
+    TOKENS_FOLLOWING_T__52_IN_attribute_name_1184 = Set[ 1 ]
+    TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1196 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1200 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_LOALPHA_IN_attribute_component_1205 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_DIGIT_IN_attribute_component_1209 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_DASH_IN_attribute_component_1213 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_UNDERSCORE_IN_attribute_component_1217 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_reserved_words_IN_attribute_component_1221 = Set[ 1, 7, 8, 11, 12, 13, 14, 15, 16, 20, 21, 24, 26, 29, 38, 39, 40, 41, 44, 45 ]
+    TOKENS_FOLLOWING_quoted_string_IN_attribute_value_1238 = Set[ 1 ]
+    TOKENS_FOLLOWING_number_IN_attribute_value_1244 = Set[ 1 ]
+    TOKENS_FOLLOWING_digits_IN_number_1259 = Set[ 1, 32 ]
+    TOKENS_FOLLOWING_DOT_IN_number_1263 = Set[ 10, 26 ]
+    TOKENS_FOLLOWING_digits_IN_number_1265 = Set[ 1 ]
+    TOKENS_FOLLOWING_set_IN_reserved_words_1278 = Set[ 1 ]
+    TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1731 = Set[ 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
+    TOKENS_FOLLOWING_string_IN_quoted_string_1733 = Set[ 10 ]
+    TOKENS_FOLLOWING_QUOTE_IN_quoted_string_1735 = Set[ 1 ]
+    TOKENS_FOLLOWING_set_IN_string_1746 = Set[ 1, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 ]
+    TOKENS_FOLLOWING_DIGIT_IN_digits_1780 = Set[ 1, 26 ]
 
   end # class Parser < ANTLR3::Parser
 
