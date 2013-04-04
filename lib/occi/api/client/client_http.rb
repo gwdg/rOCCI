@@ -786,7 +786,12 @@ module Occi
               collection.resources.first.location if collection.resources.first
             end
           when 201
-            Occi::Parser.locations(response.header["content-type"].split(";").first, response.body, response.header).first
+            # TODO: OCCI-OS hack, look for header Location instead of uri-list
+            if response.header['location']
+              response.header['location']
+            else
+              Occi::Parser.locations(response.header["content-type"].split(";").first, response.body, response.header).first
+            end
           else
             raise "HTTP POST failed! #{response_msg}"
           end
