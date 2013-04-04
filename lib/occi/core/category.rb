@@ -57,13 +57,13 @@ module Occi
           end
         end
 
-        if namespace.const_defined? term.classify
-          klass = namespace.const_get term.classify
+        if namespace.const_defined? self.sanitize_term_before_classify(term).classify
+          klass = namespace.const_get self.sanitize_term_before_classify(term).classify
           unless klass.ancestors.include? Occi::Core::Entity or klass.ancestors.include? Occi::Core::Category
             raise "OCCI Kind with type identifier #{scheme + term} could not be created as the corresponding class #{klass.to_s} already exists and is not derived from Occi::Core::Entity"
           end
         else
-          klass = namespace.const_set term.classify, Class.new(parent)
+          klass = namespace.const_set self.sanitize_term_before_classify(term).classify, Class.new(parent)
           klass.kind = Occi::Core::Kind.new scheme, term, nil, {}, related unless parent.ancestors.include? Occi::Core::Category
         end
 
@@ -142,6 +142,15 @@ module Occi
 
       def to_s
         self.type_identifier
+      end
+
+      private
+
+      # Relaxed parser rules require additional checks on terms.
+      # TODO: a better solution?
+      # TODO: check for more unacceptable characters
+      def self.sanitize_term_before_classify(term)
+        term.downcase.gsub(/[\s\(\)\.\{\}\-;,\\\/\?\!\|\*\<\>]/, '_').gsub(/_+/, '_').chomp('_').reverse.chomp('_').reverse
       end
 
     end
