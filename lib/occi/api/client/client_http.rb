@@ -732,12 +732,8 @@ module Occi
             entity_type = Occi::Core::Link if kind.related_to? Occi::Core::Link
           end
 
-          # TODO: remove semi-colons between networkinterface and storagelink attributes
-          # used in responses from OCCI-OS
-          modified_response = response.body.gsub('"; occi.networkinterface','" occi.networkinterface').gsub('"; occi.storagelink','" occi.storagelink')
-
           Occi::Log.debug "Parser call: #{response.content_type} #{entity_type} #{path.include?('-/')}"
-          collection = Occi::Parser.parse(response.content_type, modified_response, path.include?('-/'), entity_type, response.headers)
+          collection = Occi::Parser.parse(response.content_type, response.body, path.include?('-/'), entity_type, response.headers)
 
           Occi::Log.debug "Parsed collection: empty? #{collection.empty?}"
           collection

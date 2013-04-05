@@ -83,7 +83,7 @@ link returns [hash]
 	link_category  returns [array] @init {array = Array.new}
 	                                : SEMICOLON WS? CATEGORY EQUALS QUOTE kind=uri { array << $kind.text } (WS mixin=uri { array << $mixin.text })* QUOTE;
 	link_attributes  returns [hash] @init {hash = Hashie::Mash.new}
-					: SEMICOLON (WS? attribute { hash.merge!($attribute.hash) } )*;
+					: SEMICOLON (WS? attribute SEMICOLON? { hash.merge!($attribute.hash) })*;
 
 /*
 e.g.
@@ -123,7 +123,7 @@ attribute_name returns [hash] @init { hash = Hashie::Mash.new }
 			  ('{' ('mutable' { cur_hash[comp.to_sym][:mutable] = true })? ('immutable' { cur_hash[comp.to_sym][:mutable] = false })? ('required' { cur_hash[comp.to_sym][:required] = true })? '}' )?;
 attribute_component	: ( LOALPHA | reserved_words) ( LOALPHA | DIGIT | DASH | UNDERSCORE | reserved_words  )*;
 attribute_value returns [value]	: ( quoted_string { value = $quoted_string.text } | number { value = $number.text.to_i } );
-number			: ( digits ( DOT digits )? );
+number			: ( digits ( DOT digits | COMMA digits )? );
 reserved_words
 	:	( ACTION | ACTIONS | ATTRIBUTES | CATEGORY | CLASS | KIND | LINK | LOCATION | MIXIN | REL | SCHEME | SELF | TERM | TITLE );
 	
@@ -152,6 +152,7 @@ CLASS	:	'class';
 COLON	:	':';
 DASH	:	'-';
 DOT	:	'.';
+COMMA:      ',';
 EQUALS	:	'=';
 GT	:	'>';
 HASH	:	'#';
