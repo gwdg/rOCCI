@@ -759,17 +759,19 @@ module Occi
           path = path.gsub(/\A\//, '')
 
           headers = self.class.headers.clone
-          headers['Content-Type'] = @media_type
 
           response = case @media_type
-                     when 'application/occi+json'
+                     when /application\/occi\+json/
+                       headers['Content-Type'] = 'application/occi+json'
                        self.class.post(@endpoint + path,
                                        :body => collection.to_json,
                                        :headers => headers)
-                     when 'text/occi'
+                     when /text\/occi/
+                       headers['Content-Type'] = 'text/occi'
                        self.class.post(@endpoint + path,
                                        :headers => collection.to_header.merge(headers))
                      else
+                       headers['Content-Type'] = @media_type
                        self.class.post(@endpoint + path,
                                        :body => collection.to_text,
                                        :headers => headers)
