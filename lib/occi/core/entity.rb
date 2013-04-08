@@ -192,41 +192,50 @@ module Occi
       # @return [String] text representation
       def to_text
         text = 'Category: ' + self.kind.term + ';scheme=' + self.kind.scheme.inspect + ';class="kind"' + "\n"
+
         @mixins.each do |mixin|
           scheme, term = mixin.to_s.split('#')
           scheme << '#'
           text << 'Category: ' + term + ';scheme=' + scheme.inspect + ';class="mixin"' + "\n"
         end
+
         @attributes.combine.each_pair do |name, value|
           value = value.inspect
           text << 'X-OCCI-Attribute: ' + name + '=' + value + "\n"
         end
+
         @actions.each do |action|
           _, term = action.split('#')
           text << 'Link: <' + self.location + '?action=' + term + '>;rel=' + action.inspect + "\n"
         end
+
         text
       end
 
       # @return [Hash] hash containing the HTTP headers of the text/occi rendering
       def to_header
         header             = Hashie::Mash.new
+
         header['Category'] = self.kind.term + ';scheme=' + self.kind.scheme.inspect + ';class="kind"'
         @mixins.each do |mixin|
           scheme, term = mixin.to_s.split('#')
           scheme << '#'
           header['Category'] += ',' + term + ';scheme=' + scheme.inspect + ';class="mixin"'
         end
+
         attributes = []
         @attributes.combine.each_pair do |name, value|
           attributes << name + '=' + value.inspect
         end
         header['X-OCCI-Attribute'] = attributes.join(',') if attributes.any?
+
         links = []
         @actions.each do |action|
           _, term = action.split('#')
           links << self.location + '?action=' + term + '>;rel=' + action.inspect
         end
+        header['Link'] = links.join(',') if links.any?
+
         header
       end
 

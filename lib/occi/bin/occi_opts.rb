@@ -14,6 +14,8 @@ module Occi
       ACTIONS = [:list, :describe, :create, :delete, :trigger].freeze
       LOG_OUTPUTS = [:stdout, :stderr].freeze
 
+      MIXIN_REGEXP = /^([^#\s]+)#([^#]+)$/
+
       def self.parse(args, test_env = false)
 
         @@quiet = test_env
@@ -208,13 +210,13 @@ Examples:
                   "--mixin NAME",
                   String,
                   "Type and name of the mixin as TYPE#NAME (e.g. os_tpl#monitoring, resource_tpl#medium)") do |mixin|
-            parts = mixin.split("#")
+            matched = MIXIN_REGEXP.match(mixin)
+            raise "Unknown mixin format! Use TYPE#NAME!" unless matched
 
-            raise "Unknown mixin format! Use TYPE#NAME!" unless parts.length == 2
-
+            matched = matched.to_a.drop 1
             options.mixins = {} if options.mixins.nil?
-            options.mixins[parts[0]] = [] if options.mixins[parts[0]].nil?
-            options.mixins[parts[0]] << parts[1]
+            options.mixins[matched[0]] = [] if options.mixins[matched[0]].nil?
+            options.mixins[matched[0]] << matched[1]
           end
 
           opts.on("-j",

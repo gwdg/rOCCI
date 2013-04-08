@@ -249,7 +249,7 @@ begin
 
           options.mixins = {}
           (1..number_of_mixins).each do |mixin_number|
-            mixin = ask("What mixin should I mix in? ") { |q| q.validate = /\A\w+#\w+\Z/ }
+            mixin = ask("What mixin should I mix in? ") { |q| q.validate = Occi::Bin::OcciOpts::MIXIN_REGEXP }
             parts = mixin.split("#")
 
             options.mixins[parts[0]] = [] if options.mixins[parts[0]].nil?

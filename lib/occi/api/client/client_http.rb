@@ -759,17 +759,19 @@ module Occi
           path = path.gsub(/\A\//, '')
 
           headers = self.class.headers.clone
-          headers['Content-Type'] = @media_type
 
           response = case @media_type
-                     when 'application/occi+json'
+                     when /application\/occi\+json/
+                       headers['Content-Type'] = 'application/occi+json'
                        self.class.post(@endpoint + path,
                                        :body => collection.to_json,
                                        :headers => headers)
-                     when 'text/occi'
+                     when /text\/occi/
+                       headers['Content-Type'] = 'text/occi'
                        self.class.post(@endpoint + path,
                                        :headers => collection.to_header.merge(headers))
                      else
+                       headers['Content-Type'] = @media_type
                        self.class.post(@endpoint + path,
                                        :body => collection.to_text,
                                        :headers => headers)
@@ -786,7 +788,12 @@ module Occi
               collection.resources.first.location if collection.resources.first
             end
           when 201
-            Occi::Parser.locations(response.header["content-type"].split(";").first, response.body, response.header).first
+            # TODO: OCCI-OS hack, look for header Location instead of uri-list
+            if response.header['location']
+              response.header['location']
+            else
+              Occi::Parser.locations(response.header["content-type"].split(";").first, response.body, response.header).first
+            end
           else
             raise "HTTP POST failed! #{response_msg}"
           end
@@ -995,36 +1002,35 @@ module Occi
           response = self.class.head @endpoint
 
           return true if response.success?
+          raise "#{response_message(response)}!" unless response.code == 401
 
-          if response.code == 401 && response.headers["www-authenticate"]
-            if response.headers["www-authenticate"].start_with? "Keystone"
-              keystone_uri = /^Keystone uri='(.+)'$/.match(response.headers["www-authenticate"])[1]
+          if response.headers['www-authenticate'] && response.headers['www-authenticate'].start_with?('Keystone')
+            keystone_uri = /^Keystone uri='(.+)'$/.match(response.headers['www-authenticate'])[1]
 
-              if keystone_uri
-                if @auth_options[:type] == "x509"
-                  body = { "auth" => { "voms" => true } }
-                else
-                  body = {
-                    "auth" => {
-                      "passwordCredentials" => {
-                        "username" => @auth_options[:username],
-                        "password" => @auth_options[:password]
-                      }
-                    }
+            return false unless keystone_uri
+
+            if @auth_options[:type] == "x509"
+              body = { "auth" => { "voms" => true } }
+            else
+              body = {
+                "auth" => {
+                  "passwordCredentials" => {
+                    "username" => @auth_options[:username],
+                    "password" => @auth_options[:password]
                   }
-                end
+                }
+              }
+            end
 
-                headers = self.class.headers.clone
-                headers['Content-Type'] = "application/json"
-                headers['Accept'] = headers['Content-Type']
+            headers = self.class.headers.clone
+            headers['Content-Type'] = "application/json"
+            headers['Accept'] = headers['Content-Type']
 
-                response = self.class.post(keystone_uri + "/v2.0/tokens", :body => body.to_json, :headers => headers)
+            response = self.class.post(keystone_uri + "/v2.0/tokens", :body => body.to_json, :headers => headers)
 
-                if response.success?
-                  self.class.headers['X-Auth-Token'] = response['access']['token']['id']
-                  return true
-                end
-              end
+            if response.success?
+              self.class.headers['X-Auth-Token'] = response['access']['token']['id']
+              return true
             end
           end
 
