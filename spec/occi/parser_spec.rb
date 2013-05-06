@@ -33,6 +33,7 @@ describe "Parser" do
 
     # add link to resource
     link = resource.links.create
+    link.id = UUIDTools::UUID.random_create.to_s
     link.target = 'http://example.com/resource/aee5acf5-71de-40b0-bd1c-2284658bfd0e'
 
     # render collection to text/plain MIME type

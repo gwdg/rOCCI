@@ -8,6 +8,10 @@ group :development do
   gem 'rubygems-tasks', :git => 'git://github.com/postmodern/rubygems-tasks.git'
 end
 
+platforms :ruby_18 do
+  gem 'oniguruma'
+end
+
 platforms :jruby do
   gem 'jruby-openssl' if ((defined? JRUBY_VERSION) && (JRUBY_VERSION.split('.')[1].to_i < 7))
 end
