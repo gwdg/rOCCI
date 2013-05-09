@@ -69,6 +69,7 @@ module Occi
       def self.categories(lines)
         collection = Occi::Collection.new
         lines.each do |line|
+          line.strip!
           category = self.category(line) if line.start_with? 'Category:'
           collection << category if category.kind_of? Occi::Core::Category
         end
@@ -79,6 +80,7 @@ module Occi
         collection = Occi::Collection.new
         resource = Occi::Core::Resource.new
         lines.each do |line|
+          line.strip!
           case line
             when /^Category:/
               category = self.category(line)
@@ -98,6 +100,7 @@ module Occi
         collection = Occi::Collection.new
         link = Occi::Core::Link.new
         lines.each do |line|
+          line.strip!
           case line
             when /^Category:/
               category = self.category(line)
@@ -114,6 +117,7 @@ module Occi
       def self.locations(lines)
         locations = []
         lines.each do |line|
+          line.strip!
           locations << self.location(line) if line.start_with? 'X-OCCI-Location:'
         end
         locations
@@ -129,14 +133,12 @@ module Occi
 
         raise "could not match #{string}" unless match
 
-        category = Hashie::Mash.new
-        category.term = match[:term]
-        category.scheme = match[:scheme]
-        category.class = match[:class]
-        category.title = match[:title]
-        category.rel = match[:rel]
+        term = match[:term]
+        scheme = match[:scheme]
+        title = match[:title]
+        related = match[:rel].to_s.split
         if match[:attributes]
-          category.attributes = Hashie::Mash.new
+          attributes = Hashie::Mash.new
           match[:attributes].split.each do |attribute|
             property_string = attribute[/#{REGEXP_ATTRIBUTE_DEF}/, -2]
             properties = Occi::Core::AttributeProperties.new
@@ -145,11 +147,21 @@ module Occi
               properties.mutable = false if property_string.include? 'immutable'
             end
             name = attribute[/#{REGEXP_ATTRIBUTE_DEF}/, 1]
-            category.attributes.merge! name.split('.').reverse.inject(properties) { |a, n| {n => a} }
+            attributes.merge! name.split('.').reverse.inject(properties) { |a, n| {n => a} }
           end
         end
-        category.actions = match[:actions]
-        Occi::Core::Category.new category
+        actions = match[:actions].to_s.split
+        location = match[:location]
+        case match[:class]
+          when 'kind'
+            Occi::Core::Kind.new scheme, term, title, attributes, related, actions, location
+          when 'mixin'
+            Occi::Core::Mixin.new scheme, term, title, attributes, related, actions, location
+          when 'action'
+            Occi::Core::Action.new scheme, term, title, attributes
+          else
+            raise "Category with class #{match[:class]} not recognized in string: #{string}"
+        end
       end
 
       def self.attribute(string)
