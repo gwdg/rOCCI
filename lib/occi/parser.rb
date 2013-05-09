@@ -38,12 +38,12 @@ module Occi
           nil
         when 'text/plain', nil
           if category
-            collection = Occi::Parser::Text.categories body
+            collection = Occi::Parser::Text.categories body.split "\n"
           else
             if entity_type == Occi::Core::Resource
-              collection = Occi::Parser::Text.resource body
+              collection = Occi::Parser::Text.resource body.split "\n"
             elsif entity_type == Occi::Core::Link
-              collection = Occi::Parser::Text.link body
+              collection = Occi::Parser::Text.link body.split "\n"
             end
           end
         when 'application/occi+json', 'application/json'
