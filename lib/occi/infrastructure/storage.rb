@@ -2,78 +2,42 @@ module Occi
   module Infrastructure
     class Storage < Occi::Core::Resource
 
-      class Online < Occi::Core::Action
-        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
-            term='online',
-            title='activate storage')
-          super
-        end
-      end
+      online = Occi::Core::Action.new scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
+                                      term='online',
+                                      title='activate storage'
 
-      class Offline < Occi::Core::Action
-        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
-            term='offline',
-            title='deactivate storage')
-          super
-        end
-      end
+      offline = Occi::Core::Action.new scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
+                                       term='offline',
+                                       title='deactivate storage'
 
-      class Backup < Occi::Core::Action
-        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
-            term='backup',
-            title='backup storage')
-          super
-        end
-      end
+      backup = Occi::Core::Action.new scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
+                                      term='backup',
+                                      title='backup storage'
 
-      class Snapshot < Occi::Core::Action
-        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
-            term='snapshot',
-            title='snapshot storage')
-          super
-        end
-      end
+      snapshot = Occi::Core::Action.new scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
+                                        term='snapshot',
+                                        title='snapshot storage'
 
-      class Resize < Occi::Core::Action
-        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
-            term='resize',
-            title='resize storage')
-          super
-          @attributes.size = Occi::Core::AttributeProperties.new(
-              { :type    => 'number',
-                :mutable => true })
-        end
-      end
+      resize = Occi::Core::Action.new scheme='http://schemas.ogf.org/occi/infrastructure/storage/action#',
+                                      term='resize',
+                                      title='resize storage',
+                                      attributes = Occi::Core::Attributes.new('size' => Occi::Core::AttributeProperties.new(:type => 'number',
+                                                                                                                            :mutable => true))
 
-      def self.actions
-        Occi::Core::Actions.new << Online.new << Offline.new << Backup.new << Snapshot.new
-      end
+      self.actions = Occi::Core::Actions.new << online << offline << backup << snapshot << resize
 
-      begin
-        @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/infrastructure#', 'storage')
+      self.attributes = Occi::Core::Attributes.split 'occi.storage.size' => Occi::Core::AttributeProperties.new(:type => 'number',
+                                                                                                                :mutable => true),
+                                                     'occi.storage.state' => Occi::Core::AttributeProperties.new(:pattern => 'online|offline|backup|snapshot|resize|degraded',
+                                                                                                                 :default => 'offline')
 
-        @kind.title = "storage resource"
-
-        @kind.related << Occi::Core::Resource.kind
-
-        @kind.attributes.occi!.storage!.size = Occi::Core::AttributeProperties.new(
-            { :type    => 'number',
-              :mutable => true })
-
-        @kind.attributes.occi!.storage!.state = Occi::Core::AttributeProperties.new(
-            { :pattern => 'online|offline|backup|snapshot|resize|degraded',
-              :default => 'offline' })
-
-        @kind.location = '/storage/'
-
-        @kind.actions = [
-            "http://schemas.ogf.org/occi/infrastructure/storage/action#online",
-            "http://schemas.ogf.org/occi/infrastructure/storage/action#offline",
-            "http://schemas.ogf.org/occi/infrastructure/storage/action#backup",
-            "http://schemas.ogf.org/occi/infrastructure/storage/action#snapshot",
-            "http://schemas.ogf.org/occi/infrastructure/storage/action#resize"
-        ]
-      end
+      self.kind = Occi::Core::Kind.new scheme='http://schemas.ogf.org/occi/infrastructure#',
+                                       term='storage',
+                                       title = 'storage resource',
+                                       attributes = self.attributes,
+                                       related = Occi::Core::Related.new << Occi::Core::Resource.kind,
+                                       actions = self.actions,
+                                       location = '/storage/'
 
       def size
         @attributes.occi.storage.size if @attributes.occi.storage if @attributes.occi

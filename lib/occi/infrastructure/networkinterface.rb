@@ -2,54 +2,32 @@ module Occi
   module Infrastructure
     class Networkinterface < Occi::Core::Link
 
+      up = Occi::Core::Action.new scheme='http://schemas.ogf.org/occi/infrastructure/networkinterface/action#',
+                                  term='up',
+                                  title='activate networkinterface'
+
+      down = Occi::Core::Action.new scheme='http://schemas.ogf.org/occi/infrastructure/networkinterface/action#',
+                                    term='down',
+                                    title='deactivate networkinterface'
+
+      self.actions = Occi::Core::Actions.new << up << down
+
+      self.attributes = Occi::Core::Attributes.split 'occi.networkinterface.interface' => Occi::Core::AttributeProperties.new(:mutable => true),
+                                                     'occi.networkinterface.mac' => Occi::Core::AttributeProperties.new(:mutable => true,
+                                                                                     :pattern => '^([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2})$'),
+                                                     'occi.networkinterface.state' => Occi::Core::AttributeProperties.new(:pattern => 'active|inactive|error',
+                                                                                       :default => 'inactive')
+
+      self.kind = Occi::Core::Kind.new scheme='http://schemas.ogf.org/occi/infrastructure#',
+                                       term='networkinterface',
+                                       title = 'networkinterface link',
+                                       attributes = self.attributes,
+                                       related = Occi::Core::Related.new << Occi::Core::Link.kind,
+                                       actions = self.actions,
+                                       location = '/networkinterface/'
+
       require 'occi/infrastructure/networkinterface/ipnetworkinterface'
-
-      def self.mixins
-        Occi::Core::Mixins.new << Occi::Infrastructure::Networkinterface::Ipnetworkinterface.new
-      end
-
-      class Up < Occi::Core::Action
-        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/networkinterface/action#',
-            term='up',
-            title='activate networkinterface')
-          super
-        end
-      end
-
-      class Down < Occi::Core::Action
-        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/networkinterface/action#',
-            term='down',
-            title='deactivate networkinterface')
-          super
-        end
-      end
-
-      def self.actions
-        Occi::Core::Actions.new << Up.new << Down.new
-      end
-
-      begin
-        @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/infrastructure#', 'networkinterface')
-
-        @kind.title = "networkinterface link"
-
-        @kind.related << Occi::Core::Link.kind
-
-        @kind.attributes.occi!.networkinterface!.interface = Occi::Core::AttributeProperties.new(
-            { :mutable => true })
-
-        @kind.attributes.occi!.networkinterface!.mac = Occi::Core::AttributeProperties.new(
-            { :mutable => true,
-              :pattern => '^([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2})$' })
-
-        @kind.attributes.occi!.networkinterface!.state = Occi::Core::AttributeProperties.new(
-            { :pattern => 'active|inactive|error',
-              :default => 'inactive' })
-
-        @kind.location = '/networkinterface/'
-
-        @kind.actions = self.actions
-      end
+      self.mixins = Occi::Core::Mixins.new << Occi::Infrastructure::Networkinterface::Ipnetworkinterface.mixin
 
       def ipnetworkinterface(boolean=true)
         if boolean

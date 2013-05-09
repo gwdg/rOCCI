@@ -2,93 +2,59 @@ module Occi
   module Infrastructure
     class Compute < Occi::Core::Resource
 
-      class Start < Occi::Core::Action
-        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/compute/action#',
-            term='start',
-            title='start compute instance')
-          super
-        end
-      end
+      start = Occi::Core::Action.new scheme='http://schemas.ogf.org/occi/infrastructure/compute/action#',
+                                     term='start',
+                                     title='start compute instance'
 
-      class Stop < Occi::Core::Action
-        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/compute/action#',
-            term='stop',
-            title='stop compute instance')
-          super
-          @attributes.method = Occi::Core::AttributeProperties.new(
-              { :mutable => true,
-                :pattern => 'graceful|acpioff|poweroff',
-                :default => 'poweroff' })
-        end
-      end
+      stop = Occi::Core::Action.new scheme='http://schemas.ogf.org/occi/infrastructure/compute/action#',
+                                    term='stop',
+                                    title='stop compute instance',
+                                    attributes={:method => Occi::Core::AttributeProperties.new(
+                                        {:mutable => true,
+                                         :pattern => 'graceful|acpioff|poweroff',
+                                         :default => 'poweroff'})}
 
-      class Restart < Occi::Core::Action
-        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/compute/action#',
-            term='restart',
-            title='restart compute instance')
-          super
-          @attributes.method = Occi::Core::AttributeProperties.new(
-              { :mutable => true,
-                :pattern => 'graceful|warm|cold',
-                :default => 'cold' })
-        end
-      end
+      restart = Occi::Core::Action.new scheme='http://schemas.ogf.org/occi/infrastructure/compute/action#',
+                                       term='restart',
+                                       title='restart compute instance',
+                                       attributes={:method => Occi::Core::AttributeProperties.new(
+                                           {:mutable => true,
+                                            :pattern => 'graceful|warm|cold',
+                                            :default => 'cold'})}
 
-      class Suspend < Occi::Core::Action
-        def initialize(scheme='http://schemas.ogf.org/occi/infrastructure/compute/action#',
-            term='suspend',
-            title='suspend compute instance')
-          super
-          @attributes.method = Occi::Core::AttributeProperties.new(
-              { :mutable => true,
-                :pattern => 'hibernate|suspend',
-                :default => 'suspend' })
-        end
-      end
+      suspend = Occi::Core::Action.new scheme='http://schemas.ogf.org/occi/infrastructure/compute/action#',
+                                       term='suspend',
+                                       title='suspend compute instance',
+                                       attributes={:method => Occi::Core::AttributeProperties.new(
+                                           {:mutable => true,
+                                            :pattern => 'hibernate|suspend',
+                                            :default => 'suspend'})}
 
-      def self.mixins
-        Occi::Core::Mixins.new << Occi::Infrastructure::Resource_tpl.new << Occi::Infrastructure::Os_tpl.new
-      end
 
-      def self.actions
-        Occi::Core::Actions.new << Start.new << Stop.new << Restart.new << Suspend.new
-      end
+      self.actions = Occi::Core::Actions.new << start << stop << restart << suspend
 
-      begin
-        @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/infrastructure#', 'compute')
+      self.attributes = Occi::Core::Attributes.split('occi.compute.architecture' => Occi::Core::AttributeProperties.new(:mutable => true,
+                                                                                                                        :pattern => 'x86|x64'),
+                                                     'occi.compute.cores' => Occi::Core::AttributeProperties.new(:type => 'number',
+                                                                                                                 :mutable => true),
+                                                     'occi.compute.hostname' => Occi::Core::AttributeProperties.new(:mutable => true,
+                                                                                                                    :pattern => '(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*'),
+                                                     'occi.compute.memory' => Occi::Core::AttributeProperties.new(:type => 'number',
+                                                                                                                  :mutable => true),
+                                                     'occi.compute.state' => Occi::Core::AttributeProperties.new(:pattern => 'inactive|active|suspended|error',
+                                                                                                                 :default => 'inactive'))
 
-        @kind.title = "compute resource"
+      self.kind = Occi::Core::Kind.new scheme='http://schemas.ogf.org/occi/infrastructure#',
+                                       term='compute',
+                                       title = 'compute resource',
+                                       attributes=self.attributes,
+                                       related=Occi::Core::Related.new << Occi::Core::Resource.kind,
+                                       actions = self.actions,
+                                       location = '/compute/'
 
-        @kind.related << Occi::Core::Resource.kind
-
-        @kind.attributes.occi!.compute!.architecture = Occi::Core::AttributeProperties.new(
-            { :mutable => true,
-              :pattern => 'x86|x64' })
-
-        @kind.attributes.occi!.compute!.cores = Occi::Core::AttributeProperties.new(
-            { :type    => 'number',
-              :mutable => true })
-
-        @kind.attributes.occi!.compute!.hostname = Occi::Core::AttributeProperties.new(
-            { :mutable => true,
-              :pattern => '(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*' })
-
-        @kind.attributes.occi!.compute!.speed = Occi::Core::AttributeProperties.new(
-            { :type    => 'number',
-              :mutable => true })
-
-        @kind.attributes.occi!.compute!.memory = Occi::Core::AttributeProperties.new(
-            { :type    => 'number',
-              :mutable => true })
-
-        @kind.attributes.occi!.compute!.state = Occi::Core::AttributeProperties.new(
-            { :pattern => 'inactive|active|suspended|error',
-              :default => 'inactive' })
-
-        @kind.location = '/compute/'
-
-        @kind.actions = self.actions
-      end
+      require 'occi/infrastructure/resource_tpl'
+      require 'occi/infrastructure/os_tpl'
+      self.mixins = Occi::Core::Mixins.new << Occi::Infrastructure::Resource_tpl.mixin << Occi::Infrastructure::Os_tpl.mixin
 
       def architecture
         @attributes.occi.compute.architecture if @attributes.occi.compute if @attributes.occi

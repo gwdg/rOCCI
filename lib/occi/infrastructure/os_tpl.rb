@@ -1,19 +1,19 @@
 module Occi
   module Infrastructure
-    class Os_tpl < Occi::Core::Mixin
+    module Os_tpl
 
-      def initialize(scheme='http://schemas.ogf.org/occi/infrastructure#',
-          term='os_tpl',
-          title='operating system template',
-          attributes=Occi::Core::Attributes.new,
-          related=Occi::Core::Categories.new,
-          actions=Occi::Core::Actions.new,
-          location='/mixins/os_tpl/')
+      mattr_accessor :attributes, :mixin
 
-        super(scheme, term, title, attributes, related, actions, location)
-        self.related << Occi::Infrastructure::Compute.kind
-      end
+      self.attributes = Occi::Core::Attributes.new
 
+      self.mixin = Occi::Core::Mixin.new scheme='http://schemas.ogf.org/occi/infrastructure#',
+                                         term='os_tpl',
+                                         title='operating system template',
+                                         attributes=self.attributes,
+                                         related=Occi::Core::Categories.new << Occi::Infrastructure::Compute.kind,
+                                         actions=Occi::Core::Actions.new,
+                                         location='/mixins/os_tpl/'
     end
+
   end
 end
