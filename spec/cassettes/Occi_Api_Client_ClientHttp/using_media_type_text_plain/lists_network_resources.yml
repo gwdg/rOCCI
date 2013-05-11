@@ -242,7 +242,7 @@ http_interactions:
         Category: up;scheme="http://schemas.ogf.org/occi/infrastructure/network/action#";class="action";title="Activate
         network"
 
-        Category: down;scheme="http://schemas.ogf.org/occi/infrastructure/network/action#up";class="action";title="Activate
+        Category: down;scheme="http://schemas.ogf.org/occi/infrastructure/network/action#";class="action";title="Activate
         network"
 
         Category: online;scheme="http://schemas.ogf.org/occi/infrastructure/storage/action#";class="action";title="Activate

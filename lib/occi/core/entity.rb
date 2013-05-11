@@ -2,27 +2,20 @@ module Occi
   module Core
     class Entity
 
-      attr_accessor :mixins, :attributes, :actions, :id, :model, :kind
+      attr_accessor :mixins, :attributes, :actions, :id, :model, :kind, :location
 
-      class << self
-        attr_accessor :kind
-        attr_reader :mixins, :actions
-      end
+      class_attribute :kind, :mixins, :attributes, :actions
 
-      def self.mixins
-        Occi::Core::Mixins.new
-      end
+      self.mixins = Occi::Core::Mixins.new
 
-      @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'entity')
+      self.attributes = Occi::Core::Attributes.split(
+          'occi.core.id' => Occi::Core::AttributeProperties.new(:pattern => "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"),
+          'occi.core.title' => Occi::Core::AttributeProperties.new(:mutable => true))
 
-      @kind.title = "entity"
-
-      @kind.attributes.occi!.core!.id = Occi::Core::AttributeProperties.new(
-          { :pattern => "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}" })
-
-      @kind.attributes.occi!.core!.title = Occi::Core::AttributeProperties.new(
-          { :mutable => true })
-
+      self.kind = Occi::Core::Kind.new scheme='http://schemas.ogf.org/occi/core#',
+                                       term='entity',
+                                       title='entity',
+                                       attributes=self.attributes
 
       # @return [String]
       def self.type_identifier
@@ -34,10 +27,10 @@ module Occi
       def self.new(*args)
         if args.size > 0
           type_identifier = args[0].to_s
-          related         = [self.kind]
+          related = [self.kind]
         else
           type_identifier = self.kind.type_identifier
-          related         = nil
+          related = nil
         end
         scheme, term = type_identifier.split '#'
 
@@ -53,11 +46,12 @@ module Occi
       # @param [Occi::Core::Attributes] attributes
       # @param [Occi::Core::Actions] actions
       # @return [Occi::Core::Entity]
-      def initialize(kind = self.kind, mixins=[], attributes={ }, actions=[])
-        @kind       = self.class.kind.clone
-        @mixins     = Occi::Core::Mixins.new mixins
+      def initialize(kind = self.kind, mixins=[], attributes={}, actions=[], location=nil)
+        @kind = self.class.kind.clone
+        @mixins = Occi::Core::Mixins.new mixins
         @attributes = Occi::Core::Attributes.new attributes
-        @actions    = Occi::Core::Actions.new actions
+        @actions = Occi::Core::Actions.new actions
+        @location = location
       end
 
       # @return [Occi::Core::Kind]
@@ -70,7 +64,7 @@ module Occi
       def kind=(kind)
         if kind.kind_of? String
           scheme, term = kind.split '#'
-          kind         = Occi::Core::Category.get_class scheme, term
+          kind = Occi::Core::Category.get_class scheme, term
         end
         @kind = kind
       end
@@ -94,7 +88,7 @@ module Occi
       # @param [UUIDTools::UUID] id
       def id=(id)
         @attributes.occi!.core!.id = id
-        @id                        = id
+        @id = id
       end
 
       # @return [UUIDTools::UUID] id of the entity
@@ -118,15 +112,22 @@ module Occi
       # @return [Occi::Model]
       def model=(model)
         @model = model
-        @kind  = (model.get_by_id(@kind.type_identifier) || @kind)
+        @kind = (model.get_by_id(@kind.type_identifier) || @kind)
         @kind.entities << self
         @mixins.model = model
         @mixins.each { |mixin| mixin.entities << self }
         @actions.model = model
       end
 
+      # set location attribute of entity
+      # @param [String] location
+      def location=(location)
+        @location = location
+      end
+
       # @return [String] location of the entity
       def location
+        return @location if @location
         kind.location + id.gsub('urn:uuid:', '') if id
       end
 
@@ -155,7 +156,7 @@ module Occi
             attributes[key] = check(attributes[key], definitions[key])
           else
             properties = definitions[key]
-            value      = attributes[key]
+            value = attributes[key]
             value ||= properties.default if set_defaults or properties.required
             raise "required attribute #{key} not found" if value.nil? && properties.required
             next if value.nil? and not properties.required
@@ -179,7 +180,7 @@ module Occi
 
       # @param [Hash] options
       # @return [Hashie::Mash] json representation
-      def as_json(options={ })
+      def as_json(options={})
         entity = Hashie::Mash.new
         entity.kind = @kind.to_s if @kind
         entity.mixins = @mixins.join(' ').split(' ') if @mixins.any?
@@ -210,7 +211,7 @@ module Occi
 
       # @return [Hash] hash containing the HTTP headers of the text/occi rendering
       def to_header
-        header             = Hashie::Mash.new
+        header = Hashie::Mash.new
         header['Category'] = self.kind.term + ';scheme=' + self.kind.scheme.inspect + ';class="kind"'
         @mixins.each do |mixin|
           scheme, term = mixin.to_s.split('#')

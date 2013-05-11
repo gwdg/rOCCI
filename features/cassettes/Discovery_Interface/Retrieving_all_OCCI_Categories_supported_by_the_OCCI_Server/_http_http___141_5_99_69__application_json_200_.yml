@@ -102,7 +102,7 @@ http_interactions:
         Storage"},{"scheme":"http://schemas.ogf.org/occi/infrastructure/storage/action#","term":"snapshot","title":"Snapshot
         Storage"},{"scheme":"http://schemas.ogf.org/occi/infrastructure/storage/action#","term":"resize","title":"Resize
         Storage","attributes":{"size":{"Mutable":true,"Required":false,"Type":"number","Pattern":".*"}}},{"scheme":"http://schemas.ogf.org/occi/infrastructure/network/action#","term":"up","title":"Activate
-        network"},{"scheme":"http://schemas.ogf.org/occi/infrastructure/network/action#up","term":"down","title":"Activate
+        network"},{"scheme":"http://schemas.ogf.org/occi/infrastructure/network/action#","term":"down","title":"Activate
         network"}]}'
     http_version: 
   recorded_at: Thu, 10 Jan 2013 13:52:41 GMT
@@ -166,7 +166,7 @@ http_interactions:
         Storage"},{"scheme":"http://schemas.ogf.org/occi/infrastructure/storage/action#","term":"snapshot","title":"Snapshot
         Storage"},{"scheme":"http://schemas.ogf.org/occi/infrastructure/storage/action#","term":"resize","title":"Resize
         Storage","attributes":{"size":{"Mutable":true,"Required":false,"Type":"number","Pattern":".*"}}},{"scheme":"http://schemas.ogf.org/occi/infrastructure/network/action#","term":"up","title":"Activate
-        network"},{"scheme":"http://schemas.ogf.org/occi/infrastructure/network/action#up","term":"down","title":"Activate
+        network"},{"scheme":"http://schemas.ogf.org/occi/infrastructure/network/action#","term":"down","title":"Activate
         network"}]}'
     http_version: 
   recorded_at: Thu, 10 Jan 2013 13:52:42 GMT
