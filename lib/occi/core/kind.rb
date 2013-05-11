@@ -14,7 +14,7 @@ module Occi
           term='kind',
           title=nil,
           attributes=Occi::Core::Attributes.new,
-          related=Occi::Core::Categories.new,
+          related=Occi::Core::Related.new,
           actions=Occi::Core::Actions.new,
           location=nil)
         super(scheme, term, title, attributes)

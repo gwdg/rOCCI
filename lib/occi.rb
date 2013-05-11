@@ -3,6 +3,7 @@ require 'rubygems'
 require 'set'
 require 'hashie/mash'
 
+require 'active_support/core_ext'
 require 'active_support/json'
 require 'active_support/inflector'
 require 'active_support/notifications'
@@ -28,9 +29,6 @@ require 'occi/model'
 require 'occi/log'
 require 'occi/core'
 require 'occi/infrastructure'
-
-require 'occiantlr/OCCIANTLRLexer'
-require 'occiantlr/OCCIANTLRParser'
 
 require 'occi/api/dsl'
 require 'occi/api/client/client_http'

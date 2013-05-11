@@ -4,16 +4,14 @@ module Occi
 
       attr_accessor :rel, :source, :target
 
-      @kind = Occi::Core::Kind.new('http://schemas.ogf.org/occi/core#', 'link')
+      self.attributes = Occi::Core::Attributes.split('occi.core.target' => Occi::Core::AttributeProperties.new(:mutable => true),
+                                                     'occi.core.source' => Occi::Core::AttributeProperties.new(:mutable => true))
 
-      @kind.related << Occi::Core::Entity.kind
-      @kind.title = "link"
-
-      @kind.attributes.occi!.core!.target = Occi::Core::AttributeProperties.new(
-          { :mutable => true })
-
-      @kind.attributes.occi!.core!.source = Occi::Core::AttributeProperties.new(
-          { :mutable => true })
+      self.kind = Occi::Core::Kind.new scheme='http://schemas.ogf.org/occi/core#',
+                                       term='link',
+                                       title='link',
+                                       attributes=self.attributes,
+                                       related=Occi::Core::Related.new << Occi::Core::Entity.kind
 
       # @param [String] kind
       # @param [String] mixins
@@ -22,12 +20,10 @@ module Occi
       # @param [String] rel
       # @param [String,Occi::Core::Entity] target
       # @param [String,Occi::Core::Entity] source
-      def initialize(kind=self.kind, mixins=[], attributes={ }, actions=[], rel=nil, target=nil, source=nil)
-        super(kind, mixins, attributes, actions)
-        if rel.kind_of? String
-          scheme, term = rel.to_s.split('#')
-          @rel         = Occi::Core::Category.get_class(scheme, term).kind if scheme && term
-        end
+      def initialize(kind=self.kind, mixins=[], attributes={}, actions=[], rel=Occi::Core::Link.type_identifier, target=nil, source=nil, location=nil)
+        super(kind, mixins, attributes, actions, location)
+        scheme, term = rel.to_s.split('#')
+        @rel = Occi::Core::Category.get_class(scheme, term).kind if scheme && term
         @source = source if source
         @target = target
       end
@@ -40,8 +36,8 @@ module Occi
 
       # set target attribute of link
       # @param [String] target
-      def target=(resource)
-        @target = resource
+      def target=(target)
+        @target = target
       end
 
       # @return [String] source attribute of the link
@@ -52,8 +48,8 @@ module Occi
 
       # set source attribute of link
       # @param [String] source
-      def source=(resource)
-        @source = resource
+      def source=(source)
+        @source = source
       end
 
       # @param [Occi::Model] model
@@ -64,7 +60,7 @@ module Occi
 
       # @param [Hash] options
       # @return [Hashie::Mash] json representation
-      def as_json(options={ })
+      def as_json(options={})
         link = super
         link.rel = @rel.to_s if @rel
         link.source = self.source.to_s if self.source.to_s
@@ -79,13 +75,12 @@ module Occi
         string << ';self=' + self.location.inspect if self.location
         categories = [@kind] + @mixins.join(',').split(',')
         string << ';category=' + categories.join(' ').inspect
-        string << ';'
         @attributes.combine.each_pair do |name, value|
           value = value.inspect
-          string << name + '=' + value + ';'
+          string << ';' + name + '=' + value
         end
-        string << 'occi.core.target=' + self.target.to_s.inspect
-        string << 'occi.core.source=' + self.source.to_s.inspect if self.source.to_s
+        string << ';occi.core.target=' + self.target.to_s.inspect
+        string << ';occi.core.source=' + self.source.to_s.inspect if self.source
 
         string
       end
