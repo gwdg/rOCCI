@@ -9,14 +9,28 @@ rescue NoMethodError
   warn "Gem::Command doesn't have a method named 'build_args'!"
 end 
 
-if defined? RUBY_PLATFORM && RUBY_PLATFORM == "java"
-  inst = Gem::DependencyInstaller.new
+warn 'Installing platform-specific dependencies.'
 
-  begin
-    inst.install "jruby-openssl" if ((defined? JRUBY_VERSION) && (JRUBY_VERSION.split('.')[1].to_i < 7))
-  rescue
-    warn "Gem::DependencyInstaller failed to install 'jruby-openssl'!"
-    exit
+warn 'Installing the most recent version of \'rake\''
+inst = Gem::DependencyInstaller.new
+inst.install "rake"
+
+if RUBY_PLATFORM == "java"
+  warn 'Installing dependencies specific for jRuby'
+
+  jrver = (JRUBY_VERSION || "").split('.').map{ |elm| elm.to_i }
+  if jrver[0] == 1 && jrver[1] < 7
+    warn 'Installing \'jruby-openssl\' for jRuby 1.6.x'
+    inst.install "jruby-openssl"
+  end
+else
+  warn 'Installing dependencies specific for Ruby'
+
+  rver = RUBY_VERSION.split('.').map{ |elm| elm.to_i }
+  if rver[0] == 1 && rver[1] < 9
+    warn 'Installing \'oniguruma\' for Ruby 1.8.x'
+    warn 'Make sure you have \'libonig-dev\' installed!'
+    inst.install "oniguruma"
   end
 end
 
