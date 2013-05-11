@@ -3,8 +3,6 @@ require 'occi/infrastructure/storage'
 require 'occi/infrastructure/storagelink'
 require 'occi/infrastructure/network'
 require 'occi/infrastructure/networkinterface'
-require 'occi/infrastructure/os_tpl'
-require 'occi/infrastructure/resource_tpl'
 
 module Occi
   module Infrastructure

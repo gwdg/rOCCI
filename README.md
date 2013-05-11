@@ -8,6 +8,9 @@ rOCCI - A Ruby OCCI Framework
 Requirements
 ------------
 
+Ruby
+* at least version 1.8.7 is required
+
 The following setup is recommended
 
 * usage of the Ruby Version Manager
@@ -18,6 +21,7 @@ The following libraries / packages may be required to use rOCCI
 
 * libxslt-dev
 * libxml2-dev
+* **only if using Ruby 1.8.7:** libonig-dev (Linux) or oniguruma (Mac)
 
 To use rOCCI with Java, you need JRE 6 or 7. To build rOCCI for Java, you need JDK 6 or 7.
 

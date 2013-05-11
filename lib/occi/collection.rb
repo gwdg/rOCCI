@@ -25,6 +25,14 @@ module Occi
       @action = Occi::Core::Action_instance.new(collection.action, collection.attributes) if collection.action
     end
 
+    def <<(object)
+      object.kind_of? Occi::Core::Kind and self.kinds << object
+      object.kind_of? Occi::Core::Mixin and self.mixins << object
+      object.kind_of? Occi::Core::Action and self.actions << object
+      object.kind_of? Occi::Core::Resource and self.resources << object
+      object.kind_of? Occi::Core::Link and self.links << object
+    end
+
     def ==(category)
       not intersect(category).empty?
     end
