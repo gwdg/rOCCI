@@ -7,7 +7,6 @@ $:.unshift(File.dirname(__FILE__))
 # enable coverage reports
 if ENV['COVERAGE']
   require 'simplecov'
-  SimpleCov.minimum_coverage 90
   SimpleCov.start
 end
 
