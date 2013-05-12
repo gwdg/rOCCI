@@ -16,6 +16,8 @@ end
 # using so called cassettes (YAML)
 require 'vcr'
 
+require 'occi'
+
 # enable VCR for HTTP/HTTPS connections
 # using RSPEC metadata integration;
 # this will automatically generate a named

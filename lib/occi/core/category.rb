@@ -50,20 +50,21 @@ module Occi
                     end
 
         namespace = namespace.inject(Object) do |mod, name|
-          if mod.constants.collect { |sym| sym.to_s }.include? name.classify
-            mod.const_get name.classify
+          if mod.constants.collect { |sym| sym.to_s }.include? name.capitalize
+            mod.const_get name.capitalize
           else
-            mod.const_set name.classify, Module.new
+            mod.const_set name.capitalize, Module.new
           end
         end
 
-        if namespace.const_defined? term.classify
-          klass = namespace.const_get term.classify
+        class_name =  term.gsub('-', '_').capitalize
+        if namespace.const_defined? class_name
+          klass = namespace.const_get class_name
           unless klass.ancestors.include? Occi::Core::Entity or klass.ancestors.include? Occi::Core::Category
             raise "OCCI Kind with type identifier #{scheme + term} could not be created as the corresponding class #{klass.to_s} already exists and is not derived from Occi::Core::Entity"
           end
         else
-          klass = namespace.const_set term.classify, Class.new(parent)
+          klass = namespace.const_set class_name, Class.new(parent)
           klass.kind = Occi::Core::Kind.new scheme, term, nil, {}, related unless parent.ancestors.include? Occi::Core::Category
         end
 
