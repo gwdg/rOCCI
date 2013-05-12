@@ -10,9 +10,7 @@ module Occi
         if category.kind_of? String
           scheme, term = category.split '#'
           scheme       += '#'
-
-          klass    = Occi::Core::Category.get_class scheme, term, [Occi::Core::Action.new]
-          category = klass.new(scheme, term)
+          category = Occi::Core::Action.new(scheme, term)
         end
         category
       end
