@@ -10,7 +10,7 @@ module Occi
       end
 
       # Regular expressions
-      REGEXP_QUOTED_STRING = /([^"\\\\]|\\\\.)*/
+      REGEXP_QUOTED_STRING = /([^"\\]|\\.)*/
       REGEXP_LOALPHA = /[a-z]/
       REGEXP_DIGIT = /[0-9]/
       REGEXP_INT = /#{REGEXP_DIGIT}*/
@@ -19,7 +19,7 @@ module Occi
       REGEXP_BOOL = /true|false/
 
       # Regular expressions for OCCI
-      REGEXP_TERM = /#{REGEXP_LOALPHA}(#{REGEXP_LOALPHA}|-|_)*/
+      REGEXP_TERM = /#{REGEXP_LOALPHA}(#{REGEXP_LOALPHA}|#{REGEXP_DIGIT}|-|_)*/
       REGEXP_SCHEME = /#{URI::ABS_URI_REF}#/
       REGEXP_TYPE_IDENTIFIER = /#{REGEXP_SCHEME}#{REGEXP_TERM}/
       REGEXP_CLASS = /action|mixin|kind/
