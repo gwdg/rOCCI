@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 module Occi
   module Parser
     describe Text do
