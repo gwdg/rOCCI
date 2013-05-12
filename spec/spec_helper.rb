@@ -7,6 +7,7 @@ $:.unshift(File.dirname(__FILE__))
 # enable coverage reports
 if ENV['COVERAGE']
   require 'simplecov'
+  SimpleCov.minimum_coverage 90
   SimpleCov.start
 end
 
@@ -15,6 +16,8 @@ end
 # communication between client and server
 # using so called cassettes (YAML)
 require 'vcr'
+
+require 'occi'
 
 # enable VCR for HTTP/HTTPS connections
 # using RSPEC metadata integration;
