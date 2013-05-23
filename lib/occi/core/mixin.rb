@@ -13,7 +13,7 @@ module Occi
       def initialize(scheme='http://schemas.ogf.org/occi/core#',
           term='mixin',
           title=nil,
-          attributes=Occi::Core::Attributes.new,
+          attributes=Occi::Core::AttributeProperties.new,
           related=Occi::Core::Related.new,
           actions=Occi::Core::Actions.new,
           location='')

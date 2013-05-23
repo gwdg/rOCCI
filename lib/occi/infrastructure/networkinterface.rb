@@ -12,11 +12,12 @@ module Occi
 
       self.actions = Occi::Core::Actions.new << up << down
 
-      self.attributes = Occi::Core::Attributes.split 'occi.networkinterface.interface' => Occi::Core::AttributeProperties.new(:mutable => true),
-                                                     'occi.networkinterface.mac' => Occi::Core::AttributeProperties.new(:mutable => true,
-                                                                                     :pattern => '^([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2})$'),
-                                                     'occi.networkinterface.state' => Occi::Core::AttributeProperties.new(:pattern => 'active|inactive|error',
-                                                                                       :default => 'inactive')
+      self.attributes = Occi::Core::AttributeProperties.new
+      self.attributes['occi.networkinterface.interface'] ={:mutable => true}
+      self.attributes['occi.networkinterface.mac'] = {:mutable => true,
+                                                      :pattern => '^([0-9a-fA-F]{2}[:-]){5}([0-9a-fA-F]{2})$'}
+      self.attributes['occi.networkinterface.state'] = {:pattern => 'active|inactive|error',
+                                                        :default => 'inactive'}
 
       self.kind = Occi::Core::Kind.new scheme='http://schemas.ogf.org/occi/infrastructure#',
                                        term='networkinterface',

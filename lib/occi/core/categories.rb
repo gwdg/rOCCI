@@ -2,6 +2,8 @@ module Occi
   module Core
     class Categories < Set
 
+      include Occi::Helpers::Inspect
+
       attr_accessor :model
 
       def initialize(categories=[])
@@ -36,11 +38,6 @@ module Occi
       # @return [Hashie::Mash] json representation
       def as_json(options={})
         self.to_a.as_json
-      end
-
-      # @return [String] json representation
-      def inspect
-        JSON.pretty_generate(JSON.parse(to_json))
       end
 
       private

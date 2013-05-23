@@ -2,6 +2,8 @@ module Occi
   module Core
     class Category
 
+      include Occi::Helpers::Inspect
+
       attr_accessor :scheme, :term, :title, :attributes, :model
 
       def self.categories
@@ -19,8 +21,14 @@ module Occi
         @scheme = scheme
         @term = term
         @title = title
-        @attributes = Occi::Core::AttributeProperties.parse attributes
+        case attributes
+          when Occi::Core::AttributeProperties
+            @attributes = attributes
+          else
+            @attributes = Occi::Core::AttributeProperties.parse attributes
+        end
       end
+
 
       # @param [String] scheme
       # @param [String] term
@@ -129,11 +137,6 @@ module Occi
       # @return [Hash] hash containing the HTTP headers of the text/occi rendering
       def to_header
         {:Category => self.to_string}
-      end
-
-      # @return [String] json representation
-      def inspect
-        JSON.pretty_generate(JSON.parse(to_json))
       end
 
       # @return [NilClass] category itself does not have a location

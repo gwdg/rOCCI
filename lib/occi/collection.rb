@@ -1,6 +1,8 @@
 module Occi
   class Collection
 
+    include Occi::Helpers::Inspect
+
     attr_accessor :kinds, :mixins, :actions, :resources, :links, :action, :model
 
     # Initialize a new OCCI Collection by initializing all supplied OCCI objects
@@ -22,7 +24,7 @@ module Occi
       @actions.merge collection.actions.to_a.collect { |action| Occi::Core::Action.new(action.scheme, action.term, action.title, action.attributes) }
       @resources.merge collection.resources.to_a.collect { |resource| Occi::Core::Resource.new(resource.kind, resource.mixins, resource.attributes, resource.links) }
       @links.merge collection.links.to_a.collect { |link| Occi::Core::Link.new(link.kind, link.mixins, link.attributes) }
-      @action = Occi::Core::Action_instance.new(collection.action, collection.attributes) if collection.action
+      @action = Occi::Core::ActionInstance.new(collection.action, collection.attributes) if collection.action
     end
 
     def <<(object)
@@ -184,10 +186,6 @@ module Occi
       header['Link'] = self.links.collect { |link| link.to_string }.join(',') if self.links.any?
       header = self.action.to_header if self.action
       header
-    end
-
-    def inspect
-      JSON.pretty_generate(JSON.parse(to_json))
     end
 
   end

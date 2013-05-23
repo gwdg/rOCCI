@@ -12,13 +12,14 @@ module Occi
 
       self.actions = Occi::Core::Actions.new << up << down
 
-      self.attributes = Occi::Core::Attributes.split('occi.network.vlan' => Occi::Core::AttributeProperties.new(:type => 'number',
-                                                                                                                :mutable => true,
-                                                                                                                :pattern => 'x86|x64'),
-                                                     'occi.network.label' => Occi::Core::AttributeProperties.new(:type => 'number',
-                                                                                                                 :mutable => true),
-                                                     'occi.network.state' => Occi::Core::AttributeProperties.new(:pattern => 'active|inactive|error',
-                                                                                                                 :default => 'inactive'))
+      self.attributes = Occi::Core::AttributeProperties.new
+      self.attributes['occi.network.vlan'] = {:type => 'number',
+                                              :mutable => true,
+                                              :pattern => 'x86|x64'}
+      self.attributes['occi.network.label'] = {:type => 'number',
+                                               :mutable => true}
+      self.attributes['occi.network.state'] ={:pattern => 'active|inactive|error',
+                                              :default => 'inactive'}
 
       self.kind = Occi::Core::Kind.new scheme='http://schemas.ogf.org/occi/infrastructure#',
                                        term='network',

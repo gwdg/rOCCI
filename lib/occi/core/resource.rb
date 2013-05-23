@@ -4,7 +4,8 @@ module Occi
 
       attr_accessor :links
 
-      self.attributes = Occi::Core::Attributes.split('occi.core.summary' => Occi::Core::AttributeProperties.new(:mutable => true))
+      self.attributes = Occi::Core::AttributeProperties.new
+      self.attributes['occi.core.summary'] = {:mutable => true}
 
       self.kind = Occi::Core::Kind.new scheme='http://schemas.ogf.org/occi/core#',
                                        term='resource',

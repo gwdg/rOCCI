@@ -9,7 +9,7 @@ module Occi
       def initialize(scheme='http://schemas.ogf.org/occi/core#',
           term='action',
           title=nil,
-          attributes=Occi::Core::Attributes.new)
+          attributes=Occi::Core::AttributeProperties.new)
         super scheme, term, title, attributes
       end
 

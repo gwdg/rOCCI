@@ -10,13 +10,13 @@ module Occi
 
       @action = Occi::Core::Action.new('http://schemas.ogf.org/occi/core#', 'action_instance')
 
-      def initialize(action = self.action, attributes={ })
+      def initialize(action = self.action, attributes=self.action.attributes)
         if action.kind_of? String
           scheme, term = action.split '#'
           action = Occi::Core::Action.new(scheme, term)
         end
         @action     = action
-        @attributes = attributes
+        @attributes = Occi::Core::Attributes.new attributes
       end
 
     end
