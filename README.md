@@ -6,6 +6,13 @@ rOCCI - A Ruby OCCI Framework
 [![Gem Version](https://fury-badge.herokuapp.com/rb/occi.png)](https://badge.fury.io/rb/occi)
 [![Code Climate](https://codeclimate.com/github/gwdg/rOCCI.png)](https://codeclimate.com/github/gwdg/rOCCI)
 
+Support
+-------
+
+If you discover any issues with rOCCI, please file them in the [issue tracker](https://github.com/gwdg/rOCCI/issues) where we can discuss and solve them.
+
+If you have questions regarding the usage or development of rOCCI, feel free to subscribe to the [rOCCI Mailinglist](https://listserv.gwdg.de/mailman/listinfo/rocci) and send us a mail.
+
 Requirements
 ------------
 
