@@ -2,17 +2,19 @@ module Occi
   module Core
     class Entity
 
+      include Occi::Helpers::Inspect
+
       attr_accessor :mixins, :attributes, :actions, :id, :model, :kind, :location
 
       class_attribute :kind, :mixins, :attributes, :actions
 
       self.mixins = Occi::Core::Mixins.new
 
-      self.attributes = Occi::Core::Attributes.split(
-          'occi.core.id' => Occi::Core::AttributeProperties.new(:pattern => "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"),
-          'occi.core.title' => Occi::Core::AttributeProperties.new(:mutable => true))
+      self.attributes = Occi::Core::AttributeProperties.new
+      self.attributes['occi.core.id'] = {:pattern => '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'}
+      self.attributes['occi.core.title'] = {:mutable => true}
 
-      self.kind = Occi::Core::Kind.new scheme='http://schemas.ogf.org/occi/core#',
+      self.kind = Occi::Core::Kind.new scheme=' http ://schemas.ogf.org/occi/core #',
                                        term='entity',
                                        title='entity',
                                        attributes=self.attributes
@@ -49,7 +51,7 @@ module Occi
       def initialize(kind = self.kind, mixins=[], attributes={}, actions=[], location=nil)
         @kind = self.class.kind.clone
         @mixins = Occi::Core::Mixins.new mixins
-        @attributes = Occi::Core::Attributes.new attributes
+        @attributes = Occi::Core::Attributes.new self.kind.attributes
         @actions = Occi::Core::Actions.new actions
         @location = location
       end
@@ -229,11 +231,6 @@ module Occi
           links << self.location + '?action=' + term + '>;rel=' + action.inspect
         end
         header
-      end
-
-      # @return [String] json representation
-      def inspect
-        JSON.pretty_generate(JSON.parse(to_json))
       end
 
       # @return [String] string representation of entity is its location

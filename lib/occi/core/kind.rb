@@ -2,7 +2,7 @@ module Occi
   module Core
     class Kind < Occi::Core::Category
 
-      attr_accessor :entities, :related, :actions, :location
+      attr_accessor :entities, :parent, :actions, :location
 
       # @param [String ] scheme
       # @param [String] term
@@ -13,13 +13,13 @@ module Occi
       def initialize(scheme='http://schemas.ogf.org/occi/core#',
           term='kind',
           title=nil,
-          attributes=Occi::Core::Attributes.new,
+          attributes=Occi::Core::AttributeProperties.new,
           related=Occi::Core::Related.new,
           actions=Occi::Core::Actions.new,
           location=nil)
         super(scheme, term, title, attributes)
-        @related  = Occi::Core::Related.new(related)
-        @actions  = Occi::Core::Actions.new(actions)
+        @related = Occi::Core::Related.new(related)
+        @actions = Occi::Core::Actions.new(actions)
         @entities = Occi::Core::Entities.new
         location.blank? ? @location = '/' + term + '/' : @location = location
       end
@@ -34,7 +34,7 @@ module Occi
 
       # @param [Hash] options
       # @return [Hashie::Mash] json representation
-      def as_json(options={ })
+      def as_json(options={})
         kind = Hashie::Mash.new
         kind.related = @related.join(' ').split(' ') if @related.any?
         kind.actions = @actions.join(' ').split(' ') if @actions.any?

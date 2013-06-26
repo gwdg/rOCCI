@@ -4,8 +4,9 @@ module Occi
 
       attr_accessor :rel, :source, :target
 
-      self.attributes = Occi::Core::Attributes.split('occi.core.target' => Occi::Core::AttributeProperties.new(:mutable => true),
-                                                     'occi.core.source' => Occi::Core::AttributeProperties.new(:mutable => true))
+      self.attributes = Occi::Core::AttributeProperties.new
+      self.attributes['occi.core.target'] = {:mutable => true}
+      self.attributes['occi.core.source'] = {:mutable => true}
 
       self.kind = Occi::Core::Kind.new scheme='http://schemas.ogf.org/occi/core#',
                                        term='link',

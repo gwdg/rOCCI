@@ -9,7 +9,7 @@ module Occi
       collection.kinds << "http://schemas.ogf.org/occi/infrastructure#compute"
       collection.mixins << "http://example.com/occi/tags#my_mixin"
       collection.actions << "http://schemas.ogf.org/occi/infrastructure/compute/action#start"
-      collection.action = Occi::Core::Action_instance.new
+      collection.action = Occi::Core::ActionInstance.new
       collection.resources << Occi::Core::Resource.new
       collection.links << Occi::Core::Link.new
       collection.kinds.first.should be_kind_of Occi::Core::Kind
@@ -17,7 +17,7 @@ module Occi
       collection.actions.first.should be_kind_of Occi::Core::Action
       collection.resources.first.should be_kind_of Occi::Core::Resource
       collection.links.first.should be_kind_of Occi::Core::Link
-      collection.action.should be_kind_of Occi::Core::Action_instance
+      collection.action.should be_kind_of Occi::Core::ActionInstance
     end
 
     it "registers a model, creates a new OCCI Resource and checks it against the model" do

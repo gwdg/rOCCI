@@ -1,5 +1,7 @@
-require 'occi/core/attributes'
+require 'occi/core/attribute_property'
 require 'occi/core/attribute_properties'
+require 'occi/core/attribute'
+require 'occi/core/attributes'
 require 'occi/core/category'
 require 'occi/core/categories'
 require 'occi/core/related'
