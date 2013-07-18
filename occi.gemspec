@@ -17,6 +17,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'occi-cli'
 
   gem.add_development_dependency 'rubygems-tasks'
+  gem.add_development_dependency 'rake'
 
   gem.required_ruby_version     = ">= 1.8.7"
 end
