@@ -22,9 +22,9 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'json'
   gem.add_dependency 'antlr3'
   gem.add_dependency 'hashie'
-  gem.add_dependency 'uuidtools', ">=2.1.3"
-  gem.add_dependency 'nokogiri'
-  gem.add_dependency 'activesupport'
+  gem.add_dependency 'uuidtools', '>=2.1.3'
+  gem.add_dependency 'nokogiri', '~>1.5.0'
+  gem.add_dependency 'activesupport', '~>3.2'
   gem.add_dependency 'httparty'
   gem.add_dependency 'highline'
   gem.add_dependency 'i18n'
