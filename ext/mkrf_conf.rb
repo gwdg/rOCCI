@@ -9,6 +9,10 @@ rescue NoMethodError
   warn "Gem::Command doesn't have a method named 'build_args'!"
 end 
 
+warn 'Installing the most recent version of \'rake\''
+inst = Gem::DependencyInstaller.new
+inst.install "rake"
+
 if defined? RUBY_PLATFORM && RUBY_PLATFORM == "java"
   inst = Gem::DependencyInstaller.new
 
