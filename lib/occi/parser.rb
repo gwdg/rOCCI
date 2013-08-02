@@ -142,10 +142,11 @@ module OCCI
     # @param [Class] entity_type
     # @return [OCCI::Collection]
     def self.text_entity(text, entity_type)
-      collection = OCCI::Collection.new
-      entity     = Hashie::Mash.new
-      links      = []
-      categories = Hashie::Mash.new({ :kinds => [], :mixins => [], :actions => [] })
+      collection   = OCCI::Collection.new
+      entity       = Hashie::Mash.new
+      links        = []
+      entity.links = []
+      categories   = Hashie::Mash.new({ :kinds => [], :mixins => [], :actions => [] })
       text.each_line do |line|
         if line.include? 'Category'
           cat = (OCCIANTLR::Parser.new(line.chomp).category)
@@ -164,7 +165,8 @@ module OCCI
         cats          = entity.categories.split(' ')
         kind          = cats.reverse!.pop
         mixins        = cats.categories
-        collection.links << OCCI::Core::Link.new(entity.kind, entity.mixins, entity.attributes)
+
+        collection.links << OCCI::Core::Link.new(kind, mixins, entity.attributes)
       elsif entity_type == OCCI::Core::Resource
         links.each do |link|
           if link.rel.include? 'action#'
@@ -178,7 +180,7 @@ module OCCI
 
             link = OCCI::Core::Link.new(kind, mixins, link.attributes, link.actions, link.rel, link.target, link.source)
             collection.links << link
-            entity.links = [link.id] + entity.links.to_a
+            entity.links << link
           end
         end
         collection.resources << OCCI::Core::Resource.new(entity.kind, entity.mixins, entity.attributes, entity.actions, entity.links)
