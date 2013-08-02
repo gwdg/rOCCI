@@ -13,6 +13,7 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{Executable OCCI client}
   gem.homepage      = 'https://github.com/gwdg/rOCCI'
   gem.license       = 'Apache License, Version 2.0'
+  gem.extensions    = 'ext/mkrf_conf.rb'
 
   gem.add_dependency 'occi-cli'
 
