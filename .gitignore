@@ -1,4 +1,13 @@
-Gemfile.lock
+*.gem
 *.swp
+.project
+.idea
+.yardoc
+.bundle
+.rvmrc
 pkg
+tmp
+log
 coverage
+vendor
+Gemfile.lock
