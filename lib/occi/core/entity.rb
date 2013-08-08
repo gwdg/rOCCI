@@ -89,7 +89,8 @@ module OCCI
       # @param [OCCI::Model] model representation of the OCCI model to check the attributes against
       def check(model)
         raise "No kind defined" unless @kind
-        definitions = model.get_by_id(@kind).attributes
+        definitions = Occi::Core::Attributes.new
+        definitions.merge!(model.get_by_id(@kind).attributes)
         @mixins.each do |mixin_id|
           mixin = model.get_by_id(mixin_id)
           next if mixin.nil?
