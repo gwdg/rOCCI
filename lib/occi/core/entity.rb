@@ -134,9 +134,10 @@ module Occi
       # @param [Occi::Model] model representation of the Occi model to check the attributes against
       def check
         raise "No model associated" unless @model
-        definitions = model.get_by_id(@kind.to_s).attributes
+        definitions = Occi::Core::Attributes.new
+        definitions.merge!(@model.get_by_id(@kind.to_s).attributes)
         @mixins.each do |mixin_id|
-          mixin = model.get_by_id(mixin_id)
+          mixin = @model.get_by_id(mixin_id)
           next if mixin.nil?
           definitions.merge!(mixin.attributes) if mixin.attributes
         end if @mixins
