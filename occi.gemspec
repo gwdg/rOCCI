@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
   gem.license       = 'Apache License, Version 2.0'
   gem.extensions    = 'ext/mkrf_conf.rb'
 
-  gem.add_dependency 'occi-cli'
+  gem.add_dependency 'occi-cli', '~> 4.0.1'
 
   gem.add_development_dependency 'rake'
 
