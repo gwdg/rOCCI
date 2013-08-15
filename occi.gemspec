@@ -13,12 +13,11 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{Executable OCCI client}
   gem.homepage      = 'https://github.com/gwdg/rOCCI'
   gem.license       = 'Apache License, Version 2.0'
-  gem.extensions    = 'ext/mkrf_conf.rb'
 
-  gem.add_dependency 'occi-cli', '~> 4.0.1'
+  gem.add_dependency 'occi-cli', '~> 4.1.0'
 
   gem.add_development_dependency 'rake'
 
-  gem.required_ruby_version = ">= 1.8.7"
+  gem.required_ruby_version = ">= 1.9.3"
   gem.post_install_message = "This gem is just a wrapper providing backward compatibility and might be removed in the future! Please, consider using 'occi-cli' directly."
 end
