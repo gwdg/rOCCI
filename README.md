@@ -26,8 +26,8 @@ Requirements
 * Rake has to be installed (e.g., `gem install rake`)
 
 ### Dependencies
-* libxslt1-dev/libxslt-devel
-* libxml2-dev/libxml2-devel
+* `libxslt1-dev` or `libxslt-devel`
+* `libxml2-dev` or `libxml2-devel`
 
 ### Examples
 #### For distros based on Debian:
@@ -38,7 +38,7 @@ apt-get install ruby rubygems ruby-dev libxslt1-dev libxml2-dev
 ruby -v
 ~~~
 
-Unless you have Ruby >= 1.9.3, please, go to rOCCI#RVM and install RVM with a newer Ruby version.
+**Unless you have Ruby >= 1.9.3, please, go to [rOCCI#RVM](#rvm) and install RVM with a newer Ruby version.**
 
 #### For distros based on RHEL:
 ~~~
@@ -48,14 +48,16 @@ yum install libxml2-devel libxslt-devel ruby-devel openssl-devel gcc gcc-c++ rub
 ruby -v
 ~~~
 
-Unless you have Ruby >= 1.9.3, please, go to rOCCI#RVM and install RVM with a newer Ruby version.
+**Unless you have Ruby >= 1.9.3, please, go to rOCCI#RVM and install RVM with a newer Ruby version.**
 
 #### RVM
-**Notice: Follow the RVM installation guide linked below, we recommend using the default 'Single-User installation'.**
-**Warning: NEVER install RVM as root! If you choose the 'Multi-User installation', use a different user account with sudo access instead!**
+**Notice:** Follow the RVM installation guide linked below, we recommend using the default 'Single-User installation'.
+
+**Warning:** NEVER install RVM as root! If you choose the 'Multi-User installation', use a different user account with sudo access instead!
 
 * [Installing RVM](https://rvm.io/rvm/install#explained)
 * Install Ruby
+
 ~~~
 rvm requirements
 rvm install 1.9.3
