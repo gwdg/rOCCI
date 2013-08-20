@@ -48,7 +48,7 @@ yum install libxml2-devel libxslt-devel ruby-devel openssl-devel gcc gcc-c++ rub
 ruby -v
 ~~~
 
-**Unless you have Ruby >= 1.9.3, please, go to rOCCI#RVM and install RVM with a newer Ruby version.**
+**Unless you have Ruby >= 1.9.3, please, go to [rOCCI#RVM](#rvm) and install RVM with a newer Ruby version.**
 
 #### RVM
 **Notice:** Follow the RVM installation guide linked below, we recommend using the default 'Single-User installation'.
