@@ -1,9 +1,0 @@
-rOcci was designed and is mainly developed by Florian Feldhaus (GWDG) and Piotr Kasprzak (GWDG) in Germany.
-
-Special thanks to the following extraordinary individuals, whithout whom rOcci would not be possible:
-
-* Hayati Bice - who wrote the initial version of an Occi server rOcci is based on
-* Max Günther - who wrote the EC2 backend
-* Andre Thevapalan - for his input regarding the JSON rendering
-* Boris Parak - especially for his input regarding the Client / Client DSL and CLI
-* the OCCI Working Group - for developing OCCI
